@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface LivePreviewProps {
-  code: string;
+  html: string;
+  css: string;
+  js: string;
   onConsoleLog?: (log: { type: string; message: string }) => void;
 }
 
-const LivePreview = ({ code, onConsoleLog }: LivePreviewProps) => {
+const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [key, setKey] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,18 +39,46 @@ const LivePreview = ({ code, onConsoleLog }: LivePreviewProps) => {
         </script>
       `;
 
-      const injectedCode = code.replace('<head>', '<head>' + consoleOverride)
-        .replace('<HEAD>', '<HEAD>' + consoleOverride);
-      
-      const finalCode = injectedCode.includes('<head>') || injectedCode.includes('<HEAD>')
-        ? injectedCode
-        : consoleOverride + code;
+      // Build combined code: inject CSS as <style> and JS as <script>
+      let finalHtml = html;
 
-      iframeRef.current.srcdoc = finalCode;
+      // Add console override into <head>
+      if (finalHtml.includes('<head>')) {
+        finalHtml = finalHtml.replace('<head>', '<head>' + consoleOverride);
+      } else if (finalHtml.includes('<HEAD>')) {
+        finalHtml = finalHtml.replace('<HEAD>', '<HEAD>' + consoleOverride);
+      } else {
+        finalHtml = consoleOverride + finalHtml;
+      }
+
+      // Inject CSS: replace link to style.css with inline style, or append to head
+      if (finalHtml.includes('href="style.css"') || finalHtml.includes("href='style.css'")) {
+        finalHtml = finalHtml.replace(/<link[^>]*href=["']style\.css["'][^>]*>/gi, `<style>${css}</style>`);
+      } else if (css.trim()) {
+        // Add CSS to head or before </head>
+        if (finalHtml.includes('</head>')) {
+          finalHtml = finalHtml.replace('</head>', `<style>${css}</style></head>`);
+        } else {
+          finalHtml = `<style>${css}</style>` + finalHtml;
+        }
+      }
+
+      // Inject JS: replace script src="script.js" with inline script, or append
+      if (finalHtml.includes('src="script.js"') || finalHtml.includes("src='script.js'")) {
+        finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, `<script>${js}</script>`);
+      } else if (js.trim()) {
+        if (finalHtml.includes('</body>')) {
+          finalHtml = finalHtml.replace('</body>', `<script>${js}</script></body>`);
+        } else {
+          finalHtml = finalHtml + `<script>${js}</script>`;
+        }
+      }
+
+      iframeRef.current.srcdoc = finalHtml;
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [code]);
+  }, [html, css, js]);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -64,8 +93,7 @@ const LivePreview = ({ code, onConsoleLog }: LivePreviewProps) => {
   return (
     <iframe
       ref={iframeRef}
-      key={key}
-      className="w-full h-full border-0 bg-white rounded-b-lg"
+      className="w-full h-full border-0 bg-white"
       sandbox="allow-scripts allow-modals"
       title="Preview"
     />
