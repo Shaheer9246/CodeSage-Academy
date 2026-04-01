@@ -4,19 +4,23 @@ import { Lesson } from '@/data/lessons';
 
 interface ChallengePanelProps {
   lesson: Lesson;
-  code: string;
+  html: string;
+  css: string;
+  js: string;
   onBack: () => void;
   onComplete: () => void;
 }
 
-const ChallengePanel = ({ lesson, code, onBack, onComplete }: ChallengePanelProps) => {
+const ChallengePanel = ({ lesson, html, css, js, onBack, onComplete }: ChallengePanelProps) => {
   const [result, setResult] = useState<'pass' | 'fail' | null>(null);
 
   if (!lesson.challenge) return null;
 
   const checkCode = () => {
+    // Combine all code for validation
+    const allCode = (html + '\n' + css + '\n' + js).toLowerCase();
     const passed = lesson.challenge!.validationKeywords.every(kw =>
-      code.toLowerCase().includes(kw.toLowerCase())
+      allCode.includes(kw.toLowerCase())
     );
     setResult(passed ? 'pass' : 'fail');
     if (passed) {

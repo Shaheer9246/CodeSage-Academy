@@ -7,10 +7,16 @@ export interface Lesson {
   level: LessonLevel;
   content: string;
   initialCode: string;
+  initialCss?: string;
+  initialJs?: string;
+  initialJsx?: string;
   language: 'html' | 'css' | 'javascript' | 'typescript';
   challenge?: {
     instruction: string;
     initialCode: string;
+    initialCss?: string;
+    initialJs?: string;
+    initialJsx?: string;
     validationKeywords: string[];
   };
 }
@@ -35,20 +41,107 @@ const basicLessons: LevelData = {
     {
       id: 'html-basics',
       name: 'HTML Fundamentals',
-      icon: 'E',
+      icon: '📄',
       lessons: [
         {
           id: 'html-1',
           title: 'What is HTML?',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# What is HTML?\n\nHTML (HyperText Markup Language) is the standard language for creating web pages. It describes the structure of a web page using **elements** represented by tags.\n\n## Basic Structure\n\nEvery HTML page has this basic structure:\n\n\`\`\`html\n<!DOCTYPE html>\n<html>\n  <head>\n    <title>Page Title</title>\n  </head>\n  <body>\n    <h1>Hello World!</h1>\n  </body>\n</html>\n\`\`\`\n\n- \`<!DOCTYPE html>\` declares the document type\n- \`<html>\` is the root element\n- \`<head>\` contains metadata\n- \`<body>\` contains visible content`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>My First Page</title>\n</head>\n<body>\n  <h1>Hello World!</h1>\n  <p>This is my first web page.</p>\n</body>\n</html>`,
+          content: `# What is HTML?
+
+Welcome to your very first lesson! 🎉 Let's start from the absolute beginning.
+
+## Think of it Like Building a House 🏠
+
+Imagine you're building a house:
+
+- **HTML** is the **structure** — the walls, rooms, doors, and windows
+- **CSS** is the **decoration** — the paint, furniture, curtains
+- **JavaScript** is the **electricity** — making things work, lights turning on, doors opening
+
+**HTML** stands for HyperText Markup Language. Don't let the fancy name scare you! It's simply a way to tell the browser: "Hey, this is a heading, this is a paragraph, this is an image."
+
+## How HTML Works
+
+HTML uses **tags** — special words wrapped in angle brackets \`< >\`. Most tags come in pairs:
+
+\`\`\`html
+<h1>This is a heading</h1>
+<p>This is a paragraph</p>
+\`\`\`
+
+The first tag \`<h1>\` **opens** and the second \`</h1>\` **closes**. Everything between them is the content.
+
+## The Basic Structure
+
+Every web page needs this skeleton:
+
+\`\`\`html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page Title</title>
+  </head>
+  <body>
+    <!-- Your content goes here -->
+  </body>
+</html>
+\`\`\`
+
+- \`<!DOCTYPE html>\` tells the browser "this is an HTML page"
+- \`<html>\` wraps everything
+- \`<head>\` has invisible info (like the page title)
+- \`<body>\` has everything you can **see** on the page
+
+Try editing the code on the right! Change the text inside the \`<h1>\` tag and watch the preview update instantly! ✨`,
+          initialCode: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My First Page</title>
+</head>
+<body>
+  <h1>Hello World!</h1>
+  <!-- Try adding an h1 and a p tag -->
+</body>
+</html>`,
+          initialCss: `/* CSS is automatically applied for you!
+   Don't worry about this file yet.
+   You'll learn CSS in later lessons. */
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+}
+
+h1 {
+  color: #e94560;
+}
+
+p {
+  color: #ccc;
+  font-size: 18px;
+  line-height: 1.6;
+}`,
+          initialJs: `// JavaScript will be covered later!
+// For now, this file is empty.`,
           language: 'html',
           challenge: {
-            instruction: 'Create an HTML page with a heading that says "Welcome" and a paragraph below it saying "I am learning HTML!"',
-            initialCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>My Page</title>\n</head>\n<body>\n  <!-- Write your code here -->\n</body>\n</html>`,
-            validationKeywords: ['<h1>', 'Welcome', '<p>', 'I am learning HTML!'],
+            instruction: 'Add a heading that says "Welcome" and a paragraph that says "I am learning HTML!" inside the body.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head>
+  <title>My Challenge</title>
+</head>
+<body>
+  <!-- Add an <h1> with "Welcome" -->
+  <!-- Add a <p> with "I am learning HTML!" -->
+</body>
+</html>`,
+            validationKeywords: ['<h1>', 'welcome', '<p>', 'i am learning html'],
           },
         },
         {
@@ -56,13 +149,75 @@ const basicLessons: LevelData = {
           title: 'Headings & Text',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Headings & Text\n\nHTML has 6 levels of headings, from \`<h1>\` (largest) to \`<h6>\` (smallest).\n\n## Headings\n\`\`\`html\n<h1>Main Heading</h1>\n<h2>Sub Heading</h2>\n<h3>Section Heading</h3>\n\`\`\`\n\n## Text Elements\n- \`<p>\` - Paragraph\n- \`<strong>\` - Bold text\n- \`<em>\` - Italic text\n- \`<br>\` - Line break`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>Main Title</h1>\n  <h2>Subtitle</h2>\n  <p>This is a <strong>bold</strong> and <em>italic</em> paragraph.</p>\n  <h3>Section</h3>\n  <p>Another paragraph with a<br>line break.</p>\n</body>\n</html>`,
+          content: `# Headings & Text
+
+Now that you know what HTML is, let's learn about the most basic building blocks: **headings** and **text**! 📝
+
+## Headings — Like Chapter Titles
+
+HTML has 6 heading levels. Think of them like a book:
+- \`<h1>\` = Book title (biggest, most important — use only ONE per page)
+- \`<h2>\` = Chapter title
+- \`<h3>\` = Section title
+- \`<h4>\` to \`<h6>\` = Smaller sub-sections
+
+\`\`\`html
+<h1>My Website</h1>
+<h2>About Me</h2>
+<h3>My Hobbies</h3>
+\`\`\`
+
+## Paragraphs — Your Main Text
+
+Use \`<p>\` for paragraphs. Each \`<p>\` starts on a new line:
+
+\`\`\`html
+<p>This is the first paragraph.</p>
+<p>This is the second paragraph.</p>
+\`\`\`
+
+## Making Text Special
+
+- \`<strong>\` makes text **bold** (important text)
+- \`<em>\` makes text *italic* (emphasized text)
+- \`<br>\` creates a line break (no closing tag needed!)
+
+\`\`\`html
+<p>This is <strong>very important</strong> and this is <em>emphasized</em>.</p>
+\`\`\`
+
+Try creating headings of different sizes in the editor!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><title>Headings</title></head>
+<body>
+  <h1>Main Title</h1>
+  <h2>Subtitle</h2>
+  <p>This is a <strong>bold</strong> and <em>italic</em> paragraph.</p>
+  <h3>Section</h3>
+  <p>Another paragraph with a<br>line break.</p>
+</body>
+</html>`,
+          initialCss: `body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #1a1a2e;
+  color: #e0e0e0;
+}
+h1 { color: #e94560; }
+h2 { color: #0f3460; }
+h3 { color: #16c79a; }
+p { line-height: 1.6; color: #ccc; }`,
           language: 'html',
           challenge: {
-            instruction: 'Create a page with h1 saying "My Blog", h2 saying "First Post", and a paragraph with some bold text.',
-            initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <!-- Create headings and a paragraph with bold text -->\n</body>\n</html>`,
-            validationKeywords: ['<h1>', 'My Blog', '<h2>', 'First Post', '<strong>'],
+            instruction: 'Create a page with an h1 saying "My Blog", an h2 saying "First Post", and a paragraph with some bold text using <strong>.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <!-- Create headings and a paragraph with bold text -->
+</body>
+</html>`,
+            validationKeywords: ['<h1>', 'my blog', '<h2>', 'first post', '<strong>'],
           },
         },
         {
@@ -70,54 +225,469 @@ const basicLessons: LevelData = {
           title: 'Links & Navigation',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Links & Navigation\n\nLinks are created with the \`<a>\` (anchor) tag.\n\n\`\`\`html\n<a href="https://example.com">Visit Example</a>\n\`\`\`\n\n## Attributes\n- \`href\` - The URL to link to\n- \`target="_blank"\` - Opens in new tab\n\n## Navigation\n\`\`\`html\n<nav>\n  <a href="/">Home</a>\n  <a href="/about">About</a>\n</nav>\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <nav>\n    <a href="/">Home</a> |\n    <a href="/about">About</a> |\n    <a href="/contact">Contact</a>\n  </nav>\n  <h1>Welcome!</h1>\n  <p>Visit <a href="https://example.com" target="_blank">Example.com</a></p>\n</body>\n</html>`,
+          content: `# Links & Navigation 🔗
+
+Links are what make the web a "web"! They connect pages together. Let's learn how to create them.
+
+## The Anchor Tag
+
+Links use the \`<a>\` tag (short for "anchor"):
+
+\`\`\`html
+<a href="https://google.com">Go to Google</a>
+\`\`\`
+
+- \`href\` is the **address** (where the link goes)
+- The text between tags is what people **click on**
+
+## Open in New Tab
+
+Add \`target="_blank"\` to open in a new tab:
+
+\`\`\`html
+<a href="https://google.com" target="_blank">Google (new tab)</a>
+\`\`\`
+
+## Navigation Menus
+
+Use \`<nav>\` to group navigation links:
+
+\`\`\`html
+<nav>
+  <a href="/">Home</a>
+  <a href="/about">About</a>
+  <a href="/contact">Contact</a>
+</nav>
+\`\`\`
+
+## Email & Phone Links
+
+\`\`\`html
+<a href="mailto:hello@example.com">Email Us</a>
+<a href="tel:+1234567890">Call Us</a>
+\`\`\`
+
+Try adding your own links in the editor!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <nav>
+    <a href="/">Home</a> |
+    <a href="/about">About</a> |
+    <a href="/contact">Contact</a>
+  </nav>
+  <h1>Welcome!</h1>
+  <p>Visit <a href="https://example.com" target="_blank">Example.com</a></p>
+  <p><a href="mailto:hello@example.com">Send an email</a></p>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+nav { background: #16213e; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+nav a { color: #e94560; margin: 0 10px; text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+a { color: #4fc3f7; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a navigation with 3 links: Home, About, and Contact. Then add a paragraph with a link to any website.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <!-- Create a <nav> with 3 links -->
+  <!-- Add a paragraph with a link -->
+</body>
+</html>`,
+            validationKeywords: ['<nav>', '<a', 'href', 'home', 'about', 'contact'],
+          },
         },
         {
           id: 'html-4',
           title: 'Images & Media',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Images & Media\n\nImages use the \`<img>\` tag (self-closing).\n\n\`\`\`html\n<img src="photo.jpg" alt="Description" width="300">\n\`\`\`\n\n## Key Attributes\n- \`src\` - Image source URL\n- \`alt\` - Alternative text (important for accessibility)\n- \`width\` / \`height\` - Dimensions`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>My Gallery</h1>\n  <img src="https://picsum.photos/300/200" alt="Random photo" width="300">\n  <p>A beautiful random image from the web.</p>\n</body>\n</html>`,
+          content: `# Images & Media 🖼️
+
+Let's make your pages more visual by adding images!
+
+## The Image Tag
+
+Images use \`<img>\` — a **self-closing** tag (no \`</img>\` needed):
+
+\`\`\`html
+<img src="photo.jpg" alt="A cute cat" width="300">
+\`\`\`
+
+## Important Attributes
+
+- \`src\` — the image address (URL or file path)
+- \`alt\` — description of the image (VERY important for accessibility!)
+- \`width\` / \`height\` — size in pixels
+
+## Using Online Images
+
+You can use any image URL:
+
+\`\`\`html
+<img src="https://picsum.photos/400/300" alt="Random photo">
+\`\`\`
+
+## Why \`alt\` Matters
+
+- Screen readers read \`alt\` text for blind users
+- Shows when image fails to load
+- Helps search engines understand your page
+
+Always add meaningful \`alt\` text! Instead of \`alt="image"\`, write \`alt="Golden retriever playing in the park"\`.`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>My Gallery</h1>
+  <img src="https://picsum.photos/300/200" alt="Random photo" width="300">
+  <p>A beautiful random image from the web.</p>
+  <img src="https://picsum.photos/300/200?random=2" alt="Another random photo" width="300">
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; text-align: center; }
+h1 { color: #e94560; }
+img { border-radius: 12px; margin: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+p { color: #ccc; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Add an image using <img> with a src attribute pointing to any URL and an alt attribute describing the image.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>My Photo</h1>
+  <!-- Add an <img> tag with src and alt attributes -->
+</body>
+</html>`,
+            validationKeywords: ['<img', 'src=', 'alt='],
+          },
         },
         {
           id: 'html-5',
           title: 'Lists',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Lists\n\nHTML has two types of lists:\n\n## Unordered List\n\`\`\`html\n<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n</ul>\n\`\`\`\n\n## Ordered List\n\`\`\`html\n<ol>\n  <li>First</li>\n  <li>Second</li>\n</ol>\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>Shopping List</h1>\n  <ul>\n    <li>Apples</li>\n    <li>Bread</li>\n    <li>Milk</li>\n  </ul>\n  <h2>Steps to Make Tea</h2>\n  <ol>\n    <li>Boil water</li>\n    <li>Add tea bag</li>\n    <li>Wait 3 minutes</li>\n    <li>Enjoy!</li>\n  </ol>\n</body>\n</html>`,
+          content: `# Lists 📋
+
+Lists help organize information. HTML has two main types.
+
+## Unordered List (Bullet Points)
+
+Use \`<ul>\` with \`<li>\` items:
+
+\`\`\`html
+<ul>
+  <li>Apples</li>
+  <li>Bananas</li>
+  <li>Oranges</li>
+</ul>
+\`\`\`
+
+## Ordered List (Numbered)
+
+Use \`<ol>\` with \`<li>\` items:
+
+\`\`\`html
+<ol>
+  <li>Wake up</li>
+  <li>Brush teeth</li>
+  <li>Eat breakfast</li>
+</ol>
+\`\`\`
+
+## Nested Lists
+
+You can put lists inside lists!
+
+\`\`\`html
+<ul>
+  <li>Fruits
+    <ul>
+      <li>Apple</li>
+      <li>Banana</li>
+    </ul>
+  </li>
+</ul>
+\`\`\`
+
+Try creating your own shopping list or recipe steps!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Shopping List</h1>
+  <ul>
+    <li>Apples</li>
+    <li>Bread</li>
+    <li>Milk</li>
+  </ul>
+  <h2>Steps to Make Tea</h2>
+  <ol>
+    <li>Boil water</li>
+    <li>Add tea bag</li>
+    <li>Wait 3 minutes</li>
+    <li>Enjoy!</li>
+  </ol>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1, h2 { color: #e94560; }
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; color: #ccc; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create an unordered list with at least 3 items and an ordered list with at least 3 steps.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>My Lists</h1>
+  <!-- Create a <ul> with 3+ items -->
+  <!-- Create an <ol> with 3+ items -->
+</body>
+</html>`,
+            validationKeywords: ['<ul>', '<ol>', '<li>'],
+          },
         },
         {
           id: 'html-6',
           title: 'Tables',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Tables\n\nTables organize data in rows and columns.\n\n\`\`\`html\n<table>\n  <tr>\n    <th>Name</th>\n    <th>Age</th>\n  </tr>\n  <tr>\n    <td>Alice</td>\n    <td>25</td>\n  </tr>\n</table>\n\`\`\`\n\n- \`<table>\` - Table container\n- \`<tr>\` - Table row\n- \`<th>\` - Header cell\n- \`<td>\` - Data cell`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>Student Grades</h1>\n  <table border="1">\n    <tr>\n      <th>Name</th>\n      <th>Subject</th>\n      <th>Grade</th>\n    </tr>\n    <tr>\n      <td>Alice</td>\n      <td>Math</td>\n      <td>A</td>\n    </tr>\n    <tr>\n      <td>Bob</td>\n      <td>Science</td>\n      <td>B+</td>\n    </tr>\n  </table>\n</body>\n</html>`,
+          content: `# Tables 📊
+
+Tables organize data into rows and columns — like a spreadsheet!
+
+## Basic Table Structure
+
+\`\`\`html
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Age</th>
+  </tr>
+  <tr>
+    <td>Alice</td>
+    <td>25</td>
+  </tr>
+</table>
+\`\`\`
+
+## Table Tags
+
+- \`<table>\` — the whole table
+- \`<tr>\` — a table **row**
+- \`<th>\` — a **header** cell (bold, centered)
+- \`<td>\` — a **data** cell
+
+Think of it like this:
+- \`<tr>\` = a new row (going across →)
+- \`<td>\` or \`<th>\` = a cell in that row
+
+Try adding more rows and columns!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Student Grades</h1>
+  <table border="1">
+    <tr>
+      <th>Name</th>
+      <th>Subject</th>
+      <th>Grade</th>
+    </tr>
+    <tr>
+      <td>Alice</td>
+      <td>Math</td>
+      <td>A</td>
+    </tr>
+    <tr>
+      <td>Bob</td>
+      <td>Science</td>
+      <td>B+</td>
+    </tr>
+  </table>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #e94560; }
+table { border-collapse: collapse; width: 100%; max-width: 500px; }
+th, td { padding: 12px; text-align: left; border: 1px solid #333; }
+th { background: #16213e; color: #e94560; }
+tr:nth-child(even) { background: #1e2a3a; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a table with 3 columns (Product, Price, Quantity) and at least 2 rows of data.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Price List</h1>
+  <!-- Create a table with th and td -->
+</body>
+</html>`,
+            validationKeywords: ['<table', '<tr>', '<th>', '<td>'],
+          },
         },
         {
           id: 'html-7',
           title: 'Forms & Input',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Forms & Input\n\nForms collect user input.\n\n\`\`\`html\n<form>\n  <label for="name">Name:</label>\n  <input type="text" id="name">\n  <button type="submit">Submit</button>\n</form>\n\`\`\`\n\n## Input Types\n- \`text\`, \`email\`, \`password\`, \`number\`\n- \`checkbox\`, \`radio\`\n- \`textarea\` for multi-line`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>Contact Form</h1>\n  <form>\n    <label for="name">Name:</label><br>\n    <input type="text" id="name" placeholder="Your name"><br><br>\n    <label for="email">Email:</label><br>\n    <input type="email" id="email" placeholder="you@example.com"><br><br>\n    <label for="msg">Message:</label><br>\n    <textarea id="msg" rows="4" cols="30"></textarea><br><br>\n    <button type="submit">Send</button>\n  </form>\n</body>\n</html>`,
+          content: `# Forms & Input 📝
+
+Forms let users type information and send it. Think of signup pages, search bars, contact forms.
+
+## Basic Form
+
+\`\`\`html
+<form>
+  <label for="name">Name:</label>
+  <input type="text" id="name">
+  <button type="submit">Submit</button>
+</form>
+\`\`\`
+
+## Input Types
+
+- \`type="text"\` — regular text
+- \`type="email"\` — email address
+- \`type="password"\` — hidden text
+- \`type="number"\` — numbers only
+- \`type="checkbox"\` — a checkbox
+- \`type="radio"\` — pick one from a group
+
+## Labels Are Important!
+
+Always pair inputs with \`<label>\`. The \`for\` attribute connects them:
+
+\`\`\`html
+<label for="email">Email:</label>
+<input type="email" id="email" placeholder="you@example.com">
+\`\`\`
+
+## Textarea for Long Text
+
+\`\`\`html
+<textarea rows="4" cols="30">Write here...</textarea>
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Contact Form</h1>
+  <form>
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" placeholder="Your name"><br><br>
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" placeholder="you@example.com"><br><br>
+    <label for="msg">Message:</label><br>
+    <textarea id="msg" rows="4" cols="30"></textarea><br><br>
+    <button type="submit">Send</button>
+  </form>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #e94560; }
+input, textarea { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #16213e; color: #e0e0e0; width: 100%; max-width: 300px; margin: 4px 0; }
+button { background: #e94560; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; margin-top: 8px; }
+button:hover { background: #c0392b; }
+label { color: #ccc; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a form with a text input for name, an email input, and a submit button.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Sign Up</h1>
+  <!-- Create a form with inputs and a button -->
+</body>
+</html>`,
+            validationKeywords: ['<form', '<input', 'type=', '<button'],
+          },
         },
         {
           id: 'html-8',
           title: 'Semantic HTML',
           topic: 'HTML Fundamentals',
           level: 'basic',
-          content: `# Semantic HTML\n\nSemantic elements describe their meaning:\n\n- \`<header>\` - Page/section header\n- \`<nav>\` - Navigation links\n- \`<main>\` - Main content\n- \`<article>\` - Independent content\n- \`<section>\` - Themed grouping\n- \`<footer>\` - Page/section footer\n- \`<aside>\` - Side content`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <header>\n    <h1>My Website</h1>\n    <nav>\n      <a href="/">Home</a> | <a href="/blog">Blog</a>\n    </nav>\n  </header>\n  <main>\n    <article>\n      <h2>First Article</h2>\n      <p>This is the main content.</p>\n    </article>\n    <aside>\n      <h3>Related Links</h3>\n      <p>Some sidebar content.</p>\n    </aside>\n  </main>\n  <footer>\n    <p>&copy; 2026 My Website</p>\n  </footer>\n</body>\n</html>`,
+          content: `# Semantic HTML 🏗️
+
+Semantic tags describe what the content **means**, not just how it looks.
+
+## Why Semantic HTML?
+
+Instead of using \`<div>\` for everything, use tags that describe the content:
+
+- \`<header>\` — top of the page (logo, nav)
+- \`<nav>\` — navigation links
+- \`<main>\` — the main content
+- \`<article>\` — independent content (blog post, news article)
+- \`<section>\` — a group of related content
+- \`<footer>\` — bottom of the page
+- \`<aside>\` — sidebar content
+
+## Why Does This Matter?
+
+1. **Screen readers** understand your page better (accessibility!)
+2. **Search engines** can find your content easier (SEO!)
+3. **Other developers** can read your code more easily
+
+## Bad vs Good
+
+❌ Bad:
+\`\`\`html
+<div class="header"><div class="nav">...</div></div>
+\`\`\`
+
+✅ Good:
+\`\`\`html
+<header><nav>...</nav></header>
+\`\`\`
+
+Same result visually, but the good version has **meaning**.`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <header>
+    <h1>My Website</h1>
+    <nav>
+      <a href="/">Home</a> | <a href="/blog">Blog</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h2>First Article</h2>
+      <p>This is the main content.</p>
+    </article>
+    <aside>
+      <h3>Related Links</h3>
+      <p>Some sidebar content.</p>
+    </aside>
+  </main>
+  <footer>
+    <p>&copy; 2026 My Website</p>
+  </footer>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; margin: 0; background: #1a1a2e; color: #e0e0e0; }
+header { background: #16213e; padding: 20px; }
+header h1 { color: #e94560; margin: 0; }
+nav { margin-top: 10px; }
+nav a { color: #4fc3f7; margin-right: 15px; text-decoration: none; }
+main { padding: 20px; display: flex; gap: 20px; }
+article { flex: 2; }
+aside { flex: 1; background: #16213e; padding: 15px; border-radius: 8px; }
+footer { background: #16213e; padding: 15px; text-align: center; margin-top: 20px; }
+h2 { color: #e94560; }
+h3 { color: #16c79a; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a page with <header>, <main>, and <footer> tags. The header should have an h1 and the footer should have a paragraph.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <!-- Use semantic tags: header, main, footer -->
+</body>
+</html>`,
+            validationKeywords: ['<header>', '<main>', '<footer>', '<h1>'],
+          },
         },
       ],
     },
@@ -131,54 +701,608 @@ const basicLessons: LevelData = {
           title: 'What is CSS?',
           topic: 'CSS Fundamentals',
           level: 'basic',
-          content: `# What is CSS?\n\nCSS (Cascading Style Sheets) styles HTML elements.\n\n## Ways to Add CSS\n1. **Inline**: \`<p style="color: red;">Text</p>\`\n2. **Internal**: \`<style>\` tag in \`<head>\`\n3. **External**: Linked \`.css\` file (best practice)\n\n## Basic Syntax\n\`\`\`css\nselector {\n  property: value;\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body {\n    font-family: Arial, sans-serif;\n    background-color: #f0f0f0;\n  }\n  h1 {\n    color: #333;\n    text-align: center;\n  }\n  p {\n    color: #666;\n    font-size: 18px;\n    line-height: 1.6;\n  }\n</style>\n</head>\n<body>\n  <h1>Styled Page</h1>\n  <p>This page uses CSS for styling!</p>\n</body>\n</html>`,
+          content: `# What is CSS? 🎨
+
+CSS (Cascading Style Sheets) is how you make web pages **beautiful**! If HTML is the skeleton, CSS is the skin, clothes, and makeup.
+
+## Three Ways to Add CSS
+
+**1. Inline** (directly on elements):
+\`\`\`html
+<p style="color: red;">Red text</p>
+\`\`\`
+
+**2. Internal** (\`<style>\` tag inside \`<head>\`):
+\`\`\`html
+<style>
+  p { color: red; }
+</style>
+\`\`\`
+
+**3. External** (separate .css file — BEST practice!):
+\`\`\`html
+<link rel="stylesheet" href="style.css">
+\`\`\`
+
+In our editor, the **style.css** tab is your external CSS file!
+
+## CSS Syntax
+
+\`\`\`css
+selector {
+  property: value;
+}
+\`\`\`
+
+Example:
+\`\`\`css
+h1 {
+  color: blue;
+  font-size: 24px;
+}
+\`\`\`
+
+This says: "Find all \`<h1>\` tags, make them blue, and 24 pixels big."
+
+Try editing the CSS tab to change colors and sizes!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Styled Page</h1>
+  <p>This page uses CSS for styling!</p>
+  <p class="highlight">This text is highlighted.</p>
+</body>
+</html>`,
+          initialCss: `body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+}
+
+h1 {
+  color: #e94560;
+  text-align: center;
+  font-size: 36px;
+}
+
+p {
+  color: #ccc;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.highlight {
+  background-color: #16213e;
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 4px solid #e94560;
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'In the CSS tab, change the h1 color to any color you like and set the body background-color to a dark color.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Style Me!</h1>
+  <p>Change the CSS to make me look different.</p>
+</body>
+</html>`,
+            initialCss: `/* Change the h1 color and body background-color */
+h1 {
+
+}
+
+body {
+
+}`,
+            validationKeywords: ['color:', 'background'],
+          },
         },
         {
           id: 'css-2',
           title: 'Selectors',
           topic: 'CSS Fundamentals',
           level: 'basic',
-          content: `# CSS Selectors\n\n## Types\n- **Element**: \`p { }\` - all paragraphs\n- **Class**: \`.highlight { }\` - elements with class="highlight"\n- **ID**: \`#header { }\` - element with id="header"\n- **Descendant**: \`div p { }\` - p inside div`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  .highlight { background-color: yellow; padding: 4px; }\n  #title { color: navy; font-size: 32px; }\n  .card { border: 1px solid #ddd; padding: 16px; margin: 8px; border-radius: 8px; }\n  .card h3 { color: #e74c3c; }\n</style>\n</head>\n<body>\n  <h1 id="title">CSS Selectors</h1>\n  <div class="card">\n    <h3>Card Title</h3>\n    <p>Some <span class="highlight">highlighted</span> text.</p>\n  </div>\n</body>\n</html>`,
+          content: `# CSS Selectors 🎯
+
+Selectors tell CSS **which elements** to style. Think of them as pointing at things on your page.
+
+## Element Selector
+
+Style ALL elements of that type:
+\`\`\`css
+p { color: blue; }  /* ALL paragraphs */
+h1 { color: red; }  /* ALL h1 headings */
+\`\`\`
+
+## Class Selector (.)
+
+Style elements with a specific class:
+\`\`\`css
+.warning { color: orange; }
+.big { font-size: 30px; }
+\`\`\`
+
+Use in HTML: \`<p class="warning">Watch out!</p>\`
+
+## ID Selector (#)
+
+Style ONE specific element:
+\`\`\`css
+#title { color: gold; }
+\`\`\`
+
+Use in HTML: \`<h1 id="title">Hello</h1>\`
+
+## Quick Rule
+
+- **Classes** (\`.\`) — reuse on many elements
+- **IDs** (\`#\`) — use on ONE element only
+
+Try adding classes to the HTML and styling them in the CSS tab!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1 id="title">CSS Selectors</h1>
+  <div class="card">
+    <h3>Card Title</h3>
+    <p>Some <span class="highlight">highlighted</span> text.</p>
+  </div>
+  <div class="card special">
+    <h3>Special Card</h3>
+    <p>This card has two classes.</p>
+  </div>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+
+#title { color: #e94560; font-size: 32px; text-align: center; }
+
+.card {
+  border: 1px solid #333;
+  padding: 16px;
+  margin: 8px 0;
+  border-radius: 8px;
+  background: #16213e;
+}
+
+.card h3 { color: #4fc3f7; }
+
+.highlight {
+  background-color: #e94560;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+}
+
+.special { border-left: 4px solid #16c79a; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Add a class "important" to a paragraph in HTML and style it in CSS with a different color and font-size.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>My Page</h1>
+  <p>Normal paragraph.</p>
+  <!-- Add class="important" to a paragraph -->
+  <p>Make me important!</p>
+</body>
+</html>`,
+            initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #e94560; }
+
+/* Style the .important class */`,
+            validationKeywords: ['class=', 'important', 'color'],
+          },
         },
         {
           id: 'css-3',
-          title: 'Box Model',
+          title: 'Colors & Typography',
           topic: 'CSS Fundamentals',
           level: 'basic',
-          content: `# The Box Model\n\nEvery element is a box with:\n- **Content** - The actual content\n- **Padding** - Space inside the border\n- **Border** - The border\n- **Margin** - Space outside the border\n\n\`\`\`css\n.box {\n  padding: 20px;\n  border: 2px solid black;\n  margin: 10px;\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  .box {\n    background-color: #3498db;\n    color: white;\n    padding: 20px;\n    margin: 15px;\n    border: 3px solid #2c3e50;\n    border-radius: 8px;\n    width: 200px;\n    text-align: center;\n  }\n  .box:hover {\n    background-color: #2980b9;\n    transform: scale(1.05);\n    transition: all 0.3s;\n  }\n</style>\n</head>\n<body>\n  <div class="box">Box 1</div>\n  <div class="box">Box 2</div>\n  <div class="box">Box 3</div>\n</body>\n</html>`,
+          content: `# Colors & Typography 🌈
+
+Let's learn how to make your pages colorful and text beautiful!
+
+## Colors in CSS
+
+**Named colors:**
+\`\`\`css
+color: red;
+color: blue;
+color: tomato;
+\`\`\`
+
+**Hex codes** (most common):
+\`\`\`css
+color: #ff0000;   /* red */
+color: #3498db;   /* nice blue */
+color: #2ecc71;   /* green */
+\`\`\`
+
+**RGB:**
+\`\`\`css
+color: rgb(255, 0, 0);    /* red */
+color: rgba(0, 0, 0, 0.5); /* 50% transparent black */
+\`\`\`
+
+## Typography
+
+\`\`\`css
+p {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.6;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+\`\`\`
+
+Try mixing different colors and font properties!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Colors & Fonts</h1>
+  <p class="red">I am red!</p>
+  <p class="blue">I am blue!</p>
+  <p class="fancy">I am fancy text!</p>
+  <p class="big">I am BIG text!</p>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+
+h1 { color: #e94560; text-align: center; }
+
+.red { color: #e74c3c; font-size: 20px; }
+.blue { color: #3498db; font-size: 20px; }
+
+.fancy {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 24px;
+  color: #f39c12;
+  letter-spacing: 2px;
+}
+
+.big {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2ecc71;
+  text-transform: uppercase;
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Style 3 different paragraphs with different colors using hex codes and different font-sizes.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>My Colors</h1>
+  <p class="first">First paragraph</p>
+  <p class="second">Second paragraph</p>
+  <p class="third">Third paragraph</p>
+</body>
+</html>`,
+            initialCss: `body { background: #1a1a2e; padding: 20px; }
+h1 { color: white; }
+
+/* Style .first, .second, .third with different colors and font-sizes */`,
+            validationKeywords: ['.first', '.second', '.third', 'color:', 'font-size:'],
+          },
         },
         {
           id: 'css-4',
-          title: 'Flexbox',
+          title: 'The Box Model',
           topic: 'CSS Fundamentals',
           level: 'basic',
-          content: `# Flexbox\n\nFlexbox is a layout model for arranging items.\n\n\`\`\`css\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  gap: 10px;\n}\n\`\`\`\n\n## Key Properties\n- \`flex-direction\`: row | column\n- \`justify-content\`: flex-start | center | space-between\n- \`align-items\`: flex-start | center | stretch`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  .flex-container {\n    display: flex;\n    justify-content: space-around;\n    align-items: center;\n    gap: 16px;\n    padding: 20px;\n    min-height: 200px;\n    background: #1a1a2e;\n  }\n  .flex-item {\n    background: #e94560;\n    color: white;\n    padding: 20px 30px;\n    border-radius: 8px;\n    font-size: 18px;\n    font-weight: bold;\n  }\n</style>\n</head>\n<body>\n  <div class="flex-container">\n    <div class="flex-item">Item 1</div>\n    <div class="flex-item">Item 2</div>\n    <div class="flex-item">Item 3</div>\n  </div>\n</body>\n</html>`,
+          content: `# The Box Model 📦
+
+Every HTML element is a **box**. Understanding the box model is KEY to CSS layouts!
+
+## Four Layers (Inside → Outside)
+
+1. **Content** — your text/images
+2. **Padding** — space INSIDE the border
+3. **Border** — the edge of the box
+4. **Margin** — space OUTSIDE the border
+
+\`\`\`css
+.box {
+  padding: 20px;    /* inner space */
+  border: 2px solid black;
+  margin: 10px;     /* outer space */
+}
+\`\`\`
+
+## Shorthand
+
+\`\`\`css
+padding: 10px;              /* all sides */
+padding: 10px 20px;         /* top/bottom, left/right */
+padding: 10px 20px 30px 40px; /* top, right, bottom, left */
+\`\`\`
+
+## Box Sizing
+
+Add this to make life easier:
+\`\`\`css
+* { box-sizing: border-box; }
+\`\`\`
+
+This makes \`width\` include padding and border (no surprises!).`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="box box-1">Padding: 10px</div>
+  <div class="box box-2">Padding: 30px</div>
+  <div class="box box-3">Margin: 40px</div>
+</body>
+</html>`,
+          initialCss: `* { box-sizing: border-box; }
+body { font-family: Arial; padding: 20px; background: #1a1a2e; color: white; }
+
+.box {
+  background: #16213e;
+  border-radius: 8px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.box-1 {
+  padding: 10px;
+  border: 2px solid #e94560;
+}
+
+.box-2 {
+  padding: 30px;
+  border: 2px solid #4fc3f7;
+}
+
+.box-3 {
+  padding: 20px;
+  margin: 40px;
+  border: 2px solid #2ecc71;
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a box with padding of 20px, margin of 15px, and a border of 3px solid with any color.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="my-box">Style this box!</div>
+</body>
+</html>`,
+            initialCss: `body { background: #1a1a2e; padding: 20px; color: white; }
+
+.my-box {
+  /* Add padding, margin, and border */
+}`,
+            validationKeywords: ['padding', 'margin', 'border'],
+          },
         },
         {
           id: 'css-5',
-          title: 'Grid Layout',
+          title: 'Flexbox Layout',
           topic: 'CSS Fundamentals',
           level: 'basic',
-          content: `# CSS Grid\n\nGrid is a 2D layout system.\n\n\`\`\`css\n.grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr 1fr;\n  gap: 10px;\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  .grid {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    gap: 12px;\n    padding: 20px;\n  }\n  .grid-item {\n    background: linear-gradient(135deg, #667eea, #764ba2);\n    color: white;\n    padding: 30px;\n    text-align: center;\n    border-radius: 8px;\n    font-weight: bold;\n  }\n  .grid-item:first-child {\n    grid-column: span 2;\n  }\n</style>\n</head>\n<body>\n  <div class="grid">\n    <div class="grid-item">Wide Item</div>\n    <div class="grid-item">Item 2</div>\n    <div class="grid-item">Item 3</div>\n    <div class="grid-item">Item 4</div>\n    <div class="grid-item">Item 5</div>\n  </div>\n</body>\n</html>`,
+          content: `# Flexbox Layout 📐
+
+Flexbox makes arranging items EASY. No more fighting with floats!
+
+## Enable Flexbox
+
+\`\`\`css
+.container {
+  display: flex;
+}
+\`\`\`
+
+That's it! Now the children line up in a row.
+
+## Main Properties
+
+\`\`\`css
+.container {
+  display: flex;
+  justify-content: center;     /* horizontal alignment */
+  align-items: center;         /* vertical alignment */
+  gap: 10px;                   /* space between items */
+  flex-direction: row;         /* row or column */
+}
+\`\`\`
+
+## justify-content Options
+- \`flex-start\` — items at the start
+- \`center\` — items in the middle
+- \`space-between\` — equal space between
+- \`space-around\` — equal space around
+
+## align-items Options
+- \`flex-start\` — items at the top
+- \`center\` — items in the middle
+- \`stretch\` — items stretch to fill
+
+Try changing the properties to see what happens!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Flexbox Demo</h1>
+  <div class="flex-container">
+    <div class="item">1</div>
+    <div class="item">2</div>
+    <div class="item">3</div>
+  </div>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: white; }
+h1 { color: #e94560; text-align: center; }
+
+.flex-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  min-height: 200px;
+  background: #16213e;
+  border-radius: 12px;
+}
+
+.item {
+  background: #e94560;
+  color: white;
+  padding: 20px 40px;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: bold;
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a flex container with 3 items centered both horizontally and vertically using display: flex, justify-content, and align-items.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="container">
+    <div class="box">A</div>
+    <div class="box">B</div>
+    <div class="box">C</div>
+  </div>
+</body>
+</html>`,
+            initialCss: `body { background: #1a1a2e; margin: 0; }
+.box { background: #e94560; color: white; padding: 20px; border-radius: 8px; }
+
+.container {
+  /* Add display: flex, justify-content, align-items */
+  min-height: 100vh;
+}`,
+            validationKeywords: ['display: flex', 'justify-content', 'align-items'],
+          },
         },
         {
           id: 'css-6',
-          title: 'Animations',
+          title: 'Responsive Design',
           topic: 'CSS Fundamentals',
           level: 'basic',
-          content: `# CSS Animations\n\n## Transitions\n\`\`\`css\n.btn { transition: all 0.3s ease; }\n.btn:hover { transform: scale(1.1); }\n\`\`\`\n\n## Keyframes\n\`\`\`css\n@keyframes slide {\n  from { transform: translateX(-100%); }\n  to { transform: translateX(0); }\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  @keyframes bounce {\n    0%, 100% { transform: translateY(0); }\n    50% { transform: translateY(-20px); }\n  }\n  @keyframes fadeIn {\n    from { opacity: 0; transform: translateY(20px); }\n    to { opacity: 1; transform: translateY(0); }\n  }\n  .bounce { animation: bounce 1s infinite; display: inline-block; font-size: 40px; }\n  .fade-in { animation: fadeIn 1s ease-out; }\n  .btn {\n    padding: 12px 24px;\n    background: #e74c3c;\n    color: white;\n    border: none;\n    border-radius: 8px;\n    font-size: 16px;\n    cursor: pointer;\n    transition: all 0.3s ease;\n  }\n  .btn:hover { transform: scale(1.1); background: #c0392b; }\n</style>\n</head>\n<body style="text-align:center; padding: 40px;">\n  <div class="bounce">🚀</div>\n  <h1 class="fade-in">CSS Animations!</h1>\n  <button class="btn">Hover Me</button>\n</body>\n</html>`,
+          content: `# Responsive Design 📱
+
+Your website should look good on phones, tablets, AND desktops!
+
+## Media Queries
+
+Change styles based on screen size:
+
+\`\`\`css
+/* Default styles (mobile first) */
+.container { padding: 10px; }
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .container { padding: 20px; }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .container { padding: 40px; }
+}
+\`\`\`
+
+## Responsive Units
+
+- \`%\` — percentage of parent
+- \`vw\` / \`vh\` — percentage of screen width/height
+- \`rem\` — relative to root font size
+- \`em\` — relative to parent font size
+
+## Max-Width Trick
+
+\`\`\`css
+img { max-width: 100%; height: auto; }
+\`\`\`
+
+This makes images scale down on small screens!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Responsive Page</h1>
+    <div class="grid">
+      <div class="card">Card 1</div>
+      <div class="card">Card 2</div>
+      <div class="card">Card 3</div>
+    </div>
+  </div>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; margin: 0; background: #1a1a2e; color: white; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+h1 { color: #e94560; text-align: center; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.card {
+  background: #16213e;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+}
+
+@media (min-width: 500px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 800px) {
+  .grid { grid-template-columns: 1fr 1fr 1fr; }
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a grid that shows 1 column on small screens and 3 columns on wide screens using @media query.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="grid">
+    <div class="item">A</div>
+    <div class="item">B</div>
+    <div class="item">C</div>
+  </div>
+</body>
+</html>`,
+            initialCss: `body { background: #1a1a2e; padding: 20px; }
+.item { background: #e94560; color: white; padding: 20px; border-radius: 8px; text-align: center; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* Add @media query for wider screens */`,
+            validationKeywords: ['@media', 'grid-template-columns'],
+          },
         },
       ],
     },
@@ -192,57 +1316,838 @@ const basicLessons: LevelData = {
           title: 'What is JavaScript?',
           topic: 'JavaScript Basics',
           level: 'basic',
-          content: `# What is JavaScript?\n\nJavaScript makes web pages interactive.\n\n## Adding JavaScript\n\`\`\`html\n<script>\n  console.log("Hello!");\n</script>\n\`\`\`\n\n## Variables\n\`\`\`js\nlet name = "Alice";\nconst age = 25;\n\`\`\`\n\nOpen the console to see output!`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head><title>JavaScript</title></head>\n<body>\n  <h1>Check the Console! 👇</h1>\n  <p>Open the console panel at the bottom to see output.</p>\n  <script>\n    console.log("Hello from JavaScript!");\n    let name = "Coder";\n    console.log("Welcome, " + name + "!");\n    const age = 20;\n    console.log("You are " + age + " years old.");\n  </script>\n</body>\n</html>`,
+          content: `# What is JavaScript? ⚡
+
+JavaScript (JS) makes your web pages come alive! Buttons that click, menus that slide, forms that validate — that's all JavaScript.
+
+## Where Does JS Go?
+
+In the **script.js** tab! Or in a \`<script>\` tag:
+
+\`\`\`html
+<script src="script.js"></script>
+\`\`\`
+
+## Your First JavaScript
+
+Open the console at the bottom to see output:
+
+\`\`\`javascript
+console.log("Hello, World!");
+\`\`\`
+
+## Variables — Storing Data
+
+\`\`\`javascript
+let name = "Alice";    // can change later
+const age = 25;        // cannot change (constant)
+var old = "don't use"; // old way, avoid it
+\`\`\`
+
+## Data Types
+
+- **String**: \`"hello"\` (text)
+- **Number**: \`42\`, \`3.14\`
+- **Boolean**: \`true\`, \`false\`
+- **Array**: \`[1, 2, 3]\`
+
+Open the console below to see the output!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Check the Console! 👇</h1>
+  <p>Open the console panel at the bottom to see output.</p>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 40px; background: #1a1a2e; color: #e0e0e0; text-align: center; }
+h1 { color: #f39c12; font-size: 36px; }
+p { color: #ccc; font-size: 18px; }`,
+          initialJs: `// Welcome to JavaScript!
+console.log("Hello from JavaScript!");
+
+let name = "Coder";
+console.log("Welcome, " + name + "!");
+
+const age = 20;
+console.log("You are " + age + " years old.");
+
+// Try changing the name and age above!`,
           language: 'html',
           challenge: {
-            instruction: 'Create variables for your name and age, then console.log a greeting message.',
-            initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>My First JS</h1>\n  <script>\n    // Create a variable 'name' and 'age'\n    // Then console.log: "Hi, I'm [name] and I'm [age] years old!"\n  </script>\n</body>\n</html>`,
+            instruction: 'Create variables for your name and age using let/const, then console.log a greeting message.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>My First JS</h1>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create a variable 'name' with let
+// Create a variable 'age' with const
+// Then console.log a greeting message`,
             validationKeywords: ['let', 'console.log'],
           },
         },
         {
           id: 'js-2',
-          title: 'Functions',
+          title: 'Variables & Data Types',
           topic: 'JavaScript Basics',
           level: 'basic',
-          content: `# Functions\n\nFunctions are reusable blocks of code.\n\n\`\`\`js\nfunction greet(name) {\n  return "Hello, " + name;\n}\n\nconst add = (a, b) => a + b;\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<body>\n  <h1>Functions</h1>\n  <div id="output"></div>\n  <script>\n    function greet(name) {\n      return "Hello, " + name + "!";\n    }\n\n    const add = (a, b) => a + b;\n    const multiply = (a, b) => a * b;\n\n    document.getElementById("output").innerHTML = \n      greet("World") + "<br>" +\n      "2 + 3 = " + add(2, 3) + "<br>" +\n      "4 × 5 = " + multiply(4, 5);\n\n    console.log(greet("Console"));\n  </script>\n</body>\n</html>`,
+          content: `# Variables & Data Types 📦
+
+Let's dig deeper into storing and using data in JavaScript.
+
+## let vs const
+
+\`\`\`javascript
+let score = 0;     // Can change: score = 10;
+const PI = 3.14;   // Cannot change. Trying will cause an error!
+\`\`\`
+
+**Rule of thumb:** Use \`const\` unless you NEED to change the value.
+
+## Strings (Text)
+
+\`\`\`javascript
+const greeting = "Hello";
+const name = 'World';
+const message = \`Hi \${name}!\`;  // Template literal (backticks)
+\`\`\`
+
+## Numbers
+
+\`\`\`javascript
+const age = 25;
+const price = 9.99;
+const sum = 10 + 5;      // 15
+const remainder = 10 % 3; // 1
+\`\`\`
+
+## Booleans
+
+\`\`\`javascript
+const isLoggedIn = true;
+const isEmpty = false;
+const isAdult = age >= 18; // true
+\`\`\`
+
+## Checking Types
+
+\`\`\`javascript
+console.log(typeof "hello"); // "string"
+console.log(typeof 42);      // "number"
+console.log(typeof true);    // "boolean"
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Variables & Types</h1>
+  <p>Check the console!</p>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 30px; background: #1a1a2e; color: #e0e0e0; text-align: center; }
+h1 { color: #f39c12; }`,
+          initialJs: `// Strings
+const firstName = "Alice";
+const lastName = "Smith";
+const fullName = firstName + " " + lastName;
+console.log("Full name:", fullName);
+
+// Template literals (modern way!)
+const greeting = \`Hello, \${fullName}!\`;
+console.log(greeting);
+
+// Numbers
+const a = 10;
+const b = 3;
+console.log(a + " + " + b + " = " + (a + b));
+console.log(a + " - " + b + " = " + (a - b));
+console.log(a + " * " + b + " = " + (a * b));
+
+// Booleans
+const isHappy = true;
+console.log("Is happy?", isHappy);
+console.log("Type of name:", typeof firstName);
+console.log("Type of age:", typeof a);`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a const string, a let number, and log their types using typeof.',
+            initialCode: `<!DOCTYPE html>
+<html><body><h1>Types</h1><script src="script.js"></script></body></html>`,
+            initialJs: `// Create a const string variable
+// Create a let number variable
+// Log both using typeof`,
+            validationKeywords: ['const', 'let', 'typeof', 'console.log'],
+          },
         },
         {
           id: 'js-3',
-          title: 'DOM Manipulation',
+          title: 'Functions',
           topic: 'JavaScript Basics',
           level: 'basic',
-          content: `# DOM Manipulation\n\nJavaScript can change HTML content dynamically.\n\n\`\`\`js\ndocument.getElementById("demo").textContent = "Changed!";\ndocument.querySelector(".btn").addEventListener("click", () => {\n  alert("Clicked!");\n});\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; text-align: center; padding: 40px; }\n  button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; border-radius: 8px; border: none; color: white; }\n  .add-btn { background: #2ecc71; }\n  .change-btn { background: #3498db; }\n  .remove-btn { background: #e74c3c; }\n  #output { margin-top: 20px; font-size: 20px; }\n</style>\n</head>\n<body>\n  <h1 id="title">DOM Manipulation</h1>\n  <button class="change-btn" onclick="changeTitle()">Change Title</button>\n  <button class="add-btn" onclick="addItem()">Add Item</button>\n  <button class="remove-btn" onclick="clearList()">Clear</button>\n  <ul id="list"></ul>\n  <div id="output">Click a button!</div>\n  <script>\n    let count = 0;\n    function changeTitle() {\n      document.getElementById("title").textContent = "Title Changed! ✨";\n      document.getElementById("title").style.color = "#e74c3c";\n    }\n    function addItem() {\n      count++;\n      const li = document.createElement("li");\n      li.textContent = "Item " + count;\n      document.getElementById("list").appendChild(li);\n    }\n    function clearList() {\n      document.getElementById("list").innerHTML = "";\n      count = 0;\n    }\n  </script>\n</body>\n</html>`,
+          content: `# Functions 🔧
+
+Functions are reusable blocks of code. Write once, use many times!
+
+## Creating a Function
+
+\`\`\`javascript
+function greet(name) {
+  return "Hello, " + name + "!";
+}
+\`\`\`
+
+## Calling a Function
+
+\`\`\`javascript
+const result = greet("Alice");
+console.log(result); // "Hello, Alice!"
+\`\`\`
+
+## Arrow Functions (Modern Way)
+
+\`\`\`javascript
+const add = (a, b) => a + b;
+const square = (n) => n * n;
+\`\`\`
+
+## Functions with Multiple Lines
+
+\`\`\`javascript
+const calculateTotal = (price, quantity) => {
+  const subtotal = price * quantity;
+  const tax = subtotal * 0.1;
+  return subtotal + tax;
+};
+\`\`\`
+
+## Default Parameters
+
+\`\`\`javascript
+function greet(name = "stranger") {
+  return "Hello, " + name;
+}
+greet();      // "Hello, stranger"
+greet("Bob"); // "Hello, Bob"
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Functions</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 30px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #f39c12; }
+#output { background: #16213e; padding: 20px; border-radius: 8px; font-family: monospace; line-height: 2; }`,
+          initialJs: `function greet(name) {
+  return "Hello, " + name + "!";
+}
+
+const add = (a, b) => a + b;
+const multiply = (a, b) => a * b;
+
+const output = document.getElementById("output");
+output.innerHTML =
+  greet("World") + "<br>" +
+  "2 + 3 = " + add(2, 3) + "<br>" +
+  "4 × 5 = " + multiply(4, 5);
+
+console.log(greet("Console"));
+console.log("Sum:", add(10, 20));`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a function called "multiply" that takes two numbers and returns their product. Call it and log the result.',
+            initialCode: `<!DOCTYPE html>
+<html><body><h1>Functions</h1><script src="script.js"></script></body></html>`,
+            initialJs: `// Create a function called multiply
+// Call it and console.log the result`,
+            validationKeywords: ['function', 'return', 'console.log'],
+          },
         },
         {
           id: 'js-4',
-          title: 'Events',
+          title: 'Conditionals & Loops',
           topic: 'JavaScript Basics',
           level: 'basic',
-          content: `# Events\n\nEvents let you respond to user actions.\n\n## Common Events\n- \`click\` - Mouse click\n- \`input\` - Input value changes\n- \`keydown\` - Key pressed\n- \`mouseover\` - Mouse enters element`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 30px; }\n  .box { width: 200px; height: 200px; background: #3498db; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 12px; cursor: pointer; transition: all 0.3s; margin: 20px auto; }\n  input { padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; width: 300px; }\n  #preview { margin-top: 10px; font-size: 24px; color: #2c3e50; }\n</style>\n</head>\n<body>\n  <h1>Events Demo</h1>\n  <input type="text" id="nameInput" placeholder="Type your name...">\n  <div id="preview">Hello, stranger!</div>\n  <div class="box" id="colorBox">Click me!</div>\n  <script>\n    document.getElementById("nameInput").addEventListener("input", (e) => {\n      const name = e.target.value || "stranger";\n      document.getElementById("preview").textContent = "Hello, " + name + "!";\n    });\n    const colors = ["#e74c3c", "#2ecc71", "#9b59b6", "#f39c12", "#3498db"];\n    let colorIndex = 0;\n    document.getElementById("colorBox").addEventListener("click", () => {\n      colorIndex = (colorIndex + 1) % colors.length;\n      document.getElementById("colorBox").style.background = colors[colorIndex];\n      document.getElementById("colorBox").textContent = "Color " + (colorIndex + 1);\n    });\n  </script>\n</body>\n</html>`,
+          content: `# Conditionals & Loops 🔄
+
+## If/Else — Making Decisions
+
+\`\`\`javascript
+const age = 18;
+
+if (age >= 18) {
+  console.log("You can vote!");
+} else {
+  console.log("Too young to vote.");
+}
+\`\`\`
+
+## Comparison Operators
+- \`===\` — equals (use this, not ==)
+- \`!==\` — not equals
+- \`>\`, \`<\`, \`>=\`, \`<=\`
+
+## For Loop — Repeating Things
+
+\`\`\`javascript
+for (let i = 0; i < 5; i++) {
+  console.log("Count:", i);
+}
+\`\`\`
+
+## While Loop
+
+\`\`\`javascript
+let count = 0;
+while (count < 3) {
+  console.log(count);
+  count++;
+}
+\`\`\`
+
+## Looping Through Arrays
+
+\`\`\`javascript
+const fruits = ["apple", "banana", "cherry"];
+for (const fruit of fruits) {
+  console.log(fruit);
+}
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Conditionals & Loops</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 30px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #f39c12; }
+#output { background: #16213e; padding: 15px; border-radius: 8px; white-space: pre-line; }`,
+          initialJs: `// If/Else
+const temperature = 30;
+let weather;
+
+if (temperature > 30) {
+  weather = "It's hot! 🔥";
+} else if (temperature > 20) {
+  weather = "Nice weather! ☀️";
+} else {
+  weather = "It's cold! 🥶";
+}
+console.log(weather);
+
+// For loop
+let result = "";
+for (let i = 1; i <= 5; i++) {
+  result += "⭐".repeat(i) + "\\n";
+}
+
+document.getElementById("output").textContent = result;
+
+// Loop through array
+const colors = ["red", "green", "blue"];
+for (const color of colors) {
+  console.log("Color:", color);
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Write an if/else that checks if a number is positive, negative, or zero. Then use a for loop to count from 1 to 5.',
+            initialCode: `<!DOCTYPE html>
+<html><body><h1>Logic</h1><script src="script.js"></script></body></html>`,
+            initialJs: `// Check if a number is positive, negative, or zero
+const num = 5;
+
+// Use for loop to count 1 to 5`,
+            validationKeywords: ['if', 'else', 'for', 'console.log'],
+          },
+        },
+        {
+          id: 'js-5',
+          title: 'DOM Manipulation',
+          topic: 'JavaScript Basics',
+          level: 'basic',
+          content: `# DOM Manipulation 🎮
+
+The DOM (Document Object Model) is how JavaScript talks to HTML. You can change text, colors, add elements — anything!
+
+## Getting Elements
+
+\`\`\`javascript
+// By ID
+const title = document.getElementById("title");
+
+// By class
+const cards = document.querySelectorAll(".card");
+
+// First match
+const btn = document.querySelector(".btn");
+\`\`\`
+
+## Changing Content
+
+\`\`\`javascript
+title.textContent = "New Title!";
+title.innerHTML = "<em>Italic Title</em>";
+\`\`\`
+
+## Changing Styles
+
+\`\`\`javascript
+title.style.color = "red";
+title.style.fontSize = "32px";
+\`\`\`
+
+## Adding Event Listeners
+
+\`\`\`javascript
+btn.addEventListener("click", () => {
+  alert("Button clicked!");
+});
+\`\`\`
+
+Try clicking the buttons in the preview!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1 id="title">DOM Manipulation</h1>
+  <button class="btn change-btn" onclick="changeTitle()">Change Title</button>
+  <button class="btn add-btn" onclick="addItem()">Add Item</button>
+  <button class="btn remove-btn" onclick="clearList()">Clear</button>
+  <ul id="list"></ul>
+  <div id="output">Click a button!</div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; text-align: center; padding: 40px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #e94560; }
+.btn { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; border-radius: 8px; border: none; color: white; }
+.change-btn { background: #3498db; }
+.add-btn { background: #2ecc71; }
+.remove-btn { background: #e74c3c; }
+#output { margin-top: 20px; font-size: 20px; color: #ccc; }
+ul { list-style: none; padding: 0; }
+li { background: #16213e; padding: 8px; margin: 4px auto; border-radius: 6px; max-width: 200px; }`,
+          initialJs: `let count = 0;
+
+function changeTitle() {
+  const title = document.getElementById("title");
+  title.textContent = "Title Changed! ✨";
+  title.style.color = "#f39c12";
+}
+
+function addItem() {
+  count++;
+  const li = document.createElement("li");
+  li.textContent = "Item " + count;
+  document.getElementById("list").appendChild(li);
+}
+
+function clearList() {
+  document.getElementById("list").innerHTML = "";
+  count = 0;
+}`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a button that when clicked, changes the text of a paragraph using document.getElementById and textContent.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <p id="text">Click the button to change me!</p>
+  <button onclick="changeText()">Change Text</button>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create the changeText function
+// Use document.getElementById to get the paragraph
+// Change its textContent`,
+            validationKeywords: ['function', 'document.getElementById', 'textContent'],
+          },
         },
       ],
     },
     {
       id: 'react-basics',
-      name: 'React JSX',
+      name: 'React Fundamentals',
       icon: '⚛️',
       lessons: [
         {
           id: 'react-1',
-          title: 'What is React?',
-          topic: 'React JSX',
+          title: 'Components & JSX',
+          topic: 'React Fundamentals',
           level: 'basic',
-          content: `# What is React?\n\nReact is a JavaScript library for building UIs with components.\n\n## JSX\nJSX lets you write HTML-like code in JavaScript:\n\`\`\`jsx\nconst element = <h1>Hello, React!</h1>;\n\`\`\`\n\n**Note:** In this playground, we simulate React concepts using vanilla JS since we can't run a full React build.`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; background: #282c34; color: white; padding: 40px; text-align: center; }\n  .component { background: #3b3f47; padding: 20px; margin: 10px; border-radius: 12px; border-left: 4px solid #61dafb; }\n  .react-blue { color: #61dafb; }\n</style>\n</head>\n<body>\n  <h1 class="react-blue">⚛️ React Concepts</h1>\n  <div class="component">\n    <h2>Component: Header</h2>\n    <p>This represents a React component!</p>\n  </div>\n  <div class="component">\n    <h2>Component: Card</h2>\n    <p>Components are reusable building blocks.</p>\n  </div>\n  <script>\n    // React uses components like functions:\n    // function Header() { return <h1>Hello</h1>; }\n    // function App() { return <div><Header /><Card /></div>; }\n    console.log("React uses a virtual DOM for efficient updates!");\n    console.log("Components are like JavaScript functions that return HTML.");\n  </script>\n</body>\n</html>`,
+          content: `# Components & JSX ⚛️
+
+React builds UIs with **components** — reusable pieces of your page.
+
+## What is a Component?
+
+A component is a JavaScript function that returns HTML-like code (called **JSX**):
+
+\`\`\`jsx
+function Welcome() {
+  return <h1>Hello, World!</h1>;
+}
+\`\`\`
+
+## JSX Rules
+
+1. Must return **one parent element** (use \`<div>\` or \`<>\`)
+2. Use \`className\` instead of \`class\`
+3. Close all tags: \`<img />\`, \`<br />\`
+
+## Components are Building Blocks
+
+Think of them like LEGO pieces:
+- \`<Header />\` — the top bar
+- \`<Card />\` — a content card
+- \`<Footer />\` — the bottom section
+
+**Note:** In this playground, we demonstrate React concepts. The App.jsx tab shows component patterns!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; background: #282c34; color: white; padding: 0; margin: 0; }
+.app { padding: 40px; text-align: center; }
+.react-blue { color: #61dafb; }
+.component { background: #3b3f47; padding: 20px; margin: 10px auto; border-radius: 12px; border-left: 4px solid #61dafb; max-width: 500px; text-align: left; }
+.component h3 { color: #61dafb; margin-top: 0; }`,
+          initialJs: `// Simulating React components with vanilla JS
+function Header() {
+  return '<h1 class="react-blue">⚛️ React Components</h1>';
+}
+
+function Card(title, text) {
+  return \`
+    <div class="component">
+      <h3>\${title}</h3>
+      <p>\${text}</p>
+    </div>
+  \`;
+}
+
+// "Rendering" our components
+const app = document.getElementById("app");
+app.innerHTML = \`
+  <div class="app">
+    \${Header()}
+    \${Card("Component: Header", "The top section of your page")}
+    \${Card("Component: Card", "A reusable content container")}
+    \${Card("Component: Footer", "The bottom section")}
+  </div>
+\`;
+
+console.log("React uses a virtual DOM for efficient updates!");`,
+          initialJsx: `// This is what React JSX looks like:
+// (This is for learning — it runs in the preview as vanilla JS)
+
+// function App() {
+//   return (
+//     <div>
+//       <Header />
+//       <Card title="Hello" text="World" />
+//     </div>
+//   );
+// }
+
+// function Header() {
+//   return <h1>My App</h1>;
+// }
+
+// function Card({ title, text }) {
+//   return (
+//     <div className="card">
+//       <h3>{title}</h3>
+//       <p>{text}</p>
+//     </div>
+//   );
+// }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a function called "Card" that takes a title and returns HTML with an h3 heading. Use it to render 2 cards.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create a Card function that returns HTML
+// Render 2 cards into #app`,
+            validationKeywords: ['function', 'card', 'innerhtml'],
+          },
+        },
+        {
+          id: 'react-2',
+          title: 'State with useState',
+          topic: 'React Fundamentals',
+          level: 'basic',
+          content: `# State with useState 🔄
+
+State is data that can **change** and makes your UI update automatically!
+
+## What is State?
+
+In React:
+\`\`\`jsx
+const [count, setCount] = useState(0);
+\`\`\`
+
+- \`count\` — the current value
+- \`setCount\` — function to update it
+- \`0\` — the starting value
+
+## When State Changes, UI Updates!
+
+\`\`\`jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </div>
+  );
+}
+\`\`\`
+
+In our playground, we simulate state with regular variables and DOM updates.`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; background: #282c34; color: white; padding: 40px; text-align: center; }
+.counter { font-size: 48px; color: #61dafb; margin: 20px; }
+button { padding: 12px 24px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+.inc { background: #2ecc71; color: white; }
+.dec { background: #e74c3c; color: white; }
+.reset { background: #3498db; color: white; }`,
+          initialJs: `// Simulating React useState
+let count = 0;
+
+function render() {
+  document.getElementById("app").innerHTML = \`
+    <h1 style="color: #61dafb;">⚛️ State Demo</h1>
+    <div class="counter">\${count}</div>
+    <button class="dec" onclick="decrement()">- 1</button>
+    <button class="reset" onclick="reset()">Reset</button>
+    <button class="inc" onclick="increment()">+ 1</button>
+    <p style="color: #888; margin-top: 20px;">
+      In React: const [count, setCount] = useState(0)
+    </p>
+  \`;
+}
+
+function increment() { count++; render(); }
+function decrement() { count--; render(); }
+function reset() { count = 0; render(); }
+
+render(); // Initial render`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a counter with increment and decrement buttons that update a displayed number.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create a counter variable
+// Create render(), increment(), decrement() functions`,
+            validationKeywords: ['let', 'function', 'innerhtml', 'onclick'],
+          },
+        },
+        {
+          id: 'react-3',
+          title: 'Props & Data Flow',
+          topic: 'React Fundamentals',
+          level: 'basic',
+          content: `# Props & Data Flow 📨
+
+Props (properties) let you pass data FROM a parent TO a child component.
+
+## In React:
+
+\`\`\`jsx
+function UserCard({ name, age, role }) {
+  return (
+    <div className="card">
+      <h2>{name}</h2>
+      <p>Age: {age}</p>
+      <p>Role: {role}</p>
+    </div>
+  );
+}
+
+// Using it:
+<UserCard name="Alice" age={25} role="Developer" />
+\`\`\`
+
+## Key Rules:
+1. Props flow **one way**: parent → child
+2. Props are **read-only** in the child
+3. Use them to make components reusable
+
+## In Our Playground:
+
+We pass data as function arguments (same concept!):
+
+\`\`\`javascript
+function Card(props) {
+  return \`<div><h3>\${props.name}</h3></div>\`;
+}
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; background: #282c34; color: white; padding: 20px; }
+h1 { color: #61dafb; text-align: center; }
+.cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.user-card { background: #3b3f47; padding: 20px; border-radius: 12px; min-width: 200px; border-top: 4px solid #61dafb; }
+.user-card h3 { color: #61dafb; margin-top: 0; }
+.user-card .role { color: #2ecc71; font-weight: bold; }`,
+          initialJs: `// Simulating Props
+function UserCard({ name, age, role, emoji }) {
+  return \`
+    <div class="user-card">
+      <h3>\${emoji} \${name}</h3>
+      <p>Age: \${age}</p>
+      <p class="role">\${role}</p>
+    </div>
+  \`;
+}
+
+const users = [
+  { name: "Alice", age: 28, role: "Developer", emoji: "👩‍💻" },
+  { name: "Bob", age: 32, role: "Designer", emoji: "🎨" },
+  { name: "Charlie", age: 25, role: "Manager", emoji: "📊" },
+];
+
+const app = document.getElementById("app");
+app.innerHTML = \`
+  <h1>⚛️ Props Demo</h1>
+  <div class="cards">
+    \${users.map(u => UserCard(u)).join("")}
+  </div>
+\`;
+
+console.log("Props let you pass data to components!");`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a ProductCard function that takes name and price, and render 3 products.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create ProductCard function with name and price
+// Render 3 products into #app`,
+            validationKeywords: ['function', 'productcard', 'innerhtml'],
+          },
+        },
+        {
+          id: 'react-4',
+          title: 'Event Handling',
+          topic: 'React Fundamentals',
+          level: 'basic',
+          content: `# Event Handling 🖱️
+
+React handles events with camelCase names.
+
+## In React:
+\`\`\`jsx
+<button onClick={() => alert("Clicked!")}>Click Me</button>
+<input onChange={(e) => setName(e.target.value)} />
+\`\`\`
+
+## Common Events:
+- \`onClick\` — mouse click
+- \`onChange\` — input value changes
+- \`onSubmit\` — form submission
+- \`onMouseEnter\` / \`onMouseLeave\` — hover
+
+## Practical Example:
+
+A real-time search filter is a great way to see events in action!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; background: #282c34; color: white; padding: 20px; }
+h1 { color: #61dafb; text-align: center; }
+input { width: 100%; max-width: 400px; padding: 12px; border-radius: 8px; border: 2px solid #444; background: #3b3f47; color: white; font-size: 16px; display: block; margin: 10px auto; }
+.list { max-width: 400px; margin: 0 auto; }
+.list-item { background: #3b3f47; padding: 12px; margin: 6px 0; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.list-item:hover { background: #4b4f57; }`,
+          initialJs: `const items = ["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape"];
+let filtered = [...items];
+
+function render() {
+  document.getElementById("app").innerHTML = \`
+    <h1>🔍 Search Filter</h1>
+    <input type="text" placeholder="Type to search..." oninput="handleSearch(this.value)">
+    <div class="list">
+      \${filtered.map(item => \`<div class="list-item">\${item}</div>\`).join("")}
+    </div>
+  \`;
+}
+
+function handleSearch(query) {
+  filtered = items.filter(item =>
+    item.toLowerCase().includes(query.toLowerCase())
+  );
+  render();
+}
+
+render();`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create an input that filters a list of items as the user types. Use addEventListener or oninput.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <input type="text" id="search" placeholder="Search...">
+  <ul id="list"></ul>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create an array of items
+// Add an input event listener that filters and re-renders the list`,
+            validationKeywords: ['filter', 'innerhtml', 'addeventlistener'],
+          },
         },
       ],
     },
@@ -256,16 +2161,181 @@ const intermediateLessons: LevelData = {
     {
       id: 'html-intermediate',
       name: 'Advanced HTML',
-      icon: 'E',
+      icon: '📄',
       lessons: [
         {
           id: 'html-int-1',
           title: 'HTML5 APIs',
           topic: 'Advanced HTML',
           level: 'intermediate',
-          content: `# HTML5 APIs\n\nModern HTML5 provides powerful APIs:\n- **Local Storage** - Store data in the browser\n- **Geolocation** - Get user location\n- **Canvas** - Draw graphics\n- **Drag & Drop** - Native drag and drop`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; }\n  canvas { border: 2px solid #333; border-radius: 8px; }\n  button { padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 8px; border: none; background: #3498db; color: white; }\n</style>\n</head>\n<body>\n  <h1>HTML5 Canvas</h1>\n  <canvas id="canvas" width="400" height="300"></canvas>\n  <br>\n  <button onclick="drawCircle()">Draw Circle</button>\n  <button onclick="clearCanvas()">Clear</button>\n  <script>\n    const canvas = document.getElementById("canvas");\n    const ctx = canvas.getContext("2d");\n    function drawCircle() {\n      const x = Math.random() * 350 + 25;\n      const y = Math.random() * 250 + 25;\n      const r = Math.random() * 30 + 10;\n      ctx.beginPath();\n      ctx.arc(x, y, r, 0, Math.PI * 2);\n      ctx.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);\n      ctx.fill();\n    }\n    function clearCanvas() { ctx.clearRect(0, 0, 400, 300); }\n  </script>\n</body>\n</html>`,
+          content: `# HTML5 APIs 🚀
+
+Modern HTML5 provides powerful built-in features!
+
+## Local Storage
+
+Store data that persists even after closing the browser:
+\`\`\`javascript
+localStorage.setItem("name", "Alice");
+const name = localStorage.getItem("name");
+\`\`\`
+
+## Canvas — Drawing Graphics
+
+The \`<canvas>\` element lets you draw shapes, animations, and games:
+\`\`\`html
+<canvas id="canvas" width="400" height="300"></canvas>
+\`\`\`
+
+## Data Attributes
+
+Store custom data on any element:
+\`\`\`html
+<div data-id="42" data-color="blue">Item</div>
+\`\`\`
+
+## Audio & Video
+
+\`\`\`html
+<video src="movie.mp4" controls width="400"></video>
+<audio src="song.mp3" controls></audio>
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>HTML5 Canvas</h1>
+  <canvas id="canvas" width="400" height="300"></canvas>
+  <br>
+  <button onclick="drawCircle()">Draw Circle</button>
+  <button onclick="clearCanvas()">Clear</button>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; text-align: center; }
+h1 { color: #e94560; }
+canvas { border: 2px solid #333; border-radius: 8px; background: #0d1117; }
+button { padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 8px; border: none; background: #3498db; color: white; font-size: 14px; }
+button:hover { opacity: 0.8; }`,
+          initialJs: `const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function drawCircle() {
+  const x = Math.random() * 350 + 25;
+  const y = Math.random() * 250 + 25;
+  const r = Math.random() * 30 + 10;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, "0");
+  ctx.fill();
+}
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, 400, 300);
+}
+
+console.log("Click 'Draw Circle' to add random circles!");`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a canvas and draw a rectangle and a circle using the Canvas API.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <canvas id="canvas" width="400" height="300"></canvas>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+// Draw a rectangle with fillRect
+// Draw a circle with arc`,
+            validationKeywords: ['getcontext', 'fillrect', 'arc'],
+          },
+        },
+        {
+          id: 'html-int-2',
+          title: 'Accessibility (a11y)',
+          topic: 'Advanced HTML',
+          level: 'intermediate',
+          content: `# Accessibility (a11y) ♿
+
+Making your website usable by EVERYONE, including people with disabilities.
+
+## ARIA Attributes
+
+\`\`\`html
+<button aria-label="Close menu">X</button>
+<div role="alert">Error occurred!</div>
+<input aria-required="true" aria-invalid="false">
+\`\`\`
+
+## Key Practices
+
+1. **Always use alt text** on images
+2. **Use semantic HTML** (header, nav, main, etc.)
+3. **Labels on inputs** — always pair label + input
+4. **Keyboard navigation** — users should be able to tab through
+5. **Color contrast** — text must be readable
+6. **Focus indicators** — don't remove outline on focus
+
+## Skip Navigation
+
+\`\`\`html
+<a href="#main" class="skip-link">Skip to content</a>
+\`\`\`
+
+## Testing
+
+- Tab through your page — can you reach everything?
+- Use a screen reader to hear your page
+- Check color contrast ratios (4.5:1 minimum)`,
+          initialCode: `<!DOCTYPE html>
+<html lang="en">
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+  <header>
+    <nav aria-label="Main navigation">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+    </nav>
+  </header>
+  <main id="main">
+    <h1>Accessible Page</h1>
+    <form>
+      <label for="name">Name (required):</label>
+      <input type="text" id="name" aria-required="true">
+      <button type="submit">Submit</button>
+    </form>
+    <img src="https://picsum.photos/200/150" alt="A beautiful landscape photo">
+  </main>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; background: #1a1a2e; color: #e0e0e0; margin: 0; }
+.skip-link { position: absolute; top: -40px; left: 0; background: #e94560; color: white; padding: 8px; z-index: 100; }
+.skip-link:focus { top: 0; }
+header { background: #16213e; padding: 15px; }
+nav a { color: #4fc3f7; margin-right: 20px; }
+main { padding: 20px; }
+h1 { color: #e94560; }
+label { display: block; margin-top: 15px; color: #ccc; }
+input { padding: 10px; border-radius: 6px; border: 2px solid #333; background: #16213e; color: white; margin-top: 5px; }
+input:focus { border-color: #4fc3f7; outline: none; }
+button { margin-top: 15px; padding: 10px 24px; background: #e94560; color: white; border: none; border-radius: 6px; cursor: pointer; }
+img { border-radius: 8px; margin-top: 15px; }`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a form with proper labels, aria-required on inputs, and a button with aria-label.',
+            initialCode: `<!DOCTYPE html>
+<html lang="en">
+<body>
+  <form>
+    <!-- Add label, input with aria-required, and button with aria-label -->
+  </form>
+</body>
+</html>`,
+            validationKeywords: ['<label', 'aria-required', 'aria-label'],
+          },
         },
       ],
     },
@@ -276,12 +2346,295 @@ const intermediateLessons: LevelData = {
       lessons: [
         {
           id: 'css-int-1',
-          title: 'CSS Variables & Responsive',
+          title: 'CSS Variables',
           topic: 'Advanced CSS',
           level: 'intermediate',
-          content: `# CSS Variables & Responsive Design\n\n## Custom Properties\n\`\`\`css\n:root { --primary: #3498db; }\n.btn { background: var(--primary); }\n\`\`\`\n\n## Media Queries\n\`\`\`css\n@media (max-width: 768px) {\n  .grid { grid-template-columns: 1fr; }\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  :root {\n    --primary: #6c5ce7;\n    --secondary: #00cec9;\n    --bg: #2d3436;\n    --text: #dfe6e9;\n  }\n  body { background: var(--bg); color: var(--text); font-family: Arial; padding: 20px; }\n  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }\n  .card { background: #636e72; padding: 20px; border-radius: 12px; border-top: 4px solid var(--primary); }\n  .card h3 { color: var(--secondary); }\n  .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }\n</style>\n</head>\n<body>\n  <h1>Responsive Cards</h1>\n  <p>Resize the preview to see the grid adapt!</p>\n  <div class="card-grid">\n    <div class="card"><h3>Card 1</h3><p>Responsive grid item</p><button class="btn">Action</button></div>\n    <div class="card"><h3>Card 2</h3><p>Using CSS variables</p><button class="btn">Action</button></div>\n    <div class="card"><h3>Card 3</h3><p>Auto-fit columns</p><button class="btn">Action</button></div>\n  </div>\n</body>\n</html>`,
+          content: `# CSS Variables (Custom Properties) 🎛️
+
+CSS variables let you define reusable values!
+
+## Defining Variables
+
+\`\`\`css
+:root {
+  --primary: #3498db;
+  --bg-dark: #1a1a2e;
+  --spacing: 16px;
+}
+\`\`\`
+
+## Using Variables
+
+\`\`\`css
+.button {
+  background: var(--primary);
+  padding: var(--spacing);
+}
+\`\`\`
+
+## Why Use Variables?
+
+1. Change one value, update everywhere
+2. Easy theming (dark/light mode!)
+3. Cleaner, more maintainable code
+
+## Dynamic Theming
+
+You can change variables with JavaScript:
+\`\`\`javascript
+document.documentElement.style.setProperty('--primary', '#e74c3c');
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>CSS Variables</h1>
+  <div class="card-grid">
+    <div class="card"><h3>Card 1</h3><p>Using CSS variables</p><button class="btn" onclick="changeTheme()">Change Theme</button></div>
+    <div class="card"><h3>Card 2</h3><p>Responsive and themed</p><button class="btn">Action</button></div>
+    <div class="card"><h3>Card 3</h3><p>Easy to customize</p><button class="btn">Action</button></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `:root {
+  --primary: #6c5ce7;
+  --secondary: #00cec9;
+  --bg: #2d3436;
+  --text: #dfe6e9;
+  --card-bg: #636e72;
+  --radius: 12px;
+  --spacing: 16px;
+}
+
+body { background: var(--bg); color: var(--text); font-family: Arial; padding: 20px; }
+h1 { color: var(--primary); text-align: center; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing); }
+.card { background: var(--card-bg); padding: 20px; border-radius: var(--radius); border-top: 4px solid var(--primary); }
+.card h3 { color: var(--secondary); }
+.btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.btn:hover { opacity: 0.8; }`,
+          initialJs: `const themes = [
+  { primary: "#6c5ce7", secondary: "#00cec9", bg: "#2d3436", card: "#636e72" },
+  { primary: "#e94560", secondary: "#f39c12", bg: "#1a1a2e", card: "#16213e" },
+  { primary: "#2ecc71", secondary: "#3498db", bg: "#0d1117", card: "#161b22" },
+];
+let themeIndex = 0;
+
+function changeTheme() {
+  themeIndex = (themeIndex + 1) % themes.length;
+  const t = themes[themeIndex];
+  document.documentElement.style.setProperty("--primary", t.primary);
+  document.documentElement.style.setProperty("--secondary", t.secondary);
+  document.documentElement.style.setProperty("--bg", t.bg);
+  document.documentElement.style.setProperty("--card-bg", t.card);
+  console.log("Theme changed to:", themeIndex + 1);
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Define CSS variables for --primary and --bg in :root, and use them on elements.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body><h1>Themed</h1><p class="box">Styled box</p></body></html>`,
+            initialCss: `:root {
+  /* Define --primary and --bg variables */
+}
+body { background: var(--bg); }
+h1 { color: var(--primary); }
+.box { border: 2px solid var(--primary); padding: 20px; }`,
+            validationKeywords: ['--primary', '--bg', 'var('],
+          },
+        },
+        {
+          id: 'css-int-2',
+          title: 'CSS Grid Advanced',
+          topic: 'Advanced CSS',
+          level: 'intermediate',
+          content: `# CSS Grid — Advanced 📐
+
+Let's go deeper with CSS Grid for complex layouts!
+
+## Grid Template Areas
+
+Name your grid areas:
+\`\`\`css
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 250px 1fr;
+}
+.header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main { grid-area: main; }
+\`\`\`
+
+## Auto-Fill & Auto-Fit
+
+\`\`\`css
+/* Cards that auto-wrap */
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+\`\`\`
+
+## Grid Item Placement
+
+\`\`\`css
+.featured { grid-column: span 2; }
+.tall { grid-row: span 2; }
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="layout">
+    <header class="header">Header</header>
+    <aside class="sidebar">Sidebar</aside>
+    <main class="main">Main Content</main>
+    <footer class="footer">Footer</footer>
+  </div>
+</body>
+</html>`,
+          initialCss: `* { box-sizing: border-box; margin: 0; }
+body { font-family: Arial; background: #0d1117; color: white; }
+
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 60px 1fr 50px;
+  min-height: 100vh;
+  gap: 2px;
+}
+
+.header { grid-area: header; background: #161b22; padding: 15px; display: flex; align-items: center; font-size: 20px; color: #e94560; font-weight: bold; }
+.sidebar { grid-area: sidebar; background: #161b22; padding: 15px; }
+.main { grid-area: main; background: #0d1117; padding: 20px; }
+.footer { grid-area: footer; background: #161b22; padding: 15px; text-align: center; color: #666; }`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a grid layout with named template areas for header, sidebar, main, and footer.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="layout">
+    <div class="header">Header</div>
+    <div class="sidebar">Sidebar</div>
+    <div class="main">Main</div>
+    <div class="footer">Footer</div>
+  </div>
+</body></html>`,
+            initialCss: `.layout {
+  display: grid;
+  /* Add grid-template-areas */
+}
+.header { grid-area: header; background: #333; padding: 10px; }
+.sidebar { grid-area: sidebar; background: #444; padding: 10px; }
+.main { grid-area: main; background: #555; padding: 10px; }
+.footer { grid-area: footer; background: #333; padding: 10px; }`,
+            validationKeywords: ['grid-template-areas', 'grid-area'],
+          },
+        },
+        {
+          id: 'css-int-3',
+          title: 'Animations & Transitions',
+          topic: 'Advanced CSS',
+          level: 'intermediate',
+          content: `# Animations & Transitions 🎬
+
+## Transitions — Smooth Changes
+
+\`\`\`css
+.button {
+  background: blue;
+  transition: all 0.3s ease;
+}
+.button:hover {
+  background: red;
+  transform: scale(1.1);
+}
+\`\`\`
+
+## Keyframe Animations
+
+\`\`\`css
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.element {
+  animation: slideIn 0.5s ease-out;
+}
+\`\`\`
+
+## Animation Properties
+- \`animation-name\` — which keyframes to use
+- \`animation-duration\` — how long
+- \`animation-timing-function\` — speed curve (ease, linear)
+- \`animation-iteration-count\` — how many times (or \`infinite\`)
+- \`animation-delay\` — wait before starting`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="bounce">🚀</div>
+  <h1 class="fade-in">CSS Animations!</h1>
+  <button class="btn">Hover Me</button>
+  <div class="spinner"></div>
+</body>
+</html>`,
+          initialCss: `body { text-align: center; padding: 40px; background: #1a1a2e; color: white; font-family: Arial; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.bounce { animation: bounce 1s infinite; display: inline-block; font-size: 50px; }
+.fade-in { animation: fadeIn 1s ease-out; color: #e94560; }
+
+.btn {
+  padding: 15px 30px; background: #e94560; color: white; border: none;
+  border-radius: 8px; font-size: 18px; cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn:hover { transform: scale(1.1) rotate(2deg); background: #c0392b; box-shadow: 0 10px 30px rgba(233,69,96,0.4); }
+
+.spinner {
+  width: 40px; height: 40px; border: 4px solid #333;
+  border-top-color: #e94560; border-radius: 50%;
+  animation: spin 1s linear infinite; margin: 30px auto;
+}`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a @keyframes animation and apply it to an element. Also add a hover transition to a button.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="animated">🎉</div>
+  <button class="btn">Hover me</button>
+</body></html>`,
+            initialCss: `body { text-align: center; padding: 40px; background: #1a1a2e; color: white; }
+
+/* Create @keyframes and apply to .animated */
+/* Add transition to .btn */`,
+            validationKeywords: ['@keyframes', 'animation:', 'transition:'],
+          },
         },
       ],
     },
@@ -295,18 +2648,478 @@ const intermediateLessons: LevelData = {
           title: 'Async/Await & Fetch',
           topic: 'Advanced JavaScript',
           level: 'intermediate',
-          content: `# Async JavaScript\n\n## Promises & Async/Await\n\`\`\`js\nasync function getData() {\n  const res = await fetch("https://api.example.com/data");\n  const data = await res.json();\n  return data;\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }\n  .user-card { background: #16213e; padding: 16px; margin: 8px 0; border-radius: 8px; border-left: 3px solid #e94560; }\n  button { background: #e94560; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; }\n  .loading { color: #e94560; }\n</style>\n</head>\n<body>\n  <h1>Fetch API Demo</h1>\n  <button onclick="loadUsers()">Load Users</button>\n  <div id="users"></div>\n  <script>\n    async function loadUsers() {\n      document.getElementById("users").innerHTML = '<p class="loading">Loading...</p>';\n      try {\n        const res = await fetch("https://jsonplaceholder.typicode.com/users");\n        const users = await res.json();\n        let html = "";\n        users.slice(0, 5).forEach(user => {\n          html += '<div class="user-card"><strong>' + user.name + '</strong><br>' + user.email + '</div>';\n        });\n        document.getElementById("users").innerHTML = html;\n      } catch(err) {\n        document.getElementById("users").innerHTML = "Error loading data";\n      }\n    }\n  </script>\n</body>\n</html>`,
+          content: `# Async JavaScript 🌐
+
+## The Problem
+
+Some operations take time (loading data from the internet). JavaScript doesn't wait — it keeps running!
+
+## Promises
+
+A promise is like ordering food: you get a receipt (promise) and pick up later.
+
+\`\`\`javascript
+fetch("https://api.example.com/data")
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+\`\`\`
+
+## Async/Await (Cleaner!)
+
+\`\`\`javascript
+async function getData() {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed:", error);
+  }
+}
+\`\`\`
+
+\`async\` marks the function. \`await\` pauses until done.`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Fetch API Demo</h1>
+  <button onclick="loadUsers()">Load Users</button>
+  <div id="users"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #e94560; }
+button { background: #e94560; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+.user-card { background: #16213e; padding: 16px; margin: 8px 0; border-radius: 8px; border-left: 3px solid #e94560; }
+.loading { color: #e94560; font-style: italic; }`,
+          initialJs: `async function loadUsers() {
+  const container = document.getElementById("users");
+  container.innerHTML = '<p class="loading">Loading...</p>';
+
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users");
+    const users = await response.json();
+
+    container.innerHTML = users.slice(0, 5).map(user => \`
+      <div class="user-card">
+        <strong>\${user.name}</strong><br>
+        \${user.email}
+      </div>
+    \`).join("");
+
+    console.log("Loaded", users.length, "users");
+  } catch (error) {
+    container.innerHTML = "Error loading data";
+    console.error("Fetch error:", error);
+  }
+}`,
           language: 'html',
+          challenge: {
+            instruction: 'Use fetch() with async/await to load data from https://jsonplaceholder.typicode.com/posts and display the first 3 titles.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Posts</h1>
+  <button onclick="loadPosts()">Load Posts</button>
+  <div id="posts"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create an async function loadPosts
+// Fetch from https://jsonplaceholder.typicode.com/posts
+// Display first 3 post titles`,
+            validationKeywords: ['async', 'await', 'fetch'],
+          },
         },
         {
           id: 'js-int-2',
           title: 'Array Methods',
           topic: 'Advanced JavaScript',
           level: 'intermediate',
-          content: `# Array Methods\n\nPowerful array methods:\n- \`map()\` - Transform each element\n- \`filter()\` - Keep matching elements\n- \`reduce()\` - Combine to single value\n- \`find()\` - Find first match`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }\n  .result { background: #2d2d2d; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 3px solid #569cd6; }\n  h3 { color: #569cd6; }\n</style>\n</head>\n<body>\n  <h1>Array Methods</h1>\n  <div id="output"></div>\n  <script>\n    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n    const doubled = numbers.map(n => n * 2);\n    const evens = numbers.filter(n => n % 2 === 0);\n    const sum = numbers.reduce((acc, n) => acc + n, 0);\n    const products = [{name: "Laptop", price: 999}, {name: "Phone", price: 699}, {name: "Tablet", price: 399}];\n    const expensive = products.filter(p => p.price > 500).map(p => p.name);\n\n    document.getElementById("output").innerHTML = \n      '<div class="result"><h3>Original:</h3>' + JSON.stringify(numbers) + '</div>' +\n      '<div class="result"><h3>Doubled (map):</h3>' + JSON.stringify(doubled) + '</div>' +\n      '<div class="result"><h3>Evens (filter):</h3>' + JSON.stringify(evens) + '</div>' +\n      '<div class="result"><h3>Sum (reduce):</h3>' + sum + '</div>' +\n      '<div class="result"><h3>Expensive Products:</h3>' + JSON.stringify(expensive) + '</div>';\n    \n    console.log("Sum:", sum);\n  </script>\n</body>\n</html>`,
+          content: `# Array Methods 🧰
+
+Modern JavaScript has powerful array methods. They're used CONSTANTLY!
+
+## map() — Transform each item
+
+\`\`\`javascript
+const numbers = [1, 2, 3];
+const doubled = numbers.map(n => n * 2); // [2, 4, 6]
+\`\`\`
+
+## filter() — Keep matching items
+
+\`\`\`javascript
+const evens = numbers.filter(n => n % 2 === 0); // [2]
+\`\`\`
+
+## reduce() — Combine into one value
+
+\`\`\`javascript
+const sum = numbers.reduce((total, n) => total + n, 0); // 6
+\`\`\`
+
+## find() — First match
+
+\`\`\`javascript
+const found = numbers.find(n => n > 1); // 2
+\`\`\`
+
+## Chaining Methods
+
+\`\`\`javascript
+const result = products
+  .filter(p => p.price > 50)
+  .map(p => p.name)
+  .sort();
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Array Methods</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; }
+h1 { color: #e94560; }
+.result { background: #161b22; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 3px solid #4fc3f7; }
+h3 { color: #4fc3f7; margin: 0 0 5px 0; }`,
+          initialJs: `const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const doubled = numbers.map(n => n * 2);
+const evens = numbers.filter(n => n % 2 === 0);
+const sum = numbers.reduce((acc, n) => acc + n, 0);
+
+const products = [
+  { name: "Laptop", price: 999 },
+  { name: "Phone", price: 699 },
+  { name: "Tablet", price: 399 },
+  { name: "Watch", price: 199 },
+];
+const expensive = products.filter(p => p.price > 500).map(p => p.name);
+
+document.getElementById("output").innerHTML =
+  '<div class="result"><h3>Original:</h3>' + JSON.stringify(numbers) + '</div>' +
+  '<div class="result"><h3>Doubled (map):</h3>' + JSON.stringify(doubled) + '</div>' +
+  '<div class="result"><h3>Evens (filter):</h3>' + JSON.stringify(evens) + '</div>' +
+  '<div class="result"><h3>Sum (reduce):</h3>' + sum + '</div>' +
+  '<div class="result"><h3>Expensive (>$500):</h3>' + JSON.stringify(expensive) + '</div>';
+
+console.log("Sum:", sum);
+console.log("Expensive items:", expensive);`,
           language: 'html',
+          challenge: {
+            instruction: 'Use map() to double an array of numbers and filter() to keep only even results.',
+            initialCode: `<!DOCTYPE html>
+<html><body><div id="output"></div><script src="script.js"></script></body></html>`,
+            initialJs: `const numbers = [1, 2, 3, 4, 5];
+// Use map to double them
+// Use filter to keep evens
+// Display results`,
+            validationKeywords: ['.map(', '.filter(', 'console.log'],
+          },
+        },
+        {
+          id: 'js-int-3',
+          title: 'Objects & Destructuring',
+          topic: 'Advanced JavaScript',
+          level: 'intermediate',
+          content: `# Objects & Destructuring 📦
+
+## Objects — Key-Value Pairs
+
+\`\`\`javascript
+const user = {
+  name: "Alice",
+  age: 28,
+  skills: ["HTML", "CSS", "JS"],
+};
+console.log(user.name); // "Alice"
+\`\`\`
+
+## Destructuring — Unpack Values
+
+\`\`\`javascript
+const { name, age } = user;
+console.log(name); // "Alice"
+\`\`\`
+
+## Spread Operator
+
+\`\`\`javascript
+const updated = { ...user, age: 29 };
+const combined = [...arr1, ...arr2];
+\`\`\`
+
+## Optional Chaining
+
+\`\`\`javascript
+const city = user?.address?.city; // undefined (no error!)
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Objects & Destructuring</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; }
+h1 { color: #e94560; }
+.card { background: #161b22; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 3px solid #2ecc71; }
+.card h3 { color: #2ecc71; margin: 0 0 8px 0; }
+.skill { display: inline-block; background: #e94560; color: white; padding: 3px 8px; border-radius: 4px; margin: 2px; font-size: 12px; }`,
+          initialJs: `const user = {
+  name: "Alice",
+  age: 28,
+  role: "Developer",
+  skills: ["HTML", "CSS", "JavaScript", "React"],
+};
+
+// Destructuring
+const { name, age, role, skills } = user;
+
+// Spread operator
+const updatedUser = { ...user, age: 29, city: "NYC" };
+
+document.getElementById("output").innerHTML = \`
+  <div class="card">
+    <h3>\${name} (\${age})</h3>
+    <p>Role: \${role}</p>
+    <p>Skills: \${skills.map(s => '<span class="skill">' + s + '</span>').join(" ")}</p>
+  </div>
+  <div class="card">
+    <h3>Updated User (Spread)</h3>
+    <pre>\${JSON.stringify(updatedUser, null, 2)}</pre>
+  </div>
+\`;
+
+console.log("Destructured:", { name, age, role });
+console.log("Updated:", updatedUser);`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create an object with name, age, and hobby properties. Use destructuring to extract them and log each one.',
+            initialCode: `<!DOCTYPE html>
+<html><body><script src="script.js"></script></body></html>`,
+            initialJs: `// Create an object
+// Destructure it
+// Console.log each property`,
+            validationKeywords: ['const {', 'console.log'],
+          },
+        },
+        {
+          id: 'js-int-4',
+          title: 'Error Handling',
+          topic: 'Advanced JavaScript',
+          level: 'intermediate',
+          content: `# Error Handling 🛡️
+
+Things go wrong. Good code handles errors gracefully!
+
+## Try/Catch
+
+\`\`\`javascript
+try {
+  // Code that might fail
+  const data = JSON.parse(badString);
+} catch (error) {
+  console.error("Something went wrong:", error.message);
+} finally {
+  console.log("This always runs");
+}
+\`\`\`
+
+## Throwing Custom Errors
+
+\`\`\`javascript
+function divide(a, b) {
+  if (b === 0) throw new Error("Cannot divide by zero!");
+  return a / b;
+}
+\`\`\`
+
+## Error Types
+- \`TypeError\` — wrong data type
+- \`ReferenceError\` — variable doesn't exist
+- \`SyntaxError\` — bad syntax
+- \`RangeError\` — number out of range`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Error Handling</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; }
+h1 { color: #e94560; }
+.success { background: #0d2818; border-left: 3px solid #2ecc71; padding: 12px; margin: 8px 0; border-radius: 6px; }
+.error { background: #2d0a0a; border-left: 3px solid #e74c3c; padding: 12px; margin: 8px 0; border-radius: 6px; }`,
+          initialJs: `const output = document.getElementById("output");
+let html = "";
+
+// Example 1: JSON parsing
+try {
+  const data = JSON.parse('{"name": "Alice"}');
+  html += '<div class="success">✅ Parsed: ' + data.name + '</div>';
+} catch (e) {
+  html += '<div class="error">❌ ' + e.message + '</div>';
+}
+
+// Example 2: Bad JSON
+try {
+  const bad = JSON.parse("not json");
+  html += '<div class="success">✅ This won\\'t show</div>';
+} catch (e) {
+  html += '<div class="error">❌ ' + e.message + '</div>';
+}
+
+// Example 3: Custom error
+function divide(a, b) {
+  if (b === 0) throw new Error("Cannot divide by zero!");
+  return a / b;
+}
+
+try {
+  html += '<div class="success">✅ 10 / 2 = ' + divide(10, 2) + '</div>';
+  html += '<div class="success">✅ 10 / 0 = ' + divide(10, 0) + '</div>';
+} catch (e) {
+  html += '<div class="error">❌ ' + e.message + '</div>';
+}
+
+output.innerHTML = html;`,
+          language: 'html',
+          challenge: {
+            instruction: 'Write a function that throws an error if the input is not a number, and wrap the call in try/catch.',
+            initialCode: `<!DOCTYPE html>
+<html><body><script src="script.js"></script></body></html>`,
+            initialJs: `// Create a function that validates input
+// Throw an error if not a number
+// Wrap in try/catch`,
+            validationKeywords: ['try', 'catch', 'throw', 'error'],
+          },
+        },
+      ],
+    },
+    {
+      id: 'react-intermediate',
+      name: 'Advanced React',
+      icon: '⚛️',
+      lessons: [
+        {
+          id: 'react-int-1',
+          title: 'Lists & Keys',
+          topic: 'Advanced React',
+          level: 'intermediate',
+          content: `# Lists & Keys 📋
+
+In React, rendering lists uses \`.map()\` and requires unique **keys**.
+
+## Rendering a List
+
+\`\`\`jsx
+function TodoList({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>{item.text}</li>
+      ))}
+    </ul>
+  );
+}
+\`\`\`
+
+## Why Keys?
+
+Keys help React know WHICH items changed:
+- Use unique IDs (from database, etc.)
+- DON'T use array index if items can be reordered
+- Keys must be unique among siblings
+
+## Filtering & Sorting Lists
+
+\`\`\`jsx
+const filtered = items
+  .filter(item => !item.done)
+  .map(item => <TodoItem key={item.id} {...item} />);
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; background: #282c34; color: white; padding: 20px; }
+h1 { color: #61dafb; text-align: center; }
+input { width: 100%; max-width: 400px; padding: 10px; border-radius: 8px; border: 2px solid #444; background: #3b3f47; color: white; font-size: 16px; }
+.todo-item { display: flex; align-items: center; gap: 10px; background: #3b3f47; padding: 12px; margin: 6px 0; border-radius: 8px; }
+.todo-item.done { opacity: 0.5; text-decoration: line-through; }
+.todo-item button { background: #e74c3c; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+.add-btn { background: #61dafb; color: #282c34; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 8px; }`,
+          initialJs: `let todos = [
+  { id: 1, text: "Learn HTML", done: true },
+  { id: 2, text: "Learn CSS", done: true },
+  { id: 3, text: "Learn JavaScript", done: false },
+  { id: 4, text: "Learn React", done: false },
+];
+let nextId = 5;
+
+function render() {
+  document.getElementById("app").innerHTML = \`
+    <h1>📋 Todo List (Lists & Keys)</h1>
+    <div style="display:flex;justify-content:center;margin-bottom:20px;">
+      <input type="text" id="newTodo" placeholder="Add new todo..." onkeypress="if(event.key==='Enter')addTodo()">
+      <button class="add-btn" onclick="addTodo()">Add</button>
+    </div>
+    <div style="max-width:400px;margin:0 auto;">
+      \${todos.map(todo => \`
+        <div class="todo-item \${todo.done ? 'done' : ''}" data-key="\${todo.id}">
+          <input type="checkbox" \${todo.done ? 'checked' : ''} onchange="toggleTodo(\${todo.id})">
+          <span style="flex:1">\${todo.text}</span>
+          <button onclick="deleteTodo(\${todo.id})">✕</button>
+        </div>
+      \`).join("")}
+    </div>
+    <p style="text-align:center;color:#666;margin-top:20px;">\${todos.filter(t=>!t.done).length} items remaining</p>
+  \`;
+}
+
+function addTodo() {
+  const input = document.getElementById("newTodo");
+  if (!input.value.trim()) return;
+  todos.push({ id: nextId++, text: input.value, done: false });
+  render();
+}
+
+function toggleTodo(id) {
+  todos = todos.map(t => t.id === id ? { ...t, done: !t.done } : t);
+  render();
+}
+
+function deleteTodo(id) {
+  todos = todos.filter(t => t.id !== id);
+  render();
+}
+
+render();`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a todo list where you can add items and mark them as done using an array and .map().',
+            initialCode: `<!DOCTYPE html>
+<html><body><div id="app"></div><script src="script.js"></script></body></html>`,
+            initialJs: `// Create a todos array
+// Render function using .map()
+// Add and toggle functions`,
+            validationKeywords: ['.map(', 'innerhtml', 'function'],
+          },
         },
       ],
     },
@@ -327,9 +3140,324 @@ const expertLessons: LevelData = {
           title: 'Design Patterns',
           topic: 'Expert JavaScript',
           level: 'expert',
-          content: `# Design Patterns\n\nCommon patterns in JavaScript:\n- **Module Pattern** - Encapsulate private data\n- **Observer Pattern** - Event-based communication\n- **Factory Pattern** - Create objects dynamically`,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; }\n  .pattern { background: #161b22; padding: 16px; margin: 12px 0; border-radius: 8px; border: 1px solid #30363d; }\n  h3 { color: #58a6ff; }\n  .output { color: #7ee787; }\n</style>\n</head>\n<body>\n  <h1>Design Patterns</h1>\n  <div id="output"></div>\n  <script>\n    // Module Pattern\n    const Counter = (() => {\n      let count = 0;\n      return {\n        increment: () => ++count,\n        decrement: () => --count,\n        getCount: () => count\n      };\n    })();\n\n    Counter.increment();\n    Counter.increment();\n    Counter.increment();\n\n    // Observer Pattern\n    class EventEmitter {\n      constructor() { this.events = {}; }\n      on(event, fn) { (this.events[event] = this.events[event] || []).push(fn); }\n      emit(event, data) { (this.events[event] || []).forEach(fn => fn(data)); }\n    }\n\n    const emitter = new EventEmitter();\n    let messages = [];\n    emitter.on('message', (msg) => messages.push(msg));\n    emitter.emit('message', 'Hello Observer!');\n    emitter.emit('message', 'Pattern works!');\n\n    document.getElementById("output").innerHTML =\n      '<div class="pattern"><h3>Module Pattern</h3><p class="output">Counter: ' + Counter.getCount() + '</p></div>' +\n      '<div class="pattern"><h3>Observer Pattern</h3><p class="output">Messages: ' + JSON.stringify(messages) + '</p></div>';\n    \n    console.log("Count:", Counter.getCount());\n    console.log("Messages:", messages);\n  </script>\n</body>\n</html>`,
+          content: `# Design Patterns 🏗️
+
+Patterns are proven solutions to common problems.
+
+## Module Pattern — Encapsulation
+
+\`\`\`javascript
+const Counter = (() => {
+  let count = 0; // private
+  return {
+    increment: () => ++count,
+    getCount: () => count,
+  };
+})();
+\`\`\`
+
+## Observer Pattern — Events
+
+\`\`\`javascript
+class EventEmitter {
+  constructor() { this.events = {}; }
+  on(event, fn) { (this.events[event] ||= []).push(fn); }
+  emit(event, data) { this.events[event]?.forEach(fn => fn(data)); }
+}
+\`\`\`
+
+## Factory Pattern — Object Creation
+
+\`\`\`javascript
+function createUser(name, role) {
+  return { name, role, id: Date.now() };
+}
+\`\`\`
+
+## Singleton Pattern — One Instance
+
+\`\`\`javascript
+class Database {
+  static instance = null;
+  static getInstance() {
+    if (!Database.instance) Database.instance = new Database();
+    return Database.instance;
+  }
+}
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Design Patterns</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; }
+h1 { color: #e94560; }
+.pattern { background: #161b22; padding: 16px; margin: 12px 0; border-radius: 8px; border: 1px solid #30363d; }
+h3 { color: #58a6ff; margin: 0 0 8px 0; }
+.output { color: #7ee787; }`,
+          initialJs: `// Module Pattern
+const Counter = (() => {
+  let count = 0;
+  return {
+    increment: () => ++count,
+    decrement: () => --count,
+    getCount: () => count,
+  };
+})();
+
+Counter.increment();
+Counter.increment();
+Counter.increment();
+
+// Observer Pattern
+class EventEmitter {
+  constructor() { this.events = {}; }
+  on(event, fn) { (this.events[event] = this.events[event] || []).push(fn); }
+  emit(event, data) { (this.events[event] || []).forEach(fn => fn(data)); }
+}
+
+const emitter = new EventEmitter();
+let messages = [];
+emitter.on("message", msg => messages.push(msg));
+emitter.emit("message", "Hello Observer!");
+emitter.emit("message", "Pattern works!");
+
+document.getElementById("output").innerHTML =
+  '<div class="pattern"><h3>Module Pattern</h3><p class="output">Counter: ' + Counter.getCount() + '</p></div>' +
+  '<div class="pattern"><h3>Observer Pattern</h3><p class="output">Messages: ' + JSON.stringify(messages) + '</p></div>';
+
+console.log("Count:", Counter.getCount());
+console.log("Messages:", messages);`,
           language: 'html',
+          challenge: {
+            instruction: 'Implement the Module Pattern: create a module with private data and public methods to interact with it.',
+            initialCode: `<!DOCTYPE html>
+<html><body><script src="script.js"></script></body></html>`,
+            initialJs: `// Create a Module Pattern with private state
+// and public methods`,
+            validationKeywords: ['const', 'return', 'function'],
+          },
+        },
+        {
+          id: 'js-exp-2',
+          title: 'Closures & Scope',
+          topic: 'Expert JavaScript',
+          level: 'expert',
+          content: `# Closures & Scope 🔒
+
+A closure is a function that remembers variables from its outer scope even after the outer function has returned.
+
+## Basic Closure
+
+\`\`\`javascript
+function makeCounter() {
+  let count = 0;
+  return function() {
+    count++;
+    return count;
+  };
+}
+
+const counter = makeCounter();
+counter(); // 1
+counter(); // 2
+\`\`\`
+
+## Practical Uses
+
+**1. Data Privacy:**
+\`\`\`javascript
+function createWallet(initial) {
+  let balance = initial;
+  return {
+    deposit: (amount) => balance += amount,
+    getBalance: () => balance,
+  };
+}
+\`\`\`
+
+**2. Function Factories:**
+\`\`\`javascript
+function multiplier(factor) {
+  return (n) => n * factor;
+}
+const double = multiplier(2);
+double(5); // 10
+\`\`\`
+
+## Scope Chain
+
+JavaScript looks for variables: local → outer → outer → ... → global`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Closures & Scope</h1>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; }
+h1 { color: #e94560; }
+.demo { background: #161b22; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 3px solid #58a6ff; }
+.demo h3 { color: #58a6ff; margin: 0 0 8px 0; }
+.value { color: #7ee787; font-weight: bold; }`,
+          initialJs: `// Closure: Counter
+function makeCounter() {
+  let count = 0;
+  return {
+    increment: () => ++count,
+    getCount: () => count,
+  };
+}
+
+const counter = makeCounter();
+counter.increment();
+counter.increment();
+counter.increment();
+
+// Closure: Wallet
+function createWallet(initial) {
+  let balance = initial;
+  return {
+    deposit: (amt) => { balance += amt; return balance; },
+    withdraw: (amt) => { balance -= amt; return balance; },
+    getBalance: () => balance,
+  };
+}
+
+const wallet = createWallet(100);
+wallet.deposit(50);
+wallet.withdraw(30);
+
+// Function Factory
+function multiplier(factor) {
+  return (n) => n * factor;
+}
+const double = multiplier(2);
+const triple = multiplier(3);
+
+document.getElementById("output").innerHTML = \`
+  <div class="demo"><h3>Counter Closure</h3>Count: <span class="value">\${counter.getCount()}</span></div>
+  <div class="demo"><h3>Wallet Closure</h3>Balance: <span class="value">$\${wallet.getBalance()}</span></div>
+  <div class="demo"><h3>Function Factory</h3>
+    double(5) = <span class="value">\${double(5)}</span>,
+    triple(5) = <span class="value">\${triple(5)}</span>
+  </div>
+\`;`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a closure-based counter with increment, decrement, and getCount methods.',
+            initialCode: `<!DOCTYPE html>
+<html><body><script src="script.js"></script></body></html>`,
+            initialJs: `// Create makeCounter function using closures`,
+            validationKeywords: ['function', 'return', 'let'],
+          },
+        },
+        {
+          id: 'js-exp-3',
+          title: 'Promises & Async Patterns',
+          topic: 'Expert JavaScript',
+          level: 'expert',
+          content: `# Advanced Async Patterns ⚡
+
+## Promise.all — Run in Parallel
+
+\`\`\`javascript
+const [users, posts] = await Promise.all([
+  fetch("/users").then(r => r.json()),
+  fetch("/posts").then(r => r.json()),
+]);
+\`\`\`
+
+## Promise.race — First to Finish
+
+\`\`\`javascript
+const result = await Promise.race([
+  fetch(url),
+  timeout(5000),
+]);
+\`\`\`
+
+## Promise.allSettled — All Complete
+
+\`\`\`javascript
+const results = await Promise.allSettled([p1, p2, p3]);
+results.forEach(r => {
+  if (r.status === "fulfilled") console.log(r.value);
+  else console.log("Failed:", r.reason);
+});
+\`\`\`
+
+## Debounce Pattern
+
+\`\`\`javascript
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Async Patterns</h1>
+  <button onclick="runAll()">Promise.all</button>
+  <button onclick="runRace()">Promise.race</button>
+  <div id="output"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; padding: 20px; background: #0d1117; color: #c9d1d9; text-align: center; }
+h1 { color: #e94560; }
+button { background: #e94560; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 5px; font-size: 14px; }
+#output { text-align: left; max-width: 500px; margin: 20px auto; }
+.result { background: #161b22; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 3px solid #58a6ff; }`,
+          initialJs: `const output = document.getElementById("output");
+
+async function runAll() {
+  output.innerHTML = '<p style="color:#e94560">Loading all...</p>';
+  const start = Date.now();
+
+  const [users, posts] = await Promise.all([
+    fetch("https://jsonplaceholder.typicode.com/users").then(r => r.json()),
+    fetch("https://jsonplaceholder.typicode.com/posts").then(r => r.json()),
+  ]);
+
+  const time = Date.now() - start;
+  output.innerHTML = \`
+    <div class="result">✅ Users: \${users.length} loaded</div>
+    <div class="result">✅ Posts: \${posts.length} loaded</div>
+    <div class="result">⏱️ Total time: \${time}ms (parallel!)</div>
+  \`;
+  console.log("Promise.all completed in", time, "ms");
+}
+
+async function runRace() {
+  output.innerHTML = '<p style="color:#e94560">Racing...</p>';
+
+  const fast = new Promise(resolve => setTimeout(() => resolve("Fast wins! 🏆"), 100));
+  const slow = new Promise(resolve => setTimeout(() => resolve("Slow... 🐢"), 2000));
+
+  const winner = await Promise.race([fast, slow]);
+  output.innerHTML = '<div class="result">🏁 Winner: ' + winner + '</div>';
+  console.log("Race winner:", winner);
+}`,
+          language: 'html',
+          challenge: {
+            instruction: 'Use Promise.all to fetch from two different endpoints simultaneously.',
+            initialCode: `<!DOCTYPE html>
+<html><body><button onclick="loadBoth()">Load Both</button><div id="result"></div><script src="script.js"></script></body></html>`,
+            initialJs: `// Use Promise.all to fetch users and posts simultaneously`,
+            validationKeywords: ['promise.all', 'await', 'fetch'],
+          },
         },
       ],
     },
@@ -343,9 +3471,331 @@ const expertLessons: LevelData = {
           title: 'Advanced Animations & 3D',
           topic: 'Expert CSS',
           level: 'expert',
-          content: `# Advanced CSS Animations & 3D\n\nCSS can create complex 3D transforms and animations.\n\n\`\`\`css\n.card {\n  transform: perspective(1000px) rotateY(15deg);\n  transition: transform 0.5s;\n}\n\`\`\``,
-          initialCode: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { background: #0f0f23; color: white; font-family: Arial; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; perspective: 1000px; }\n  .scene { display: flex; gap: 30px; }\n  .card-3d {\n    width: 150px; height: 200px; position: relative; transform-style: preserve-3d;\n    transition: transform 0.6s; cursor: pointer;\n  }\n  .card-3d:hover { transform: rotateY(180deg); }\n  .card-face {\n    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;\n    display: flex; align-items: center; justify-content: center;\n    border-radius: 12px; font-size: 20px; font-weight: bold;\n  }\n  .front { background: linear-gradient(135deg, #667eea, #764ba2); }\n  .back { background: linear-gradient(135deg, #f093fb, #f5576c); transform: rotateY(180deg); }\n  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }\n  .card-3d { animation: float 3s ease-in-out infinite; }\n  .card-3d:nth-child(2) { animation-delay: 0.5s; }\n  .card-3d:nth-child(3) { animation-delay: 1s; }\n</style>\n</head>\n<body>\n  <div class="scene">\n    <div class="card-3d"><div class="card-face front">🎯 Front</div><div class="card-face back">✨ Back</div></div>\n    <div class="card-3d"><div class="card-face front">🚀 Front</div><div class="card-face back">💫 Back</div></div>\n    <div class="card-3d"><div class="card-face front">🎨 Front</div><div class="card-face back">🌟 Back</div></div>\n  </div>\n</body>\n</html>`,
+          content: `# Advanced Animations & 3D 🎭
+
+## 3D Transforms
+
+\`\`\`css
+.scene { perspective: 1000px; }
+.card {
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+.card:hover { transform: rotateY(180deg); }
+\`\`\`
+
+## Multi-Step Animations
+
+\`\`\`css
+@keyframes complex {
+  0% { transform: scale(1); background: red; }
+  25% { transform: scale(1.2); background: blue; }
+  50% { transform: scale(1) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+\`\`\`
+
+## Performance Tips
+
+- Use \`transform\` and \`opacity\` for animations (GPU-accelerated!)
+- Avoid animating \`width\`, \`height\`, \`top\`, \`left\` (slow!)
+- Use \`will-change\` sparingly for hints`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="scene">
+    <div class="card-3d"><div class="card-face front">🎯 Front</div><div class="card-face back">✨ Back</div></div>
+    <div class="card-3d"><div class="card-face front">🚀 Front</div><div class="card-face back">💫 Back</div></div>
+    <div class="card-3d"><div class="card-face front">🎨 Front</div><div class="card-face back">🌟 Back</div></div>
+  </div>
+</body>
+</html>`,
+          initialCss: `body { background: #0f0f23; color: white; font-family: Arial; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; perspective: 1000px; }
+.scene { display: flex; gap: 30px; }
+.card-3d {
+  width: 150px; height: 200px; position: relative; transform-style: preserve-3d;
+  transition: transform 0.6s; cursor: pointer;
+}
+.card-3d:hover { transform: rotateY(180deg); }
+.card-face {
+  position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px; font-size: 20px; font-weight: bold;
+}
+.front { background: linear-gradient(135deg, #667eea, #764ba2); }
+.back { background: linear-gradient(135deg, #f093fb, #f5576c); transform: rotateY(180deg); }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.card-3d { animation: float 3s ease-in-out infinite; }
+.card-3d:nth-child(2) { animation-delay: 0.5s; }
+.card-3d:nth-child(3) { animation-delay: 1s; }`,
           language: 'html',
+          challenge: {
+            instruction: 'Create a 3D card flip effect using CSS transform: rotateY, perspective, and backface-visibility.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body><div class="card"><div class="front">Front</div><div class="back">Back</div></div></body></html>`,
+            initialCss: `/* Create 3D card flip with perspective and rotateY */`,
+            validationKeywords: ['perspective', 'rotatey', 'backface-visibility'],
+          },
+        },
+        {
+          id: 'css-exp-2',
+          title: 'CSS Architecture',
+          topic: 'Expert CSS',
+          level: 'expert',
+          content: `# CSS Architecture — Scalable CSS 📐
+
+## BEM Naming Convention
+
+**Block__Element--Modifier**
+
+\`\`\`css
+.card { }              /* Block */
+.card__title { }       /* Element */
+.card__title--large { } /* Modifier */
+.card--featured { }    /* Block modifier */
+\`\`\`
+
+\`\`\`html
+<div class="card card--featured">
+  <h2 class="card__title card__title--large">Title</h2>
+  <p class="card__body">Content</p>
+</div>
+\`\`\`
+
+## Utility Classes
+
+Small, single-purpose classes:
+\`\`\`css
+.text-center { text-align: center; }
+.mt-4 { margin-top: 16px; }
+.flex { display: flex; }
+.gap-2 { gap: 8px; }
+\`\`\`
+
+## CSS Custom Properties for Theming
+
+\`\`\`css
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --text: #c9d1d9;
+}
+[data-theme="light"] {
+  --bg: #ffffff;
+  --text: #24292f;
+}
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body data-theme="dark">
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+  <div class="card-grid">
+    <div class="card card--featured">
+      <h3 class="card__title">Featured Post</h3>
+      <p class="card__body">BEM naming makes CSS scalable and maintainable.</p>
+      <span class="card__tag">CSS</span>
+    </div>
+    <div class="card">
+      <h3 class="card__title">Regular Post</h3>
+      <p class="card__body">Utility classes + BEM = powerful combo!</p>
+      <span class="card__tag">Architecture</span>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `[data-theme="dark"] {
+  --bg: #0d1117; --surface: #161b22; --text: #c9d1d9;
+  --primary: #e94560; --border: #30363d;
+}
+[data-theme="light"] {
+  --bg: #f6f8fa; --surface: #ffffff; --text: #24292f;
+  --primary: #e94560; --border: #d0d7de;
+}
+
+body { background: var(--bg); color: var(--text); font-family: Arial; padding: 20px; transition: all 0.3s; margin: 0; }
+
+.theme-toggle { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-bottom: 20px; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.card--featured { border-left: 4px solid var(--primary); }
+.card__title { color: var(--primary); margin-top: 0; }
+.card__body { line-height: 1.6; }
+.card__tag { display: inline-block; background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }`,
+          initialJs: `function toggleTheme() {
+  const body = document.body;
+  const current = body.getAttribute("data-theme");
+  body.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+  console.log("Theme:", body.getAttribute("data-theme"));
+}`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a card using BEM naming (.card, .card__title, .card__body, .card--featured) and add dark/light theme toggling with CSS variables.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body data-theme="dark">
+  <button onclick="toggleTheme()">Toggle</button>
+  <div class="card card--featured">
+    <h3 class="card__title">BEM Card</h3>
+    <p class="card__body">Content</p>
+  </div>
+  <script src="script.js"></script>
+</body></html>`,
+            initialCss: `/* Define theme variables and BEM styles */`,
+            initialJs: `function toggleTheme() {
+  // Toggle data-theme attribute
+}`,
+            validationKeywords: ['card__', 'card--', '--bg', 'var('],
+          },
+        },
+      ],
+    },
+    {
+      id: 'react-expert',
+      name: 'Expert React',
+      icon: '⚛️',
+      lessons: [
+        {
+          id: 'react-exp-1',
+          title: 'State Management',
+          topic: 'Expert React',
+          level: 'expert',
+          content: `# State Management Patterns 🧠
+
+## Local State vs Global State
+
+**Local:** Button click counter → \`useState\`
+**Global:** User auth, theme, cart → Context/Store
+
+## The Store Pattern
+
+\`\`\`javascript
+const store = {
+  state: { count: 0, todos: [] },
+  listeners: [],
+  subscribe(fn) { this.listeners.push(fn); },
+  dispatch(action) {
+    this.state = reducer(this.state, action);
+    this.listeners.forEach(fn => fn(this.state));
+  }
+};
+\`\`\`
+
+## Reducer Pattern (like Redux)
+
+\`\`\`javascript
+function reducer(state, action) {
+  switch (action.type) {
+    case "ADD_TODO":
+      return { ...state, todos: [...state.todos, action.payload] };
+    case "TOGGLE":
+      return { ...state, todos: state.todos.map(t =>
+        t.id === action.payload ? { ...t, done: !t.done } : t
+      )};
+    default: return state;
+  }
+}
+\`\`\`
+
+## React Context API
+
+\`\`\`jsx
+const ThemeContext = createContext('light');
+// Provider wraps the app
+// useContext(ThemeContext) reads the value
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: monospace; background: #0d1117; color: #c9d1d9; padding: 20px; }
+h1 { color: #61dafb; text-align: center; }
+.store-view { background: #161b22; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #30363d; }
+.store-view h3 { color: #58a6ff; margin: 0 0 8px 0; }
+button { background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin: 3px; }
+button.danger { background: #da3633; }
+.todo { display: flex; gap: 8px; align-items: center; padding: 6px 0; }
+.todo.done { opacity: 0.5; text-decoration: line-through; }
+input { padding: 8px; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #c9d1d9; }`,
+          initialJs: `// Simple Store Pattern (Redux-like)
+function createStore(reducer, initialState) {
+  let state = initialState;
+  const listeners = [];
+  return {
+    getState: () => state,
+    dispatch: (action) => {
+      state = reducer(state, action);
+      listeners.forEach(fn => fn(state));
+    },
+    subscribe: (fn) => listeners.push(fn),
+  };
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "ADD_TODO":
+      return { ...state, todos: [...state.todos, { id: Date.now(), text: action.payload, done: false }] };
+    case "TOGGLE":
+      return { ...state, todos: state.todos.map(t => t.id === action.payload ? { ...t, done: !t.done } : t) };
+    case "DELETE":
+      return { ...state, todos: state.todos.filter(t => t.id !== action.payload) };
+    default: return state;
+  }
+}
+
+const store = createStore(reducer, { todos: [
+  { id: 1, text: "Learn State Management", done: false },
+  { id: 2, text: "Build a Store", done: false },
+] });
+
+function render() {
+  const { todos } = store.getState();
+  document.getElementById("app").innerHTML = \`
+    <h1>🧠 State Management</h1>
+    <div class="store-view">
+      <h3>Store State</h3>
+      <pre>\${JSON.stringify(store.getState(), null, 2)}</pre>
+    </div>
+    <div style="display:flex;gap:8px;margin:10px 0;">
+      <input id="newTodo" placeholder="New todo..." onkeypress="if(event.key==='Enter')addTodo()">
+      <button onclick="addTodo()">Dispatch ADD</button>
+    </div>
+    \${todos.map(t => \`
+      <div class="todo \${t.done ? 'done' : ''}">
+        <input type="checkbox" \${t.done ? 'checked' : ''} onchange="store.dispatch({type:'TOGGLE',payload:\${t.id}})">
+        <span style="flex:1">\${t.text}</span>
+        <button class="danger" onclick="store.dispatch({type:'DELETE',payload:\${t.id}})">✕</button>
+      </div>
+    \`).join("")}
+  \`;
+}
+
+function addTodo() {
+  const input = document.getElementById("newTodo");
+  if (input.value.trim()) {
+    store.dispatch({ type: "ADD_TODO", payload: input.value });
+  }
+}
+
+store.subscribe(render);
+render();`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a simple store with a reducer that handles ADD and REMOVE actions for a list of items.',
+            initialCode: `<!DOCTYPE html>
+<html><body><div id="app"></div><script src="script.js"></script></body></html>`,
+            initialJs: `// Create a store with reducer pattern
+// Handle ADD and REMOVE actions`,
+            validationKeywords: ['reducer', 'dispatch', 'switch', 'case'],
+          },
         },
       ],
     },
@@ -368,4 +3818,35 @@ export function getCompletedCount(completedIds: string[], level: LessonLevel): {
     completed: lessons.filter(l => completedIds.includes(l.id)).length,
     total: lessons.length,
   };
+}
+
+// Check if a lesson is unlocked (previous lesson's challenge must be completed)
+export function isLessonUnlocked(lessonId: string, completedLessons: string[]): boolean {
+  const allLessonsList = getAllLessons();
+  const lessonIndex = allLessonsList.findIndex(l => l.id === lessonId);
+  if (lessonIndex <= 0) return true; // First lesson is always unlocked
+
+  // Find the previous lesson in the same topic
+  const lesson = allLessonsList[lessonIndex];
+  const topic = allLevels
+    .flatMap(l => l.topics)
+    .find(t => t.lessons.some(l => l.id === lessonId));
+
+  if (!topic) return true;
+
+  const topicLessonIndex = topic.lessons.findIndex(l => l.id === lessonId);
+  if (topicLessonIndex <= 0) {
+    // First lesson in a topic - check if previous topic's last lesson is completed
+    const level = allLevels.find(l => l.topics.some(t => t.id === topic.id));
+    if (!level) return true;
+    const topicIndex = level.topics.findIndex(t => t.id === topic.id);
+    if (topicIndex <= 0) return true; // First topic in level
+    const prevTopic = level.topics[topicIndex - 1];
+    const lastLesson = prevTopic.lessons[prevTopic.lessons.length - 1];
+    return completedLessons.includes(lastLesson.id);
+  }
+
+  // Previous lesson in same topic must be completed
+  const prevLesson = topic.lessons[topicLessonIndex - 1];
+  return completedLessons.includes(prevLesson.id);
 }

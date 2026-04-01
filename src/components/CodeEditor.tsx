@@ -16,7 +16,7 @@ const CodeEditor = ({ code, onChange, language = 'html' }: CodeEditorProps) => {
       theme="vs-dark"
       options={{
         fontSize: 14,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         wordWrap: 'on',
@@ -29,6 +29,14 @@ const CodeEditor = ({ code, onChange, language = 'html' }: CodeEditorProps) => {
         formatOnPaste: true,
         bracketPairColorization: { enabled: true },
         padding: { top: 12 },
+        readOnly: false,
+        domReadOnly: false,
+        contextmenu: true,
+        lineNumbers: 'on',
+        renderLineHighlight: 'all',
+        cursorBlinking: 'smooth',
+        cursorSmoothCaretAnimation: 'on',
+        smoothScrolling: true,
       }}
     />
   );
