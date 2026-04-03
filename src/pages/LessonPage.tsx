@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getLessonById, getAllLessons, isLessonUnlocked } from '@/data/lessons';
 import CodeEditor from '@/components/CodeEditor';
