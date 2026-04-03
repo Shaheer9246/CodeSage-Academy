@@ -3968,6 +3968,316 @@ render();`,
         },
       ],
     },
+    {
+      id: 'pro-projects',
+      name: 'Pro Projects',
+      icon: '🚀',
+      lessons: [
+        {
+          id: 'pro-1',
+          title: 'Build a Login Page',
+          topic: 'Pro Projects',
+          level: 'expert',
+          content: `# Build a Beautiful Login Page 🔐
+
+Now let's build something real — a professional login page!
+
+## What Makes a Good Login Page?
+
+- Clean, centered design
+- Proper form with email and password
+- Show/hide password toggle
+- Responsive design
+- Good visual feedback
+
+## The Structure
+
+\`\`\`html
+<div class="login-container">
+  <form class="login-form">
+    <h1>Welcome Back</h1>
+    <input type="email" placeholder="Email">
+    <div class="password-field">
+      <input type="password" id="password">
+      <button type="button" onclick="togglePassword()">👁</button>
+    </div>
+    <button type="submit">Sign In</button>
+  </form>
+</div>
+\`\`\`
+
+## Password Show/Hide
+
+\`\`\`javascript
+function togglePassword() {
+  const pw = document.getElementById("password");
+  pw.type = pw.type === "password" ? "text" : "password";
+}
+\`\`\`
+
+This is a very common feature in real apps!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="login-container">
+    <form class="login-form">
+      <h1>🔐 Welcome Back</h1>
+      <p>Sign in to your account</p>
+      <input type="email" placeholder="Email address" required>
+      <div class="password-field">
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="button" onclick="togglePassword()">👁</button>
+      </div>
+      <button type="submit" class="btn-primary">Sign In</button>
+      <p class="link">Don't have an account? <a href="#">Sign Up</a></p>
+    </form>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login-container { width: 100%; max-width: 400px; padding: 20px; }
+.login-form { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; }
+h1 { color: white; font-size: 24px; margin-bottom: 8px; }
+.login-form > p { color: #888; font-size: 14px; margin-bottom: 24px; }
+input { width: 100%; padding: 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(255,255,255,0.05); color: white; font-size: 14px; margin-bottom: 16px; outline: none; }
+input:focus { border-color: #e94560; }
+.password-field { position: relative; }
+.password-field button { position: absolute; right: 12px; top: 14px; background: none; border: none; cursor: pointer; font-size: 18px; }
+.btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, #e94560, #c0392b); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+.btn-primary:hover { opacity: 0.9; }
+.link { text-align: center; margin-top: 20px; color: #888; font-size: 13px; }
+.link a { color: #e94560; text-decoration: none; }`,
+          initialJs: `function togglePassword() {
+  const pw = document.getElementById("password");
+  if (pw.type === "password") {
+    pw.type = "text";
+  } else {
+    pw.type = "password";
+  }
+}`,
+          language: 'html',
+          challenge: {
+            instruction: 'Build a login form with email input, password input with show/hide toggle, and a submit button. Add the togglePassword function.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <!-- Build a login form with password toggle -->
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialCss: `body { font-family: Arial; background: #1a1a2e; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }`,
+            initialJs: `// Create togglePassword function`,
+            validationKeywords: ['type="password"', 'type="email"', 'togglepassword', 'type'],
+          },
+        },
+        {
+          id: 'pro-2',
+          title: 'Animated Card Gallery',
+          topic: 'Pro Projects',
+          level: 'expert',
+          content: `# Animated Card Gallery with Hover Effects ✨
+
+Let's build a professional card gallery with smooth animations!
+
+## CSS Transitions
+
+\`\`\`css
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+\`\`\`
+
+## CSS Animations
+
+\`\`\`css
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeIn 0.5s ease forwards; }
+\`\`\`
+
+## Animation Delay for Staggered Effect
+
+\`\`\`css
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <h1>Project Showcase</h1>
+  <div class="gallery">
+    <div class="card">
+      <img src="https://picsum.photos/300/200?random=1" alt="Project 1">
+      <h3>Web App</h3>
+      <p>A modern web application</p>
+      <span class="tag">HTML/CSS</span>
+    </div>
+    <div class="card">
+      <img src="https://picsum.photos/300/200?random=2" alt="Project 2">
+      <h3>Dashboard</h3>
+      <p>Analytics dashboard</p>
+      <span class="tag">JavaScript</span>
+    </div>
+    <div class="card">
+      <img src="https://picsum.photos/300/200?random=3" alt="Project 3">
+      <h3>Mobile App</h3>
+      <p>Cross-platform mobile app</p>
+      <span class="tag">React</span>
+    </div>
+  </div>
+</body>
+</html>`,
+          initialCss: `* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial; background: #0f0f1a; color: white; padding: 40px; }
+h1 { text-align: center; color: #e94560; margin-bottom: 30px; font-size: 28px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.card { background: #16213e; border-radius: 16px; overflow: hidden; animation: fadeIn 0.6s ease forwards; opacity: 0; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.3s; }
+.card:nth-child(3) { animation-delay: 0.5s; }
+.card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(233,69,96,0.2); }
+.card img { width: 100%; height: 180px; object-fit: cover; }
+.card h3 { padding: 16px 16px 4px; color: white; }
+.card p { padding: 0 16px; color: #888; font-size: 14px; }
+.tag { display: inline-block; margin: 12px 16px 16px; padding: 4px 12px; background: rgba(233,69,96,0.2); color: #e94560; border-radius: 20px; font-size: 12px; }`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a card gallery with at least 3 cards, each with hover effects using CSS transitions and a fadeIn animation.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <!-- Build an animated card gallery -->
+</body>
+</html>`,
+            initialCss: `body { font-family: Arial; background: #0f0f1a; color: white; padding: 40px; }`,
+            validationKeywords: ['class="card"', 'transition', '@keyframes', 'hover'],
+          },
+        },
+        {
+          id: 'pro-3',
+          title: 'Dark/Light Theme Toggle',
+          topic: 'Pro Projects',
+          level: 'expert',
+          content: `# Dark/Light Theme Toggle 🌓
+
+Let's build a theme switcher — a must-have feature for modern websites!
+
+## The Strategy
+
+1. Define CSS variables for both themes
+2. Toggle a class on the body
+3. Save preference in localStorage
+
+## CSS Variables for Themes
+
+\`\`\`css
+:root {
+  --bg: #1a1a2e;
+  --text: #e0e0e0;
+  --card: #16213e;
+}
+body.light {
+  --bg: #f5f5f5;
+  --text: #333;
+  --card: #ffffff;
+}
+\`\`\`
+
+## Toggle with JavaScript
+
+\`\`\`javascript
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const theme = document.body.classList.contains('light') ? 'light' : 'dark';
+  localStorage.setItem('theme', theme);
+}
+
+// Load saved theme
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light');
+}
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header>
+    <h1>My Website</h1>
+    <button onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+  </header>
+  <main>
+    <div class="card">
+      <h2>Welcome!</h2>
+      <p>Click the theme button to switch between dark and light mode.</p>
+    </div>
+    <div class="card">
+      <h2>It Saves!</h2>
+      <p>Your preference is saved using localStorage.</p>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `:root { --bg: #1a1a2e; --text: #e0e0e0; --card: #16213e; --accent: #e94560; }
+body.light { --bg: #f0f2f5; --text: #333; --card: #ffffff; --accent: #e94560; }
+* { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
+body { font-family: Arial; background: var(--bg); color: var(--text); min-height: 100vh; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; border-bottom: 1px solid rgba(128,128,128,0.2); }
+h1 { color: var(--accent); font-size: 22px; }
+#themeBtn { background: var(--card); color: var(--text); border: 1px solid rgba(128,128,128,0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+main { padding: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; }
+.card { background: var(--card); padding: 24px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.card h2 { color: var(--accent); margin-bottom: 8px; }
+.card p { line-height: 1.6; opacity: 0.8; }`,
+          initialJs: `function toggleTheme() {
+  document.body.classList.toggle('light');
+  const btn = document.getElementById('themeBtn');
+  if (document.body.classList.contains('light')) {
+    btn.textContent = '☀️ Light';
+    localStorage.setItem('theme', 'light');
+  } else {
+    btn.textContent = '🌙 Dark';
+    localStorage.setItem('theme', 'dark');
+  }
+}
+
+// Load saved theme
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light');
+  document.getElementById('themeBtn').textContent = '☀️ Light';
+}`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a theme toggle using CSS variables and JavaScript. Store the preference in localStorage.',
+            initialCode: `<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <button onclick="toggleTheme()">Toggle Theme</button>
+  <h1>Theme Test</h1>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialCss: `:root { --bg: #1a1a2e; --text: white; }
+body { background: var(--bg); color: var(--text); font-family: Arial; padding: 20px; }`,
+            initialJs: `// Create toggleTheme function with localStorage`,
+            validationKeywords: ['classlist', 'localstorage', 'toggle', '--bg'],
+          },
+        },
+      ],
+    },
   ],
 };
 
