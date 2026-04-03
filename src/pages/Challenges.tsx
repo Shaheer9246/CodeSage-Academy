@@ -97,7 +97,6 @@ const Challenges = () => {
     if (passed) completeLesson(`challenge-${selected.id}`);
   };
 
-  const handleConsoleLog = useCallback(() => {}, []);
 
   if (selected) {
     return (
