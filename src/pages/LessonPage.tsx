@@ -44,10 +44,6 @@ const LessonPage = () => {
   if (!lesson) return <Navigate to="/learn" replace />;
   if (!isLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/learn" replace />;
 
-  const handleConsoleLog = useCallback((log: { type: string; message: string }) => {
-    setConsoleLogs(prev => [...prev, log]);
-  }, []);
-
   const currentCode = fileTab === 'html' ? htmlCode : fileTab === 'css' ? cssCode : jsCode;
   const setCurrentCode = (val: string) => {
     if (fileTab === 'html') setHtmlCode(val);
