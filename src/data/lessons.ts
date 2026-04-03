@@ -689,6 +689,175 @@ h3 { color: #16c79a; }`,
             validationKeywords: ['<header>', '<main>', '<footer>', '<h1>'],
           },
         },
+        {
+          id: 'html-9',
+          title: 'Audio & Video',
+          topic: 'HTML Fundamentals',
+          level: 'basic',
+          content: `# Audio & Video in HTML 🎬
+
+Want to add videos or music to your website? HTML makes it easy!
+
+## Adding a Video
+
+Use the \`<video>\` tag:
+
+\`\`\`html
+<video width="400" controls>
+  <source src="movie.mp4" type="video/mp4">
+  Your browser doesn't support video.
+</video>
+\`\`\`
+
+## Video Attributes
+
+- \`controls\` — shows play, pause, volume buttons
+- \`autoplay\` — starts playing automatically
+- \`loop\` — repeats the video
+- \`muted\` — starts muted (needed for autoplay in most browsers)
+- \`poster\` — shows an image before video plays
+
+## Adding Audio
+
+Use the \`<audio>\` tag:
+
+\`\`\`html
+<audio controls>
+  <source src="song.mp3" type="audio/mpeg">
+  Your browser doesn't support audio.
+</audio>
+\`\`\`
+
+## Embedding YouTube Videos
+
+Use \`<iframe>\` for YouTube:
+
+\`\`\`html
+<iframe width="560" height="315"
+  src="https://www.youtube.com/embed/VIDEO_ID"
+  allowfullscreen>
+</iframe>
+\`\`\`
+
+Replace \`VIDEO_ID\` with the actual YouTube video ID (the part after \`v=\` in the URL).`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>Media Gallery</h1>
+  
+  <h2>Video</h2>
+  <video width="400" controls poster="https://picsum.photos/400/225">
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    Your browser doesn't support video.
+  </video>
+  
+  <h2>Audio</h2>
+  <audio controls>
+    <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+    Your browser doesn't support audio.
+  </audio>
+  
+  <h2>YouTube Embed</h2>
+  <iframe width="400" height="225"
+    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+    allowfullscreen>
+  </iframe>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #e94560; }
+h2 { color: #16c79a; margin-top: 20px; }
+video, iframe { border-radius: 12px; margin: 10px 0; }`,
+          language: 'html',
+          challenge: {
+            instruction: 'Add a video with controls and an audio element with controls to your page.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <h1>My Media Page</h1>
+  <!-- Add a <video> tag with controls -->
+  <!-- Add an <audio> tag with controls -->
+</body>
+</html>`,
+            validationKeywords: ['<video', 'controls', '<audio'],
+          },
+        },
+        {
+          id: 'html-10',
+          title: 'Div & Span',
+          topic: 'HTML Fundamentals',
+          level: 'basic',
+          content: `# Div & Span — Container Tags 📦
+
+These are the most common tags for grouping content.
+
+## The \`<div>\` Tag
+
+\`<div>\` is a **block** container — it takes up the full width:
+
+\`\`\`html
+<div class="box">
+  <h2>Title</h2>
+  <p>Content inside a div</p>
+</div>
+\`\`\`
+
+Think of \`<div>\` as a box that holds things together.
+
+## The \`<span>\` Tag
+
+\`<span>\` is an **inline** container — it stays in the same line:
+
+\`\`\`html
+<p>My favorite color is <span style="color: red;">red</span>!</p>
+\`\`\`
+
+## When to Use What?
+
+- \`<div>\` for grouping sections (cards, containers, layouts)
+- \`<span>\` for styling small parts of text
+- Use semantic tags (\`<header>\`, \`<nav>\`, etc.) when possible instead of \`<div>\`
+
+## Classes & IDs
+
+- \`class\` — can be reused on many elements
+- \`id\` — must be unique on the page
+
+\`\`\`html
+<div class="card">Card 1</div>
+<div class="card">Card 2</div>
+<div id="special">Unique element</div>
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <div class="card">
+    <h2>Card 1</h2>
+    <p>This is inside a <span class="highlight">div container</span>.</p>
+  </div>
+  <div class="card">
+    <h2>Card 2</h2>
+    <p>Another card with <span class="highlight">highlighted</span> text.</p>
+  </div>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+.card { background: #16213e; padding: 20px; border-radius: 12px; margin: 10px 0; border: 1px solid #333; }
+h2 { color: #e94560; margin-top: 0; }
+.highlight { color: #f39c12; font-weight: bold; }`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create two div elements with class="box" and use a span inside a paragraph to highlight a word.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <!-- Create 2 divs with class="box" -->
+  <!-- Use <span> inside a paragraph -->
+</body>
+</html>`,
+            validationKeywords: ['<div', 'class="box"', '<span'],
+          },
+        },
       ],
     },
     {
