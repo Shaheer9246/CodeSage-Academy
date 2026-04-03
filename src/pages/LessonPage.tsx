@@ -24,6 +24,10 @@ const LessonPage = () => {
   const [showChallenge, setShowChallenge] = useState(false);
   const [challengeResult, setChallengeResult] = useState<'pass' | 'fail' | null>(null);
 
+  const handleConsoleLog = useCallback((log: { type: string; message: string }) => {
+    setConsoleLogs(prev => [...prev, log]);
+  }, []);
+
   useEffect(() => {
     if (lesson) {
       setHtmlCode(lesson.initialCode);
@@ -36,9 +40,9 @@ const LessonPage = () => {
     }
   }, [lesson?.id]);
 
-  if (!user) { navigate('/auth'); return null; }
-  if (!lesson) { navigate('/learn'); return null; }
-  if (!isLessonUnlocked(lesson.id, user.completedLessons)) { navigate('/learn'); return null; }
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!lesson) return <Navigate to="/learn" replace />;
+  if (!isLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/learn" replace />;
 
   const handleConsoleLog = useCallback((log: { type: string; message: string }) => {
     setConsoleLogs(prev => [...prev, log]);
