@@ -77,6 +77,7 @@ const Challenges = () => {
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [result, setResult] = useState<'pass' | 'fail' | null>(null);
+  const handleConsoleLog = useCallback(() => {}, []);
 
   if (!user) { navigate('/auth'); return null; }
 
