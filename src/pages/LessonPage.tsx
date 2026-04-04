@@ -31,7 +31,7 @@ const LessonPage = () => {
   useEffect(() => {
     if (lesson) {
       setHtmlCode(lesson.initialCode);
-      setCssCode(lesson.initialCss || 'body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #e0e0e0; }');
+      setCssCode(lesson.initialCss || 'body { font-family: Arial; padding: 20px; background: #0f0a2e; color: #e0e0e0; }');
       setJsCode(lesson.initialJs || '');
       setConsoleLogs([]);
       setShowChallenge(false);
@@ -84,21 +84,17 @@ const LessonPage = () => {
     }
   };
 
-  // Render markdown content
   const renderContent = (md: string) => {
     const lines = md.split('\n');
     const html: string[] = [];
     let inCode = false;
     let codeBlock = '';
-    let codeLang = '';
 
     for (const line of lines) {
       if (line.startsWith('```')) {
         if (inCode) {
-          html.push(`<pre class="bg-[hsl(220,20%,8%)] rounded-lg p-4 my-3 text-sm font-mono overflow-x-auto border border-[hsl(220,15%,20%)]"><code class="text-[hsl(175,70%,45%)]">${codeBlock}</code></pre>`);
+          html.push(`<pre class="bg-secondary/50 rounded-lg p-3 my-3 text-xs font-mono overflow-x-auto border border-border"><code class="text-accent">${codeBlock}</code></pre>`);
           codeBlock = '';
-        } else {
-          codeLang = line.slice(3);
         }
         inCode = !inCode;
         continue;
@@ -108,19 +104,19 @@ const LessonPage = () => {
         continue;
       }
       if (line.startsWith('# ')) {
-        html.push(`<h1 class="text-2xl font-bold text-[hsl(210,20%,90%)] mb-4">${line.slice(2)}</h1>`);
+        html.push(`<h1 class="text-xl font-bold text-foreground mb-3">${line.slice(2)}</h1>`);
       } else if (line.startsWith('## ')) {
-        html.push(`<h2 class="text-lg font-semibold text-[hsl(210,20%,90%)] mt-5 mb-2">${line.slice(3)}</h2>`);
+        html.push(`<h2 class="text-sm font-semibold text-foreground mt-4 mb-2">${line.slice(3)}</h2>`);
       } else if (line.startsWith('- ')) {
         const content = line.slice(2)
-          .replace(/`([^`]+)`/g, '<code class="bg-[hsl(220,15%,18%)] px-1.5 py-0.5 rounded text-[hsl(175,70%,45%)] text-sm font-mono">$1</code>')
-          .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-[hsl(25,95%,55%)]">$1</strong>');
-        html.push(`<li class="ml-4 text-sm text-[hsl(215,15%,55%)] mb-1.5 list-disc">${content}</li>`);
+          .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono">$1</code>')
+          .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
+        html.push(`<li class="ml-4 text-xs text-muted-foreground mb-1 list-disc">${content}</li>`);
       } else if (line.trim()) {
         const content = line
-          .replace(/`([^`]+)`/g, '<code class="bg-[hsl(220,15%,18%)] px-1.5 py-0.5 rounded text-[hsl(175,70%,45%)] text-sm font-mono">$1</code>')
-          .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-[hsl(25,95%,55%)]">$1</strong>');
-        html.push(`<p class="text-sm text-[hsl(215,15%,65%)] mb-3 leading-relaxed">${content}</p>`);
+          .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono">$1</code>')
+          .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
+        html.push(`<p class="text-xs text-muted-foreground mb-2 leading-relaxed">${content}</p>`);
       }
     }
     return html.join('');
@@ -129,32 +125,32 @@ const LessonPage = () => {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-5 h-5" />
+      <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border">
+        <div className="flex items-center gap-2 min-w-0">
+          <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+            <ArrowLeft className="w-4 h-4" />
           </button>
-          <span className="text-primary font-semibold text-sm">⚡ {lesson.topic}</span>
-          <span className="text-muted-foreground text-xs">— {lesson.title}</span>
+          <span className="text-primary font-semibold text-xs truncate">⚡ {lesson.topic}</span>
+          <span className="text-muted-foreground text-[10px] hidden sm:inline truncate">— {lesson.title}</span>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
         {/* Lesson content panel */}
-        <div className="w-[380px] flex-shrink-0 border-r border-border overflow-auto bg-card">
-          <div className="p-5">
+        <div className="w-full sm:w-[340px] flex-shrink-0 border-b sm:border-b-0 sm:border-r border-border overflow-auto glass-card max-h-[40vh] sm:max-h-none">
+          <div className="p-4">
             <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
 
             {/* Challenge section - inline box */}
             {lesson.challenge && !showChallenge && (
-              <div className="mt-6 border border-primary/30 rounded-xl p-4 bg-primary/5">
-                <h3 className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+              <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
                   🏆 Challenge
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
+                <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
                 <button
                   onClick={handleStartChallenge}
-                  className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
+                  className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
                 >
                   Start Challenge
                 </button>
@@ -163,21 +159,21 @@ const LessonPage = () => {
 
             {/* Challenge active */}
             {showChallenge && lesson.challenge && (
-              <div className="mt-6 border border-primary/30 rounded-xl p-4 bg-primary/5">
-                <h3 className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+              <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
                   🏆 Challenge Active
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
+                <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
 
                 {challengeResult === 'pass' && (
-                  <div className="flex items-center gap-2 p-3 bg-success/10 rounded-lg text-success text-sm mb-3">
-                    <CheckCircle2 className="w-5 h-5" />
+                  <div className="flex items-center gap-2 p-2.5 bg-success/10 rounded-lg text-success text-xs mb-3">
+                    <CheckCircle2 className="w-4 h-4" />
                     <span className="font-semibold">Great job! Challenge completed! 🎉</span>
                   </div>
                 )}
                 {challengeResult === 'fail' && (
-                  <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg text-destructive text-sm mb-3">
-                    <XCircle className="w-5 h-5" />
+                  <div className="flex items-center gap-2 p-2.5 bg-destructive/10 rounded-lg text-destructive text-xs mb-3">
+                    <XCircle className="w-4 h-4" />
                     <span>Not quite right. Check requirements and try again.</span>
                   </div>
                 )}
@@ -185,16 +181,16 @@ const LessonPage = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={handleCheckCode}
-                    className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-semibold text-sm hover:opacity-90"
+                    className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90"
                   >
                     Check My Code
                   </button>
                   {challengeResult === 'pass' && (
                     <button
                       onClick={goToNext}
-                      className="flex items-center gap-1 bg-success text-primary-foreground px-4 py-2 rounded-lg font-semibold text-sm hover:opacity-90"
+                      className="flex items-center gap-1 bg-success text-primary-foreground px-3 py-2 rounded-lg font-semibold text-xs hover:opacity-90"
                     >
-                      Next <ChevronRight className="w-4 h-4" />
+                      Next <ChevronRight className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -205,13 +201,13 @@ const LessonPage = () => {
 
         {/* Code editor + console */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center border-b border-border bg-card">
+          <div className="flex items-center border-b border-border glass-card">
             {(['html', 'css', 'js'] as FileTab[]).map(tab => (
               <button
                 key={tab}
                 onClick={() => setFileTab(tab)}
-                className={`px-4 py-2 text-xs font-mono transition-colors border-b-2 ${
-                  fileTab === tab ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/30'
+                className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
+                  fileTab === tab ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
                 }`}
               >
                 {tab === 'html' ? 'index.html' : tab === 'css' ? 'style.css' : 'script.js'}
@@ -225,9 +221,9 @@ const LessonPage = () => {
         </div>
 
         {/* Live preview */}
-        <div className="flex-1 flex flex-col min-w-0 border-l border-border">
-          <div className="px-3 py-2 border-b border-border text-xs text-muted-foreground font-mono flex items-center gap-2 bg-card">
-            <div className="w-2 h-2 rounded-full bg-success" /> Preview
+        <div className="hidden sm:flex flex-1 flex-col min-w-0 border-l border-border">
+          <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono flex items-center gap-2 glass-card">
+            <div className="w-1.5 h-1.5 rounded-full bg-success" /> Preview
           </div>
           <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />

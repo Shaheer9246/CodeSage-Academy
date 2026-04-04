@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ArrowLeft, CheckCircle2, XCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, XCircle, Trophy } from 'lucide-react';
 
 interface TestQuestion {
   question: string;
@@ -73,24 +73,25 @@ const LevelTest = () => {
     const passed = correct >= test.questions.length * 0.7;
 
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="glow-orb glow-primary w-64 h-64 top-10 -right-20" />
+        <div className="glass-card-strong rounded-3xl p-8 max-w-md w-full text-center relative z-10">
           {passed ? (
             <>
               <Trophy className="w-16 h-16 text-primary mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-foreground mb-2">Congratulations! 🎉</h2>
-              <p className="text-muted-foreground mb-4">You passed with {correct}/{test.questions.length} correct answers!</p>
-              <p className="text-sm text-success mb-6">The next level is now unlocked!</p>
+              <p className="text-muted-foreground text-sm mb-4">You passed with {correct}/{test.questions.length} correct answers!</p>
+              <p className="text-xs text-success mb-6">The next level is now unlocked!</p>
             </>
           ) : (
             <>
               <XCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-foreground mb-2">Not quite!</h2>
-              <p className="text-muted-foreground mb-4">You got {correct}/{test.questions.length}. You need at least 70% to pass.</p>
-              <p className="text-sm text-muted-foreground mb-6">Review the lessons and try again!</p>
+              <p className="text-muted-foreground text-sm mb-4">You got {correct}/{test.questions.length}. You need at least 70% to pass.</p>
+              <p className="text-xs text-muted-foreground mb-6">Review the lessons and try again!</p>
             </>
           )}
-          <button onClick={() => navigate('/learn')} className="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90">
+          <button onClick={() => navigate('/learn')} className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 shadow-lg shadow-primary/20">
             Back to Learning
           </button>
         </div>
@@ -101,29 +102,31 @@ const LevelTest = () => {
   const q = test.questions[currentQ];
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="glow-orb glow-accent w-48 h-48 top-20 -left-10 opacity-20" />
+
+      <div className="w-full max-w-lg relative z-10">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground">
+          <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <span className="text-sm text-muted-foreground">{currentQ + 1} / {test.questions.length}</span>
+          <span className="text-xs text-muted-foreground font-mono">{currentQ + 1} / {test.questions.length}</span>
         </div>
 
         <div className="flex gap-1 mb-6">
           {test.questions.map((_, i) => (
-            <div key={i} className={`flex-1 h-1.5 rounded-full ${i < currentQ ? 'bg-primary' : i === currentQ ? 'bg-primary/50' : 'bg-secondary'}`} />
+            <div key={i} className={`flex-1 h-1.5 rounded-full transition-all ${i < currentQ ? 'bg-primary' : i === currentQ ? 'bg-primary/50' : 'bg-secondary'}`} />
           ))}
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-6">{q.question}</h2>
-          <div className="space-y-3">
+        <div className="glass-card-strong rounded-2xl p-6">
+          <h2 className="text-base font-semibold text-foreground mb-5">{q.question}</h2>
+          <div className="space-y-2.5">
             {q.options.map((opt, i) => (
               <button
                 key={i}
                 onClick={() => handleAnswer(i)}
-                className="w-full text-left px-4 py-3 rounded-xl border border-border bg-secondary text-foreground hover:border-primary/50 transition-all"
+                className="w-full text-left px-4 py-3 rounded-xl border border-border bg-secondary/40 text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all text-sm"
               >
                 {opt}
               </button>
