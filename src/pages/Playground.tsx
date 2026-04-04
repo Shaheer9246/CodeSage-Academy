@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Upload, ArrowLeft, Code2 } from 'lucide-react';
+import { Download, Upload, ArrowLeft } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
@@ -22,7 +22,7 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 
 const DEFAULT_CSS = `body {
   font-family: Arial, sans-serif;
-  background: #1a1a2e;
+  background: #0f0a2e;
   color: white;
   display: flex;
   justify-content: center;
@@ -30,7 +30,7 @@ const DEFAULT_CSS = `body {
   min-height: 100vh;
   margin: 0;
 }
-h1 { color: #e94560; }
+h1 { color: #e98a2e; }
 p { color: #ccc; }`;
 
 const DEFAULT_JS = `// Write your JavaScript here
@@ -93,34 +93,33 @@ const Playground = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      <header className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-5 h-5" />
+      <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border">
+        <div className="flex items-center gap-2.5">
+          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" />
           </button>
-          <Code2 className="w-5 h-5 text-primary" />
-          <span className="text-primary font-bold text-lg font-mono">Playground</span>
+          <span className="text-primary font-bold text-sm font-mono">Playground</span>
         </div>
         <div className="flex items-center gap-1">
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js,.jsx" className="hidden" />
-          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2 py-1.5 rounded hover:bg-secondary transition-colors">
-            <Upload className="w-3.5 h-3.5" /> Import
+          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-2 py-1.5 rounded hover:bg-secondary/50 transition-colors">
+            <Upload className="w-3 h-3" /> Import
           </button>
-          <button onClick={handleExport} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2 py-1.5 rounded hover:bg-secondary transition-colors">
-            <Download className="w-3.5 h-3.5" /> Export
+          <button onClick={handleExport} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-2 py-1.5 rounded hover:bg-secondary/50 transition-colors">
+            <Download className="w-3 h-3" /> Export
           </button>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center border-b border-border bg-card">
+          <div className="flex items-center border-b border-border glass-card">
             {FILE_TABS.map(ft => (
               <button
                 key={ft.id}
                 onClick={() => setFileTab(ft.id)}
-                className={`px-4 py-2 text-xs font-mono transition-colors border-b-2 ${
-                  fileTab === ft.id ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/30'
+                className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
+                  fileTab === ft.id ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
                 }`}
               >
                 {ft.label}
@@ -133,9 +132,9 @@ const Playground = () => {
           <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
         </div>
 
-        <div className="flex-1 flex flex-col min-w-0 border-l border-border">
-          <div className="px-3 py-2 border-b border-border text-xs text-muted-foreground font-mono flex items-center gap-2 bg-card">
-            <div className="w-2 h-2 rounded-full bg-success" /> Preview
+        <div className="flex-1 flex flex-col min-w-0 border-t sm:border-t-0 sm:border-l border-border">
+          <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono flex items-center gap-2 glass-card">
+            <div className="w-1.5 h-1.5 rounded-full bg-success" /> Preview
           </div>
           <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />

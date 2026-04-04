@@ -36,46 +36,65 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
               window.parent.postMessage({ type: 'console-log', logType: 'error', message: 'Error: ' + msg + ' (line ' + line + ')' }, '*');
             };
           })();
-        </script>
+        <\/script>
       `;
 
-      // Build combined code: inject CSS as <style> and JS as <script>
-      let finalHtml = html;
+      let finalHtml = html.trim();
 
-      // Add console override into <head>
-      if (finalHtml.includes('<head>')) {
-        finalHtml = finalHtml.replace('<head>', '<head>' + consoleOverride);
-      } else if (finalHtml.includes('<HEAD>')) {
-        finalHtml = finalHtml.replace('<HEAD>', '<HEAD>' + consoleOverride);
+      // If the HTML doesn't look like a full document, wrap it
+      const hasDoctype = /<!doctype\s+html>/i.test(finalHtml);
+      const hasHtmlTag = /<html[\s>]/i.test(finalHtml);
+      const hasBodyTag = /<body[\s>]/i.test(finalHtml);
+
+      if (!hasDoctype && !hasHtmlTag && !hasBodyTag) {
+        // User is writing just content — wrap in a full HTML document
+        finalHtml = `<!DOCTYPE html>
+<html>
+<head>
+  ${consoleOverride}
+  <style>${css}</style>
+</head>
+<body>
+  ${finalHtml}
+  <script>${js}<\/script>
+</body>
+</html>`;
       } else {
-        finalHtml = consoleOverride + finalHtml;
-      }
-
-      // Inject CSS: replace link to style.css with inline style, or append to head
-      if (finalHtml.includes('href="style.css"') || finalHtml.includes("href='style.css'")) {
-        finalHtml = finalHtml.replace(/<link[^>]*href=["']style\.css["'][^>]*>/gi, `<style>${css}</style>`);
-      } else if (css.trim()) {
-        // Add CSS to head or before </head>
-        if (finalHtml.includes('</head>')) {
-          finalHtml = finalHtml.replace('</head>', `<style>${css}</style></head>`);
+        // Full HTML document — inject into it
+        // Add console override into <head>
+        if (finalHtml.match(/<head[^>]*>/i)) {
+          finalHtml = finalHtml.replace(/<head[^>]*>/i, '$&' + consoleOverride);
+        } else if (finalHtml.match(/<html[^>]*>/i)) {
+          finalHtml = finalHtml.replace(/<html[^>]*>/i, '$&<head>' + consoleOverride + '</head>');
         } else {
-          finalHtml = `<style>${css}</style>` + finalHtml;
+          finalHtml = consoleOverride + finalHtml;
         }
-      }
 
-      // Inject JS: replace script src="script.js" with inline script, or append
-      if (finalHtml.includes('src="script.js"') || finalHtml.includes("src='script.js'")) {
-        finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, `<script>${js}</script>`);
-      } else if (js.trim()) {
-        if (finalHtml.includes('</body>')) {
-          finalHtml = finalHtml.replace('</body>', `<script>${js}</script></body>`);
-        } else {
-          finalHtml = finalHtml + `<script>${js}</script>`;
+        // Inject CSS: replace link to style.css with inline style, or append to head
+        if (finalHtml.match(/href=["']style\.css["']/i)) {
+          finalHtml = finalHtml.replace(/<link[^>]*href=["']style\.css["'][^>]*>/gi, `<style>${css}</style>`);
+        } else if (css.trim()) {
+          if (finalHtml.match(/<\/head>/i)) {
+            finalHtml = finalHtml.replace(/<\/head>/i, `<style>${css}</style></head>`);
+          } else {
+            finalHtml = `<style>${css}</style>` + finalHtml;
+          }
+        }
+
+        // Inject JS: replace script src="script.js" with inline script, or append
+        if (finalHtml.match(/src=["']script\.js["']/i)) {
+          finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, `<script>${js}<\/script>`);
+        } else if (js.trim()) {
+          if (finalHtml.match(/<\/body>/i)) {
+            finalHtml = finalHtml.replace(/<\/body>/i, `<script>${js}<\/script></body>`);
+          } else {
+            finalHtml = finalHtml + `<script>${js}<\/script>`;
+          }
         }
       }
 
       iframeRef.current.srcdoc = finalHtml;
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [html, css, js]);
