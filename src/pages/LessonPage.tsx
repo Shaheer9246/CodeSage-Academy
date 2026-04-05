@@ -5,9 +5,19 @@ import { getLessonById, getAllLessons, isLessonUnlocked } from '@/data/lessons';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
-import { ArrowLeft, CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Lightbulb } from 'lucide-react';
 
 type FileTab = 'html' | 'css' | 'js';
+
+/** Escape HTML entities in text BEFORE markdown processing */
+function escapeHtml(str: string): string {
+  return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/** Normalize code for lenient validation */
+function normalizeCode(code: string): string {
+  return code.toLowerCase().replace(/'/g, '"').replace(/\s+/g, ' ').replace(/\s*=\s*/g, '=');
+}
 
 const LessonPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +33,7 @@ const LessonPage = () => {
   const [consoleLogs, setConsoleLogs] = useState<{ type: string; message: string }[]>([]);
   const [showChallenge, setShowChallenge] = useState(false);
   const [challengeResult, setChallengeResult] = useState<'pass' | 'fail' | null>(null);
+  const [showHint, setShowHint] = useState(false);
 
   const handleConsoleLog = useCallback((log: { type: string; message: string }) => {
     setConsoleLogs(prev => [...prev, log]);
@@ -36,6 +47,7 @@ const LessonPage = () => {
       setConsoleLogs([]);
       setShowChallenge(false);
       setChallengeResult(null);
+      setShowHint(false);
       setFileTab('html');
     }
   }, [lesson?.id]);
@@ -60,28 +72,24 @@ const LessonPage = () => {
       setJsCode(lesson.challenge.initialJs || jsCode);
       setShowChallenge(true);
       setChallengeResult(null);
+      setShowHint(false);
       setFileTab('html');
     }
   };
 
   const handleCheckCode = () => {
     if (!lesson.challenge) return;
-    const allCode = (htmlCode + '\n' + cssCode + '\n' + jsCode).toLowerCase();
-    const passed = lesson.challenge.validationKeywords.every(kw => allCode.includes(kw.toLowerCase()));
+    const allCode = normalizeCode(htmlCode + '\n' + cssCode + '\n' + jsCode);
+    const passed = lesson.challenge.validationKeywords.every(kw => allCode.includes(normalizeCode(kw)));
     setChallengeResult(passed ? 'pass' : 'fail');
-    if (passed) {
-      completeLesson(lesson.id);
-    }
+    if (passed) completeLesson(lesson.id);
   };
 
   const goToNext = () => {
     const all = getAllLessons();
     const idx = all.findIndex(l => l.id === lesson.id);
-    if (idx < all.length - 1) {
-      navigate(`/lesson/${all[idx + 1].id}`);
-    } else {
-      navigate('/learn');
-    }
+    if (idx < all.length - 1) navigate(`/lesson/${all[idx + 1].id}`);
+    else navigate('/learn');
   };
 
   const renderContent = (md: string) => {
@@ -93,27 +101,31 @@ const LessonPage = () => {
     for (const line of lines) {
       if (line.startsWith('```')) {
         if (inCode) {
-          html.push(`<pre class="bg-secondary/50 rounded-lg p-3 my-3 text-xs font-mono overflow-x-auto border border-border"><code class="text-accent">${codeBlock}</code></pre>`);
+          html.push(`<pre class="bg-secondary/60 rounded-lg p-3 my-3 text-xs font-mono overflow-x-auto border border-border/50"><code class="text-accent">${codeBlock}</code></pre>`);
           codeBlock = '';
         }
         inCode = !inCode;
         continue;
       }
       if (inCode) {
-        codeBlock += line.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '\n';
+        codeBlock += escapeHtml(line) + '\n';
         continue;
       }
-      if (line.startsWith('# ')) {
-        html.push(`<h1 class="text-xl font-bold text-foreground mb-3">${line.slice(2)}</h1>`);
-      } else if (line.startsWith('## ')) {
-        html.push(`<h2 class="text-sm font-semibold text-foreground mt-4 mb-2">${line.slice(3)}</h2>`);
-      } else if (line.startsWith('- ')) {
-        const content = line.slice(2)
+
+      // ESCAPE HTML in non-code lines FIRST, then apply markdown formatting
+      const escaped = escapeHtml(line);
+
+      if (escaped.startsWith('# ')) {
+        html.push(`<h1 class="text-xl font-bold text-foreground mb-3">${escaped.slice(2)}</h1>`);
+      } else if (escaped.startsWith('## ')) {
+        html.push(`<h2 class="text-sm font-semibold text-foreground mt-4 mb-2">${escaped.slice(3)}</h2>`);
+      } else if (escaped.startsWith('- ')) {
+        const content = escaped.slice(2)
           .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono">$1</code>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
         html.push(`<li class="ml-4 text-xs text-muted-foreground mb-1 list-disc">${content}</li>`);
-      } else if (line.trim()) {
-        const content = line
+      } else if (escaped.trim()) {
+        const content = escaped
           .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono">$1</code>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
         html.push(`<p class="text-xs text-muted-foreground mb-2 leading-relaxed">${content}</p>`);
@@ -125,7 +137,7 @@ const LessonPage = () => {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border">
+      <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border terminal-dots">
         <div className="flex items-center gap-2 min-w-0">
           <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
             <ArrowLeft className="w-4 h-4" />
@@ -141,17 +153,13 @@ const LessonPage = () => {
           <div className="p-4">
             <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
 
-            {/* Challenge section - inline box */}
+            {/* Challenge section */}
             {lesson.challenge && !showChallenge && (
               <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                  🏆 Challenge
-                </h3>
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge</h3>
                 <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
-                <button
-                  onClick={handleStartChallenge}
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
-                >
+                <button onClick={handleStartChallenge}
+                  className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
                   Start Challenge
                 </button>
               </div>
@@ -160,9 +168,7 @@ const LessonPage = () => {
             {/* Challenge active */}
             {showChallenge && lesson.challenge && (
               <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                  🏆 Challenge Active
-                </h3>
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge Active</h3>
                 <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
 
                 {challengeResult === 'pass' && (
@@ -174,22 +180,30 @@ const LessonPage = () => {
                 {challengeResult === 'fail' && (
                   <div className="flex items-center gap-2 p-2.5 bg-destructive/10 rounded-lg text-destructive text-xs mb-3">
                     <XCircle className="w-4 h-4" />
-                    <span>Not quite right. Check requirements and try again.</span>
+                    <span>Not quite right. Check hints and try again.</span>
+                  </div>
+                )}
+
+                {/* Hint */}
+                <button onClick={() => setShowHint(!showHint)}
+                  className="flex items-center gap-1.5 text-xs text-warning hover:text-warning/80 mb-3 transition-colors">
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  {showHint ? 'Hide Hint' : 'Show Hint'}
+                </button>
+                {showHint && (
+                  <div className="p-2.5 bg-warning/10 border border-warning/20 rounded-lg text-xs text-warning mb-3">
+                    💡 Your code should include: {lesson.challenge.validationKeywords.join(', ')}
                   </div>
                 )}
 
                 <div className="flex gap-2">
-                  <button
-                    onClick={handleCheckCode}
-                    className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90"
-                  >
+                  <button onClick={handleCheckCode}
+                    className="flex-1 bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90">
                     Check My Code
                   </button>
                   {challengeResult === 'pass' && (
-                    <button
-                      onClick={goToNext}
-                      className="flex items-center gap-1 bg-success text-primary-foreground px-3 py-2 rounded-lg font-semibold text-xs hover:opacity-90"
-                    >
+                    <button onClick={goToNext}
+                      className="flex items-center gap-1 bg-success text-primary-foreground px-3 py-2 rounded-lg font-semibold text-xs hover:opacity-90">
                       Next <ChevronRight className="w-3 h-3" />
                     </button>
                   )}
@@ -203,13 +217,10 @@ const LessonPage = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex items-center border-b border-border glass-card">
             {(['html', 'css', 'js'] as FileTab[]).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setFileTab(tab)}
+              <button key={tab} onClick={() => setFileTab(tab)}
                 className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
                   fileTab === tab ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
-                }`}
-              >
+                }`}>
                 {tab === 'html' ? 'index.html' : tab === 'css' ? 'style.css' : 'script.js'}
               </button>
             ))}
@@ -223,7 +234,7 @@ const LessonPage = () => {
         {/* Live preview */}
         <div className="hidden sm:flex flex-1 flex-col min-w-0 border-l border-border">
           <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono flex items-center gap-2 glass-card">
-            <div className="w-1.5 h-1.5 rounded-full bg-success" /> Preview
+            <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Preview
           </div>
           <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />

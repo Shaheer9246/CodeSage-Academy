@@ -1,9 +1,11 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export interface UserProfile {
+  id: string;
   username: string;
   email: string;
-  password: string;
   name: string;
   studying: string;
   hasJob: string;
@@ -21,33 +23,13 @@ export interface UserProfile {
   darkMode: boolean;
 }
 
-const defaultUser: UserProfile = {
-  username: '',
-  email: '',
-  password: '',
-  name: '',
-  studying: '',
-  hasJob: '',
-  dob: '',
-  goal: '',
-  experienceLevel: '',
-  joinDate: '',
-  streakCount: 0,
-  lastActiveDate: '',
-  badges: [],
-  completedLessons: [],
-  completedTests: [],
-  unlockedSections: ['frontend'],
-  promoCodes: [],
-  darkMode: true,
-};
-
 interface UserContextType {
   user: UserProfile | null;
+  loading: boolean;
   isLoggedIn: boolean;
   isOnboarded: boolean;
-  login: (email: string, password: string) => boolean;
-  signup: (username: string, email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<string | null>;
+  signup: (username: string, email: string, password: string) => Promise<string | null>;
   completeOnboarding: (data: Partial<UserProfile>) => void;
   completeLesson: (lessonId: string) => void;
   completeTest: (testId: string) => void;
@@ -55,8 +37,8 @@ interface UserContextType {
   updateStreak: () => void;
   applyPromoCode: (code: string) => boolean;
   updateUser: (data: Partial<UserProfile>) => void;
-  logout: () => void;
-  deleteAccount: () => void;
+  logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   toggleDarkMode: () => void;
 }
 
@@ -74,74 +56,157 @@ const VALID_PROMO_CODES: Record<string, string[]> = {
   'FULLACCESS': ['backend', 'ai'],
 };
 
+function dbRowToProfile(row: any, email: string): UserProfile {
+  return {
+    id: row.id,
+    username: row.username || '',
+    email,
+    name: row.name || '',
+    studying: row.studying || '',
+    hasJob: row.has_job || '',
+    dob: row.dob || '',
+    goal: row.goal || '',
+    experienceLevel: row.experience_level || '',
+    joinDate: row.created_at || '',
+    streakCount: row.streak_count || 0,
+    lastActiveDate: row.last_active_date || '',
+    badges: row.badges || [],
+    completedLessons: row.completed_lessons || [],
+    completedTests: row.completed_tests || [],
+    unlockedSections: row.unlocked_sections || ['frontend'],
+    promoCodes: row.promo_codes || [],
+    darkMode: row.dark_mode ?? true,
+  };
+}
+
+function profileToDbUpdate(p: UserProfile): Record<string, any> {
+  return {
+    username: p.username,
+    name: p.name,
+    studying: p.studying,
+    has_job: p.hasJob,
+    dob: p.dob,
+    goal: p.goal,
+    experience_level: p.experienceLevel,
+    streak_count: p.streakCount,
+    last_active_date: p.lastActiveDate || null,
+    badges: p.badges,
+    completed_lessons: p.completedLessons,
+    completed_tests: p.completedTests,
+    unlocked_sections: p.unlockedSections,
+    promo_codes: p.promoCodes,
+    dark_mode: p.darkMode,
+  };
+}
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<UserProfile | null>(() => {
-    const saved = localStorage.getItem('codesage-user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const syncTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const fetchProfile = useCallback(async (authUser: User) => {
+    try {
+      const { data } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
+      if (data) {
+        setUser(dbRowToProfile(data, authUser.email || ''));
+      } else {
+        // Profile missing (shouldn't happen due to trigger, but handle gracefully)
+        const defaultProfile: UserProfile = {
+          id: authUser.id,
+          username: authUser.user_metadata?.username || '',
+          email: authUser.email || '',
+          name: '', studying: '', hasJob: '', dob: '', goal: '', experienceLevel: '',
+          joinDate: new Date().toISOString(),
+          streakCount: 0, lastActiveDate: '',
+          badges: [], completedLessons: [], completedTests: [],
+          unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
+        };
+        setUser(defaultProfile);
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+    }
+    setLoading(false);
+  }, []);
+
+  const syncToDb = useCallback((profile: UserProfile) => {
+    if (syncTimer.current) clearTimeout(syncTimer.current);
+    syncTimer.current = setTimeout(async () => {
+      try {
+        await supabase.from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
+      } catch (err) {
+        console.error('Failed to sync profile:', err);
+      }
+    }, 500);
+  }, []);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('codesage-user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('codesage-user');
-    }
-  }, [user]);
+    let mounted = true;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
+      if (session?.user) {
+        setTimeout(() => { if (mounted) fetchProfile(session.user); }, 0);
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      if (session?.user) {
+        fetchProfile(session.user);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => { mounted = false; subscription.unsubscribe(); };
+  }, [fetchProfile]);
 
   const isLoggedIn = !!user;
   const isOnboarded = !!user?.name;
 
-  const login = (email: string, password: string): boolean => {
-    const users: UserProfile[] = JSON.parse(localStorage.getItem('codesage-users') || '[]');
-    const found = users.find(u => u.email === email && u.password === password);
-    if (found) {
-      setUser(found);
-      return true;
-    }
-    return false;
+  const updateProfile = (updated: UserProfile) => {
+    setUser(updated);
+    syncToDb(updated);
   };
 
-  const signup = (username: string, email: string, password: string): boolean => {
-    const users: UserProfile[] = JSON.parse(localStorage.getItem('codesage-users') || '[]');
-    if (users.find(u => u.email === email)) return false;
-    const newUser: UserProfile = {
-      ...defaultUser,
-      username,
-      email,
-      password,
-      joinDate: new Date().toISOString(),
-      lastActiveDate: new Date().toISOString(),
-    };
-    users.push(newUser);
-    localStorage.setItem('codesage-users', JSON.stringify(users));
-    setUser(newUser);
-    return true;
+  const login = async (email: string, password: string): Promise<string | null> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return error ? error.message : null;
+  };
+
+  const signup = async (username: string, email: string, password: string): Promise<string | null> => {
+    const { error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { username } },
+    });
+    return error ? error.message : null;
   };
 
   const completeOnboarding = (data: Partial<UserProfile>) => {
     if (!user) return;
-    const updated = { ...user, ...data };
-    updateAllUsers(updated);
+    updateProfile({ ...user, ...data });
   };
 
   const completeLesson = (lessonId: string) => {
     if (!user) return;
     const lessons = [...new Set([...user.completedLessons, lessonId])];
     const updated = { ...user, completedLessons: lessons };
-    // Check for badges
-    if (lessons.length === 1 && !updated.badges.includes('first-lesson')) {
-      updated.badges = [...updated.badges, 'first-lesson'];
-    }
-    if (lessons.length === 5 && !updated.badges.includes('five-lessons')) {
-      updated.badges = [...updated.badges, 'five-lessons'];
-    }
-    if (lessons.length === 10 && !updated.badges.includes('ten-lessons')) {
-      updated.badges = [...updated.badges, 'ten-lessons'];
-    }
-    if (lessons.length === 25 && !updated.badges.includes('quarter-century')) {
-      updated.badges = [...updated.badges, 'quarter-century'];
-    }
-    updateAllUsers(updated);
+    // Badge thresholds: lite(1), silver(5), gold(15), premium(25), elite(50)
+    const badgeCheck = (count: number, badge: string) => {
+      if (lessons.length >= count && !updated.badges.includes(badge)) {
+        updated.badges = [...updated.badges, badge];
+      }
+    };
+    badgeCheck(1, 'lite');
+    badgeCheck(5, 'silver');
+    badgeCheck(15, 'gold');
+    badgeCheck(25, 'premium');
+    badgeCheck(50, 'elite');
+    updateProfile(updated);
   };
 
   const completeTest = (testId: string) => {
@@ -151,80 +216,71 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (!updated.badges.includes('test-passer')) {
       updated.badges = [...updated.badges, 'test-passer'];
     }
-    updateAllUsers(updated);
+    updateProfile(updated);
   };
 
   const addBadge = (badge: string) => {
     if (!user || user.badges.includes(badge)) return;
-    updateAllUsers({ ...user, badges: [...user.badges, badge] });
+    updateProfile({ ...user, badges: [...user.badges, badge] });
   };
 
   const updateStreak = () => {
     if (!user) return;
     const today = new Date().toDateString();
-    const lastActive = new Date(user.lastActiveDate).toDateString();
-    if (today === lastActive) return;
-
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const isConsecutive = yesterday.toDateString() === lastActive;
-
-    const newStreak = isConsecutive ? user.streakCount + 1 : 1;
-    const updated = { ...user, streakCount: newStreak, lastActiveDate: new Date().toISOString() };
-    
-    if (newStreak >= 7 && !updated.badges.includes('week-streak')) {
-      updated.badges = [...updated.badges, 'week-streak'];
+    if (user.lastActiveDate) {
+      const lastActive = new Date(user.lastActiveDate).toDateString();
+      if (today === lastActive) return;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const isConsecutive = yesterday.toDateString() === lastActive;
+      const newStreak = isConsecutive ? user.streakCount + 1 : 1;
+      const updated = { ...user, streakCount: newStreak, lastActiveDate: new Date().toISOString() };
+      if (newStreak >= 3 && !updated.badges.includes('streak-3')) updated.badges = [...updated.badges, 'streak-3'];
+      if (newStreak >= 7 && !updated.badges.includes('streak-7')) updated.badges = [...updated.badges, 'streak-7'];
+      if (newStreak >= 30 && !updated.badges.includes('streak-30')) updated.badges = [...updated.badges, 'streak-30'];
+      updateProfile(updated);
+    } else {
+      updateProfile({ ...user, streakCount: 1, lastActiveDate: new Date().toISOString() });
     }
-    if (newStreak >= 30 && !updated.badges.includes('month-streak')) {
-      updated.badges = [...updated.badges, 'month-streak'];
-    }
-    updateAllUsers(updated);
   };
 
   const applyPromoCode = (code: string): boolean => {
     if (!user) return false;
     const sections = VALID_PROMO_CODES[code.toUpperCase()];
     if (!sections) return false;
-    const updated = {
+    updateProfile({
       ...user,
       unlockedSections: [...new Set([...user.unlockedSections, ...sections])],
       promoCodes: [...new Set([...user.promoCodes, code.toUpperCase()])],
-    };
-    updateAllUsers(updated);
+    });
     return true;
   };
 
   const updateUser = (data: Partial<UserProfile>) => {
     if (!user) return;
-    updateAllUsers({ ...user, ...data });
+    updateProfile({ ...user, ...data });
   };
 
-  const logout = () => setUser(null);
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
-  const deleteAccount = () => {
+  const deleteAccount = async () => {
     if (!user) return;
-    const users: UserProfile[] = JSON.parse(localStorage.getItem('codesage-users') || '[]');
-    localStorage.setItem('codesage-users', JSON.stringify(users.filter(u => u.email !== user.email)));
+    await supabase.from('profiles').delete().eq('id', user.id);
+    await supabase.auth.signOut();
     setUser(null);
   };
 
   const toggleDarkMode = () => {
     if (!user) return;
-    updateAllUsers({ ...user, darkMode: !user.darkMode });
-  };
-
-  const updateAllUsers = (updated: UserProfile) => {
-    setUser(updated);
-    const users: UserProfile[] = JSON.parse(localStorage.getItem('codesage-users') || '[]');
-    const idx = users.findIndex(u => u.email === updated.email);
-    if (idx >= 0) users[idx] = updated;
-    else users.push(updated);
-    localStorage.setItem('codesage-users', JSON.stringify(users));
+    updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
   return (
     <UserContext.Provider value={{
-      user, isLoggedIn, isOnboarded, login, signup, completeOnboarding,
+      user, loading, isLoggedIn, isOnboarded, login, signup, completeOnboarding,
       completeLesson, completeTest, addBadge, updateStreak, applyPromoCode,
       updateUser, logout, deleteAccount, toggleDarkMode,
     }}>

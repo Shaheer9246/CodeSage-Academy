@@ -36,20 +36,21 @@ const Learn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden animated-bg">
       <div className="glow-orb glow-accent w-48 h-48 top-20 -right-10 opacity-20" />
+      <div className="glow-orb glow-primary w-32 h-32 bottom-20 left-10 opacity-15" />
 
       <header className="border-b border-border glass-card px-4 sm:px-6 py-3 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="w-7 h-7 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+          <div className="w-7 h-7 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center neon-border">
             <span className="text-xs font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
           </div>
-          <span className="text-base font-bold text-foreground font-mono">Learning Path</span>
+          <span className="text-base font-bold gradient-text font-mono">Learning Path</span>
         </div>
-        <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full">
+        <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
           <Flame className="w-3.5 h-3.5 text-primary" />
           <span className="text-xs font-bold text-primary">{user.streakCount}</span>
         </div>
@@ -57,17 +58,17 @@ const Learn = () => {
 
       <div className="max-w-3xl mx-auto p-4 sm:p-6 relative z-10">
         {/* Progress */}
-        <div className="glass-card rounded-xl p-4 mb-5">
+        <div className="glass-card rounded-xl p-4 mb-5 neon-border-subtle">
           <div className="flex justify-between text-xs mb-2">
             <span className="text-muted-foreground">Overall Progress</span>
             <span className="text-foreground font-mono">{completedCount}/{totalLessons} ({progress}%)</span>
           </div>
-          <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
         </div>
 
-        {/* Levels roadmap */}
+        {/* Levels */}
         <div className="space-y-3">
           {allLevels.map((level) => {
             const stats = getCompletedCount(user.completedLessons, level.level);
@@ -79,13 +80,10 @@ const Learn = () => {
               <div key={level.level} className={`glass-card rounded-xl overflow-hidden transition-all ${!unlocked ? 'opacity-50' : ''}`}>
                 <button
                   onClick={() => unlocked && setExpandedLevel(isExpanded ? '' : level.level)}
-                  className={`w-full flex items-center justify-between p-4 text-left ${!unlocked ? 'cursor-not-allowed' : 'hover:bg-secondary/20'} transition-colors`}
-                >
+                  className={`w-full flex items-center justify-between p-4 text-left ${!unlocked ? 'cursor-not-allowed' : 'hover:bg-secondary/20'} transition-colors`}>
                   <div className="flex items-center gap-3">
-                    <div className={`px-2.5 py-1 rounded-full text-xs font-bold border ${style.badge}`}>
-                      {level.label}
-                    </div>
-                    <span className="text-xs text-muted-foreground">{stats.completed}/{stats.total} lessons</span>
+                    <div className={`px-2.5 py-1 rounded-full text-xs font-bold border ${style.badge}`}>{level.label}</div>
+                    <span className="text-xs text-muted-foreground font-mono">{stats.completed}/{stats.total} lessons</span>
                   </div>
                   <div className="flex items-center gap-2.5">
                     {!unlocked && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
@@ -101,35 +99,30 @@ const Learn = () => {
                     {level.topics.map(topic => {
                       const topicExpanded = expandedTopics.includes(topic.id);
                       const topicCompleted = topic.lessons.filter(l => user.completedLessons.includes(l.id)).length;
-
                       return (
                         <div key={topic.id} className="border border-border rounded-lg overflow-hidden bg-secondary/10">
                           <button
                             onClick={() => setExpandedTopics(prev => prev.includes(topic.id) ? prev.filter(t => t !== topic.id) : [...prev, topic.id])}
-                            className="w-full flex items-center justify-between p-3 hover:bg-secondary/20 transition-colors"
-                          >
+                            className="w-full flex items-center justify-between p-3 hover:bg-secondary/20 transition-colors">
                             <span className="flex items-center gap-2 text-sm text-foreground">
                               <span>{topic.icon}</span> {topic.name}
                             </span>
                             <span className="text-xs text-muted-foreground font-mono">{topicCompleted}/{topic.lessons.length}</span>
                           </button>
-
                           {topicExpanded && (
                             <div className="px-3 pb-3 space-y-0.5">
                               {topic.lessons.map((lesson, i) => {
                                 const completed = user.completedLessons.includes(lesson.id);
                                 const lessonUnlocked = isLessonUnlocked(lesson.id, user.completedLessons);
                                 return (
-                                  <button
-                                    key={lesson.id}
+                                  <button key={lesson.id}
                                     onClick={() => lessonUnlocked && navigate(`/lesson/${lesson.id}`)}
                                     disabled={!lessonUnlocked}
                                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-xs transition-all ${
                                       !lessonUnlocked ? 'text-muted-foreground/30 cursor-not-allowed' :
                                       completed ? 'text-success bg-success/5 hover:bg-success/10' :
                                       'text-foreground hover:bg-secondary/30'
-                                    }`}
-                                  >
+                                    }`}>
                                     {completed ? <Check className="w-3.5 h-3.5 text-success flex-shrink-0" /> :
                                      !lessonUnlocked ? <Lock className="w-3.5 h-3.5 flex-shrink-0" /> :
                                      <div className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 flex-shrink-0" />}
@@ -143,7 +136,6 @@ const Learn = () => {
                       );
                     })}
 
-                    {/* Level test */}
                     {level.level !== 'expert' && (
                       <div className="border border-primary/20 rounded-lg p-4 bg-primary/5">
                         <div className="flex items-center justify-between">
@@ -157,10 +149,8 @@ const Learn = () => {
                           {user.completedTests.includes(`test-${level.level}`) ? (
                             <span className="text-success text-xs font-semibold">✅ Passed</span>
                           ) : stats.completed === stats.total ? (
-                            <button
-                              onClick={() => navigate(`/test/${level.level}`)}
-                              className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity"
-                            >
+                            <button onClick={() => navigate(`/test/${level.level}`)}
+                              className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">
                               Take Test
                             </button>
                           ) : (

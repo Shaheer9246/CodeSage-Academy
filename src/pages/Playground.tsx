@@ -71,9 +71,7 @@ const Playground = () => {
     const blob = new Blob([htmlCode], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'code.html';
-    a.click();
+    a.href = url; a.download = 'code.html'; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -98,6 +96,9 @@ const Playground = () => {
           <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
+          <div className="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-md flex items-center justify-center">
+            <span className="text-[8px] font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
+          </div>
           <span className="text-primary font-bold text-sm font-mono">Playground</span>
         </div>
         <div className="flex items-center gap-1">
@@ -115,13 +116,10 @@ const Playground = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex items-center border-b border-border glass-card">
             {FILE_TABS.map(ft => (
-              <button
-                key={ft.id}
-                onClick={() => setFileTab(ft.id)}
+              <button key={ft.id} onClick={() => setFileTab(ft.id)}
                 className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
                   fileTab === ft.id ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
-                }`}
-              >
+                }`}>
                 {ft.label}
               </button>
             ))}
@@ -134,7 +132,7 @@ const Playground = () => {
 
         <div className="flex-1 flex flex-col min-w-0 border-t sm:border-t-0 sm:border-l border-border">
           <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono flex items-center gap-2 glass-card">
-            <div className="w-1.5 h-1.5 rounded-full bg-success" /> Preview
+            <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Preview
           </div>
           <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />

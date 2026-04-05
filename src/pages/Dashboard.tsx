@@ -2,24 +2,28 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { BookOpen, Trophy, Flame, Settings, Lock, Brain, Server, Code, ArrowRight, Star, Zap, Sparkles } from 'lucide-react';
 import { getAllLessons } from '@/data/lessons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const BADGE_INFO: Record<string, { icon: string; label: string }> = {
-  'first-lesson': { icon: '🎯', label: 'First Lesson' },
-  'five-lessons': { icon: '⭐', label: '5 Lessons' },
-  'ten-lessons': { icon: '🏆', label: '10 Lessons' },
-  'quarter-century': { icon: '💎', label: '25 Lessons' },
-  'test-passer': { icon: '📜', label: 'Test Passer' },
-  'week-streak': { icon: '🔥', label: '7-Day Streak' },
-  'month-streak': { icon: '💪', label: '30-Day Streak' },
+  'lite': { icon: '🌱', label: 'Lite Coder' },
+  'silver': { icon: '🥈', label: 'Silver Coder' },
+  'gold': { icon: '🥇', label: 'Gold Coder' },
+  'premium': { icon: '💎', label: 'Premium Coder' },
+  'elite': { icon: '👑', label: 'Elite Coder' },
+  'test-passer': { icon: '📜', label: 'Test Ace' },
+  'streak-3': { icon: '🔥', label: '3-Day Streak' },
+  'streak-7': { icon: '⚡', label: '7-Day Streak' },
+  'streak-30': { icon: '🏆', label: '30-Day Streak' },
 };
 
 const DAILY_CHALLENGES = [
-  { title: 'Build a Card Component', desc: 'Create a profile card with CSS', link: '/challenges' },
-  { title: 'Style a Navigation Bar', desc: 'Make a responsive navbar', link: '/challenges' },
-  { title: 'Create a Counter', desc: 'JavaScript counter with buttons', link: '/challenges' },
-  { title: 'Build a Grid Gallery', desc: 'CSS Grid image gallery', link: '/challenges' },
-  { title: 'Todo List App', desc: 'Add, remove, and toggle todos', link: '/challenges' },
+  { title: 'Add a Heading', desc: 'Create an h1 heading with your name', link: '/playground' },
+  { title: 'Style a Button', desc: 'Create and style a colorful button', link: '/playground' },
+  { title: 'Build a List', desc: 'Create an unordered list with 5 items', link: '/playground' },
+  { title: 'Center a Div', desc: 'Center a div using CSS flexbox', link: '/playground' },
+  { title: 'Color Palette', desc: 'Create 4 colored boxes in a row', link: '/playground' },
+  { title: 'Simple Form', desc: 'Build a form with name and email', link: '/playground' },
+  { title: 'Image Card', desc: 'Create a card with an image and text', link: '/playground' },
 ];
 
 const Dashboard = () => {
@@ -28,10 +32,12 @@ const Dashboard = () => {
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
 
+  useEffect(() => {
+    if (user) updateStreak();
+  }, []);
+
   if (!user) { navigate('/auth'); return null; }
   if (!user.name) { navigate('/onboarding'); return null; }
-
-  updateStreak();
 
   const totalLessons = getAllLessons().length;
   const completedCount = user.completedLessons.length;
@@ -51,21 +57,26 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="glow-orb glow-primary w-64 h-64 top-0 right-0 opacity-30" />
-      <div className="glow-orb glow-accent w-48 h-48 bottom-1/4 left-0 opacity-20" />
+    <div className="min-h-screen bg-background relative overflow-hidden animated-bg">
+      {/* Background effects */}
+      <div className="glow-orb glow-primary w-64 h-64 top-0 right-0 opacity-25" />
+      <div className="glow-orb glow-accent w-48 h-48 bottom-1/4 left-0 opacity-15" />
+      <div className="glow-orb glow-cyan w-32 h-32 top-1/2 right-1/4 opacity-10" />
+
+      {/* Floating code */}
+      <span className="code-float text-4xl top-20 right-10 text-primary animate-float">{`{ }`}</span>
+      <span className="code-float text-3xl bottom-20 left-8 text-accent animate-float" style={{ animationDelay: '3s' }}>{`</>`}</span>
 
       {/* Header */}
       <header className="relative z-10 border-b border-border glass-card px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center neon-border">
             <span className="text-xs font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
           </div>
-          <span className="text-lg font-bold text-foreground font-mono hidden sm:inline">CodeSage</span>
+          <span className="text-lg font-bold gradient-text font-mono hidden sm:inline">CodeSage</span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
             <Flame className="w-4 h-4 text-primary" />
             <span className="font-bold text-xs text-primary">{user.streakCount}</span>
           </div>
@@ -77,15 +88,15 @@ const Dashboard = () => {
 
       <div className="relative z-10 max-w-6xl mx-auto p-4 sm:p-6 space-y-4">
         {/* Welcome Banner */}
-        <div className="glass-card-strong rounded-2xl p-5 sm:p-6">
+        <div className="glass-card-strong rounded-2xl p-5 sm:p-6 neon-border-subtle">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center text-2xl">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center text-2xl border border-primary/20">
                 👋
               </div>
               <div>
                 <h1 className="text-lg sm:text-xl font-bold text-foreground">Welcome back, {user.name}!</h1>
-                <p className="text-muted-foreground text-xs mt-0.5">Your coding journey continues</p>
+                <p className="text-muted-foreground text-xs mt-0.5 font-mono">Your coding journey continues</p>
               </div>
             </div>
             <div className="text-right">
@@ -93,88 +104,42 @@ const Dashboard = () => {
               <p className="text-xl font-bold text-primary font-mono">{progress}%</p>
             </div>
           </div>
-          <div className="mt-4 w-full h-2 bg-secondary rounded-full overflow-hidden">
+          <div className="mt-4 w-full h-2.5 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
         </div>
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {/* Code Editor */}
-          <DashCard
-            icon={<Code className="w-5 h-5" />}
-            title="Code Playground"
-            desc="Write & preview code instantly"
-            gradient="from-primary/20 to-primary/5"
-            iconBg="bg-primary/20"
-            onClick={() => navigate('/playground')}
-          />
-
-          {/* Learn */}
-          <DashCard
-            icon={<BookOpen className="w-5 h-5" />}
-            title={completedCount > 0 ? 'Continue Learning' : 'Start Learning'}
+          <DashCard icon={<Code className="w-5 h-5" />} title="Code Playground" desc="Write & preview code instantly"
+            gradient="from-primary/20 to-primary/5" iconBg="bg-primary/20" onClick={() => navigate('/playground')} />
+          <DashCard icon={<BookOpen className="w-5 h-5" />} title={completedCount > 0 ? 'Continue Learning' : 'Start Learning'}
             desc={`${completedCount}/${totalLessons} lessons completed`}
-            gradient="from-accent/20 to-accent/5"
-            iconBg="bg-accent/20"
-            onClick={() => navigate('/learn')}
-          />
-
-          {/* Challenges */}
-          <DashCard
-            icon={<Trophy className="w-5 h-5" />}
-            title="Challenges"
-            desc="Test your skills"
-            gradient="from-warning/20 to-warning/5"
-            iconBg="bg-warning/20"
-            onClick={() => navigate('/challenges')}
-          />
-
-          {/* Backend - locked */}
-          <DashCard
-            icon={<Server className="w-5 h-5" />}
-            title="Backend"
+            gradient="from-accent/20 to-accent/5" iconBg="bg-accent/20" onClick={() => navigate('/learn')} />
+          <DashCard icon={<Trophy className="w-5 h-5" />} title="Challenges" desc="Test your skills"
+            gradient="from-warning/20 to-warning/5" iconBg="bg-warning/20" onClick={() => navigate('/challenges')} />
+          <DashCard icon={<Server className="w-5 h-5" />} title="Backend"
             desc={user.unlockedSections.includes('backend') ? 'Node.js & SQL' : 'Complete frontend or promo code'}
-            gradient="from-info/20 to-info/5"
-            iconBg="bg-info/20"
-            locked={!user.unlockedSections.includes('backend')}
-          />
-
-          {/* AI - locked */}
-          <DashCard
-            icon={<Brain className="w-5 h-5" />}
-            title="AI Integration"
+            gradient="from-info/20 to-info/5" iconBg="bg-info/20" locked={!user.unlockedSections.includes('backend')} />
+          <DashCard icon={<Brain className="w-5 h-5" />} title="AI Integration"
             desc={user.unlockedSections.includes('ai') ? 'Python & AI' : 'Complete frontend or promo code'}
-            gradient="from-destructive/20 to-destructive/5"
-            iconBg="bg-destructive/20"
-            locked={!user.unlockedSections.includes('ai')}
-          />
-
-          {/* Python - coming soon */}
-          <DashCard
-            icon={<Zap className="w-5 h-5" />}
-            title="Python"
-            desc="Coming Soon"
-            gradient="from-success/20 to-success/5"
-            iconBg="bg-success/20"
-            locked
-          />
+            gradient="from-destructive/20 to-destructive/5" iconBg="bg-destructive/20" locked={!user.unlockedSections.includes('ai')} />
+          <DashCard icon={<Zap className="w-5 h-5" />} title="Python" desc="Coming Soon"
+            gradient="from-success/20 to-success/5" iconBg="bg-success/20" locked />
         </div>
 
         {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Daily Challenge */}
-          <div className="glass-card rounded-2xl p-5 border border-primary/20">
+          <div className="glass-card rounded-2xl p-5 border border-primary/15 neon-border-subtle">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-primary" /> Daily Challenge
             </h3>
             <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
               <p className="text-sm font-semibold text-foreground">{dailyChallenge.title}</p>
               <p className="text-xs text-muted-foreground mt-1">{dailyChallenge.desc}</p>
-              <button
-                onClick={() => navigate(dailyChallenge.link)}
-                className="mt-3 text-xs bg-primary/20 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/30 transition-colors font-medium"
-              >
+              <button onClick={() => navigate(dailyChallenge.link)}
+                className="mt-3 text-xs bg-gradient-to-r from-primary/20 to-accent/20 text-primary px-3 py-1.5 rounded-lg hover:from-primary/30 hover:to-accent/30 transition-colors font-medium border border-primary/20">
                 Start Challenge →
               </button>
             </div>
@@ -189,9 +154,10 @@ const Dashboard = () => {
               <div className="text-4xl">🔥</div>
               <div>
                 <p className="text-2xl font-bold text-primary font-mono">{user.streakCount}</p>
-                <p className="text-xs text-muted-foreground">day streak</p>
+                <p className="text-xs text-muted-foreground">day{user.streakCount !== 1 ? 's' : ''} streak</p>
               </div>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-3">Come back every day to increase your streak!</p>
           </div>
 
           {/* Badges */}
@@ -200,11 +166,11 @@ const Dashboard = () => {
               <Star className="w-4 h-4 text-primary" /> Badges
             </h3>
             {user.badges.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Complete lessons to earn badges!</p>
+              <p className="text-xs text-muted-foreground">Complete lessons to earn badges! 🌱 Lite → 🥈 Silver → 🥇 Gold → 💎 Premium → 👑 Elite</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {user.badges.map(b => (
-                  <div key={b} className="flex items-center gap-1 bg-secondary/60 px-2.5 py-1 rounded-full text-xs">
+                  <div key={b} className="flex items-center gap-1 bg-secondary/60 px-2.5 py-1 rounded-full text-xs badge-glow border border-primary/10">
                     <span>{BADGE_INFO[b]?.icon || '🏅'}</span>
                     <span className="font-medium text-foreground">{BADGE_INFO[b]?.label || b}</span>
                   </div>
@@ -216,15 +182,11 @@ const Dashboard = () => {
 
         {/* Promo Code */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Promo Code</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">Promo Code</h3>
           <div className="flex gap-2">
-            <input
-              value={promoInput}
-              onChange={e => setPromoInput(e.target.value)}
-              placeholder="Enter promo code"
-              className="flex-1 bg-secondary/60 border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-            <button onClick={handlePromo} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">
+            <input value={promoInput} onChange={e => setPromoInput(e.target.value)} placeholder="Enter promo code"
+              className="flex-1 bg-secondary/60 border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono" />
+            <button onClick={handlePromo} className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-2 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">
               Apply
             </button>
           </div>
@@ -241,24 +203,16 @@ function DashCard({ icon, title, desc, gradient, iconBg, onClick, locked }: {
   return (
     <button
       onClick={locked ? undefined : onClick}
-      className={`relative glass-card rounded-2xl p-5 text-left hover:border-primary/20 transition-all group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      className={`relative glass-card rounded-2xl p-5 text-left transition-all group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:neon-border-subtle'}`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity`} />
-      {locked && (
-        <div className="absolute top-3 right-3 z-10">
-          <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-        </div>
-      )}
+      {locked && <div className="absolute top-3 right-3 z-10"><Lock className="w-3.5 h-3.5 text-muted-foreground" /></div>}
       <div className="relative z-10">
-        <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center text-foreground mb-3`}>
-          {icon}
-        </div>
+        <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center text-foreground mb-3`}>{icon}</div>
         <h3 className="font-semibold text-foreground text-sm">{title}</h3>
         <p className="text-xs text-muted-foreground mt-1">{desc}</p>
       </div>
-      {!locked && (
-        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-      )}
+      {!locked && <ArrowRight className="w-3.5 h-3.5 text-muted-foreground absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10" />}
     </button>
   );
 }
