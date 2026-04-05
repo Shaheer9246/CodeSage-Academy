@@ -14,17 +14,34 @@ import Challenges from "./pages/Challenges";
 import LevelTest from "./pages/LevelTest";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
+import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center animated-bg">
+      <div className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl flex items-center justify-center mx-auto mb-4 neon-border animate-pulse-glow">
+          <span className="text-2xl font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
+        </div>
+        <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto mb-2" />
+        <p className="text-muted-foreground text-sm font-mono">Loading CodeSage...</p>
+      </div>
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn, loading } = useUser();
+  if (loading) return <LoadingScreen />;
   if (!isLoggedIn) return <Navigate to="/auth" replace />;
   return <>{children}</>;
 }
 
 function AuthRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, isOnboarded } = useUser();
+  const { isLoggedIn, isOnboarded, loading } = useUser();
+  if (loading) return <LoadingScreen />;
   if (isLoggedIn && isOnboarded) return <Navigate to="/dashboard" replace />;
   if (isLoggedIn && !isOnboarded) return <Navigate to="/onboarding" replace />;
   return <>{children}</>;

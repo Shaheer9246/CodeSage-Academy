@@ -13,18 +13,12 @@ const steps = [
 ];
 
 const goalIcons: Record<string, string> = {
-  'Build websites': '🌐',
-  'Get a tech job': '💼',
-  'Learn for fun': '🎮',
-  'School/College project': '🎓',
-  'Start freelancing': '💰',
+  'Build websites': '🌐', 'Get a tech job': '💼', 'Learn for fun': '🎮', 'School/College project': '🎓', 'Start freelancing': '💰',
 };
 
 const expIcons: Record<string, React.ReactNode> = {
-  'Complete Beginner': <Sprout className="w-5 h-5" />,
-  'Know some basics': <Code2 className="w-5 h-5" />,
-  'Intermediate': <GraduationCap className="w-5 h-5" />,
-  'Experienced': <Rocket className="w-5 h-5" />,
+  'Complete Beginner': <Sprout className="w-5 h-5" />, 'Know some basics': <Code2 className="w-5 h-5" />,
+  'Intermediate': <GraduationCap className="w-5 h-5" />, 'Experienced': <Rocket className="w-5 h-5" />,
 };
 
 const Onboarding = () => {
@@ -50,23 +44,19 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Glow orbs */}
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden animated-bg">
       <div className="glow-orb glow-accent w-64 h-64 top-10 -right-20" />
       <div className="glow-orb glow-primary w-48 h-48 bottom-20 -left-10" />
-
-      {/* Floating symbols */}
-      <span className="code-float text-4xl top-20 left-6 text-primary">{`< >`}</span>
-      <span className="code-float text-3xl bottom-16 right-12 text-accent">{`{ }`}</span>
+      <span className="code-float text-4xl top-20 left-6 text-primary animate-float">{`< >`}</span>
+      <span className="code-float text-3xl bottom-16 right-12 text-accent animate-float" style={{ animationDelay: '2s' }}>{`{ }`}</span>
 
       <div className="w-full max-w-lg relative z-10">
-        {/* Logo */}
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary via-accent to-primary rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary via-accent to-primary rounded-xl flex items-center justify-center neon-border">
               <span className="text-lg font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
             </div>
-            <span className="text-2xl font-bold text-foreground font-mono">CodeSage</span>
+            <span className="text-2xl font-bold gradient-text font-mono">CodeSage</span>
           </div>
         </div>
 
@@ -77,43 +67,32 @@ const Onboarding = () => {
           ))}
         </div>
 
-        {/* Question card */}
-        <div className="glass-card-strong rounded-3xl p-7">
+        <div className="glass-card-strong rounded-3xl p-7 neon-border-subtle">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-mono">Step {step + 1} of {steps.length}</p>
           <h2 className="text-xl font-semibold text-foreground mb-5">{current.question}</h2>
 
           {current.type === 'text' && (
-            <input
-              type="text"
-              placeholder={current.placeholder}
-              value={value}
+            <input type="text" placeholder={current.placeholder} value={value}
               onChange={e => setAnswers({ ...answers, [current.key]: e.target.value })}
               className="w-full bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all text-sm"
-              autoFocus
-            />
+              autoFocus />
           )}
 
           {current.type === 'date' && (
-            <input
-              type="date"
-              value={value}
+            <input type="date" value={value}
               onChange={e => setAnswers({ ...answers, [current.key]: e.target.value })}
-              className="w-full bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all text-sm"
-            />
+              className="w-full bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all text-sm" />
           )}
 
           {current.type === 'choice' && (
             <div className="space-y-2">
               {current.options?.map(opt => (
-                <button
-                  key={opt}
-                  onClick={() => setAnswers({ ...answers, [current.key]: opt })}
+                <button key={opt} onClick={() => setAnswers({ ...answers, [current.key]: opt })}
                   className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm ${
                     value === opt
-                      ? 'border-primary bg-primary/10 text-primary shadow-md shadow-primary/10'
+                      ? 'border-primary bg-primary/10 text-primary shadow-md shadow-primary/10 neon-border-subtle'
                       : 'border-border bg-secondary/40 text-foreground hover:border-primary/30 hover:bg-secondary/60'
-                  }`}
-                >
+                  }`}>
                   <div className="flex items-center gap-3">
                     {current.key === 'experienceLevel' && expIcons[opt]}
                     {current.key === 'goal' && <span className="text-lg">{goalIcons[opt]}</span>}
@@ -124,11 +103,8 @@ const Onboarding = () => {
             </div>
           )}
 
-          <button
-            onClick={handleNext}
-            disabled={!canContinue}
-            className="mt-6 w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-primary/20 text-sm uppercase tracking-wider"
-          >
+          <button onClick={handleNext} disabled={!canContinue}
+            className="mt-6 w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-primary/20 text-sm uppercase tracking-wider">
             {step === steps.length - 1 ? 'Start Learning' : 'Continue'}
             <ChevronRight className="w-4 h-4" />
           </button>

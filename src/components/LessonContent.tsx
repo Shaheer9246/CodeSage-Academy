@@ -1,5 +1,4 @@
 import { Lesson } from '@/data/lessons';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface LessonContentProps {
   lesson: Lesson;
@@ -11,8 +10,12 @@ interface LessonContentProps {
   isLastInTopic: boolean;
 }
 
-const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onStartChallenge, isLastInTopic }: LessonContentProps) => {
-  // Simple markdown-to-html
+/** Escape HTML entities in text */
+function escapeHtml(str: string): string {
+  return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onStartChallenge }: LessonContentProps) => {
   const renderContent = (md: string) => {
     const lines = md.split('\n');
     const html: string[] = [];
@@ -29,19 +32,23 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
         continue;
       }
       if (inCode) {
-        codeBlock += line.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '\n';
+        codeBlock += escapeHtml(line) + '\n';
         continue;
       }
-      if (line.startsWith('# ')) {
-        html.push(`<h1 class="text-xl font-bold text-foreground mb-3">${line.slice(2)}</h1>`);
-      } else if (line.startsWith('## ')) {
-        html.push(`<h2 class="text-lg font-semibold text-foreground mt-4 mb-2">${line.slice(3)}</h2>`);
-      } else if (line.startsWith('- ')) {
-        const content = line.slice(2).replace(/`([^`]+)`/g, '<code class="bg-secondary px-1 py-0.5 rounded text-accent text-sm">$1</code>')
+
+      // Escape HTML FIRST, then apply markdown formatting
+      const escaped = escapeHtml(line);
+
+      if (escaped.startsWith('# ')) {
+        html.push(`<h1 class="text-xl font-bold text-foreground mb-3">${escaped.slice(2)}</h1>`);
+      } else if (escaped.startsWith('## ')) {
+        html.push(`<h2 class="text-lg font-semibold text-foreground mt-4 mb-2">${escaped.slice(3)}</h2>`);
+      } else if (escaped.startsWith('- ')) {
+        const content = escaped.slice(2).replace(/`([^`]+)`/g, '<code class="bg-secondary px-1 py-0.5 rounded text-accent text-sm">$1</code>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
         html.push(`<li class="ml-4 text-sm text-muted-foreground mb-1">${content}</li>`);
-      } else if (line.trim()) {
-        const content = line.replace(/`([^`]+)`/g, '<code class="bg-secondary px-1 py-0.5 rounded text-accent text-sm">$1</code>')
+      } else if (escaped.trim()) {
+        const content = escaped.replace(/`([^`]+)`/g, '<code class="bg-secondary px-1 py-0.5 rounded text-accent text-sm">$1</code>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
         html.push(`<p class="text-sm text-muted-foreground mb-2">${content}</p>`);
       }
@@ -63,15 +70,10 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
       </div>
 
       <div className="flex items-center justify-between px-4 py-2 border-t border-border">
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onPrev}
-            disabled={lessonIndex === 0}
-            className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-          >
-            Previous
-          </button>
-        </div>
+        <button onClick={onPrev} disabled={lessonIndex === 0}
+          className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors">
+          Previous
+        </button>
         <div className="flex gap-1">
           {Array.from({ length: totalLessons }, (_, i) => (
             <div key={i} className={`w-2 h-2 rounded-full ${i === lessonIndex ? 'bg-primary' : 'bg-secondary'}`} />
@@ -79,17 +81,12 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
         </div>
         <div className="flex gap-2">
           {lesson.challenge && (
-            <button
-              onClick={onStartChallenge}
-              className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded hover:opacity-90 transition-opacity"
-            >
+            <button onClick={onStartChallenge}
+              className="text-xs bg-gradient-to-r from-primary to-accent text-primary-foreground px-3 py-1 rounded hover:opacity-90 transition-opacity">
               Challenge
             </button>
           )}
-          <button
-            onClick={onNext}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <button onClick={onNext} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
             Next
           </button>
         </div>
