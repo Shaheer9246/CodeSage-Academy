@@ -4736,6 +4736,37 @@ body { background: var(--bg); color: var(--text); font-family: Arial; padding: 2
         },
       ],
     },
+    {
+      id: 'real-projects',
+      name: 'Real-World Projects',
+      icon: '🏗️',
+      lessons: [
+        {
+          id: 'proj-1',
+          title: 'Build a Login Page',
+          topic: 'Real-World Projects',
+          level: 'expert',
+          content: `# Build a Professional Login Page 🔐\n\nPut everything together: glassmorphism design, password show/hide, form validation, responsive layout.\n\n## Key Techniques\n- \`backdrop-filter: blur(10px)\` for glass effect\n- Toggle \`input.type\` between "password" and "text"\n- \`form.addEventListener('submit', ...)\` for validation\n- CSS \`linear-gradient\` backgrounds`,
+          initialCode: `<!DOCTYPE html>\n<html><head><link rel="stylesheet" href="style.css"></head>\n<body>\n  <div class="container">\n    <div class="login-card">\n      <h1>🔐 Welcome Back</h1>\n      <form id="loginForm">\n        <input type="email" id="email" placeholder="Email" required>\n        <div class="pw-wrap">\n          <input type="password" id="pw" placeholder="Password" required>\n          <button type="button" onclick="togglePw()">👁️</button>\n        </div>\n        <button type="submit" class="btn">Login</button>\n      </form>\n    </div>\n  </div>\n  <script src="script.js"></script>\n</body></html>`,
+          initialCss: `* { box-sizing: border-box; margin: 0; } body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f0a2e, #1a1040); font-family: Arial; } .container { width: 100%; max-width: 400px; padding: 20px; } .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; color: white; } h1 { text-align: center; margin-bottom: 30px; } input { width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; margin-bottom: 15px; outline: none; } .pw-wrap { position: relative; } .pw-wrap button { position: absolute; right: 10px; top: 12px; background: none; border: none; cursor: pointer; } .btn { width: 100%; padding: 12px; background: #e98a2e; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; }`,
+          initialJs: `function togglePw() { const p = document.getElementById('pw'); p.type = p.type === 'password' ? 'text' : 'password'; }\ndocument.getElementById('loginForm').addEventListener('submit', e => { e.preventDefault(); alert('Login successful!'); });`,
+          language: 'html',
+          challenge: { instruction: 'Build a signup page with name, email, password with show/hide, confirm password with match validation, and glassmorphism styling.', initialCode: `<!DOCTYPE html><html><body><!-- Build signup form --><script src="script.js"></script></body></html>`, initialCss: `body { background: #0f0a2e; color: white; font-family: Arial; display: flex; justify-content: center; align-items: center; min-height: 100vh; }`, initialJs: `// Add toggle and validation`, validationKeywords: ['type="password"', 'backdrop-filter', 'function'] },
+        },
+        {
+          id: 'proj-2',
+          title: 'Build a Portfolio Website',
+          topic: 'Real-World Projects',
+          level: 'expert',
+          content: `# Build a Portfolio Website 🌐\n\nCreate a professional portfolio with hero, about, skills, projects grid, contact form, and smooth scroll navigation.\n\n## Key Concepts\n- \`scroll-behavior: smooth\`\n- CSS Grid for project cards\n- Fixed navbar with \`backdrop-filter\`\n- Responsive design with \`auto-fit\``,
+          initialCode: `<!DOCTYPE html>\n<html><head><link rel="stylesheet" href="style.css"></head>\n<body>\n  <nav><a href="#hero">Home</a> <a href="#projects">Projects</a> <a href="#contact">Contact</a></nav>\n  <section id="hero"><h1>Hi, I'm <span style="color:#e98a2e">CodeSage Dev</span></h1><p>Frontend Developer</p></section>\n  <section id="projects"><h2>Projects</h2><div class="grid"><div class="card"><h3>🌐 Web App</h3></div><div class="card"><h3>📱 Mobile UI</h3></div><div class="card"><h3>🎨 Dashboard</h3></div></div></section>\n  <section id="contact"><h2>Contact</h2><form><input placeholder="Name"><input placeholder="Email" type="email"><textarea placeholder="Message"></textarea><button type="submit">Send</button></form></section>\n</body></html>`,
+          initialCss: `* { margin: 0; padding: 0; box-sizing: border-box; } html { scroll-behavior: smooth; } body { background: #0f0a2e; color: white; font-family: Arial; } nav { position: fixed; top: 0; width: 100%; padding: 15px 30px; background: rgba(15,10,46,0.9); backdrop-filter: blur(10px); z-index: 100; } nav a { color: #aaa; margin-right: 20px; text-decoration: none; } section { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; } h1 { font-size: 48px; } .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 800px; width: 100%; margin-top: 20px; } .card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.08); } form { display: flex; flex-direction: column; gap: 10px; max-width: 400px; width: 100%; } input, textarea { padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; outline: none; } button { padding: 12px; background: #e98a2e; border: none; border-radius: 8px; color: white; cursor: pointer; }`,
+          initialJs: ``,
+          language: 'html',
+          challenge: { instruction: 'Add an About section with skills tags, a 4th project card, and social media links in a footer.', initialCode: `<!DOCTYPE html><html><head><link rel="stylesheet" href="style.css"></head><body><!-- Build portfolio --></body></html>`, initialCss: `html{scroll-behavior:smooth}body{background:#0f0a2e;color:white;font-family:Arial}`, validationKeywords: ['<nav', '<section', 'grid', 'footer'] },
+        },
+      ],
+    },
   ],
 };
 
