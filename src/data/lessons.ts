@@ -3292,6 +3292,464 @@ render();`,
         },
       ],
     },
+    {
+      id: 'multimedia',
+      name: 'Multimedia & Embeds',
+      icon: '🎬',
+      lessons: [
+        {
+          id: 'multi-1',
+          title: 'Adding Video to Websites',
+          topic: 'Multimedia & Embeds',
+          level: 'intermediate',
+          content: `# Adding Video to Websites 🎬
+
+The \`<video>\` element lets you embed videos directly into your web pages without plugins.
+
+## Basic Video Element
+
+\`\`\`html
+<video width="640" height="360" controls>
+  <source src="movie.mp4" type="video/mp4">
+  Your browser does not support video.
+</video>
+\`\`\`
+
+## Key Attributes
+- **controls** — Shows play/pause, volume, fullscreen buttons
+- **autoplay** — Starts playing automatically (muted required for autoplay)
+- **loop** — Replays the video when it ends
+- **muted** — Starts muted (required for autoplay in most browsers)
+- **poster** — Shows an image before the video plays
+- **preload** — \`auto\`, \`metadata\`, or \`none\`
+
+## Responsive Video
+\`\`\`css
+video {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+}
+\`\`\`
+
+## Embedding YouTube Videos
+\`\`\`html
+<iframe width="560" height="315"
+  src="https://www.youtube.com/embed/VIDEO_ID"
+  frameborder="0" allowfullscreen>
+</iframe>
+\`\`\``,
+          initialCode: `<div style="text-align: center; padding: 20px;">
+  <h1>My Video Page</h1>
+  <video width="400" controls poster="">
+    <source src="" type="video/mp4">
+    Your browser does not support video.
+  </video>
+  <p>Add a video with controls!</p>
+</div>`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a page with a video element that has controls, width of 500, and a poster attribute. Also add an iframe for a YouTube embed.',
+            initialCode: `<div style="padding: 20px;">
+  <h1>Video Gallery</h1>
+  <!-- Add video element with controls, width, poster -->
+  <!-- Add YouTube iframe embed -->
+</div>`,
+            validationKeywords: ['<video', 'controls', 'width', '<iframe'],
+          },
+        },
+        {
+          id: 'multi-2',
+          title: 'Adding Audio to Websites',
+          topic: 'Multimedia & Embeds',
+          level: 'intermediate',
+          content: `# Adding Audio to Websites 🔊
+
+The \`<audio>\` element lets you embed sound content in your pages.
+
+## Basic Audio Element
+\`\`\`html
+<audio controls>
+  <source src="song.mp3" type="audio/mpeg">
+  <source src="song.ogg" type="audio/ogg">
+  Your browser does not support audio.
+</audio>
+\`\`\`
+
+## Attributes
+- **controls** — Shows play/pause, volume, progress
+- **autoplay** — Starts automatically (often blocked by browsers)
+- **loop** — Replays when finished
+- **muted** — Starts muted
+- **preload** — \`auto\`, \`metadata\`, or \`none\`
+
+## Multiple Sources
+Provide multiple formats for browser compatibility:
+\`\`\`html
+<audio controls>
+  <source src="audio.mp3" type="audio/mpeg">
+  <source src="audio.ogg" type="audio/ogg">
+  <source src="audio.wav" type="audio/wav">
+</audio>
+\`\`\`
+
+## JavaScript Audio Control
+\`\`\`javascript
+const audio = document.getElementById('myAudio');
+audio.play();
+audio.pause();
+audio.volume = 0.5; // 0 to 1
+\`\`\``,
+          initialCode: `<div style="text-align: center; padding: 20px;">
+  <h1>🎵 Music Player</h1>
+  <audio controls>
+    <source src="" type="audio/mpeg">
+    Your browser does not support audio.
+  </audio>
+</div>`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a page with an audio element that has controls and loop attributes. Add a title above it.',
+            initialCode: `<div style="padding: 20px;">
+  <h1>My Podcast Player</h1>
+  <!-- Add audio element with controls and loop -->
+</div>`,
+            validationKeywords: ['<audio', 'controls', 'loop'],
+          },
+        },
+        {
+          id: 'multi-3',
+          title: 'Canvas & SVG Graphics',
+          topic: 'Multimedia & Embeds',
+          level: 'intermediate',
+          content: `# Canvas & SVG Graphics 🎨
+
+## HTML Canvas
+The \`<canvas>\` element lets you draw graphics with JavaScript.
+
+\`\`\`html
+<canvas id="myCanvas" width="400" height="300"></canvas>
+\`\`\`
+
+\`\`\`javascript
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+
+// Rectangle
+ctx.fillStyle = '#e98a2e';
+ctx.fillRect(50, 50, 100, 80);
+
+// Circle
+ctx.beginPath();
+ctx.arc(250, 100, 40, 0, Math.PI * 2);
+ctx.fillStyle = '#7c3aed';
+ctx.fill();
+
+// Text
+ctx.font = '20px Arial';
+ctx.fillStyle = 'white';
+ctx.fillText('Hello Canvas!', 100, 200);
+\`\`\`
+
+## SVG (Scalable Vector Graphics)
+SVG is XML-based and scales without losing quality:
+
+\`\`\`html
+<svg width="200" height="200">
+  <circle cx="100" cy="100" r="80" fill="#e98a2e" />
+  <text x="100" y="110" text-anchor="middle" fill="white" font-size="20">SVG</text>
+</svg>
+\`\`\`
+
+Canvas = pixel-based (good for games, animations). SVG = vector-based (good for icons, logos, charts).`,
+          initialCode: `<div style="text-align: center; padding: 20px; background: #1a1a2e; color: white;">
+  <h1>Canvas Drawing</h1>
+  <canvas id="myCanvas" width="400" height="200" style="border: 1px solid #333;"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#e98a2e';
+    ctx.fillRect(50, 50, 100, 80);
+  </script>
+</div>`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a canvas element and draw a rectangle and a circle on it using JavaScript. Also add an SVG with a circle.',
+            initialCode: `<div style="padding: 20px;">
+  <!-- Add canvas element -->
+  <!-- Draw shapes with JavaScript -->
+  <!-- Add SVG circle -->
+</div>`,
+            validationKeywords: ['<canvas', 'getcontext', 'fillrect', '<svg'],
+          },
+        },
+      ],
+    },
+    {
+      id: 'forms-validation',
+      name: 'Forms & Validation',
+      icon: '📝',
+      lessons: [
+        {
+          id: 'form-1',
+          title: 'Advanced Forms',
+          topic: 'Forms & Validation',
+          level: 'intermediate',
+          content: `# Advanced HTML Forms 📝
+
+## Input Types
+HTML5 provides many specialized input types:
+
+\`\`\`html
+<input type="email" placeholder="Email" required>
+<input type="url" placeholder="Website URL">
+<input type="tel" placeholder="Phone number">
+<input type="number" min="0" max="100" step="5">
+<input type="range" min="0" max="100">
+<input type="color" value="#e98a2e">
+<input type="date">
+<input type="time">
+<input type="datetime-local">
+<input type="file" accept="image/*" multiple>
+<input type="search" placeholder="Search...">
+\`\`\`
+
+## Form Validation Attributes
+- **required** — Field must be filled
+- **minlength / maxlength** — Text length limits
+- **min / max** — Number range limits
+- **pattern** — Regex pattern matching
+- **placeholder** — Hint text
+
+## Custom Validation with JavaScript
+\`\`\`javascript
+const form = document.getElementById('myForm');
+form.addEventListener('submit', (e) => {
+  const email = document.getElementById('email').value;
+  if (!email.includes('@')) {
+    e.preventDefault();
+    alert('Please enter a valid email!');
+  }
+});
+\`\`\``,
+          initialCode: `<div style="padding: 20px; background: #1a1a2e; color: white; max-width: 400px; margin: auto;">
+  <h1>Registration Form</h1>
+  <form id="myForm">
+    <label>Name:</label><br>
+    <input type="text" required minlength="2" style="width:100%; padding:8px; margin:5px 0;"><br>
+    <label>Email:</label><br>
+    <input type="email" required style="width:100%; padding:8px; margin:5px 0;"><br>
+    <label>Age:</label><br>
+    <input type="number" min="13" max="120" style="width:100%; padding:8px; margin:5px 0;"><br>
+    <button type="submit" style="background:#e98a2e; color:white; padding:10px 20px; border:none; cursor:pointer; margin-top:10px;">Submit</button>
+  </form>
+</div>`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a contact form with name (required, min 2 chars), email (required), phone (tel type), message (textarea, required), and a submit button.',
+            initialCode: `<form style="padding: 20px;">
+  <h2>Contact Us</h2>
+  <!-- Add name input (required, minlength 2) -->
+  <!-- Add email input (required) -->
+  <!-- Add phone input (type tel) -->
+  <!-- Add textarea for message (required) -->
+  <!-- Add submit button -->
+</form>`,
+            validationKeywords: ['required', 'type="email"', 'type="tel"', '<textarea', '<button'],
+          },
+        },
+        {
+          id: 'form-2',
+          title: 'Password Show/Hide & Validation',
+          topic: 'Forms & Validation',
+          level: 'intermediate',
+          content: `# Password Show/Hide & Validation 🔐
+
+## Toggle Password Visibility
+\`\`\`html
+<div>
+  <input type="password" id="password">
+  <button onclick="togglePassword()">👁️ Show</button>
+</div>
+\`\`\`
+
+\`\`\`javascript
+function togglePassword() {
+  const pw = document.getElementById('password');
+  const btn = event.target;
+  if (pw.type === 'password') {
+    pw.type = 'text';
+    btn.textContent = '🙈 Hide';
+  } else {
+    pw.type = 'password';
+    btn.textContent = '👁️ Show';
+  }
+}
+\`\`\`
+
+## Password Strength Checker
+\`\`\`javascript
+function checkStrength(password) {
+  let strength = 0;
+  if (password.length >= 8) strength++;
+  if (/[A-Z]/.test(password)) strength++;
+  if (/[0-9]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+  
+  const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+  return labels[strength - 1] || 'Too short';
+}
+\`\`\`
+
+## Confirm Password Match
+\`\`\`javascript
+const pw1 = document.getElementById('password');
+const pw2 = document.getElementById('confirmPassword');
+pw2.addEventListener('input', () => {
+  if (pw1.value !== pw2.value) {
+    pw2.setCustomValidity('Passwords do not match');
+  } else {
+    pw2.setCustomValidity('');
+  }
+});
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html><head><style>
+body { background: #1a1a2e; color: white; font-family: Arial; padding: 20px; }
+input { padding: 8px; width: 200px; margin: 5px; }
+button { padding: 8px 12px; cursor: pointer; background: #e98a2e; color: white; border: none; }
+</style></head><body>
+  <h1>Login Form</h1>
+  <input type="password" id="pw" placeholder="Password">
+  <button onclick="toggle()">👁️ Show</button>
+  <script>
+    function toggle() {
+      const pw = document.getElementById('pw');
+      pw.type = pw.type === 'password' ? 'text' : 'password';
+    }
+  </script>
+</body></html>`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a login form with email, password with show/hide toggle, and a password strength indicator that updates as you type.',
+            initialCode: `<!DOCTYPE html>
+<html><body>
+  <h2>Login</h2>
+  <!-- Email input -->
+  <!-- Password input with show/hide button -->
+  <!-- Password strength indicator -->
+  <script>
+    // togglePassword function
+    // checkStrength function
+  </script>
+</body></html>`,
+            validationKeywords: ['type="password"', 'toggle', 'strength', 'function'],
+          },
+        },
+      ],
+    },
+    {
+      id: 'accessibility-seo',
+      name: 'Accessibility & SEO',
+      icon: '♿',
+      lessons: [
+        {
+          id: 'a11y-1',
+          title: 'Web Accessibility Basics',
+          topic: 'Accessibility & SEO',
+          level: 'intermediate',
+          content: `# Web Accessibility (a11y) ♿
+
+Accessibility ensures everyone can use your website, including people with disabilities.
+
+## Semantic HTML
+Use proper elements instead of generic divs:
+\`\`\`html
+<!-- Bad -->
+<div class="header">...</div>
+<div class="nav">...</div>
+
+<!-- Good -->
+<header>...</header>
+<nav>...</nav>
+<main>...</main>
+<footer>...</footer>
+<article>...</article>
+<section>...</section>
+\`\`\`
+
+## ARIA Attributes
+\`\`\`html
+<button aria-label="Close menu">✕</button>
+<div role="alert">Error: Invalid email</div>
+<img src="photo.jpg" alt="A sunset over the ocean">
+<nav aria-label="Main navigation">...</nav>
+\`\`\`
+
+## Key Rules
+1. **Always add alt text** to images
+2. **Use proper heading hierarchy** (h1 → h2 → h3)
+3. **Ensure color contrast** (4.5:1 ratio for text)
+4. **Make everything keyboard navigable** (Tab, Enter, Escape)
+5. **Use labels for form inputs**
+\`\`\`html
+<label for="email">Email:</label>
+<input id="email" type="email">
+\`\`\`
+
+## SEO Basics
+\`\`\`html
+<head>
+  <title>My Website - Best Coding Platform</title>
+  <meta name="description" content="Learn coding for free">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+\`\`\``,
+          initialCode: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accessible Page</title>
+</head>
+<body style="font-family: Arial; padding: 20px; background: #1a1a2e; color: white;">
+  <header>
+    <h1>My Accessible Website</h1>
+    <nav aria-label="Main navigation">
+      <a href="#home">Home</a> |
+      <a href="#about">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h2>Welcome</h2>
+      <p>This page follows accessibility best practices.</p>
+      <img src="" alt="A descriptive alt text for the image">
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2024 My Website</p>
+  </footer>
+</body>
+</html>`,
+          language: 'html',
+          challenge: {
+            instruction: 'Create a page using semantic HTML (header, nav, main, article, footer). Add proper alt text to an image, aria-label to a button, and label elements for form inputs.',
+            initialCode: `<!DOCTYPE html>
+<html lang="en">
+<body>
+  <!-- Use semantic HTML elements -->
+  <!-- Add nav with aria-label -->
+  <!-- Add image with alt text -->
+  <!-- Add form with labels -->
+  <!-- Add footer -->
+</body>
+</html>`,
+            validationKeywords: ['<header', '<nav', '<main', '<footer', 'alt=', 'aria-label', '<label'],
+          },
+        },
+      ],
+    },
   ],
 };
 
@@ -4275,6 +4733,37 @@ body { background: var(--bg); color: var(--text); font-family: Arial; padding: 2
             initialJs: `// Create toggleTheme function with localStorage`,
             validationKeywords: ['classlist', 'localstorage', 'toggle', '--bg'],
           },
+        },
+      ],
+    },
+    {
+      id: 'real-projects',
+      name: 'Real-World Projects',
+      icon: '🏗️',
+      lessons: [
+        {
+          id: 'proj-1',
+          title: 'Build a Login Page',
+          topic: 'Real-World Projects',
+          level: 'expert',
+          content: `# Build a Professional Login Page 🔐\n\nPut everything together: glassmorphism design, password show/hide, form validation, responsive layout.\n\n## Key Techniques\n- \`backdrop-filter: blur(10px)\` for glass effect\n- Toggle \`input.type\` between "password" and "text"\n- \`form.addEventListener('submit', ...)\` for validation\n- CSS \`linear-gradient\` backgrounds`,
+          initialCode: `<!DOCTYPE html>\n<html><head><link rel="stylesheet" href="style.css"></head>\n<body>\n  <div class="container">\n    <div class="login-card">\n      <h1>🔐 Welcome Back</h1>\n      <form id="loginForm">\n        <input type="email" id="email" placeholder="Email" required>\n        <div class="pw-wrap">\n          <input type="password" id="pw" placeholder="Password" required>\n          <button type="button" onclick="togglePw()">👁️</button>\n        </div>\n        <button type="submit" class="btn">Login</button>\n      </form>\n    </div>\n  </div>\n  <script src="script.js"></script>\n</body></html>`,
+          initialCss: `* { box-sizing: border-box; margin: 0; } body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f0a2e, #1a1040); font-family: Arial; } .container { width: 100%; max-width: 400px; padding: 20px; } .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; color: white; } h1 { text-align: center; margin-bottom: 30px; } input { width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; margin-bottom: 15px; outline: none; } .pw-wrap { position: relative; } .pw-wrap button { position: absolute; right: 10px; top: 12px; background: none; border: none; cursor: pointer; } .btn { width: 100%; padding: 12px; background: #e98a2e; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; }`,
+          initialJs: `function togglePw() { const p = document.getElementById('pw'); p.type = p.type === 'password' ? 'text' : 'password'; }\ndocument.getElementById('loginForm').addEventListener('submit', e => { e.preventDefault(); alert('Login successful!'); });`,
+          language: 'html',
+          challenge: { instruction: 'Build a signup page with name, email, password with show/hide, confirm password with match validation, and glassmorphism styling.', initialCode: `<!DOCTYPE html><html><body><!-- Build signup form --><script src="script.js"></script></body></html>`, initialCss: `body { background: #0f0a2e; color: white; font-family: Arial; display: flex; justify-content: center; align-items: center; min-height: 100vh; }`, initialJs: `// Add toggle and validation`, validationKeywords: ['type="password"', 'backdrop-filter', 'function'] },
+        },
+        {
+          id: 'proj-2',
+          title: 'Build a Portfolio Website',
+          topic: 'Real-World Projects',
+          level: 'expert',
+          content: `# Build a Portfolio Website 🌐\n\nCreate a professional portfolio with hero, about, skills, projects grid, contact form, and smooth scroll navigation.\n\n## Key Concepts\n- \`scroll-behavior: smooth\`\n- CSS Grid for project cards\n- Fixed navbar with \`backdrop-filter\`\n- Responsive design with \`auto-fit\``,
+          initialCode: `<!DOCTYPE html>\n<html><head><link rel="stylesheet" href="style.css"></head>\n<body>\n  <nav><a href="#hero">Home</a> <a href="#projects">Projects</a> <a href="#contact">Contact</a></nav>\n  <section id="hero"><h1>Hi, I'm <span style="color:#e98a2e">CodeSage Dev</span></h1><p>Frontend Developer</p></section>\n  <section id="projects"><h2>Projects</h2><div class="grid"><div class="card"><h3>🌐 Web App</h3></div><div class="card"><h3>📱 Mobile UI</h3></div><div class="card"><h3>🎨 Dashboard</h3></div></div></section>\n  <section id="contact"><h2>Contact</h2><form><input placeholder="Name"><input placeholder="Email" type="email"><textarea placeholder="Message"></textarea><button type="submit">Send</button></form></section>\n</body></html>`,
+          initialCss: `* { margin: 0; padding: 0; box-sizing: border-box; } html { scroll-behavior: smooth; } body { background: #0f0a2e; color: white; font-family: Arial; } nav { position: fixed; top: 0; width: 100%; padding: 15px 30px; background: rgba(15,10,46,0.9); backdrop-filter: blur(10px); z-index: 100; } nav a { color: #aaa; margin-right: 20px; text-decoration: none; } section { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; } h1 { font-size: 48px; } .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 800px; width: 100%; margin-top: 20px; } .card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.08); } form { display: flex; flex-direction: column; gap: 10px; max-width: 400px; width: 100%; } input, textarea { padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; outline: none; } button { padding: 12px; background: #e98a2e; border: none; border-radius: 8px; color: white; cursor: pointer; }`,
+          initialJs: ``,
+          language: 'html',
+          challenge: { instruction: 'Add an About section with skills tags, a 4th project card, and social media links in a footer.', initialCode: `<!DOCTYPE html><html><head><link rel="stylesheet" href="style.css"></head><body><!-- Build portfolio --></body></html>`, initialCss: `html{scroll-behavior:smooth}body{background:#0f0a2e;color:white;font-family:Arial}`, validationKeywords: ['<nav', '<section', 'grid', 'footer'] },
         },
       ],
     },

@@ -4,18 +4,20 @@ interface CodeEditorProps {
   code: string;
   onChange: (value: string) => void;
   language?: string;
+  theme?: 'vs-dark' | 'light';
+  fontSize?: number;
 }
 
-const CodeEditor = ({ code, onChange, language = 'html' }: CodeEditorProps) => {
+const CodeEditor = ({ code, onChange, language = 'html', theme = 'vs-dark', fontSize = 14 }: CodeEditorProps) => {
   return (
     <Editor
       height="100%"
       language={language}
       value={code}
       onChange={(val) => onChange(val || '')}
-      theme="vs-dark"
+      theme={theme}
       options={{
-        fontSize: 14,
+        fontSize,
         fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
         minimap: { enabled: false },
         scrollBeyondLastLine: false,

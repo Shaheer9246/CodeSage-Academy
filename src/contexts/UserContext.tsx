@@ -106,11 +106,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchProfile = useCallback(async (authUser: User) => {
     try {
-      const { data } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
+      const { data } = await (supabase as any).from('profiles').select('*').eq('id', authUser.id).single();
       if (data) {
         setUser(dbRowToProfile(data, authUser.email || ''));
       } else {
-        // Profile missing (shouldn't happen due to trigger, but handle gracefully)
         const defaultProfile: UserProfile = {
           id: authUser.id,
           username: authUser.user_metadata?.username || '',
@@ -133,7 +132,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (syncTimer.current) clearTimeout(syncTimer.current);
     syncTimer.current = setTimeout(async () => {
       try {
-        await supabase.from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
+        await (supabase as any).from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
       } catch (err) {
         console.error('Failed to sync profile:', err);
       }
@@ -142,7 +141,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       if (session?.user) {
@@ -152,7 +150,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     });
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       if (session?.user) {
@@ -161,7 +158,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     });
-
     return () => { mounted = false; subscription.unsubscribe(); };
   }, [fetchProfile]);
 
@@ -195,7 +191,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     const lessons = [...new Set([...user.completedLessons, lessonId])];
     const updated = { ...user, completedLessons: lessons };
-    // Badge thresholds: lite(1), silver(5), gold(15), premium(25), elite(50)
     const badgeCheck = (count: number, badge: string) => {
       if (lessons.length >= count && !updated.badges.includes(badge)) {
         updated.badges = [...updated.badges, badge];
@@ -268,7 +263,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteAccount = async () => {
     if (!user) return;
-    await supabase.from('profiles').delete().eq('id', user.id);
+    await (supabase as any).from('profiles').delete().eq('id', user.id);
     await supabase.auth.signOut();
     setUser(null);
   };
