@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          id: string
+          last_active_date: string | null
+          name: string | null
+          promo_codes: string[] | null
+          streak_count: number | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          badges?: string[] | null
+          completed_lessons?: string[] | null
+          completed_tests?: string[] | null
+          created_at?: string
+          dark_mode?: boolean | null
+          dob?: string | null
+          experience_level?: string | null
+          goal?: string | null
+          has_job?: string | null
+          id: string
+          last_active_date?: string | null
+          name?: string | null
+          promo_codes?: string[] | null
+          streak_count?: number | null
+          studying?: string | null
+          unlocked_sections?: string[] | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          badges?: string[] | null
+          completed_lessons?: string[] | null
+          completed_tests?: string[] | null
+          created_at?: string
+          dark_mode?: boolean | null
+          dob?: string | null
+          experience_level?: string | null
+          goal?: string | null
+          has_job?: string | null
+          id?: string
+          last_active_date?: string | null
+          name?: string | null
+          promo_codes?: string[] | null
+          streak_count?: number | null
+          studying?: string | null
+          unlocked_sections?: string[] | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
