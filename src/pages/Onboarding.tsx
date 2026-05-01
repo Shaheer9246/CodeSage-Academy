@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ChevronRight, Sprout, Rocket, Code2, GraduationCap, Settings, Pen } from 'lucide-react';
-import heroImage from '@/assets/hero-coder.png';
+import { ChevronRight, Sprout, Rocket, Code2, Settings, Pen, Terminal } from 'lucide-react';
 
 const steps = [
   { key: 'name', question: 'What is your name?', placeholder: 'Enter your full name', type: 'text' },
@@ -32,125 +31,112 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,hsl(270,65%,15%)_0%,transparent_50%)]" />
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_right,hsl(25,95%,15%)_0%,transparent_40%)]" />
-      </div>
-      <span className="absolute text-4xl top-[15%] left-[5%] text-primary/10 animate-float font-mono">{`<>`}</span>
-      <span className="absolute text-3xl bottom-[10%] right-[8%] text-accent/10 animate-float font-mono" style={{ animationDelay: '2s' }}>{`{}`}</span>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden ambient-grid">
+      {/* Glow */}
+      <div className="absolute top-[-15%] left-[20%] w-[400px] h-[400px] rounded-full bg-primary/4 blur-[120px] pointer-events-none" />
 
-      <div className="w-full max-w-2xl relative z-10">
+      <div className="w-full max-w-lg relative z-10 animate-fade-in">
         {/* Logo */}
-        <div className="text-center mb-4">
+        <div className="text-center mb-5">
           <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary via-accent to-primary rounded-xl flex items-center justify-center border border-primary/20">
-              <span className="text-lg font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center neon-glow border border-primary/20">
+              <Terminal className="w-5 h-5 text-primary" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-mono">CodeSage</span>
+            <span className="text-xl font-bold text-primary font-mono neon-text">CodeSage</span>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="flex gap-1.5 mb-6 max-w-sm mx-auto">
+        <div className="flex gap-1.5 mb-5 max-w-xs mx-auto">
           {steps.map((_, i) => (
-            <div key={i} className={`flex-1 h-1.5 rounded-full transition-all duration-500 ${i <= step ? 'bg-gradient-to-r from-primary to-accent' : 'bg-secondary/40'}`} />
+            <div key={i} className={`flex-1 h-1 rounded-full transition-all duration-500 ${
+              i <= step ? 'bg-primary neon-glow' : 'bg-secondary/40'
+            }`} />
           ))}
         </div>
 
         {/* Main content */}
-        <div className="backdrop-blur-xl bg-card/60 rounded-3xl p-6 sm:p-8 border border-border/50 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-accent/3" />
-          <div className="relative z-10">
-            <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-mono">Step {step + 1} of {steps.length}</p>
-            <h2 className="text-xl font-semibold text-foreground mb-5">{current.question}</h2>
+        <div className="glass-card rounded-2xl p-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          
+          <p className="text-[10px] text-muted-foreground mb-1 uppercase tracking-wider font-mono">step {step + 1}/{steps.length}</p>
+          <h2 className="text-lg font-semibold text-foreground mb-5 font-mono">
+            {current.question}<span className="text-primary animate-pulse">_</span>
+          </h2>
 
-            {current.type === 'text' && (
-              <input type="text" placeholder={current.placeholder} value={value}
-                onChange={e => setAnswers({ ...answers, [current.key]: e.target.value })}
-                className="w-full bg-secondary/40 border border-border/50 rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all text-sm backdrop-blur-sm"
-                autoFocus />
-            )}
+          {current.type === 'text' && (
+            <input type="text" placeholder={current.placeholder} value={value}
+              onChange={e => setAnswers({ ...answers, [current.key]: e.target.value })}
+              className="w-full bg-secondary/40 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono"
+              autoFocus />
+          )}
 
-            {current.type === 'date' && (
-              <input type="date" value={value}
-                onChange={e => setAnswers({ ...answers, [current.key]: e.target.value })}
-                className="w-full bg-secondary/40 border border-border/50 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all text-sm backdrop-blur-sm" />
-            )}
+          {current.type === 'date' && (
+            <input type="date" value={value}
+              onChange={e => setAnswers({ ...answers, [current.key]: e.target.value })}
+              className="w-full bg-secondary/40 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm font-mono" />
+          )}
 
-            {current.type === 'choice' && (
-              <div className="space-y-2">
-                {current.options?.map(opt => (
-                  <button key={opt} onClick={() => setAnswers({ ...answers, [current.key]: opt })}
-                    className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm backdrop-blur-sm ${
-                      value === opt
-                        ? 'border-primary/50 bg-primary/10 text-primary shadow-lg shadow-primary/10'
-                        : 'border-border/30 bg-secondary/30 text-foreground hover:border-primary/20 hover:bg-secondary/50'
-                    }`}>
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
+          {current.type === 'choice' && (
+            <div className="space-y-2">
+              {current.options?.map(opt => (
+                <button key={opt} onClick={() => setAnswers({ ...answers, [current.key]: opt })}
+                  className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm font-mono ${
+                    value === opt
+                      ? 'border-primary/50 bg-primary/10 text-primary neon-border'
+                      : 'border-border/40 bg-secondary/20 text-foreground hover:border-primary/20 hover:bg-secondary/30'
+                  }`}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
 
-            {current.type === 'goalCards' && (
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { val: 'Learn Code', icon: <Settings className="w-8 h-8" />, gradient: 'from-blue-500/20 to-cyan-500/20', border: 'border-blue-500/30' },
-                  { val: 'Edit Code Live', icon: <Pen className="w-8 h-8" />, gradient: 'from-purple-500/20 to-pink-500/20', border: 'border-purple-500/30' },
-                ].map(g => (
-                  <button key={g.val} onClick={() => setAnswers({ ...answers, goal: g.val })}
-                    className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all backdrop-blur-sm ${
-                      value === g.val ? `bg-gradient-to-br ${g.gradient} ${g.border} shadow-lg` : 'bg-secondary/30 border-border/30 hover:bg-secondary/50'
-                    }`}>
-                    <div className="mb-2 text-foreground">{g.icon}</div>
-                    <span className="font-semibold text-sm text-foreground uppercase tracking-wide">{g.val}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+          {current.type === 'goalCards' && (
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { val: 'Learn Code', icon: <Code2 className="w-8 h-8 text-primary" /> },
+                { val: 'Edit Code Live', icon: <Pen className="w-8 h-8 text-primary" /> },
+              ].map(g => (
+                <button key={g.val} onClick={() => setAnswers({ ...answers, goal: g.val })}
+                  className={`flex flex-col items-center justify-center p-6 rounded-xl border transition-all ${
+                    value === g.val
+                      ? 'bg-primary/10 border-primary/30 neon-border'
+                      : 'bg-secondary/20 border-border/40 hover:border-primary/20'
+                  }`}>
+                  <div className="mb-2">{g.icon}</div>
+                  <span className="font-semibold text-xs text-foreground uppercase tracking-wide font-mono">{g.val}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
-            {current.type === 'expCards' && (
-              <div className="space-y-2">
-                {[
-                  { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5 text-green-400" />, emoji: '🌱' },
-                  { val: 'Experienced', icon: <Rocket className="w-5 h-5 text-pink-400" />, emoji: '🚀' },
-                ].map(e => (
-                  <button key={e.val} onClick={() => setAnswers({ ...answers, experienceLevel: e.val })}
-                    className={`w-full flex items-center gap-3 px-5 py-4 rounded-xl border transition-all text-sm backdrop-blur-sm ${
-                      value === e.val
-                        ? 'border-primary/50 bg-primary/10 shadow-lg shadow-primary/10'
-                        : 'border-border/30 bg-secondary/30 hover:bg-secondary/50'
-                    }`}>
-                    {e.icon}
-                    <span className="font-semibold text-foreground uppercase tracking-wide">{e.val}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+          {current.type === 'expCards' && (
+            <div className="space-y-2">
+              {[
+                { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5 text-primary" />, emoji: '🌱' },
+                { val: 'Experienced', icon: <Rocket className="w-5 h-5 text-primary" />, emoji: '🚀' },
+              ].map(e => (
+                <button key={e.val} onClick={() => setAnswers({ ...answers, experienceLevel: e.val })}
+                  className={`w-full flex items-center gap-3 px-5 py-4 rounded-xl border transition-all text-sm font-mono ${
+                    value === e.val
+                      ? 'border-primary/50 bg-primary/10 neon-border'
+                      : 'border-border/40 bg-secondary/20 hover:bg-secondary/30'
+                  }`}>
+                  {e.icon}
+                  <span className="font-semibold text-foreground uppercase tracking-wide">{e.val}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
-            <button onClick={handleNext} disabled={!canContinue}
-              className="mt-6 w-full bg-gradient-to-r from-primary via-[hsl(35,95%,55%)] to-primary text-primary-foreground py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-primary/30 text-sm uppercase tracking-wider">
-              {step === steps.length - 1 ? 'Start Learning' : 'CONTINUE'}
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Illustration peek */}
-        <div className="hidden sm:block absolute -left-20 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none">
-          <img src={heroImage} alt="" width={200} height={200} loading="lazy" className="drop-shadow-xl" />
+          <button onClick={handleNext} disabled={!canContinue}
+            className="mt-6 w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:neon-glow disabled:opacity-30 transition-all text-sm font-mono uppercase tracking-wider">
+            {step === steps.length - 1 ? 'start()' : 'continue()'}
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
-
-      {/* Decorative bottom bar */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1">
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="w-3 h-5 bg-secondary/30 rounded-sm border border-border/20" />
-        ))}
-      </div>
-      <div className="absolute bottom-6 right-8 text-2xl text-primary/20 animate-pulse">✦</div>
     </div>
   );
 };

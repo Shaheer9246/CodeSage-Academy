@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
-import { Eye, EyeOff, Mail, Lock, User, Loader2 } from 'lucide-react';
-import heroImage from '@/assets/hero-coder.png';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, Terminal } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -35,113 +34,94 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,hsl(270,65%,15%)_0%,transparent_50%)]" />
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_right,hsl(25,95%,15%)_0%,transparent_40%)]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,hsl(270,65%,20%)_0%,transparent_60%)] opacity-30 animate-pulse" />
-      </div>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden ambient-grid">
+      {/* Subtle glow orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-primary/3 blur-[100px] pointer-events-none" />
 
-      {/* Floating code symbols */}
-      <span className="absolute text-5xl top-[10%] left-[5%] text-primary/15 animate-float font-mono">{`{}`}</span>
-      <span className="absolute text-4xl top-[20%] right-[8%] text-accent/15 animate-float font-mono" style={{ animationDelay: '2s' }}>{`</>`}</span>
-      <span className="absolute text-3xl bottom-[15%] left-[10%] text-primary/10 animate-float font-mono" style={{ animationDelay: '4s' }}>{`()`}</span>
-      <span className="absolute text-6xl bottom-[20%] right-[5%] text-accent/10 animate-float font-mono" style={{ animationDelay: '1s' }}>{`{}`}</span>
-      <span className="absolute text-2xl top-[40%] left-[25%] text-foreground/5 animate-float font-mono" style={{ animationDelay: '3s' }}>{`<>`}</span>
+      {/* Floating terminal symbols */}
+      <span className="absolute text-6xl top-[8%] left-[8%] text-primary/6 animate-float font-mono select-none">{`>`}</span>
+      <span className="absolute text-5xl bottom-[12%] right-[6%] text-primary/5 animate-float font-mono select-none" style={{ animationDelay: '3s' }}>{`_`}</span>
+      <span className="absolute text-4xl top-[50%] right-[15%] text-primary/4 animate-float font-mono select-none" style={{ animationDelay: '1.5s' }}>{`{}`}</span>
 
-      {/* Network dots */}
-      {[...Array(20)].map((_, i) => (
-        <div key={i} className="absolute w-1 h-1 bg-primary/20 rounded-full animate-pulse"
-          style={{ top: `${10 + Math.random() * 80}%`, left: `${5 + Math.random() * 90}%`, animationDelay: `${Math.random() * 5}s` }} />
-      ))}
-
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-sm relative z-10 animate-fade-in">
         {/* Logo */}
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 border border-primary/20">
-              <span className="text-xl font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center neon-glow-strong border border-primary/20">
+              <Terminal className="w-7 h-7 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-mono tracking-tight">CodeSage</h1>
-          <p className="text-muted-foreground text-xs mt-1">Learn to code, one step at a time</p>
-        </div>
-
-        {/* Hero illustration */}
-        <div className="flex justify-center mb-6">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
-            <img src={heroImage} alt="CodeSage - Learn to code" width={280} height={280} className="relative z-0 drop-shadow-2xl" />
-          </div>
+          <h1 className="text-3xl font-bold text-primary font-mono neon-text tracking-tight">CodeSage</h1>
+          <p className="text-muted-foreground text-xs mt-1.5 font-mono">master the art of code</p>
         </div>
 
         {/* Form Card */}
-        <div className="backdrop-blur-xl bg-card/70 rounded-3xl p-6 shadow-2xl shadow-primary/5 border border-border/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-accent/3" />
-          <div className="relative z-10">
-            <h2 className="text-xl font-semibold text-foreground mb-5 text-center">
-              {isLogin ? 'Welcome Back!' : 'Create Account'}
-            </h2>
+        <div className="glass-card rounded-2xl p-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
-              {!isLogin && (
-                <div className="relative">
-                  <User className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground" />
-                  <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)}
-                    className="w-full bg-secondary/50 border border-border/50 rounded-xl pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm backdrop-blur-sm" />
-                </div>
-              )}
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground" />
-                <input type="email" placeholder="Email or Username" value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-secondary/50 border border-border/50 rounded-xl pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm backdrop-blur-sm" />
+          <h2 className="text-lg font-semibold text-foreground mb-5 font-mono">
+            {isLogin ? '> login' : '> create_account'}
+            <span className="text-primary animate-pulse">_</span>
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            {!isLogin && (
+              <div className="relative group">
+                <User className="absolute left-3.5 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <input type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)}
+                  className="w-full bg-secondary/50 border border-border rounded-xl pl-10 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono" />
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground" />
-                <input type={showPassword ? 'text' : 'password'} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-secondary/50 border border-border/50 rounded-xl pl-10 pr-10 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm backdrop-blur-sm" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-
-              {error && <p className="text-destructive text-xs text-center bg-destructive/10 rounded-lg py-2">{error}</p>}
-
-              <button type="submit" disabled={submitting}
-                className="w-full bg-gradient-to-r from-primary via-[hsl(35,95%,55%)] to-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-all text-base shadow-lg shadow-primary/30 disabled:opacity-50 flex items-center justify-center gap-2">
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                {submitting ? 'Please wait...' : isLogin ? 'Get Started' : 'Sign Up'}
+            )}
+            <div className="relative group">
+              <Mail className="absolute left-3.5 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <input type="email" placeholder="email" value={email} onChange={e => setEmail(e.target.value)}
+                className="w-full bg-secondary/50 border border-border rounded-xl pl-10 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono" />
+            </div>
+            <div className="relative group">
+              <Lock className="absolute left-3.5 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <input type={showPassword ? 'text' : 'password'} placeholder="password" value={password} onChange={e => setPassword(e.target.value)}
+                className="w-full bg-secondary/50 border border-border rounded-xl pl-10 pr-10 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors">
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
-            </form>
+            </div>
 
-            {isLogin && (
-              <p className="text-center text-xs text-muted-foreground mt-3 cursor-pointer hover:text-primary transition-colors">
-                Forgot Password?
-              </p>
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+                <p className="text-destructive text-xs font-mono">error: {error}</p>
+              </div>
             )}
 
-            <p className="text-center text-xs text-muted-foreground mt-4">
-              {isLogin ? "Don't have an account? " : 'Already have an account? '}
-              <button onClick={() => { setIsLogin(!isLogin); setError(''); setSubmitting(false); }} className="text-primary font-semibold hover:underline">
-                {isLogin ? 'Sign Up.' : 'Log In'}
+            <button type="submit" disabled={submitting}
+              className="w-full bg-primary text-primary-foreground py-2.5 rounded-xl font-bold text-sm font-mono hover:shadow-[0_0_20px_hsl(153,100%,50%,0.3)] transition-all disabled:opacity-50 flex items-center justify-center gap-2 neon-glow">
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {submitting ? 'connecting...' : isLogin ? 'login()' : 'signup()'}
+            </button>
+          </form>
+
+          {isLogin && (
+            <p className="text-center text-[11px] text-muted-foreground mt-3 cursor-pointer hover:text-primary transition-colors font-mono">
+              forgot_password?
+            </p>
+          )}
+
+          <div className="mt-5 pt-4 border-t border-border/40">
+            <p className="text-center text-xs text-muted-foreground font-mono">
+              {isLogin ? "new_user? " : 'existing_user? '}
+              <button onClick={() => { setIsLogin(!isLogin); setError(''); setSubmitting(false); }}
+                className="text-primary font-semibold hover:underline">
+                {isLogin ? 'create_account()' : 'login()'}
               </button>
             </p>
           </div>
         </div>
 
-        {/* Bottom decoration */}
-        <div className="flex justify-center mt-6">
-          <div className="flex gap-1">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="w-3 h-5 bg-secondary/40 rounded-sm border border-border/20" />
-            ))}
-          </div>
-        </div>
+        {/* Bottom tag */}
+        <p className="text-center text-[10px] text-muted-foreground/50 mt-6 font-mono">
+          &lt;/&gt; built for learners, by learners
+        </p>
       </div>
-
-      {/* Bottom sparkle */}
-      <div className="absolute bottom-6 right-8 text-2xl text-primary/20 animate-pulse">✦</div>
     </div>
   );
 };

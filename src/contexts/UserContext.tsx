@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { useToast } from '@/hooks/use-toast';
 
 export interface UserProfile {
   id: string;
@@ -106,10 +107,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchProfile = useCallback(async (authUser: User) => {
     try {
-      const { data } = await (supabase as any).from('profiles').select('*').eq('id', authUser.id).single();
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
+      if (error && error.code !== 'PGRST116') {
+        console.error('Profile fetch error:', error.message);
+      }
       if (data) {
         setUser(dbRowToProfile(data, authUser.email || ''));
       } else {
+        // Profile doesn't exist yet — create a default one
         const defaultProfile: UserProfile = {
           id: authUser.id,
           username: authUser.user_metadata?.username || '',
@@ -120,10 +125,29 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           badges: [], completedLessons: [], completedTests: [],
           unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
         };
+        // Try to insert the profile
+        const { error: insertError } = await supabase.from('profiles').insert({
+          id: authUser.id,
+          username: authUser.user_metadata?.username || '',
+        });
+        if (insertError) {
+          console.error('Profile insert error:', insertError.message);
+        }
         setUser(defaultProfile);
       }
     } catch (err) {
       console.error('Failed to fetch profile:', err);
+      // Fallback: create local-only profile so the app still works
+      setUser({
+        id: authUser.id,
+        username: authUser.user_metadata?.username || '',
+        email: authUser.email || '',
+        name: '', studying: '', hasJob: '', dob: '', goal: '', experienceLevel: '',
+        joinDate: new Date().toISOString(),
+        streakCount: 0, lastActiveDate: '',
+        badges: [], completedLessons: [], completedTests: [],
+        unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
+      });
     }
     setLoading(false);
   }, []);
@@ -132,7 +156,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (syncTimer.current) clearTimeout(syncTimer.current);
     syncTimer.current = setTimeout(async () => {
       try {
-        await (supabase as any).from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
+        await supabase.from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
       } catch (err) {
         console.error('Failed to sync profile:', err);
       }
@@ -141,6 +165,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
+    
+    // Set up auth listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       if (session?.user) {
@@ -150,6 +176,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     });
+    
+    // Then check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       if (session?.user) {
@@ -158,6 +186,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     });
+    
     return () => { mounted = false; subscription.unsubscribe(); };
   }, [fetchProfile]);
 
@@ -170,16 +199,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string): Promise<string | null> => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return error ? error.message : null;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return error ? error.message : null;
+    } catch (err: any) {
+      return err?.message || 'Network error — please check your connection';
+    }
   };
 
   const signup = async (username: string, email: string, password: string): Promise<string | null> => {
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { username } },
-    });
-    return error ? error.message : null;
+    try {
+      const { error } = await supabase.auth.signUp({
+        email, password,
+        options: { data: { username } },
+      });
+      return error ? error.message : null;
+    } catch (err: any) {
+      return err?.message || 'Network error — please check your connection';
+    }
   };
 
   const completeOnboarding = (data: Partial<UserProfile>) => {
@@ -263,7 +300,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteAccount = async () => {
     if (!user) return;
-    await (supabase as any).from('profiles').delete().eq('id', user.id);
+    await supabase.from('profiles').delete().eq('id', user.id);
     await supabase.auth.signOut();
     setUser(null);
   };

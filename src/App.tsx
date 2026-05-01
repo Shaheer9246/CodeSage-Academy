@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider, useUser } from "@/contexts/UserContext";
+import AppShell from "@/components/AppShell";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
@@ -14,19 +15,19 @@ import Challenges from "./pages/Challenges";
 import LevelTest from "./pages/LevelTest";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center animated-bg">
-      <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl flex items-center justify-center mx-auto mb-4 neon-border animate-pulse-glow">
-          <span className="text-2xl font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
+    <div className="min-h-screen bg-background flex items-center justify-center ambient-grid">
+      <div className="text-center animate-fade-in">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 neon-glow-strong border border-primary/20">
+          <Terminal className="w-8 h-8 text-primary" />
         </div>
-        <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto mb-2" />
-        <p className="text-muted-foreground text-sm font-mono">Loading CodeSage...</p>
+        <Loader2 className="w-5 h-5 text-primary animate-spin mx-auto mb-2" />
+        <p className="text-muted-foreground text-xs font-mono">initializing CodeSage...</p>
       </div>
     </div>
   );
@@ -54,19 +55,21 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
-            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-            <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-            <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
-            <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
-            <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="/" element={<Navigate to="/auth" replace />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppShell>
+            <Routes>
+              <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+              <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
+              <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
+              <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
+              <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
+              <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="/" element={<Navigate to="/auth" replace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppShell>
         </BrowserRouter>
       </TooltipProvider>
     </UserProvider>
