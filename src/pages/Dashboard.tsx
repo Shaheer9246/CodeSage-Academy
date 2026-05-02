@@ -79,7 +79,7 @@ const Dashboard = () => {
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">
               Welcome back, <span className="text-primary neon-text">{user.name}</span>
             </h1>
-            <p className="text-xs text-muted-foreground font-mono mt-0.5">// keep building, keep learning</p>
+            <p className="text-xs text-muted-foreground font-mono mt-0.5">// Level {user.level || 1} Sage • keep building</p>
           </div>
           <div className="flex items-center gap-2 bg-card/60 px-3 py-2 rounded-xl border border-border/40 neon-border">
             <Flame className="w-4 h-4 text-primary" />
@@ -88,10 +88,11 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           <StatCard icon={<Target className="w-4 h-4 text-primary" />} label="Progress" value={`${progress}%`} />
           <StatCard icon={<BookOpen className="w-4 h-4 text-primary" />} label="Completed" value={`${completedCount}`} />
-          <StatCard icon={<Star className="w-4 h-4 text-primary" />} label="Badges" value={`${user.badges.length}`} />
+          <StatCard icon={<Zap className="w-4 h-4 text-primary" />} label="XP" value={`${user.xp || 0}`} />
+          <StatCard icon={<Star className="w-4 h-4 text-primary" />} label="Coins" value={`${user.sageCoins || 0}`} />
         </div>
 
         {/* Progress Bar */}

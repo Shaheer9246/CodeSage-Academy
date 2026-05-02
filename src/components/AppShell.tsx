@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Code, Trophy, Settings, LogOut, Flame } from 'lucide-react';
+import { Home, BookOpen, Code, Trophy, Settings, LogOut, Flame, Map } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 
 const NAV_ITEMS = [
   { path: '/dashboard', icon: Home, label: 'Home' },
   { path: '/learn', icon: BookOpen, label: 'Learn' },
+  { path: '/roadmap', icon: Map, label: 'Roadmap' },
   { path: '/playground', icon: Code, label: 'Code' },
   { path: '/challenges', icon: Trophy, label: 'Challenges' },
   { path: '/settings', icon: Settings, label: 'Settings' },
