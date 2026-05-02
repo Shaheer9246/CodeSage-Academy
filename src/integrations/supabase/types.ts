@@ -27,13 +27,16 @@ export type Database = {
           has_job: string | null
           id: string
           last_active_date: string | null
+          level: number | null
           name: string | null
           promo_codes: string[] | null
+          sage_coins: number | null
           streak_count: number | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
           username: string | null
+          xp: number | null
         }
         Insert: {
           badges?: string[] | null
@@ -47,13 +50,16 @@ export type Database = {
           has_job?: string | null
           id: string
           last_active_date?: string | null
+          level?: number | null
           name?: string | null
           promo_codes?: string[] | null
+          sage_coins?: number | null
           streak_count?: number | null
           studying?: string | null
           unlocked_sections?: string[] | null
           updated_at?: string
           username?: string | null
+          xp?: number | null
         }
         Update: {
           badges?: string[] | null
@@ -67,13 +73,16 @@ export type Database = {
           has_job?: string | null
           id?: string
           last_active_date?: string | null
+          level?: number | null
           name?: string | null
           promo_codes?: string[] | null
+          sage_coins?: number | null
           streak_count?: number | null
           studying?: string | null
           unlocked_sections?: string[] | null
           updated_at?: string
           username?: string | null
+          xp?: number | null
         }
         Relationships: []
       }
