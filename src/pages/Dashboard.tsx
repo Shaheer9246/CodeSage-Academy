@@ -79,7 +79,7 @@ const Dashboard = () => {
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">
               Welcome back, <span className="text-primary neon-text">{user.name}</span>
             </h1>
-            <p className="text-xs text-muted-foreground font-mono mt-0.5">// keep building, keep learning</p>
+            <p className="text-xs text-muted-foreground font-mono mt-0.5">// Level {user.level || 1} Sage • keep building</p>
           </div>
           <div className="flex items-center gap-2 bg-card/60 px-3 py-2 rounded-xl border border-border/40 neon-border">
             <Flame className="w-4 h-4 text-primary" />
