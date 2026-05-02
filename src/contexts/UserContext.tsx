@@ -82,6 +82,9 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     unlockedSections: row.unlocked_sections || ['frontend'],
     promoCodes: row.promo_codes || [],
     darkMode: row.dark_mode ?? true,
+    xp: row.xp || 0,
+    level: row.level || 1,
+    sageCoins: row.sage_coins || 0,
   };
 }
 
@@ -102,6 +105,9 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     unlocked_sections: p.unlockedSections,
     promo_codes: p.promoCodes,
     dark_mode: p.darkMode,
+    xp: p.xp,
+    level: p.level,
+    sage_coins: p.sageCoins,
   };
 }
 
@@ -129,6 +135,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           streakCount: 0, lastActiveDate: '',
           badges: [], completedLessons: [], completedTests: [],
           unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
+          xp: 0, level: 1, sageCoins: 0,
         };
         // Try to insert the profile
         const { error: insertError } = await supabase.from('profiles').insert({
@@ -152,6 +159,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         streakCount: 0, lastActiveDate: '',
         badges: [], completedLessons: [], completedTests: [],
         unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
+        xp: 0, level: 1, sageCoins: 0,
       });
     }
     setLoading(false);
