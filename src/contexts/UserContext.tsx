@@ -22,6 +22,9 @@ export interface UserProfile {
   unlockedSections: string[];
   promoCodes: string[];
   darkMode: boolean;
+  xp: number;
+  level: number;
+  sageCoins: number;
 }
 
 interface UserContextType {
@@ -40,6 +43,8 @@ interface UserContextType {
   updateUser: (data: Partial<UserProfile>) => void;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  addXp: (amount: number) => void;
+  addCoins: (amount: number) => void;
   toggleDarkMode: () => void;
 }
 
