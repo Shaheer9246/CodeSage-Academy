@@ -13,25 +13,25 @@ interface RoadmapNode {
 
 const FRONTEND_TRACK: RoadmapNode[] = [
   { id: 'fn-1', label: 'HTML Basics', icon: '📄', lessonIds: ['html-1', 'html-2', 'html-3', 'html-4', 'html-5'] },
-  { id: 'fn-2', label: 'CSS Styling', icon: '🎨', lessonIds: ['css-1', 'css-2', 'css-3', 'css-4', 'css-5'] },
-  { id: 'fn-3', label: 'JavaScript', icon: '⚡', lessonIds: ['js-1', 'js-2', 'js-3', 'js-4', 'js-5'] },
-  { id: 'fn-4', label: 'Flexbox', icon: '📐', lessonIds: ['int-flex-1', 'int-flex-2'] },
-  { id: 'fn-5', label: 'Grid Layout', icon: '🔲', lessonIds: ['int-grid-1', 'int-grid-2'] },
-  { id: 'fn-6', label: 'Responsive', icon: '📱', lessonIds: ['int-resp-1', 'int-resp-2'] },
-  { id: 'fn-7', label: 'DOM', icon: '🌳', lessonIds: ['int-dom-1', 'int-dom-2'] },
-  { id: 'fn-8', label: 'Events', icon: '🖱️', lessonIds: ['int-events-1'] },
-  { id: 'fn-9', label: 'Fetch API', icon: '🌐', lessonIds: ['int-fetch-1'] },
-  { id: 'fn-10', label: 'Animations', icon: '✨', lessonIds: ['int-anim-1', 'int-anim-2'] },
-  { id: 'fn-11', label: 'Canvas/SVG', icon: '🖼️', lessonIds: ['int-multimedia-1', 'int-multimedia-2'] },
-  { id: 'fn-12', label: 'Forms', icon: '📝', lessonIds: ['int-forms-1', 'int-forms-2'] },
-  { id: 'fn-13', label: 'Accessibility', icon: '♿', lessonIds: ['int-a11y-1'] },
-  { id: 'fn-14', label: 'Async/Await', icon: '⏳', lessonIds: ['exp-async-1', 'exp-async-2'] },
-  { id: 'fn-15', label: 'React Basics', icon: '⚛️', lessonIds: ['exp-react-1', 'exp-react-2'] },
-  { id: 'fn-16', label: 'State Mgmt', icon: '🔄', lessonIds: ['exp-state-1'] },
-  { id: 'fn-17', label: 'React Router', icon: '🗺️', lessonIds: ['exp-router-1'] },
-  { id: 'fn-18', label: 'APIs & Data', icon: '📊', lessonIds: ['exp-api-1'] },
-  { id: 'fn-19', label: 'Testing', icon: '🧪', lessonIds: ['exp-testing-1'] },
-  { id: 'fn-20', label: 'Deploy', icon: '🚀', lessonIds: ['exp-deploy-1'] },
+  { id: 'fn-2', label: 'HTML Forms', icon: '📝', lessonIds: ['html-6', 'html-7', 'html-8', 'html-9', 'html-10'] },
+  { id: 'fn-3', label: 'CSS Styling', icon: '🎨', lessonIds: ['css-1', 'css-2', 'css-3', 'css-4', 'css-5', 'css-6'] },
+  { id: 'fn-4', label: 'JavaScript', icon: '⚡', lessonIds: ['js-1', 'js-2', 'js-3', 'js-4', 'js-5'] },
+  { id: 'fn-5', label: 'React Basics', icon: '⚛️', lessonIds: ['react-1', 'react-2', 'react-3', 'react-4'] },
+  { id: 'fn-6', label: 'HTML Adv.', icon: '📐', lessonIds: ['html-int-1', 'html-int-2'] },
+  { id: 'fn-7', label: 'CSS Adv.', icon: '🔲', lessonIds: ['css-int-1', 'css-int-2', 'css-int-3'] },
+  { id: 'fn-8', label: 'JS Adv.', icon: '🌳', lessonIds: ['js-int-1', 'js-int-2', 'js-int-3', 'js-int-4'] },
+  { id: 'fn-9', label: 'React Int.', icon: '🔄', lessonIds: ['react-int-1'] },
+  { id: 'fn-10', label: 'Multimedia', icon: '🖼️', lessonIds: ['multi-1', 'multi-2', 'multi-3'] },
+  { id: 'fn-11', label: 'Forms', icon: '📝', lessonIds: ['form-1', 'form-2'] },
+  { id: 'fn-12', label: 'A11y & SEO', icon: '♿', lessonIds: ['a11y-1'] },
+  { id: 'fn-13', label: 'JS Expert', icon: '🧠', lessonIds: ['js-exp-1', 'js-exp-2', 'js-exp-3'] },
+  { id: 'fn-14', label: 'CSS Expert', icon: '✨', lessonIds: ['css-exp-1', 'css-exp-2'] },
+  { id: 'fn-15', label: 'React Expert', icon: '⚛️', lessonIds: ['react-exp-1'] },
+  { id: 'fn-16', label: 'Pro Projects', icon: '🛠️', lessonIds: ['pro-1', 'pro-2', 'pro-3'] },
+  { id: 'fn-17', label: 'Portfolio', icon: '🎨', lessonIds: ['proj-1'] },
+  { id: 'fn-18', label: 'Weather App', icon: '🌤️', lessonIds: ['proj-2'] },
+  { id: 'fn-19', label: 'Testing', icon: '🧪', lessonIds: [], locked: true },
+  { id: 'fn-20', label: 'Deploy', icon: '🚀', lessonIds: [], locked: true },
 ];
 
 const NETWORKING_TRACK: RoadmapNode[] = [
@@ -46,7 +46,7 @@ const NETWORKING_TRACK: RoadmapNode[] = [
 ];
 
 const FREELANCING_TRACK: RoadmapNode[] = [
-  { id: 'fl-1', label: 'Portfolio', icon: '🎨', lessonIds: ['exp-portfolio-1'] },
+  { id: 'fl-1', label: 'Portfolio', icon: '🎨', lessonIds: ['proj-1'] },
   { id: 'fl-2', label: 'Clients', icon: '🤝', lessonIds: [], locked: true },
   { id: 'fl-3', label: 'Proposals', icon: '📝', lessonIds: [], locked: true },
   { id: 'fl-4', label: 'Pricing', icon: '💰', lessonIds: [], locked: true },
