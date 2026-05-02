@@ -12,6 +12,7 @@ import Learn from "./pages/Learn";
 import LessonPage from "./pages/LessonPage";
 import Playground from "./pages/Playground";
 import Challenges from "./pages/Challenges";
+import Roadmap from "./pages/Roadmap";
 import LevelTest from "./pages/LevelTest";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
               <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
               <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
+              <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
               <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/auth" replace />} />
