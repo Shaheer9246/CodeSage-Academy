@@ -88,10 +88,11 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           <StatCard icon={<Target className="w-4 h-4 text-primary" />} label="Progress" value={`${progress}%`} />
           <StatCard icon={<BookOpen className="w-4 h-4 text-primary" />} label="Completed" value={`${completedCount}`} />
-          <StatCard icon={<Star className="w-4 h-4 text-primary" />} label="Badges" value={`${user.badges.length}`} />
+          <StatCard icon={<Zap className="w-4 h-4 text-primary" />} label="XP" value={`${user.xp || 0}`} />
+          <StatCard icon={<Star className="w-4 h-4 text-primary" />} label="Coins" value={`${user.sageCoins || 0}`} />
         </div>
 
         {/* Progress Bar */}
