@@ -251,6 +251,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     badgeCheck(15, 'gold');
     badgeCheck(25, 'premium');
     badgeCheck(50, 'elite');
+    // Award XP and coins for lesson completion
+    if (!user.completedLessons.includes(lessonId)) {
+      updated.xp = (updated.xp || 0) + 50;
+      updated.sageCoins = (updated.sageCoins || 0) + 10;
+      updated.level = Math.floor(updated.xp / 200) + 1;
+    }
     updateProfile(updated);
   };
 
