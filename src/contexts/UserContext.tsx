@@ -323,11 +323,23 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
+  const addXp = (amount: number) => {
+    if (!user) return;
+    const newXp = user.xp + amount;
+    const newLevel = Math.floor(newXp / 200) + 1;
+    updateProfile({ ...user, xp: newXp, level: newLevel });
+  };
+
+  const addCoins = (amount: number) => {
+    if (!user) return;
+    updateProfile({ ...user, sageCoins: user.sageCoins + amount });
+  };
+
   return (
     <UserContext.Provider value={{
       user, loading, isLoggedIn, isOnboarded, login, signup, completeOnboarding,
       completeLesson, completeTest, addBadge, updateStreak, applyPromoCode,
-      updateUser, logout, deleteAccount, toggleDarkMode,
+      updateUser, logout, deleteAccount, toggleDarkMode, addXp, addCoins,
     }}>
       {children}
     </UserContext.Provider>
