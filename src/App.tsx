@@ -15,6 +15,7 @@ import Challenges from "./pages/Challenges";
 import Roadmap from "./pages/Roadmap";
 import LevelTest from "./pages/LevelTest";
 import SettingsPage from "./pages/SettingsPage";
+import Suggestions from "./pages/Suggestions";
 import NotFound from "./pages/NotFound";
 import { Loader2, Terminal } from "lucide-react";
 
