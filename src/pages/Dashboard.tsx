@@ -1,39 +1,65 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { BookOpen, Trophy, Flame, Lock, Code, ArrowRight, Star, Sparkles, Zap, Target, TrendingUp } from 'lucide-react';
+import { Flame, Trophy, Star, Sparkles, Code, ArrowRight, Lock, BookOpen, Zap, Target, Check } from 'lucide-react';
 import { getAllLessons } from '@/data/lessons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const BADGE_INFO: Record<string, { icon: string; label: string }> = {
-  'lite': { icon: '🌱', label: 'Lite' },
-  'silver': { icon: '🥈', label: 'Silver' },
-  'gold': { icon: '🥇', label: 'Gold' },
-  'premium': { icon: '💎', label: 'Premium' },
-  'elite': { icon: '👑', label: 'Elite' },
-  'test-passer': { icon: '📜', label: 'Test Ace' },
-  'streak-3': { icon: '🔥', label: '3-Day' },
-  'streak-7': { icon: '⚡', label: '7-Day' },
-  'streak-30': { icon: '🏆', label: '30-Day' },
-};
-
-const ALL_BADGES = ['lite', 'silver', 'gold', 'premium', 'elite'];
-
-const DAILY_CHALLENGES = [
-  { title: 'Add a Heading', desc: 'Create an h1 heading with your name' },
-  { title: 'Style a Button', desc: 'Create and style a colorful button' },
-  { title: 'Build a List', desc: 'Create an unordered list with 5 items' },
-  { title: 'Center a Div', desc: 'Center a div using CSS flexbox' },
-  { title: 'Color Palette', desc: 'Create 4 colored boxes in a row' },
-  { title: 'Simple Form', desc: 'Build a form with name and email' },
-  { title: 'Image Card', desc: 'Create a card with image and text' },
+const BADGE_DATA = [
+  { id: 'html-hero', label: 'HTML Hero', icon: '🛡️', color: 'from-emerald-500 to-teal-600' },
+  { id: 'js-jedi', label: 'JavaScript Jedi', icon: '⚡', color: 'from-yellow-500 to-orange-500' },
+  { id: 'deploy-master', label: 'Deploy Master', icon: '🚀', color: 'from-blue-500 to-purple-600' },
+  { id: 'security-guard', label: 'Security Guardian', icon: '🔒', color: 'from-amber-500 to-yellow-600' },
+  { id: '100xp', label: '100XP Club', icon: '💯', color: 'from-gray-400 to-gray-500' },
 ];
 
-const SECTIONS = [
-  { id: 'frontend', label: 'Frontend', sub: 'HTML / CSS / JS', icon: '📱', section: 'frontend' },
-  { id: 'backend', label: 'Backend', sub: 'Node.js / SQL', icon: '🖥️', section: 'backend' },
-  { id: 'ai', label: 'AI / ML', sub: 'Python / TensorFlow', icon: '🧠', section: 'ai' },
-  { id: 'ds', label: 'Data Structures', sub: 'Algorithms', icon: '🔗', section: 'ds', comingSoon: true },
-  { id: 'fullstack', label: 'Full-Stack', sub: 'Projects', icon: '🚀', section: 'fullstack', comingSoon: true },
+const LOCKED_BADGES = [
+  { id: 'l1', label: 'React Pro' }, { id: 'l2', label: 'API Master' },
+  { id: 'l3', label: 'Git Guru' }, { id: 'l4', label: 'CSS Wizard' }, { id: 'l5', label: 'Full Stack' },
+];
+
+const MERN_ROADMAP = [
+  { step: 1, label: 'Master Web Basics', icon: '🌐', color: 'bg-primary' },
+  { step: 2, label: 'HTML/CSS Proficiency', icon: '📄', color: 'bg-primary' },
+  { step: 3, label: 'Deep Dive into JavaScript', icon: '⚡', color: 'bg-primary' },
+  { step: 4, label: 'Version Control with Git', icon: '🔀', color: 'bg-accent-orange' },
+  { step: 5, label: 'Node.js for Server-Side', icon: '🟢', color: 'bg-accent-blue' },
+  { step: 6, label: 'NPM for Package Management', icon: '📦', color: 'bg-accent-blue' },
+  { step: 7, label: 'Express.js Framework', icon: '🚂', color: 'bg-muted' },
+  { step: 8, label: 'MongoDB for Databases', icon: '🍃', color: 'bg-muted' },
+];
+
+const LEADERBOARD = [
+  { name: 'You (Rank 23)', isYou: true },
+  { name: '_ishan' },
+  { name: 'username' },
+  { name: 'movik' },
+  { name: 'moxcder2' },
+];
+
+const DAILY_CHALLENGES = [
+  { q: 'What is the difference between `==` and `===` in JavaScript?' },
+  { q: 'What does CSS `position: sticky` do?' },
+  { q: 'What is a closure in JavaScript?' },
+  { q: 'What is the Virtual DOM in React?' },
+  { q: 'What does `git rebase` do?' },
+  { q: 'What is event bubbling in the DOM?' },
+  { q: 'What is the difference between `let` and `var`?' },
+];
+
+const CODE_LINES = [
+  'const app = express();',
+  'import React from "react";',
+  'function fibonacci(n) {',
+  '  if (n <= 1) return n;',
+  '  return fibonacci(n-1) + fibonacci(n-2);',
+  '}',
+  'app.listen(3000);',
+  'const [state, setState] = useState();',
+  'export default App;',
+  'npm install express',
+  'git commit -m "init"',
+  'docker build -t app .',
 ];
 
 const Dashboard = () => {
@@ -53,6 +79,10 @@ const Dashboard = () => {
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
   const dailyChallenge = DAILY_CHALLENGES[dayOfYear % DAILY_CHALLENGES.length];
 
+  // Determine current MERN step
+  const currentMernStep = Math.min(Math.floor(progress / 12.5) + 1, 8);
+  const mernProgress = Math.min(progress * 1.25, 100);
+
   const handlePromo = () => {
     if (applyPromoCode(promoInput)) { setPromoMsg('✅ Code applied!'); setPromoInput(''); }
     else setPromoMsg('❌ Invalid code');
@@ -61,229 +91,208 @@ const Dashboard = () => {
 
   // 7-day streak calendar
   const today = new Date();
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (6 - i));
-    return { day: d.toLocaleDateString('en', { weekday: 'short' })[0], date: d.getDate(), isToday: i === 6, active: i >= 7 - user.streakCount };
-  });
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const todayIdx = today.getDay();
+  const streakDays = weekDays.map((day, i) => ({
+    day,
+    active: i <= todayIdx && i >= todayIdx - Math.min(user.streakCount, todayIdx),
+    isToday: i === todayIdx,
+  }));
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden ambient-grid">
-      {/* Subtle glow */}
-      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-primary/4 blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
+      {/* Code rain background */}
+      <div className="code-rain">
+        {CODE_LINES.map((line, i) => (
+          <div key={i} style={{ paddingLeft: `${(i * 37) % 80}%`, opacity: 0.6 }}>{line}</div>
+        ))}
+      </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto p-4 sm:p-6 space-y-5 animate-fade-in">
-        {/* Welcome Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-              Welcome back, <span className="text-primary neon-text">{user.name}</span>
+      {/* Ambient glow */}
+      <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/3 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-accent-blue/3 blur-[120px] pointer-events-none" />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative z-10 max-w-5xl mx-auto p-4 sm:p-6 space-y-5"
+      >
+        {/* Header: Welcome + Streak */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+            <h1 className="text-2xl sm:text-3xl font-bold font-display">
+              Welcome Back,<br />
+              <span className="text-primary neon-text">{user.name}</span>
             </h1>
-            <p className="text-xs text-muted-foreground font-mono mt-0.5">// Level {user.level || 1} Sage • keep building</p>
-          </div>
-          <div className="flex items-center gap-2 bg-card/60 px-3 py-2 rounded-xl border border-border/40 neon-border">
-            <Flame className="w-4 h-4 text-primary" />
-            <span className="font-bold text-sm text-primary font-mono">{user.streakCount}</span>
-          </div>
-        </div>
+          </motion.div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-4 gap-3">
-          <StatCard icon={<Target className="w-4 h-4 text-primary" />} label="Progress" value={`${progress}%`} />
-          <StatCard icon={<BookOpen className="w-4 h-4 text-primary" />} label="Completed" value={`${completedCount}`} />
-          <StatCard icon={<Zap className="w-4 h-4 text-primary" />} label="XP" value={`${user.xp || 0}`} />
-          <StatCard icon={<Star className="w-4 h-4 text-primary" />} label="Coins" value={`${user.sageCoins || 0}`} />
-        </div>
-
-        {/* Progress Bar */}
-        <div className="glass-card rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-muted-foreground font-mono">overall_progress</span>
-            <span className="text-xs text-primary font-mono font-bold">{progress}%</span>
-          </div>
-          <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-            <div className="h-full bg-primary rounded-full transition-all duration-700 neon-glow" style={{ width: `${Math.max(progress, 2)}%` }} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Left: Tracks + Roadmap */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Learning Tracks */}
-            <div className="glass-card rounded-xl p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider font-mono flex items-center gap-2">
-                <TrendingUp className="w-3.5 h-3.5 text-primary" /> learning_tracks
-              </h3>
-              <div className="space-y-2">
-                {SECTIONS.map(s => {
-                  const unlocked = user.unlockedSections.includes(s.section);
-                  const isComingSoon = s.comingSoon;
-                  return (
-                    <button key={s.id}
-                      onClick={unlocked && !isComingSoon ? () => navigate('/learn') : undefined}
-                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border transition-all ${
-                        isComingSoon ? 'opacity-30 cursor-not-allowed border-border/20 bg-secondary/10' :
-                        unlocked ? 'border-border/40 bg-secondary/20 hover:border-primary/20 hover:bg-secondary/30 cursor-pointer glass-card-hover' :
-                        'opacity-40 cursor-not-allowed border-border/20 bg-secondary/10'
-                      }`}>
-                      <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-lg border border-primary/10 flex-shrink-0">
-                        {s.icon}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <span className="font-semibold text-sm text-foreground block">{s.label}</span>
-                        <span className="text-[10px] text-muted-foreground font-mono">{s.sub}</span>
-                      </div>
-                      {s.id === 'frontend' && (
-                        <div className="w-20 h-1.5 bg-secondary rounded-full overflow-hidden">
-                          <div className="h-full bg-primary rounded-full neon-glow" style={{ width: `${progress}%` }} />
-                        </div>
-                      )}
-                      {isComingSoon && <span className="text-[9px] text-muted-foreground bg-secondary/40 px-2 py-0.5 rounded-full font-mono">soon</span>}
-                      {!unlocked && !isComingSoon && <Lock className="w-4 h-4 text-muted-foreground" />}
-                    </button>
-                  );
-                })}
-              </div>
+          {/* Streak Card */}
+          <motion.div
+            initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+            className="glass-card p-4 min-w-[200px]"
+          >
+            <p className="text-xs text-primary/80 font-display font-semibold mb-1">Your Coding Streak</p>
+            <div className="flex items-end gap-1 mb-2">
+              <span className="text-4xl font-bold text-primary font-display neon-text">{user.streakCount}</span>
+              <Flame className="w-6 h-6 text-accent-orange mb-1" />
+              <span className="text-sm text-muted-foreground ml-1 mb-1">Days</span>
             </div>
-
-            {/* Roadmap */}
-            <div className="glass-card rounded-xl p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider font-mono">roadmap</h3>
-              <div className="flex items-center gap-1 overflow-x-auto pb-2">
-                {[
-                  { label: 'HTML/CSS', active: true },
-                  { label: 'JavaScript', active: progress > 20 },
-                  { label: 'React', active: progress > 40 },
-                  { label: 'Node.js', active: false },
-                  { label: 'AI/ML', active: false },
-                ].map((node, i, arr) => (
-                  <div key={i} className="flex items-center flex-shrink-0">
-                    <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl flex items-center justify-center text-center p-1.5 border transition-all ${
-                      node.active
-                        ? 'bg-primary/10 border-primary/30 neon-border'
-                        : 'bg-secondary/20 border-border/20 opacity-40'
-                    }`}>
-                      <span className={`text-[10px] sm:text-xs font-semibold leading-tight font-mono ${node.active ? 'text-primary' : 'text-muted-foreground'}`}>{node.label}</span>
-                    </div>
-                    {i < arr.length - 1 && (
-                      <div className={`w-4 sm:w-8 h-[2px] mx-0.5 ${node.active ? 'bg-primary/40' : 'bg-border/20'}`} />
-                    )}
+            <div className="flex gap-1">
+              {streakDays.map((d, i) => (
+                <div key={i} className="flex flex-col items-center gap-0.5">
+                  <span className="text-[8px] text-muted-foreground">{d.day}</span>
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] ${
+                    d.active ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary/30 text-muted-foreground border border-border/20'
+                  }`}>
+                    {d.active ? <Check className="w-3 h-3" /> : ''}
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-4">
-            {/* 7-Day Streak Calendar */}
-            <div className="glass-card rounded-xl p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider font-mono flex items-center gap-2">
-                <Flame className="w-3.5 h-3.5 text-primary" /> streak_calendar
-              </h3>
-              <div className="flex items-center justify-between gap-1">
-                {weekDays.map((d, i) => (
-                  <div key={i} className="flex flex-col items-center gap-1">
-                    <span className="text-[9px] text-muted-foreground font-mono">{d.day}</span>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold font-mono transition-all ${
-                      d.active
-                        ? 'bg-primary/15 text-primary border border-primary/30 neon-border'
-                        : d.isToday
-                          ? 'bg-secondary/40 text-foreground border border-border/40'
-                          : 'bg-secondary/20 text-muted-foreground border border-border/20'
-                    }`}>
-                      {d.date}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Badges */}
-            <div className="glass-card rounded-xl p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider font-mono flex items-center gap-2">
-                <Star className="w-3.5 h-3.5 text-primary" /> badges
-              </h3>
-              <div className="grid grid-cols-5 gap-1.5">
-                {ALL_BADGES.map(b => {
-                  const earned = user.badges.includes(b);
-                  const info = BADGE_INFO[b];
-                  return (
-                    <div key={b} className={`flex flex-col items-center gap-0.5 p-2 rounded-lg transition-all ${
-                      earned ? 'bg-primary/10 border border-primary/20 badge-glow' : 'opacity-25'
-                    }`}>
-                      <span className="text-xl">{earned ? info.icon : '🔒'}</span>
-                      <span className="text-[7px] text-muted-foreground font-mono">{info.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              {user.badges.filter(b => !ALL_BADGES.includes(b)).length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-border/20">
-                  {user.badges.filter(b => !ALL_BADGES.includes(b)).map(b => (
-                    <span key={b} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-mono border border-primary/20">
-                      {BADGE_INFO[b]?.icon || '🏅'} {BADGE_INFO[b]?.label || b}
-                    </span>
-                  ))}
                 </div>
-              )}
+              ))}
             </div>
+          </motion.div>
+        </div>
+
+        {/* Achievements */}
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold font-display">Achievements</h2>
+            <span className="text-xs text-accent-orange font-mono">Longest Streak: <strong>{Math.max(user.streakCount, 3)} Days</strong></span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {BADGE_DATA.map((badge, i) => (
+              <motion.div
+                key={badge.id}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3 + i * 0.08 }}
+                className="flex flex-col items-center gap-1 flex-shrink-0"
+              >
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${badge.color} flex items-center justify-center text-2xl border border-white/10 shadow-lg`}>
+                  {badge.icon}
+                </div>
+                <span className="text-[10px] text-muted-foreground font-medium text-center leading-tight w-16">{badge.label}</span>
+              </motion.div>
+            ))}
+          </div>
+          <div className="flex gap-3 mt-2 overflow-x-auto pb-2">
+            {LOCKED_BADGES.map((badge) => (
+              <div key={badge.id} className="flex flex-col items-center gap-1 flex-shrink-0 opacity-40">
+                <div className="w-16 h-16 rounded-2xl bg-secondary/30 border border-border/30 flex items-center justify-center">
+                  <Lock className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <span className="text-[10px] text-muted-foreground font-medium text-center leading-tight w-16">{badge.label}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Main Grid: Roadmap + Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          {/* MERN Roadmap Progress */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+            className="lg:col-span-3 glass-card p-5"
+          >
+            <h3 className="text-base font-bold font-display mb-4">Main MERN Roadmap Progress</h3>
+            <div className="space-y-2.5">
+              {MERN_ROADMAP.map((item) => {
+                const isCompleted = item.step < currentMernStep;
+                const isCurrent = item.step === currentMernStep;
+                return (
+                  <div key={item.step} className="flex items-center gap-3">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                      isCompleted || isCurrent ? 'bg-primary text-primary-foreground' : 'bg-secondary/40 text-muted-foreground'
+                    }`}>
+                      {item.step}
+                    </div>
+                    <span className="text-lg mr-1">{item.icon}</span>
+                    <span className={`text-sm font-medium ${
+                      isCompleted ? 'text-foreground' : isCurrent ? 'text-primary font-semibold' : 'text-muted-foreground'
+                    }`}>{item.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 pt-3 border-t border-border/20">
+              <div className="h-2 bg-secondary/30 rounded-full overflow-hidden mb-2">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${mernProgress}%` }}
+                  transition={{ duration: 1, delay: 0.8 }}
+                  className="h-full bg-primary rounded-full neon-glow"
+                />
+              </div>
+              <p className="text-sm">
+                <span className="text-primary font-bold">{Math.round(mernProgress)}%</span>
+                <span className="text-muted-foreground"> Complete</span>
+              </p>
+              <p className="text-xs text-muted-foreground">Next up: {MERN_ROADMAP[currentMernStep - 1]?.label || 'All done!'}</p>
+            </div>
+          </motion.div>
+
+          {/* Right sidebar */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Community Leaderboard */}
+            <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="glass-card p-4">
+              <h3 className="text-sm font-bold font-display mb-3">Community Leaderboard</h3>
+              <div className="space-y-2">
+                {LEADERBOARD.map((p, i) => (
+                  <div key={i} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm ${
+                    p.isYou ? 'bg-primary/10 text-primary border border-primary/20' : 'text-foreground'
+                  }`}>
+                    <div className="w-6 h-6 rounded-full bg-secondary/40 flex items-center justify-center text-[10px] font-bold border border-border/30">
+                      {p.isYou ? '👤' : '🧑'}
+                    </div>
+                    <span className="font-medium text-xs">{p.name}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
 
             {/* Daily Challenge */}
-            <div className="glass-card rounded-xl p-4 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-              <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-primary" /> daily_challenge
-              </h3>
-              <p className="text-sm font-semibold text-foreground">{dailyChallenge.title}</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">{dailyChallenge.desc}</p>
-              <button onClick={() => navigate('/playground')}
-                className="w-full text-xs bg-primary/10 text-primary px-3 py-2 rounded-lg hover:bg-primary/20 transition-colors font-mono font-semibold border border-primary/20 neon-border">
-                start() →
+            <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.7 }} className="glass-card p-4">
+              <h3 className="text-sm font-bold font-display mb-2">Daily Challenge</h3>
+              <p className="text-xs text-muted-foreground mb-3">{dailyChallenge.q}</p>
+              <button
+                onClick={() => navigate('/challenges')}
+                className="w-full text-xs bg-primary/10 text-primary px-3 py-2 rounded-lg hover:bg-primary/20 transition-colors font-display font-semibold border border-primary/20 neon-border"
+              >
+                Take Challenge
               </button>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => navigate('/playground')} className="glass-card-hover rounded-xl p-3 text-left group">
-                <Code className="w-5 h-5 text-primary mb-1.5" />
-                <p className="text-xs font-semibold text-foreground font-mono">Playground</p>
-                <ArrowRight className="w-3 h-3 text-muted-foreground mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-              <button onClick={() => navigate('/challenges')} className="glass-card-hover rounded-xl p-3 text-left group">
-                <Trophy className="w-5 h-5 text-primary mb-1.5" />
-                <p className="text-xs font-semibold text-foreground font-mono">Challenges</p>
-                <ArrowRight className="w-3 h-3 text-muted-foreground mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            </div>
+            </motion.div>
           </div>
         </div>
 
+        {/* Resume Core Learning */}
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }} className="glass-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-bold font-display">Resume Core Learning</h3>
+            <button onClick={() => navigate('/learn')} className="text-xs text-primary font-display font-semibold hover:underline">Continue →</button>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">{completedCount + 1}</div>
+            <div>
+              <p className="text-sm font-semibold text-primary">React.js</p>
+              <p className="text-xs text-muted-foreground">Current lesson</p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Promo Code */}
-        <div className="glass-card rounded-xl p-4">
+        <div className="glass-card p-4">
           <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">promo_code</h3>
           <div className="flex gap-2">
             <input value={promoInput} onChange={e => setPromoInput(e.target.value)} placeholder="ENTER_CODE"
               className="flex-1 bg-secondary/40 border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 font-mono" />
-            <button onClick={handlePromo} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold font-mono hover:neon-glow transition-all">
-              apply()
+            <button onClick={handlePromo} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold font-display hover:neon-glow transition-all">
+              Apply
             </button>
           </div>
           {promoMsg && <p className="text-xs mt-2 font-mono">{promoMsg}</p>}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
-
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="glass-card rounded-xl p-3 flex flex-col items-center gap-1">
-      {icon}
-      <span className="text-lg font-bold text-foreground font-mono">{value}</span>
-      <span className="text-[9px] text-muted-foreground font-mono uppercase">{label}</span>
-    </div>
-  );
-}
 
 export default Dashboard;
