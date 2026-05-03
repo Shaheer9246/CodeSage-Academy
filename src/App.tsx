@@ -69,6 +69,7 @@ const App = () => (
               <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
               <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/auth" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
