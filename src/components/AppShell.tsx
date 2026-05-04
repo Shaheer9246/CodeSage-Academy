@@ -1,14 +1,13 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Map, FileQuestion, LayoutDashboard, Users, User, LogOut, Flame } from 'lucide-react';
+import { Home, Map, HelpCircle, Users, User, LogOut, Flame } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 
 const NAV_ITEMS = [
-  { path: '/dashboard', icon: Home, label: 'Home' },
+  { path: '/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/roadmap', icon: Map, label: 'Roadmap' },
-  { path: '/challenges', icon: FileQuestion, label: 'Question' },
-  { path: '/learn', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/suggestions', icon: Users, label: 'Community' },
+  { path: '/questions', icon: HelpCircle, label: 'Questions' },
+  { path: '/community', icon: Users, label: 'Community' },
   { path: '/settings', icon: User, label: 'Profile' },
 ];
 
@@ -22,18 +21,22 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
 
+  // Hide shell on lesson and playground pages for full-screen experience
+  const fullScreenRoutes = ['/lesson/', '/playground'];
+  if (fullScreenRoutes.some(r => location.pathname.startsWith(r))) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-[72px] border-r border-border/30 bg-card/20 backdrop-blur-xl fixed left-0 top-0 bottom-0 z-30">
-        {/* Logo */}
         <div className="flex items-center justify-center py-5 border-b border-border/20">
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center neon-border">
             <span className="text-xs font-bold text-primary font-mono">&lt;/&gt;</span>
           </div>
         </div>
 
-        {/* Nav items */}
         <nav className="flex-1 flex flex-col items-center gap-1 py-4 px-2">
           {NAV_ITEMS.map(item => {
             const active = location.pathname === item.path;
@@ -41,7 +44,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`w-full flex flex-col items-center gap-0.5 px-1 py-2.5 rounded-xl text-[10px] font-medium transition-all ${
+                className={`w-full flex flex-col items-center gap-0.5 px-1 py-2.5 rounded-xl text-[10px] font-medium transition-all relative ${
                   active
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
@@ -55,7 +58,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* User section */}
         {user && (
           <div className="flex flex-col items-center gap-2 py-4 border-t border-border/20">
             <div className="flex items-center gap-0.5">
