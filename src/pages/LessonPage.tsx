@@ -5,16 +5,15 @@ import { getLessonById, getAllLessons, isLessonUnlocked } from '@/data/lessons';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
-import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Lightbulb } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Lightbulb, BookOpen, Code, Eye } from 'lucide-react';
 
 type FileTab = 'html' | 'css' | 'js';
+type MobileView = 'lesson' | 'code' | 'preview';
 
-/** Escape HTML entities in text BEFORE markdown processing */
 function escapeHtml(str: string): string {
   return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/** Normalize code for lenient validation */
 function normalizeCode(code: string): string {
   return code.toLowerCase().replace(/'/g, '"').replace(/\s+/g, ' ').replace(/\s*=\s*/g, '=');
 }
@@ -27,6 +26,7 @@ const LessonPage = () => {
   const lesson = id ? getLessonById(id) : undefined;
 
   const [fileTab, setFileTab] = useState<FileTab>('html');
+  const [mobileView, setMobileView] = useState<MobileView>('lesson');
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
@@ -49,6 +49,7 @@ const LessonPage = () => {
       setChallengeResult(null);
       setShowHint(false);
       setFileTab('html');
+      setMobileView('lesson');
     }
   }, [lesson?.id]);
 
@@ -74,6 +75,7 @@ const LessonPage = () => {
       setChallengeResult(null);
       setShowHint(false);
       setFileTab('html');
+      setMobileView('code');
     }
   };
 
@@ -107,14 +109,9 @@ const LessonPage = () => {
         inCode = !inCode;
         continue;
       }
-      if (inCode) {
-        codeBlock += escapeHtml(line) + '\n';
-        continue;
-      }
+      if (inCode) { codeBlock += escapeHtml(line) + '\n'; continue; }
 
-      // ESCAPE HTML in non-code lines FIRST, then apply markdown formatting
       const escaped = escapeHtml(line);
-
       if (escaped.startsWith('# ')) {
         html.push(`<h1 class="text-xl font-bold text-foreground mb-3">${escaped.slice(2)}</h1>`);
       } else if (escaped.startsWith('## ')) {
@@ -147,69 +144,30 @@ const LessonPage = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
+      {/* Mobile Tab Bar */}
+      <div className="sm:hidden flex border-b border-border bg-card/50">
+        {([
+          { key: 'lesson' as MobileView, icon: BookOpen, label: 'Lesson' },
+          { key: 'code' as MobileView, icon: Code, label: 'Code' },
+          { key: 'preview' as MobileView, icon: Eye, label: 'Preview' },
+        ]).map(tab => (
+          <button key={tab.key} onClick={() => setMobileView(tab.key)}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-all border-b-2 ${
+              mobileView === tab.key ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
+            }`}>
+            <tab.icon className="w-3.5 h-3.5" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop layout */}
+      <div className="flex-1 hidden sm:flex overflow-hidden">
         {/* Lesson content panel */}
-        <div className="w-full sm:w-[340px] flex-shrink-0 border-b sm:border-b-0 sm:border-r border-border overflow-auto glass-card max-h-[40vh] sm:max-h-none">
+        <div className="w-[340px] flex-shrink-0 border-r border-border overflow-auto glass-card">
           <div className="p-4">
             <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
-
-            {/* Challenge section */}
-            {lesson.challenge && !showChallenge && (
-              <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge</h3>
-                <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
-                <button onClick={handleStartChallenge}
-                  className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-                  Start Challenge
-                </button>
-              </div>
-            )}
-
-            {/* Challenge active */}
-            {showChallenge && lesson.challenge && (
-              <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge Active</h3>
-                <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
-
-                {challengeResult === 'pass' && (
-                  <div className="flex items-center gap-2 p-2.5 bg-success/10 rounded-lg text-success text-xs mb-3">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span className="font-semibold">Great job! Challenge completed! 🎉</span>
-                  </div>
-                )}
-                {challengeResult === 'fail' && (
-                  <div className="flex items-center gap-2 p-2.5 bg-destructive/10 rounded-lg text-destructive text-xs mb-3">
-                    <XCircle className="w-4 h-4" />
-                    <span>Not quite right. Check hints and try again.</span>
-                  </div>
-                )}
-
-                {/* Hint */}
-                <button onClick={() => setShowHint(!showHint)}
-                  className="flex items-center gap-1.5 text-xs text-warning hover:text-warning/80 mb-3 transition-colors">
-                  <Lightbulb className="w-3.5 h-3.5" />
-                  {showHint ? 'Hide Hint' : 'Show Hint'}
-                </button>
-                {showHint && (
-                  <div className="p-2.5 bg-warning/10 border border-warning/20 rounded-lg text-xs text-warning mb-3">
-                    💡 Your code should include: {lesson.challenge.validationKeywords.join(', ')}
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <button onClick={handleCheckCode}
-                    className="flex-1 bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90">
-                    Check My Code
-                  </button>
-                  {challengeResult === 'pass' && (
-                    <button onClick={goToNext}
-                      className="flex items-center gap-1 bg-success text-primary-foreground px-3 py-2 rounded-lg font-semibold text-xs hover:opacity-90">
-                      Next <ChevronRight className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+            {renderChallengeSection()}
           </div>
         </div>
 
@@ -232,17 +190,113 @@ const LessonPage = () => {
         </div>
 
         {/* Live preview */}
-        <div className="hidden sm:flex flex-1 flex-col min-w-0 border-l border-border">
+        <div className="flex-1 flex flex-col min-w-0 border-l border-border">
           <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono flex items-center gap-2 glass-card">
-            <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Preview
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Preview
           </div>
           <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />
           </div>
         </div>
       </div>
+
+      {/* Mobile layout - show one view at a time */}
+      <div className="flex-1 sm:hidden flex flex-col overflow-hidden">
+        {mobileView === 'lesson' && (
+          <div className="flex-1 overflow-auto p-4">
+            <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
+            {renderChallengeSection()}
+          </div>
+        )}
+
+        {mobileView === 'code' && (
+          <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex items-center border-b border-border bg-card/50">
+              {(['html', 'css', 'js'] as FileTab[]).map(tab => (
+                <button key={tab} onClick={() => setFileTab(tab)}
+                  className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
+                    fileTab === tab ? 'text-foreground border-primary bg-background' : 'text-muted-foreground border-transparent'
+                  }`}>
+                  {tab === 'html' ? 'index.html' : tab === 'css' ? 'style.css' : 'script.js'}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 min-h-0">
+              <CodeEditor code={currentCode} onChange={setCurrentCode} language={lang} />
+            </div>
+            <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
+          </div>
+        )}
+
+        {mobileView === 'preview' && (
+          <div className="flex-1 min-h-0">
+            <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />
+          </div>
+        )}
+      </div>
     </div>
   );
+
+  function renderChallengeSection() {
+    if (!lesson.challenge) return null;
+
+    if (!showChallenge) {
+      return (
+        <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge</h3>
+          <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
+          <button onClick={handleStartChallenge}
+            className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+            Start Challenge
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge Active</h3>
+        <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
+
+        {challengeResult === 'pass' && (
+          <div className="flex items-center gap-2 p-2.5 bg-emerald-500/10 rounded-lg text-emerald-400 text-xs mb-3">
+            <CheckCircle2 className="w-4 h-4" />
+            <span className="font-semibold">Great job! Challenge completed! 🎉</span>
+          </div>
+        )}
+        {challengeResult === 'fail' && (
+          <div className="flex items-center gap-2 p-2.5 bg-red-500/10 rounded-lg text-red-400 text-xs mb-3">
+            <XCircle className="w-4 h-4" />
+            <span>Not quite right. Check hints and try again.</span>
+          </div>
+        )}
+
+        <button onClick={() => setShowHint(!showHint)}
+          className="flex items-center gap-1.5 text-xs text-yellow-400 hover:text-yellow-300 mb-3 transition-colors">
+          <Lightbulb className="w-3.5 h-3.5" />
+          {showHint ? 'Hide Hint' : 'Show Hint'}
+        </button>
+        {showHint && (
+          <div className="p-2.5 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-400 mb-3">
+            💡 Your code should include: {lesson.challenge.validationKeywords.join(', ')}
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <button onClick={handleCheckCode}
+            className="flex-1 bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90">
+            Check My Code
+          </button>
+          {challengeResult === 'pass' && (
+            <button onClick={goToNext}
+              className="flex items-center gap-1 bg-emerald-500 text-primary-foreground px-3 py-2 rounded-lg font-semibold text-xs hover:opacity-90">
+              Next <ChevronRight className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 };
 
 export default LessonPage;

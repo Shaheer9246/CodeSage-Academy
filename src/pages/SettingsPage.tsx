@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ArrowLeft, User, Calendar, Flame, Trophy, Trash2, LogOut } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getAllLessons } from '@/data/lessons';
+import { motion } from 'framer-motion';
 
 const BADGE_INFO: Record<string, { icon: string; label: string }> = {
   'lite': { icon: '🌱', label: 'Lite Coder' },
@@ -12,15 +15,58 @@ const BADGE_INFO: Record<string, { icon: string; label: string }> = {
   'streak-3': { icon: '🔥', label: '3-Day Streak' },
   'streak-7': { icon: '⚡', label: '7-Day Streak' },
   'streak-30': { icon: '🏆', label: '30-Day Streak' },
+  'html-hero': { icon: '🛡️', label: 'HTML Hero' },
+  'js-jedi': { icon: '⚡', label: 'JS Jedi' },
+  'css-wizard': { icon: '🎨', label: 'CSS Wizard' },
 };
+
+const ACHIEVEMENTS = [
+  { id: 'first-lesson', label: 'First Lesson', icon: '🎯', description: 'Complete your first lesson', check: (u: any) => u.completedLessons.length >= 1 },
+  { id: 'five-lessons', label: '5 Lessons', icon: '📚', description: 'Complete 5 lessons', check: (u: any) => u.completedLessons.length >= 5 },
+  { id: 'ten-lessons', label: '10 Lessons', icon: '🏅', description: 'Complete 10 lessons', check: (u: any) => u.completedLessons.length >= 10 },
+  { id: 'streak-3', label: '3-Day Streak', icon: '🔥', description: 'Maintain a 3-day streak', check: (u: any) => u.streakCount >= 3 },
+  { id: 'streak-7', label: '7-Day Streak', icon: '⚡', description: '7 days in a row', check: (u: any) => u.streakCount >= 7 },
+  { id: 'test-pass', label: 'Test Ace', icon: '📜', description: 'Pass a level test', check: (u: any) => u.completedTests?.length >= 1 },
+  { id: 'all-html', label: 'HTML Master', icon: '📄', description: 'Complete all HTML lessons', check: (u: any) => u.completedLessons.filter((l: string) => l.startsWith('html')).length >= 6 },
+  { id: 'all-css', label: 'CSS Wizard', icon: '🎨', description: 'Complete all CSS lessons', check: (u: any) => u.completedLessons.filter((l: string) => l.startsWith('css')).length >= 6 },
+];
 
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { user, logout, deleteAccount } = useUser();
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setDarkMode(isDark);
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   if (!user) { navigate('/auth'); return null; }
 
   const joinDate = user.joinDate ? new Date(user.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+  const totalLessons = getAllLessons().length;
+  const completedCount = user.completedLessons.length;
+  const progress = totalLessons ? Math.round((completedCount / totalLessons) * 100) : 0;
+
+  // 7-day streak calendar
+  const today = new Date();
+  const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const todayIdx = today.getDay();
+  const streakDays = weekDays.map((day, i) => ({
+    day,
+    active: i <= todayIdx && i >= todayIdx - Math.min(user.streakCount, todayIdx),
+    isToday: i === todayIdx,
+  }));
 
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
@@ -30,49 +76,72 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden animated-bg">
-      <div className="glow-orb glow-accent w-48 h-48 top-20 -right-10 opacity-20" />
+    <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto p-4 space-y-4">
+        <h1 className="text-xl font-bold font-display text-foreground">Profile & Settings</h1>
 
-      <header className="border-b border-border glass-card px-4 sm:px-6 py-3 flex items-center gap-3 relative z-10">
-        <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <span className="text-base font-bold gradient-text font-mono">Settings</span>
-      </header>
-
-      <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-4 relative z-10">
-        <div className="glass-card rounded-2xl p-5 neon-border-subtle">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-4">
-            <User className="w-4 h-4 text-primary" /> Profile
-          </h3>
+        {/* Profile Card */}
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl border border-primary/20">
+              👤
+            </div>
+            <div>
+              <h2 className="text-lg font-bold font-display text-foreground">{user.name}</h2>
+              <p className="text-xs text-muted-foreground font-mono">@{user.username}</p>
+            </div>
+          </div>
           <div className="space-y-2">
-            <InfoRow label="Username" value={user.username} />
-            <InfoRow label="Name" value={user.name} />
             <InfoRow label="Email" value={user.email} />
             <InfoRow label="Studying" value={user.studying} />
             <InfoRow label="Goal" value={user.goal} />
             <InfoRow label="Experience" value={user.experienceLevel} />
+            <InfoRow label="Member Since" value={joinDate} />
           </div>
         </div>
 
+        {/* Streak Section */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-4">
-            <Flame className="w-4 h-4 text-primary" /> Stats
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+            <Flame className="w-4 h-4 text-primary" /> Coding Streak
           </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-secondary/40 rounded-xl p-4 text-center border border-border/50">
-              <p className="text-2xl font-bold text-primary font-mono">{user.streakCount}</p>
-              <p className="text-[10px] text-muted-foreground">Day Streak</p>
-            </div>
-            <div className="bg-secondary/40 rounded-xl p-4 text-center border border-border/50">
-              <p className="text-2xl font-bold text-primary font-mono">{user.completedLessons.length}</p>
-              <p className="text-[10px] text-muted-foreground">Lessons Done</p>
-            </div>
+          <div className="flex items-end gap-2 mb-3">
+            <span className="text-4xl font-bold text-primary font-display neon-text">{user.streakCount}</span>
+            <span className="text-sm text-muted-foreground mb-1">days</span>
+          </div>
+          <div className="flex gap-2 justify-center">
+            {streakDays.map((d, i) => (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <span className="text-[9px] text-muted-foreground">{d.day}</span>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs ${
+                  d.active ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary/30 text-muted-foreground border border-border/20'
+                }`}>
+                  {d.active ? <Check className="w-3.5 h-3.5" /> : ''}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="glass-card rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-primary font-mono">{completedCount}</p>
+            <p className="text-[10px] text-muted-foreground">Lessons</p>
+          </div>
+          <div className="glass-card rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-primary font-mono">{progress}%</p>
+            <p className="text-[10px] text-muted-foreground">Progress</p>
+          </div>
+          <div className="glass-card rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</p>
+            <p className="text-[10px] text-muted-foreground">XP</p>
+          </div>
+        </div>
+
+        {/* Badges */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-4">
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-primary" /> Badges
           </h3>
           {user.badges.length === 0 ? (
@@ -80,7 +149,7 @@ const SettingsPage = () => {
           ) : (
             <div className="flex flex-wrap gap-2">
               {user.badges.map(b => (
-                <div key={b} className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full badge-glow border border-primary/10">
+                <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
                   <span className="text-sm">{BADGE_INFO[b]?.icon || '🏅'}</span>
                   <span className="text-xs font-medium text-foreground">{BADGE_INFO[b]?.label || b}</span>
                 </div>
@@ -89,31 +158,66 @@ const SettingsPage = () => {
           )}
         </div>
 
+        {/* Achievements */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
-            <Calendar className="w-4 h-4 text-primary" /> Account
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+            <Target className="w-4 h-4 text-primary" /> Achievements
           </h3>
-          <p className="text-xs text-muted-foreground">Member since: <span className="text-foreground font-medium">{joinDate}</span></p>
+          <div className="space-y-2">
+            {ACHIEVEMENTS.map(ach => {
+              const unlocked = ach.check(user);
+              return (
+                <div key={ach.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                  unlocked ? 'bg-primary/5 border border-primary/20' : 'bg-secondary/10 border border-border/20 opacity-50'
+                }`}>
+                  <span className="text-lg">{ach.icon}</span>
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-foreground">{ach.label}</p>
+                    <p className="text-[10px] text-muted-foreground">{ach.description}</p>
+                  </div>
+                  {unlocked ? <Check className="w-4 h-4 text-primary" /> : <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
+        {/* Dark Mode Toggle */}
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {darkMode ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-yellow-400" />}
+              <div>
+                <p className="text-sm font-semibold text-foreground">Dark Theme</p>
+                <p className="text-[10px] text-muted-foreground">{darkMode ? 'Dark mode enabled' : 'Light mode enabled'}</p>
+              </div>
+            </div>
+            <button onClick={toggleDarkMode}
+              className={`w-12 h-6 rounded-full transition-all relative ${darkMode ? 'bg-primary' : 'bg-secondary'}`}>
+              <div className={`w-5 h-5 bg-foreground rounded-full absolute top-0.5 transition-all ${darkMode ? 'right-0.5' : 'left-0.5'}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Actions */}
         <div className="space-y-2">
           <button onClick={async () => { await logout(); navigate('/auth'); }}
-            className="w-full glass-card rounded-xl p-4 text-left flex items-center gap-3 text-foreground hover:neon-border-subtle transition-all text-sm">
+            className="w-full glass-card rounded-xl p-4 text-left flex items-center gap-3 text-foreground hover:bg-secondary/20 transition-all text-sm">
             <LogOut className="w-4 h-4 text-muted-foreground" /> Log Out
           </button>
           <button onClick={handleDelete}
-            className="w-full glass-card rounded-xl p-4 text-left flex items-center gap-3 text-destructive hover:bg-destructive/5 transition-colors text-sm border border-destructive/20">
+            className="w-full glass-card rounded-xl p-4 text-left flex items-center gap-3 text-red-400 hover:bg-red-500/5 transition-colors text-sm border border-red-500/20">
             <Trash2 className="w-4 h-4" /> Delete Account
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
+    <div className="flex justify-between items-center py-2 border-b border-border/20 last:border-0">
       <span className="text-xs text-muted-foreground">{label}</span>
       <span className="text-xs text-foreground font-medium font-mono">{value || '—'}</span>
     </div>
