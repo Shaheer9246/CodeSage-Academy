@@ -36,9 +36,9 @@ const Learn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden animated-bg">
-      <div className="glow-orb glow-accent w-48 h-48 top-20 -right-10 opacity-20" />
-      <div className="glow-orb glow-primary w-32 h-32 bottom-20 left-10 opacity-15" />
+    <div className="bg-background relative overflow-hidden animated-bg">
+      <div className="glow-orb glow-accent w-48 h-48 top-20 -right-10 opacity-20 pointer-events-none" />
+      <div className="glow-orb glow-primary w-32 h-32 bottom-20 left-10 opacity-15 pointer-events-none" />
 
       <header className="border-b border-border glass-card px-4 sm:px-6 py-3 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">

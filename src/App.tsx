@@ -6,10 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider, useUser } from "@/contexts/UserContext";
 import AppShell from "@/components/AppShell";
 import Auth from "./pages/Auth";
+import Welcome from "./pages/Welcome";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Learn from "./pages/Learn";
 import LessonPage from "./pages/LessonPage";
+import LessonComplete from "./pages/LessonComplete";
+import NetworkingLessonPage from "./pages/NetworkingLessonPage";
 import Playground from "./pages/Playground";
 import Challenges from "./pages/Challenges";
 import Roadmap from "./pages/Roadmap";
@@ -65,14 +68,16 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
               <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-              <Route path="/playground" element={<ProtectedRoute><Playground /></ProtectedRoute>} />
+              <Route path="/lesson/:id/complete" element={<ProtectedRoute><LessonComplete /></ProtectedRoute>} />
+              <Route path="/n-lesson/:id" element={<ProtectedRoute><NetworkingLessonPage /></ProtectedRoute>} />
+              <Route path="/playground" element={<Playground />} />
               <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
               <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
               <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
-              <Route path="/" element={<Navigate to="/auth" replace />} />
+              <Route path="/" element={<Welcome />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppShell>

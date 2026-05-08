@@ -1,116 +1,83 @@
+# CodeSage — 5-Item Restructure Plan
 
+## 1. Fix top spacing (small)
+The huge gap above "Learning Path" header on `/learn` (and similar pages) comes from `AppShell` adding mobile top padding while pages also have their own padding. Audit:
+- `src/components/AppShell.tsx` — remove/reduce duplicate top padding for mobile
+- `src/pages/Learn.tsx`, `Dashboard.tsx`, `Roadmap.tsx`, `QuestionsPage.tsx`, `CommunityPage.tsx`, `SettingsPage.tsx` — make sure the first element sits flush with safe-area top.
 
-# CodeSage Visual Redesign & Feature Completion Plan
+## 2. Mobile Playground = 4 tabs (small)
+Restructure `src/pages/Playground.tsx` for mobile (keep desktop split layout):
+- **Files** tab — folder/file tree (HTML/CSS/JS files, add/rename/delete)
+- **Code** tab — Monaco editor for the active file
+- **Preview** tab — live iframe preview
+- **Recent** tab — list of recently edited snippets pulled from `localStorage` with a yellow warning banner: *"These are saved only in your browser cache. Export them to keep them safe."* + an Export (download .zip/.html) button per item.
 
-The screenshots show a **premium, futuristic dark purple/blue theme** with glassmorphism cards, gradient accents, floating code symbols, and an illustrated character. This is a significant visual overhaul from the current orange/dark theme.
+## 3. Pre-login intro page (small)
+New `src/pages/Welcome.tsx` shown at `/` (replaces current `Index` redirect):
+- Brief pitch: what CodeSage is, who it's for, what you'll learn (HTML/CSS/JS → React → Networking → Freelancing).
+- Two buttons:
+  - **Start Learning** → `/auth`
+  - **Just Edit Code** → `/playground` (allow guest access to playground)
+- Update `src/App.tsx` route table; allow `/playground` without auth.
 
----
+## 4. Post-lesson celebration page (medium)
+New `src/pages/LessonComplete.tsx` at `/lesson/:id/complete`:
+- Confetti + "Lesson Complete!" headline
+- Recap: 3-4 bullet points of "what you learned" pulled from the lesson's `keyTakeaways` field
+- XP earned (+50), Sage Coins (+10), streak status, new level if leveled up
+- Buttons: **Next Lesson →**, **Back to Roadmap**, **Review Lesson**
+After clicking "Complete" in `LessonPage.tsx`, navigate here instead of straight to next lesson.
 
-## Phase 1: Design System Overhaul
+## 5. Full lesson restructure (LARGE — main focus)
+Rebuild the lesson data model and renderer to match the PDF format.
 
-**Update color palette and visual language across the entire app.**
+### New lesson schema (`src/data/lessons.ts`)
+```ts
+type Lesson = {
+  id, title, track, module, order,
+  philosophy: string,        // "I. The Core Philosophy" — short intro
+  concepts: Concept[],       // "II. Detailed Technical Breakdown" — multiple sub-topics with beginner/advanced views
+  practical: {               // "III. Practical Lab"
+    title, instructions[], goal,
+    starterCode?: { html, css, js }   // optional — opens in embedded editor
+  },
+  quiz: QuizQuestion[],      // "IV. Mastery Quiz" — 4 MCQs
+  keyTakeaways: string[],    // for the Complete page
+  xpReward: 50,
+}
+```
 
-- Change `index.css` CSS variables from current orange/teal to a **deep purple-blue palette** (background ~`#0f0a2e`, cards with glassmorphism `rgba(255,255,255,0.05)` + `backdrop-blur`, primary gradient orange-gold for CTAs)
-- Add CSS for floating decorative elements (code brackets `{}`, `</>` scattered with low opacity), glowing orb backgrounds
-- Update border styles to use subtle glass borders (`border: 1px solid rgba(255,255,255,0.1)`)
-- Keep JetBrains Mono + Inter fonts
+### New `LessonPage.tsx` flow (4 sequential sections)
+1. **Concept** tab — read philosophy + concepts (with "Beginner View" / "Advanced View" toggle per concept)
+2. **Practical** tab — instructions on the left, embedded Monaco + live preview on the right (mobile = sub-tabs)
+3. **Quiz** tab — must score 3/4 to pass; retry on fail
+4. On pass → navigate to `/lesson/:id/complete`
 
-**Files:** `src/index.css`, `tailwind.config.ts`
+### Content to seed (from the attached PDF — Computer & Networking Module 1)
+Add all 10 lessons fully written:
+1. Hardware Architecture for Developers
+2. Operating Systems
+3. The Command Line
+4. IP Addressing
+5. DNS & DHCP
+6. The OSI Model
+7. Protocols (TCP/UDP/HTTP/SMTP/SSH/FTP)
+8. Web Security Basics
+9. The Browser (Rendering Engine, V8, Storage)
+10. Servers & Cloud
 
----
+Plus extend Frontend track lessons (HTML/CSS/JS) into the same Concept→Practical→Quiz format using existing content as the philosophy/concepts.
 
-## Phase 2: Auth Page Redesign
+### Roadmap update
+- Update `Roadmap.tsx` so the **Networking track is unlocked** with these 10 nodes (Frontend already there).
+- Each roadmap node maps to a lesson id; clicking goes to `/lesson/:id` and follows the new flow.
+- Group nodes by Module with milestone banners every ~5 lessons.
 
-**Match the first screenshot — immersive login with illustration area.**
+## Technical notes
+- Lesson data file will grow large — split into `src/data/lessons/frontend.ts`, `src/data/lessons/networking.ts`, then re-export from `src/data/lessons.ts`.
+- Quiz state stored in component; pass result up to `UserContext` to award XP via existing `addXp`/`addCoins`.
+- Confetti: use a tiny custom CSS animation (no new dep) or `canvas-confetti` (~3kb).
+- Guest playground: `Playground.tsx` should not require `user`; use `localStorage` for guest snippets.
 
-- Redesign `Auth.tsx` with a centered layout: CodeSage logo at top, decorative illustration area (CSS-only with floating code symbols and gradient orbs since we can't embed the exact illustration), then the login form card with glassmorphism styling
-- Orange gradient "Get Started" button
-- "Forgot Password?" link and "Don't have an account? Sign Up" toggle
-- Floating `{}` and `</>` symbols as background decorations
-
-**Files:** `src/pages/Auth.tsx`
-
----
-
-## Phase 3: Onboarding Redesign
-
-**Match the second screenshot — cards-based onboarding with visual flair.**
-
-- Redesign `Onboarding.tsx` to show questions in glassmorphism cards with the same purple-blue theme
-- "LEARN CODE" and "EDIT CODE LIVE" option cards with gradient backgrounds (for goal selection)
-- Experience level selection with Beginner/Experienced icons
-- Orange gradient "CONTINUE" button at bottom
-- Same floating decorative elements as auth page
-
-**Files:** `src/pages/Onboarding.tsx`
-
----
-
-## Phase 4: Dashboard Redesign
-
-**Match screenshots 3 & 4 — professional dashboard with learning roadmap, badges, streaks, and daily challenge.**
-
-- Redesign `Dashboard.tsx` with:
-  - **Welcome banner** with user avatar placeholder and greeting
-  - **Code Editor Live Preview** card (top-right) — small preview with "LEARN CODE" and "EDIT CODE LIVE" buttons
-  - **Learning sections** as colored horizontal bars: Frontend (blue), Backend (green, locked), AI Integration (green, locked), Data Structures (purple, coming soon), Full-Stack Projects (yellow, coming soon)
-  - **Badges section** with icon grid
-  - **Streaks section** with fire emoji and streak count
-  - **Daily Code Challenge** card (new feature) — shows a rotating daily challenge
-  - **Left sidebar** with Badges, Streaks, Settings links (on desktop)
-  - **Learning Roadmap** visual (from screenshot 4) — nodes connected by a flowing path
-
-- Add **daily challenge logic**: pick a challenge based on day-of-year, show in dashboard card, link to solve it
-
-**Files:** `src/pages/Dashboard.tsx`, `src/contexts/UserContext.tsx` (add daily challenge tracking)
-
----
-
-## Phase 5: Fix Preview Bug
-
-**HTML code showing JS output instead of rendered HTML.**
-
-- Review `LivePreview.tsx` — ensure `srcdoc` properly wraps HTML content and doesn't evaluate raw tags as JS
-- Test that typing `<h1>` renders a heading, not text output
-
-**Files:** `src/components/LivePreview.tsx`
-
----
-
-## Phase 6: More Lessons & Challenges
-
-**Expand intermediate and expert lesson content.**
-
-- Add **10+ intermediate lessons**: CSS animations, transitions, Flexbox deep-dive, Grid layouts, responsive design with media queries, CSS variables, pseudo-elements, JavaScript DOM manipulation, event handling, fetch API
-- Add **10+ expert lessons**: async/await, promises, error handling, localStorage/sessionStorage, Web APIs (Geolocation, Notifications), React component patterns, state management, React Router, form handling with validation, deploying a website
-- Add **5+ more challenges** beyond the initial 5: navigation bar, responsive grid gallery, todo app, animated landing page, API data display
-
-**Files:** `src/data/lessons.ts`, `src/pages/Challenges.tsx`
-
----
-
-## Phase 7: Mobile Responsive
-
-**Ensure all pages work well on small screens (384px viewport).**
-
-- Dashboard: stack cards vertically, hide sidebar on mobile
-- Learn page: full-width lesson cards
-- LessonPage/Playground: stack editor and preview vertically on mobile
-- Auth/Onboarding: already mostly centered, minor padding adjustments
-
-**Files:** All page components with responsive Tailwind classes
-
----
-
-## Summary of Changes
-
-| Phase | What | Key Files |
-|-------|------|-----------|
-| 1 | Purple-blue glassmorphism design system | `index.css`, `tailwind.config.ts` |
-| 2 | Auth page visual redesign | `Auth.tsx` |
-| 3 | Onboarding visual redesign | `Onboarding.tsx` |
-| 4 | Dashboard with daily challenge & roadmap | `Dashboard.tsx`, `UserContext.tsx` |
-| 5 | Fix HTML preview bug | `LivePreview.tsx` |
-| 6 | 20+ new lessons, 5+ challenges | `lessons.ts`, `Challenges.tsx` |
-| 7 | Mobile responsive pass | All pages |
-
+## Order of execution (today)
+1 → 3 → 2 → 4 → 5 (small wins first, then the big lesson restructure last so we have all infrastructure ready).
