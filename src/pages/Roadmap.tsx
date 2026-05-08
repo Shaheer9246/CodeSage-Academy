@@ -206,7 +206,7 @@ const Roadmap = () => {
                       {isLeft && <div className="flex-1" />}
                     </motion.div>
 
-                    {i < FRONTEND_TRACK.length - 1 && (
+                    {i < activeNodes.length - 1 && (
                       <div className="flex justify-center my-1">
                         <div className={`w-[2px] h-4 border-l-2 border-dashed ${
                           status === 'completed' ? 'border-primary/40' : 'border-border/30'
