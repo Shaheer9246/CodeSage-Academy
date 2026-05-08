@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Lock, Check, ArrowLeft, Flame } from 'lucide-react';
+import { Lock, Check, Flame } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { NETWORKING_LESSONS } from '@/data/networkingLessons';
 
 interface TrackNode {
   id: string;
@@ -12,35 +13,31 @@ interface TrackNode {
   chapter?: string;
   milestone?: string;
   lessonIds: string[];
+  routePrefix?: 'lesson' | 'n-lesson';
   locked?: boolean;
 }
 
 const FRONTEND_TRACK: TrackNode[] = [
-  // HTML Beginner
   { id: 'fe-1', step: 1, label: 'What is HTML?', icon: '📄', chapter: 'HTML — Beginner', lessonIds: ['html-1'] },
   { id: 'fe-2', step: 2, label: 'Headings & Text', icon: '📝', lessonIds: ['html-2'] },
   { id: 'fe-3', step: 3, label: 'Links & Navigation', icon: '🔗', lessonIds: ['html-3'] },
   { id: 'fe-4', step: 4, label: 'Images & Media', icon: '🖼️', lessonIds: ['html-4'] },
   { id: 'fe-5', step: 5, label: 'Lists', icon: '📋', lessonIds: ['html-5'] },
   { id: 'fe-6', step: 6, label: 'Tables', icon: '📊', milestone: 'HTML BASICS COMPLETE', lessonIds: ['html-6'] },
-  // CSS Beginner
   { id: 'fe-7', step: 7, label: 'CSS Introduction', icon: '🎨', chapter: 'CSS — Beginner', lessonIds: ['css-1'] },
   { id: 'fe-8', step: 8, label: 'Colors & Typography', icon: '🖌️', lessonIds: ['css-2'] },
   { id: 'fe-9', step: 9, label: 'Box Model', icon: '📦', lessonIds: ['css-3'] },
   { id: 'fe-10', step: 10, label: 'Flexbox', icon: '📐', lessonIds: ['css-4', 'css-5'] },
   { id: 'fe-11', step: 11, label: 'CSS Grid', icon: '🔲', milestone: 'CSS BASICS COMPLETE', lessonIds: ['css-6'] },
-  // JS Beginner
   { id: 'fe-12', step: 12, label: 'JS Introduction', icon: '⚡', chapter: 'JavaScript — Beginner', lessonIds: ['js-1'] },
   { id: 'fe-13', step: 13, label: 'Variables & Types', icon: '📦', lessonIds: ['js-2'] },
   { id: 'fe-14', step: 14, label: 'Functions', icon: '🔧', lessonIds: ['js-3'] },
   { id: 'fe-15', step: 15, label: 'DOM Manipulation', icon: '🌳', lessonIds: ['js-4', 'js-5'] },
   { id: 'fe-16', step: 16, label: 'Events', icon: '🎯', milestone: 'JS BASICS COMPLETE', lessonIds: ['js-5'] },
-  // Intermediate
   { id: 'fe-17', step: 17, label: 'ES6+ Features', icon: '✨', chapter: 'Intermediate', lessonIds: ['js-int-1', 'js-int-2'] },
   { id: 'fe-18', step: 18, label: 'APIs & Fetch', icon: '📡', lessonIds: ['js-int-3'] },
   { id: 'fe-19', step: 19, label: 'Tailwind CSS', icon: '🌬️', lessonIds: ['css-int-1'] },
   { id: 'fe-20', step: 20, label: 'React Basics', icon: '⚛️', milestone: 'INTERMEDIATE COMPLETE', lessonIds: ['react-1', 'react-2'] },
-  // Advanced
   { id: 'fe-21', step: 21, label: 'React Hooks', icon: '🪝', chapter: 'Advanced', lessonIds: ['react-3', 'react-4'] },
   { id: 'fe-22', step: 22, label: 'Context & State', icon: '🔄', lessonIds: ['react-int-1'] },
   { id: 'fe-23', step: 23, label: 'Testing', icon: '🧪', lessonIds: [], locked: true },
@@ -48,9 +45,21 @@ const FRONTEND_TRACK: TrackNode[] = [
   { id: 'fe-25', step: 25, label: 'Deployment', icon: '🚀', milestone: 'FRONTEND MASTER', lessonIds: [], locked: true },
 ];
 
+// Networking track sourced from PDF Module 1
+const NETWORKING_TRACK: TrackNode[] = NETWORKING_LESSONS.map((l, i) => ({
+  id: l.id,
+  step: l.order,
+  label: l.title,
+  icon: l.icon,
+  chapter: i === 0 ? 'Module 1: Computer & Network Fundamentals' : undefined,
+  milestone: i === NETWORKING_LESSONS.length - 1 ? 'NETWORKING FUNDAMENTALS COMPLETE' : undefined,
+  lessonIds: [l.id],
+  routePrefix: 'n-lesson' as const,
+}));
+
 const TRACKS = [
   { key: 'frontend', label: 'Frontend Dev', locked: false },
-  { key: 'networking', label: 'Networking', locked: true },
+  { key: 'networking', label: 'Networking', locked: false },
   { key: 'freelance', label: 'Freelancing', locked: true },
 ];
 
