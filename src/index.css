@@ -212,3 +212,13 @@
   mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
 }
+
+.glow-orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+}
+.glow-orb.glow-primary { background: hsl(var(--primary) / 0.4); }
+.glow-orb.glow-accent { background: hsl(var(--accent) / 0.4); }
