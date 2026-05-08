@@ -222,3 +222,9 @@
 }
 .glow-orb.glow-primary { background: hsl(var(--primary) / 0.4); }
 .glow-orb.glow-accent { background: hsl(var(--accent) / 0.4); }
+
+@keyframes confetti {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+.animate-confetti { animation: confetti linear forwards; }
