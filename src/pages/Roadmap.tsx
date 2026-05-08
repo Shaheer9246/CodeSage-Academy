@@ -89,14 +89,16 @@ const Roadmap = () => {
   const handleNodeClick = (node: TrackNode) => {
     if (node.lessonIds.length > 0 && !node.locked) {
       const firstIncomplete = node.lessonIds.find(id => !completedLessons.includes(id));
-      navigate(`/lesson/${firstIncomplete || node.lessonIds[0]}`);
+      const prefix = node.routePrefix || 'lesson';
+      navigate(`/${prefix}/${firstIncomplete || node.lessonIds[0]}`);
     }
   };
 
   const isTrackLocked = TRACKS.find(t => t.key === activeTrack)?.locked;
+  const activeNodes: TrackNode[] = activeTrack === 'networking' ? NETWORKING_TRACK : FRONTEND_TRACK;
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
+    <div className="bg-background relative overflow-hidden grid-bg">
       <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-primary/3 blur-[120px] pointer-events-none" />
 
       <motion.div
@@ -140,10 +142,9 @@ const Roadmap = () => {
             <p className="text-sm text-muted-foreground">This track is being developed. Stay tuned!</p>
           </div>
         ) : (
-          /* Frontend Zigzag Path */
           <div className="relative py-4">
             <div className="space-y-3 relative z-10">
-              {FRONTEND_TRACK.map((node, i) => {
+              {activeNodes.map((node, i) => {
                 const status = getNodeStatus(node, completedLessons);
                 const isLeft = i % 2 === 0;
                 const isCurrent = status === 'current';
