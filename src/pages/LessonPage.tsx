@@ -84,14 +84,14 @@ const LessonPage = () => {
     const allCode = normalizeCode(htmlCode + '\n' + cssCode + '\n' + jsCode);
     const passed = lesson.challenge.validationKeywords.every(kw => allCode.includes(normalizeCode(kw)));
     setChallengeResult(passed ? 'pass' : 'fail');
-    if (passed) completeLesson(lesson.id);
+    if (passed) {
+      completeLesson(lesson.id);
+      setTimeout(() => navigate(`/lesson/${lesson.id}/complete`), 600);
+    }
   };
 
   const goToNext = () => {
-    const all = getAllLessons();
-    const idx = all.findIndex(l => l.id === lesson.id);
-    if (idx < all.length - 1) navigate(`/lesson/${all[idx + 1].id}`);
-    else navigate('/learn');
+    navigate(`/lesson/${lesson.id}/complete`);
   };
 
   const renderContent = (md: string) => {
