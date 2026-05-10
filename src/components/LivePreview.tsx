@@ -101,6 +101,8 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
+      // Only accept messages from our own iframe
+      if (e.source !== iframeRef.current?.contentWindow) return;
       if (e.data?.type === 'console-log' && onConsoleLog) {
         onConsoleLog({ type: e.data.logType, message: e.data.message });
       }
