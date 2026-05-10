@@ -83,6 +83,9 @@ function dbRowToProfile(row: any, email: string): UserProfile {
 }
 
 function profileToDbUpdate(p: UserProfile): Record<string, any> {
+  // Only includes columns the user is allowed to update directly.
+  // Gamification fields (xp, level, coins, badges, streak, completed_*, unlocked_*, promo_codes)
+  // are server-managed via SECURITY DEFINER RPCs.
   return {
     username: p.username,
     name: p.name,
@@ -91,19 +94,10 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     dob: p.dob,
     goal: p.goal,
     experience_level: p.experienceLevel,
-    streak_count: p.streakCount,
-    last_active_date: p.lastActiveDate || null,
-    badges: p.badges,
-    completed_lessons: p.completedLessons,
-    completed_tests: p.completedTests,
-    unlocked_sections: p.unlockedSections,
-    promo_codes: p.promoCodes,
     dark_mode: p.darkMode,
-    xp: p.xp,
-    level: p.level,
-    sage_coins: p.sageCoins,
   };
 }
+
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
