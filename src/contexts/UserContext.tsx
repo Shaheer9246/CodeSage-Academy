@@ -35,11 +35,11 @@ interface UserContextType {
   login: (email: string, password: string) => Promise<string | null>;
   signup: (username: string, email: string, password: string) => Promise<string | null>;
   completeOnboarding: (data: Partial<UserProfile>) => void;
-  completeLesson: (lessonId: string) => void;
-  completeTest: (testId: string) => void;
+  completeLesson: (lessonId: string) => Promise<void>;
+  completeTest: (testId: string) => Promise<void>;
   addBadge: (badge: string) => void;
-  updateStreak: () => void;
-  applyPromoCode: (code: string) => boolean;
+  updateStreak: () => Promise<void>;
+  applyPromoCode: (code: string) => Promise<boolean>;
   updateUser: (data: Partial<UserProfile>) => void;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
