@@ -175,20 +175,32 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* Dark Mode Toggle */}
+        {/* Theme Picker */}
         <div className="glass-card rounded-2xl p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {darkMode ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-yellow-400" />}
-              <div>
-                <p className="text-sm font-semibold text-foreground">Dark Theme</p>
-                <p className="text-[10px] text-muted-foreground">{darkMode ? 'Dark mode enabled' : 'Light mode enabled'}</p>
-              </div>
-            </div>
-            <button onClick={toggleDarkMode}
-              className={`w-12 h-6 rounded-full transition-all relative ${darkMode ? 'bg-primary' : 'bg-secondary'}`}>
-              <div className={`w-5 h-5 bg-foreground rounded-full absolute top-0.5 transition-all ${darkMode ? 'right-0.5' : 'left-0.5'}`} />
-            </button>
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+            <Palette className="w-4 h-4 text-primary" /> Appearance
+          </h3>
+          <p className="text-[10px] text-muted-foreground mb-3">Choose a theme — applies across the whole app.</p>
+          <div className="grid grid-cols-2 gap-2">
+            {THEMES.map(t => {
+              const active = theme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => changeTheme(t.id)}
+                  className={`flex items-center gap-2 p-3 rounded-xl border transition-all text-left ${
+                    active ? 'border-primary bg-primary/10 neon-border' : 'border-border/30 bg-secondary/20 hover:border-primary/30'
+                  }`}
+                >
+                  <span className="w-7 h-7 rounded-lg flex-shrink-0 border border-border/30" style={{ background: t.swatch }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-foreground truncate">{t.label}</p>
+                    <p className="text-[9px] text-muted-foreground">{active ? 'Active' : 'Tap to apply'}</p>
+                  </div>
+                  {active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                </button>
+              );
+            })}
           </div>
         </div>
 
