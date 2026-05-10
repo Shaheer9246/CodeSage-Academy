@@ -20,6 +20,7 @@ import LevelTest from "./pages/LevelTest";
 import SettingsPage from "./pages/SettingsPage";
 import QuestionsPage from "./pages/QuestionsPage";
 import CommunityPage from "./pages/CommunityPage";
+import Suggestions from "./pages/Suggestions";
 import NotFound from "./pages/NotFound";
 import { Loader2, Terminal } from "lucide-react";
 
@@ -77,6 +78,7 @@ const App = () => (
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+              <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

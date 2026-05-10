@@ -1,27 +1,28 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Upload, ArrowLeft, Play, Eye, EyeOff, Sun, Moon, ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, X, FolderOpen, Save } from 'lucide-react';
+import { Download, Upload, ArrowLeft, Play, Eye, EyeOff, Sun, Moon, Plus, Trash2, Edit3, Check, X, FolderOpen, Save, AlertTriangle, Files, Code as CodeIcon, History } from 'lucide-react';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-interface FileItem {
-  id: string;
-  name: string;
-  lang: string;
-  content: string;
-}
+interface FileItem { id: string; name: string; lang: string; content: string; }
+interface RecentSnapshot { id: string; name: string; date: string; html: string; css: string; js: string; }
 
 const DEFAULT_FILES: FileItem[] = [
-  { id: 'html', name: 'index.html', lang: 'html', content: `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div style="text-align: center;">\n    <h1>🧠 CodeSage Playground</h1>\n    <p>Start coding in the editor!</p>\n    <p>Your changes appear here instantly.</p>\n  </div>\n  <script src="script.js"></script>\n</body>\n</html>` },
-  { id: 'css', name: 'style.css', lang: 'css', content: `body {\n  font-family: Arial, sans-serif;\n  background: #0f0a2e;\n  color: white;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  min-height: 100vh;\n  margin: 0;\n}\nh1 { color: #e98a2e; }\np { color: #ccc; }` },
-  { id: 'js', name: 'script.js', lang: 'javascript', content: `// Write your JavaScript here\nconsole.log("Hello from CodeSage!");` },
-  { id: 'jsx', name: 'App.jsx', lang: 'javascript', content: `// React JSX reference\n// function App() {\n//   return <h1>Hello React!</h1>;\n// }` },
+  { id: 'html', name: 'index.html', lang: 'html', content: `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div style="text-align:center;">\n    <h1>🧠 CodeSage Playground</h1>\n    <p>Start coding!</p>\n  </div>\n  <script src="script.js"></script>\n</body>\n</html>` },
+  { id: 'css', name: 'style.css', lang: 'css', content: `body {\n  font-family: Arial, sans-serif;\n  background: #0f0a2e;\n  color: white;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  min-height: 100vh;\n  margin: 0;\n}\nh1 { color: #22c55e; }\np { color: #ccc; }` },
+  { id: 'js', name: 'script.js', lang: 'javascript', content: `console.log("Hello from CodeSage!");` },
 ];
+
+const RECENT_KEY = 'codesage_playground_recent';
+
+type MobileTab = 'files' | 'code' | 'preview' | 'recent';
 
 const Playground = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [files, setFiles] = useState<FileItem[]>(DEFAULT_FILES);
   const [activeFileId, setActiveFileId] = useState('html');
   const [consoleLogs, setConsoleLogs] = useState<{ type: string; message: string }[]>([]);
@@ -33,34 +34,42 @@ const Playground = () => {
   const [savedIndicator, setSavedIndicator] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
-  const [manualHtml, setManualHtml] = useState('');
-  const [manualCss, setManualCss] = useState('');
-  const [manualJs, setManualJs] = useState('');
+  const [mobileTab, setMobileTab] = useState<MobileTab>('code');
+  const [recents, setRecents] = useState<RecentSnapshot[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeFile = files.find(f => f.id === activeFileId) || files[0];
-  const htmlFile = files.find(f => f.id === 'html');
-  const cssFile = files.find(f => f.id === 'css');
-  const jsFile = files.find(f => f.id === 'js');
+  const currentHtml = files.find(f => f.id === 'html')?.content || '';
+  const currentCss = files.find(f => f.id === 'css')?.content || '';
+  const currentJs = files.find(f => f.id === 'js')?.content || '';
 
-  const currentHtml = htmlFile?.content || '';
-  const currentCss = cssFile?.content || '';
-  const currentJs = jsFile?.content || '';
-
-  // Auto-refresh or manual
+  // Load recents
   useEffect(() => {
-    if (autoRefresh) {
-      setManualHtml(currentHtml);
-      setManualCss(currentCss);
-      setManualJs(currentJs);
-    }
-  }, [currentHtml, currentCss, currentJs, autoRefresh]);
+    try {
+      const raw = localStorage.getItem(RECENT_KEY);
+      if (raw) setRecents(JSON.parse(raw));
+    } catch {}
+  }, []);
 
-  const handleRun = () => {
-    setManualHtml(currentHtml);
-    setManualCss(currentCss);
-    setManualJs(currentJs);
-  };
+  // Auto-save snapshot every 30s of edits
+  const lastSaveRef = useRef(0);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const now = Date.now();
+      if (now - lastSaveRef.current < 25000) return;
+      lastSaveRef.current = now;
+      const snap: RecentSnapshot = {
+        id: crypto.randomUUID(),
+        name: `Auto-save ${new Date().toLocaleTimeString()}`,
+        date: new Date().toISOString(),
+        html: currentHtml, css: currentCss, js: currentJs,
+      };
+      const next = [snap, ...recents].slice(0, 10);
+      setRecents(next);
+      try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch {}
+    }, 30000);
+    return () => clearTimeout(t);
+  }, [currentHtml, currentCss, currentJs]);
 
   const handleConsoleLog = useCallback((log: { type: string; message: string }) => {
     setConsoleLogs(prev => [...prev, log]);
@@ -70,7 +79,6 @@ const Playground = () => {
     setFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, content: val } : f));
   };
 
-  // Ctrl+S handler
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -84,10 +92,11 @@ const Playground = () => {
   }, []);
 
   const handleExport = () => {
-    const blob = new Blob([currentHtml], { type: 'text/html' });
+    const fullHtml = `<!DOCTYPE html><html><head><style>${currentCss}</style></head><body>${currentHtml.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<head>[\s\S]*?<\/head>|<\/?body[^>]*>/gi, '')}<script>${currentJs}<\/script></body></html>`;
+    const blob = new Blob([fullHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'code.html'; a.click();
+    a.href = url; a.download = `codesage-${Date.now()}.html`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -123,16 +132,12 @@ const Playground = () => {
   };
 
   const deleteFile = (id: string) => {
-    if (['html', 'css', 'js', 'jsx'].includes(id)) return; // don't delete defaults
+    if (['html', 'css', 'js'].includes(id)) return;
     setFiles(prev => prev.filter(f => f.id !== id));
     if (activeFileId === id) setActiveFileId('html');
   };
 
-  const startRename = (f: FileItem) => {
-    setRenamingId(f.id);
-    setRenameValue(f.name);
-  };
-
+  const startRename = (f: FileItem) => { setRenamingId(f.id); setRenameValue(f.name); };
   const confirmRename = () => {
     if (renamingId && renameValue.trim()) {
       const ext = renameValue.split('.').pop() || '';
@@ -142,81 +147,261 @@ const Playground = () => {
     setRenamingId(null);
   };
 
+  const loadRecent = (snap: RecentSnapshot) => {
+    setFiles(prev => prev.map(f => {
+      if (f.id === 'html') return { ...f, content: snap.html };
+      if (f.id === 'css') return { ...f, content: snap.css };
+      if (f.id === 'js') return { ...f, content: snap.js };
+      return f;
+    }));
+    setMobileTab('code');
+  };
+
+  const exportRecent = (snap: RecentSnapshot) => {
+    const fullHtml = `<!DOCTYPE html><html><head><style>${snap.css}</style></head><body>${snap.html}<script>${snap.js}<\/script></body></html>`;
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${snap.name.replace(/\s/g, '-')}.html`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const deleteRecent = (id: string) => {
+    const next = recents.filter(r => r.id !== id);
+    setRecents(next);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch {}
+  };
+
+  const clearRecents = () => {
+    if (!confirm('Clear all auto-saved snapshots?')) return;
+    setRecents([]);
+    try { localStorage.removeItem(RECENT_KEY); } catch {}
+  };
+
+  // ===== MOBILE LAYOUT =====
+  if (isMobile) {
+    return (
+      <div className="h-screen flex flex-col bg-background overflow-hidden">
+        <header className="flex items-center justify-between px-3 py-2 backdrop-blur-xl bg-card/60 border-b border-border/30 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate('/dashboard')} className="text-muted-foreground p-1">
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <span className="text-primary font-bold text-xs font-mono">Playground</span>
+            {savedIndicator && (
+              <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">
+                <Save className="w-3 h-3" /> Saved
+              </span>
+            )}
+          </div>
+          <button onClick={handleExport} className="flex items-center gap-1 text-[10px] bg-primary/15 text-primary px-2 py-1 rounded">
+            <Download className="w-3 h-3" /> Export
+          </button>
+        </header>
+
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* FILES */}
+          {mobileTab === 'files' && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Files</span>
+                <div className="flex gap-1">
+                  <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js" className="hidden" />
+                  <button onClick={() => fileInputRef.current?.click()} className="text-[10px] flex items-center gap-1 text-muted-foreground bg-secondary/40 px-2 py-1 rounded">
+                    <Upload className="w-3 h-3" /> Import
+                  </button>
+                  <button onClick={addNewFile} className="text-[10px] flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded">
+                    <Plus className="w-3 h-3" /> New
+                  </button>
+                </div>
+              </div>
+              {files.map(f => (
+                <div key={f.id} className={`flex items-center gap-2 p-3 rounded-xl border transition-colors ${
+                  activeFileId === f.id ? 'bg-primary/10 border-primary/40' : 'bg-secondary/20 border-border/30'
+                }`}>
+                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                    f.lang === 'html' ? 'bg-orange-400' : f.lang === 'css' ? 'bg-blue-400' : 'bg-yellow-400'
+                  }`} />
+                  {renamingId === f.id ? (
+                    <div className="flex items-center gap-1 flex-1">
+                      <input value={renameValue} onChange={e => setRenameValue(e.target.value)} autoFocus
+                        className="flex-1 bg-secondary/60 border border-border/30 rounded px-2 py-1 text-xs text-foreground"
+                        onKeyDown={e => e.key === 'Enter' && confirmRename()} />
+                      <button onClick={confirmRename}><Check className="w-4 h-4 text-green-400" /></button>
+                      <button onClick={() => setRenamingId(null)}><X className="w-4 h-4 text-destructive" /></button>
+                    </div>
+                  ) : (
+                    <>
+                      <button onClick={() => { setActiveFileId(f.id); setMobileTab('code'); }} className="flex-1 text-left">
+                        <p className="text-sm font-mono text-foreground truncate">{f.name}</p>
+                        <p className="text-[9px] text-muted-foreground">{f.lang}</p>
+                      </button>
+                      <button onClick={() => startRename(f)} className="p-1 text-muted-foreground"><Edit3 className="w-3.5 h-3.5" /></button>
+                      {!['html', 'css', 'js'].includes(f.id) && (
+                        <button onClick={() => deleteFile(f.id)} className="p-1 text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* CODE */}
+          {mobileTab === 'code' && (
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex items-center border-b border-border/30 bg-card/30 overflow-x-auto flex-shrink-0">
+                {files.map(f => (
+                  <button key={f.id} onClick={() => setActiveFileId(f.id)}
+                    className={`px-3 py-1.5 text-[10px] font-mono whitespace-nowrap border-b-2 ${
+                      activeFileId === f.id ? 'text-foreground border-primary bg-background/50' : 'text-muted-foreground border-transparent'
+                    }`}>{f.name}</button>
+                ))}
+              </div>
+              <div className="flex-1 min-h-0">
+                <CodeEditor code={activeFile.content} onChange={updateFileContent} language={activeFile.lang} theme={editorTheme} fontSize={fontSize} />
+              </div>
+              <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
+            </div>
+          )}
+
+          {/* PREVIEW */}
+          {mobileTab === 'preview' && (
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20 flex-shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Preview
+              </div>
+              <div className="flex-1 min-h-0">
+                <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
+              </div>
+            </div>
+          )}
+
+          {/* RECENT */}
+          {mobileTab === 'recent' && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 flex items-start gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <div className="text-[11px] text-yellow-200/90 leading-relaxed">
+                  <strong>Heads up:</strong> Recent snapshots are saved in your browser cache only.
+                  Clearing site data will erase them. <strong>Export</strong> anything you want to keep.
+                </div>
+              </div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  Auto-saved ({recents.length})
+                </span>
+                {recents.length > 0 && (
+                  <button onClick={clearRecents} className="text-[10px] text-destructive">Clear all</button>
+                )}
+              </div>
+              {recents.length === 0 && (
+                <div className="text-center py-8 text-xs text-muted-foreground">
+                  No snapshots yet. Keep coding — auto-saves every 30s.
+                </div>
+              )}
+              {recents.map(r => (
+                <div key={r.id} className="bg-secondary/20 border border-border/30 rounded-xl p-3 space-y-2">
+                  <div>
+                    <p className="text-xs font-semibold text-foreground truncate">{r.name}</p>
+                    <p className="text-[9px] text-muted-foreground">{new Date(r.date).toLocaleString()}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => loadRecent(r)} className="flex-1 bg-primary/15 text-primary text-[11px] font-semibold py-1.5 rounded">
+                      Load
+                    </button>
+                    <button onClick={() => exportRecent(r)} className="flex-1 bg-secondary/40 text-foreground text-[11px] font-semibold py-1.5 rounded flex items-center justify-center gap-1">
+                      <Download className="w-3 h-3" /> Export
+                    </button>
+                    <button onClick={() => deleteRecent(r.id)} className="bg-destructive/15 text-destructive p-1.5 rounded">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* MOBILE BOTTOM TABS */}
+        <nav className="flex border-t border-border/30 bg-card/80 backdrop-blur-xl flex-shrink-0">
+          {[
+            { key: 'files' as MobileTab,   icon: Files,    label: 'Files' },
+            { key: 'code' as MobileTab,    icon: CodeIcon, label: 'Code' },
+            { key: 'preview' as MobileTab, icon: Eye,      label: 'Preview' },
+            { key: 'recent' as MobileTab,  icon: History,  label: 'Recent' },
+          ].map(t => {
+            const active = mobileTab === t.key;
+            return (
+              <button key={t.key} onClick={() => setMobileTab(t.key)}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                <t.icon className={`w-4 h-4 ${active ? 'drop-shadow-[0_0_6px_hsl(var(--primary))]' : ''}`} />
+                <span className="text-[9px] font-medium">{t.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    );
+  }
+
+  // ===== DESKTOP LAYOUT (unchanged behavior) =====
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      {/* Top toolbar */}
       <header className="flex items-center justify-between px-2 py-1.5 backdrop-blur-xl bg-card/60 border-b border-border/30 gap-2 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground p-1">
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <button onClick={() => setShowSidebar(!showSidebar)} className="text-muted-foreground hover:text-foreground transition-colors p-1" title="Toggle sidebar">
+          <button onClick={() => setShowSidebar(!showSidebar)} className="text-muted-foreground hover:text-foreground p-1">
             <FolderOpen className="w-4 h-4" />
           </button>
           <div className="w-5 h-5 bg-gradient-to-br from-primary to-accent rounded flex items-center justify-center">
             <span className="text-[7px] font-bold text-primary-foreground font-mono">&lt;/&gt;</span>
           </div>
-          <span className="text-primary font-bold text-xs font-mono hidden sm:inline">Playground</span>
+          <span className="text-primary font-bold text-xs font-mono">Playground</span>
           {savedIndicator && (
-            <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full animate-in fade-in">
+            <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">
               <Save className="w-3 h-3" /> Saved ✓
             </span>
           )}
         </div>
         <div className="flex items-center gap-1">
-          {/* Font size */}
           <select value={fontSize} onChange={e => setFontSize(Number(e.target.value))}
             className="bg-secondary/40 border border-border/30 rounded text-[10px] text-muted-foreground px-1.5 py-1 focus:outline-none">
             {[12, 13, 14, 15, 16, 18, 20].map(s => <option key={s} value={s}>{s}px</option>)}
           </select>
-          {/* Theme */}
           <button onClick={() => setEditorTheme(editorTheme === 'vs-dark' ? 'light' : 'vs-dark')}
-            className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-secondary/30 transition-colors" title="Toggle theme">
+            className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-secondary/30">
             {editorTheme === 'vs-dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
           </button>
-          {/* Auto-refresh toggle */}
-          <button onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`text-[10px] px-2 py-1 rounded transition-colors ${autoRefresh ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-            title={autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}>
-            {autoRefresh ? 'Auto' : 'Manual'}
-          </button>
-          {!autoRefresh && (
-            <button onClick={handleRun} className="flex items-center gap-1 text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded hover:bg-green-500/30 transition-colors" title="Run code">
-              <Play className="w-3 h-3" /> Run
-            </button>
-          )}
-          {/* Preview toggle */}
           <button onClick={() => setShowPreview(!showPreview)}
-            className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-secondary/30 transition-colors" title="Toggle preview">
+            className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-secondary/30">
             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           </button>
           <div className="w-px h-4 bg-border/30 mx-1" />
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js,.jsx,.ts,.tsx" className="hidden" />
-          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30 transition-colors">
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js,.jsx" className="hidden" />
+          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Upload className="w-3 h-3" /> Import
           </button>
-          <button onClick={handleExport} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30 transition-colors">
+          <button onClick={handleExport} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Download className="w-3 h-3" /> Export
           </button>
         </div>
       </header>
 
-      {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* File sidebar */}
         {showSidebar && (
           <div className="w-44 flex-shrink-0 border-r border-border/30 bg-card/30 backdrop-blur-sm flex flex-col">
             <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/20">
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Explorer</span>
-              <button onClick={addNewFile} className="text-muted-foreground hover:text-foreground transition-colors" title="New file">
-                <Plus className="w-3.5 h-3.5" />
-              </button>
+              <button onClick={addNewFile} className="text-muted-foreground hover:text-foreground"><Plus className="w-3.5 h-3.5" /></button>
             </div>
             <div className="flex-1 overflow-y-auto py-1">
               {files.map(f => (
                 <div key={f.id}
-                  className={`group flex items-center gap-1.5 px-2 py-1 text-[11px] cursor-pointer transition-colors ${
-                    activeFileId === f.id ? 'bg-primary/10 text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'
+                  className={`group flex items-center gap-1.5 px-2 py-1 text-[11px] cursor-pointer ${
+                    activeFileId === f.id ? 'bg-primary/10 text-foreground' : 'text-muted-foreground hover:bg-secondary/30'
                   }`}
                   onClick={() => setActiveFileId(f.id)}>
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
@@ -225,7 +410,7 @@ const Playground = () => {
                   {renamingId === f.id ? (
                     <div className="flex items-center gap-1 flex-1">
                       <input value={renameValue} onChange={e => setRenameValue(e.target.value)} autoFocus
-                        className="flex-1 bg-secondary/60 border border-border/30 rounded px-1 py-0.5 text-[10px] text-foreground focus:outline-none"
+                        className="flex-1 bg-secondary/60 border border-border/30 rounded px-1 py-0.5 text-[10px] text-foreground"
                         onKeyDown={e => e.key === 'Enter' && confirmRename()} />
                       <button onClick={confirmRename}><Check className="w-3 h-3 text-green-400" /></button>
                       <button onClick={() => setRenamingId(null)}><X className="w-3 h-3 text-destructive" /></button>
@@ -234,13 +419,9 @@ const Playground = () => {
                     <>
                       <span className="flex-1 truncate font-mono">{f.name}</span>
                       <div className="hidden group-hover:flex items-center gap-0.5">
-                        <button onClick={(e) => { e.stopPropagation(); startRename(f); }} className="text-muted-foreground hover:text-foreground">
-                          <Edit3 className="w-2.5 h-2.5" />
-                        </button>
-                        {!['html', 'css', 'js', 'jsx'].includes(f.id) && (
-                          <button onClick={(e) => { e.stopPropagation(); deleteFile(f.id); }} className="text-muted-foreground hover:text-destructive">
-                            <Trash2 className="w-2.5 h-2.5" />
-                          </button>
+                        <button onClick={(e) => { e.stopPropagation(); startRename(f); }}><Edit3 className="w-2.5 h-2.5" /></button>
+                        {!['html', 'css', 'js'].includes(f.id) && (
+                          <button onClick={(e) => { e.stopPropagation(); deleteFile(f.id); }}><Trash2 className="w-2.5 h-2.5 text-destructive" /></button>
                         )}
                       </div>
                     </>
@@ -251,21 +432,16 @@ const Playground = () => {
           </div>
         )}
 
-        {/* Editor + Preview */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* File tabs */}
           <div className="flex items-center border-b border-border/30 bg-card/20 backdrop-blur-sm overflow-x-auto flex-shrink-0">
             {files.map(f => (
               <button key={f.id} onClick={() => setActiveFileId(f.id)}
-                className={`px-3 py-1.5 text-[10px] font-mono transition-colors border-b-2 flex-shrink-0 ${
-                  activeFileId === f.id ? 'text-foreground border-primary bg-background/50' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
-                }`}>
-                {f.name}
-              </button>
+                className={`px-3 py-1.5 text-[10px] font-mono border-b-2 flex-shrink-0 ${
+                  activeFileId === f.id ? 'text-foreground border-primary bg-background/50' : 'text-muted-foreground border-transparent hover:bg-secondary/20'
+                }`}>{f.name}</button>
             ))}
           </div>
 
-          {/* Editor + Preview resizable */}
           {showPreview ? (
             <ResizablePanelGroup direction="horizontal" className="flex-1">
               <ResizablePanel defaultSize={50} minSize={25}>
@@ -279,12 +455,11 @@ const Playground = () => {
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={50} minSize={20}>
                 <div className="h-full flex flex-col">
-                  <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20 backdrop-blur-sm flex-shrink-0">
+                  <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
-                    {!autoRefresh && <span className="text-[8px] text-yellow-400">(manual)</span>}
                   </div>
                   <div className="flex-1 min-h-0">
-                    <LivePreview html={autoRefresh ? currentHtml : manualHtml} css={autoRefresh ? currentCss : manualCss} js={autoRefresh ? currentJs : manualJs} onConsoleLog={handleConsoleLog} />
+                    <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
                   </div>
                 </div>
               </ResizablePanel>

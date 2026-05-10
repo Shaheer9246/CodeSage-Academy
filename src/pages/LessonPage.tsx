@@ -94,6 +94,14 @@ const LessonPage = () => {
     navigate(`/lesson/${lesson.id}/complete`);
   };
 
+  const skipToNext = () => {
+    const all = getAllLessons();
+    const idx = all.findIndex(l => l.id === lesson.id);
+    const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+    if (next) navigate(`/lesson/${next.id}`);
+    else navigate('/learn');
+  };
+
   const renderContent = (md: string) => {
     const lines = md.split('\n');
     const html: string[] = [];
@@ -265,9 +273,15 @@ const LessonPage = () => {
           </div>
         )}
         {challengeResult === 'fail' && (
-          <div className="flex items-center gap-2 p-2.5 bg-red-500/10 rounded-lg text-red-400 text-xs mb-3">
-            <XCircle className="w-4 h-4" />
-            <span>Not quite right. Check hints and try again.</span>
+          <div className="space-y-2 mb-3">
+            <div className="flex items-center gap-2 p-2.5 bg-red-500/10 rounded-lg text-red-400 text-xs">
+              <XCircle className="w-4 h-4" />
+              <span>Not quite right. Check hints and try again.</span>
+            </div>
+            <button onClick={skipToNext}
+              className="w-full flex items-center justify-center gap-1.5 bg-secondary/60 hover:bg-secondary text-foreground px-3 py-2 rounded-lg font-semibold text-xs transition-colors border border-border/40">
+              Skip to Next Lesson <ChevronRight className="w-3 h-3" />
+            </button>
           </div>
         )}
 
