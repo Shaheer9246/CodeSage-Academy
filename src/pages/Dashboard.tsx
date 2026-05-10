@@ -141,31 +141,30 @@ const Dashboard = () => {
           <p className="text-[10px] text-muted-foreground mt-2">Beginner → Intermediate → Expert</p>
         </motion.button>
 
-        {/* Computer & Networking Box (No content yet) */}
-        <motion.div
+        {/* Computer & Networking — UNLOCKED */}
+        <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
-          className="glass-card p-5 rounded-2xl opacity-60"
+          onClick={() => navigate('/n-lesson/net-1')}
+          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-accent-blue/10 flex items-center justify-center text-2xl border border-accent-blue/20">
+              <div className="w-12 h-12 rounded-xl bg-accent-blue/15 flex items-center justify-center text-2xl border border-accent-blue/30">
                 🌐
               </div>
               <div>
-                <p className="text-base font-bold font-display text-foreground">Computer & Networking</p>
+                <p className="text-base font-bold font-display text-foreground">Computer & Networking Fundamentals</p>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {NETWORKING_LESSONS.slice(0, 4).map(l => (
-                    <span key={l.step} className="text-[8px] px-1.5 py-0.5 rounded-full bg-secondary/40 text-muted-foreground font-mono">{l.label}</span>
+                    <span key={l.step} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{l.label}</span>
                   ))}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Lock className="w-4 h-4 text-muted-foreground" />
-            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">Coming soon — content will be added</p>
-        </motion.div>
+          <p className="text-[10px] text-muted-foreground mt-2">Hardware → OS → Networking → Security · 10 lessons</p>
+        </motion.button>
 
         {/* Full Stack Frontend Development (locked, show 5, scrollable) */}
         <motion.div
