@@ -39,6 +39,11 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
         <\/script>
       `;
 
+      // Escape any literal "</script>" inside user JS so it doesn't break out
+      const safeJs = (js || '').replace(/<\/script/gi, '<\\/script');
+      // Same for CSS </style>
+      const safeCss = (css || '').replace(/<\/style/gi, '<\\/style');
+
       let finalHtml = html.trim();
 
       // If the HTML doesn't look like a full document, wrap it
