@@ -56,12 +56,6 @@ export const useUser = () => {
   return ctx;
 };
 
-const VALID_PROMO_CODES: Record<string, string[]> = {
-  'BACKEND2024': ['backend'],
-  'AI2024': ['ai'],
-  'FULLACCESS': ['backend', 'ai'],
-};
-
 function dbRowToProfile(row: any, email: string): UserProfile {
   return {
     id: row.id,
