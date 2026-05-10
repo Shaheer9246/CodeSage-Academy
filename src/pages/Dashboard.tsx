@@ -61,8 +61,9 @@ const Dashboard = () => {
   if (!user) { navigate('/auth'); return null; }
   if (!user.name) { navigate('/onboarding'); return null; }
 
-  const handlePromo = () => {
-    if (applyPromoCode(promoInput)) { setPromoMsg('✅ Code applied!'); setPromoInput(''); }
+  const handlePromo = async () => {
+    const ok = await applyPromoCode(promoInput);
+    if (ok) { setPromoMsg('✅ Code applied!'); setPromoInput(''); }
     else setPromoMsg('❌ Invalid code');
     setTimeout(() => setPromoMsg(''), 3000);
   };

@@ -91,7 +91,134 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_lesson: {
+        Args: { _lesson_id: string }
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      complete_test: {
+        Args: { _test_id: string }
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      redeem_promo: {
+        Args: { _code: string }
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      update_streak: {
+        Args: never
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never

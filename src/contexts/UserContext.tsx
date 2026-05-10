@@ -35,11 +35,11 @@ interface UserContextType {
   login: (email: string, password: string) => Promise<string | null>;
   signup: (username: string, email: string, password: string) => Promise<string | null>;
   completeOnboarding: (data: Partial<UserProfile>) => void;
-  completeLesson: (lessonId: string) => void;
-  completeTest: (testId: string) => void;
+  completeLesson: (lessonId: string) => Promise<void>;
+  completeTest: (testId: string) => Promise<void>;
   addBadge: (badge: string) => void;
-  updateStreak: () => void;
-  applyPromoCode: (code: string) => boolean;
+  updateStreak: () => Promise<void>;
+  applyPromoCode: (code: string) => Promise<boolean>;
   updateUser: (data: Partial<UserProfile>) => void;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -54,12 +54,6 @@ export const useUser = () => {
   const ctx = useContext(UserContext);
   if (!ctx) throw new Error('useUser must be inside UserProvider');
   return ctx;
-};
-
-const VALID_PROMO_CODES: Record<string, string[]> = {
-  'BACKEND2024': ['backend'],
-  'AI2024': ['ai'],
-  'FULLACCESS': ['backend', 'ai'],
 };
 
 function dbRowToProfile(row: any, email: string): UserProfile {
@@ -89,6 +83,9 @@ function dbRowToProfile(row: any, email: string): UserProfile {
 }
 
 function profileToDbUpdate(p: UserProfile): Record<string, any> {
+  // Only includes columns the user is allowed to update directly.
+  // Gamification fields (xp, level, coins, badges, streak, completed_*, unlocked_*, promo_codes)
+  // are server-managed via SECURITY DEFINER RPCs.
   return {
     username: p.username,
     name: p.name,
@@ -97,19 +94,10 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     dob: p.dob,
     goal: p.goal,
     experience_level: p.experienceLevel,
-    streak_count: p.streakCount,
-    last_active_date: p.lastActiveDate || null,
-    badges: p.badges,
-    completed_lessons: p.completedLessons,
-    completed_tests: p.completedTests,
-    unlocked_sections: p.unlockedSections,
-    promo_codes: p.promoCodes,
     dark_mode: p.darkMode,
-    xp: p.xp,
-    level: p.level,
-    sage_coins: p.sageCoins,
   };
 }
+
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -237,73 +225,42 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     updateProfile({ ...user, ...data });
   };
 
-  const completeLesson = (lessonId: string) => {
+  const applyServerProfile = (row: any) => {
+    if (!user || !row) return;
+    setUser(dbRowToProfile(row, user.email));
+  };
+
+  const completeLesson = async (lessonId: string) => {
     if (!user) return;
-    const lessons = [...new Set([...user.completedLessons, lessonId])];
-    const updated = { ...user, completedLessons: lessons };
-    const badgeCheck = (count: number, badge: string) => {
-      if (lessons.length >= count && !updated.badges.includes(badge)) {
-        updated.badges = [...updated.badges, badge];
-      }
-    };
-    badgeCheck(1, 'lite');
-    badgeCheck(5, 'silver');
-    badgeCheck(15, 'gold');
-    badgeCheck(25, 'premium');
-    badgeCheck(50, 'elite');
-    // Award XP and coins for lesson completion
-    if (!user.completedLessons.includes(lessonId)) {
-      updated.xp = (updated.xp || 0) + 50;
-      updated.sageCoins = (updated.sageCoins || 0) + 10;
-      updated.level = Math.floor(updated.xp / 200) + 1;
-    }
-    updateProfile(updated);
+    const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
+    if (error) { console.error('award_lesson failed', error.message); return; }
+    applyServerProfile(data);
   };
 
-  const completeTest = (testId: string) => {
+  const completeTest = async (testId: string) => {
     if (!user) return;
-    const tests = [...new Set([...user.completedTests, testId])];
-    const updated = { ...user, completedTests: tests };
-    if (!updated.badges.includes('test-passer')) {
-      updated.badges = [...updated.badges, 'test-passer'];
-    }
-    updateProfile(updated);
+    const { data, error } = await supabase.rpc('complete_test', { _test_id: testId });
+    if (error) { console.error('complete_test failed', error.message); return; }
+    applyServerProfile(data);
   };
 
-  const addBadge = (badge: string) => {
-    if (!user || user.badges.includes(badge)) return;
-    updateProfile({ ...user, badges: [...user.badges, badge] });
+  const addBadge = (_badge: string) => {
+    // Badges are awarded server-side via award_lesson / complete_test / update_streak RPCs.
+    // This client-only helper is intentionally a no-op now.
   };
 
-  const updateStreak = () => {
+  const updateStreak = async () => {
     if (!user) return;
-    const today = new Date().toDateString();
-    if (user.lastActiveDate) {
-      const lastActive = new Date(user.lastActiveDate).toDateString();
-      if (today === lastActive) return;
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const isConsecutive = yesterday.toDateString() === lastActive;
-      const newStreak = isConsecutive ? user.streakCount + 1 : 1;
-      const updated = { ...user, streakCount: newStreak, lastActiveDate: new Date().toISOString() };
-      if (newStreak >= 3 && !updated.badges.includes('streak-3')) updated.badges = [...updated.badges, 'streak-3'];
-      if (newStreak >= 7 && !updated.badges.includes('streak-7')) updated.badges = [...updated.badges, 'streak-7'];
-      if (newStreak >= 30 && !updated.badges.includes('streak-30')) updated.badges = [...updated.badges, 'streak-30'];
-      updateProfile(updated);
-    } else {
-      updateProfile({ ...user, streakCount: 1, lastActiveDate: new Date().toISOString() });
-    }
+    const { data, error } = await supabase.rpc('update_streak');
+    if (error) { console.error('update_streak failed', error.message); return; }
+    applyServerProfile(data);
   };
 
-  const applyPromoCode = (code: string): boolean => {
+  const applyPromoCode = async (code: string): Promise<boolean> => {
     if (!user) return false;
-    const sections = VALID_PROMO_CODES[code.toUpperCase()];
-    if (!sections) return false;
-    updateProfile({
-      ...user,
-      unlockedSections: [...new Set([...user.unlockedSections, ...sections])],
-      promoCodes: [...new Set([...user.promoCodes, code.toUpperCase()])],
-    });
+    const { data, error } = await supabase.rpc('redeem_promo', { _code: code });
+    if (error || !data) return false;
+    applyServerProfile(data);
     return true;
   };
 
@@ -319,7 +276,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteAccount = async () => {
     if (!user) return;
-    await supabase.from('profiles').delete().eq('id', user.id);
+    try {
+      await supabase.functions.invoke('delete-account');
+    } catch (err) {
+      console.error('delete-account failed', err);
+    }
     await supabase.auth.signOut();
     setUser(null);
   };
@@ -329,16 +290,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
-  const addXp = (amount: number) => {
-    if (!user) return;
-    const newXp = user.xp + amount;
-    const newLevel = Math.floor(newXp / 200) + 1;
-    updateProfile({ ...user, xp: newXp, level: newLevel });
+  const addXp = (_amount: number) => {
+    // XP is server-managed via RPCs. No-op on client to prevent inflation.
   };
 
-  const addCoins = (amount: number) => {
-    if (!user) return;
-    updateProfile({ ...user, sageCoins: user.sageCoins + amount });
+  const addCoins = (_amount: number) => {
+    // Coins are server-managed via RPCs. No-op on client to prevent inflation.
   };
 
   return (
