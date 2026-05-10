@@ -78,6 +78,7 @@ const App = () => (
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+              <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
