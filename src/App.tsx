@@ -20,6 +20,7 @@ import LevelTest from "./pages/LevelTest";
 import SettingsPage from "./pages/SettingsPage";
 import QuestionsPage from "./pages/QuestionsPage";
 import CommunityPage from "./pages/CommunityPage";
+import Suggestions from "./pages/Suggestions";
 import NotFound from "./pages/NotFound";
 import { Loader2, Terminal } from "lucide-react";
 
