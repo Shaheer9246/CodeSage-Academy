@@ -94,6 +94,14 @@ const LessonPage = () => {
     navigate(`/lesson/${lesson.id}/complete`);
   };
 
+  const skipToNext = () => {
+    const all = getAllLessons();
+    const idx = all.findIndex(l => l.id === lesson.id);
+    const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+    if (next) navigate(`/lesson/${next.id}`);
+    else navigate('/learn');
+  };
+
   const renderContent = (md: string) => {
     const lines = md.split('\n');
     const html: string[] = [];
