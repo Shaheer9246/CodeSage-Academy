@@ -227,6 +227,22 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
+        {/* Suggestions tile */}
+        <motion.button
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+          onClick={() => navigate('/suggestions')}
+          className="w-full glass-card p-4 rounded-2xl text-left hover:neon-border transition-all flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-5 h-5 text-accent-yellow" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold font-display text-foreground">Suggestions & Feedback</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">What's missing? What feels off? Tell us — we read every one.</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+        </motion.button>
+
         {/* Promo Code */}
         <div className="glass-card p-4 rounded-2xl">
           <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">promo_code</h3>
