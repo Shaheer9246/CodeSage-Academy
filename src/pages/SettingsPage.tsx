@@ -35,21 +35,13 @@ const ACHIEVEMENTS = [
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { user, logout, deleteAccount } = useUser();
-  const [darkMode, setDarkMode] = useState(true);
+  const [theme, setTheme] = useState<ThemeName>('dark');
 
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setDarkMode(isDark);
-  }, []);
+  useEffect(() => { setTheme(getTheme()); }, []);
 
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+  const changeTheme = (t: ThemeName) => {
+    setTheme(t);
+    applyTheme(t);
   };
 
   if (!user) { navigate('/auth'); return null; }
