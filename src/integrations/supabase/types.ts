@@ -86,6 +86,39 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestions: {
+        Row: {
+          created_at: string
+          id: string
+          reply: string | null
+          reply_at: string | null
+          text: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reply?: string | null
+          reply_at?: string | null
+          text: string
+          updated_at?: string
+          user_id: string
+          username?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reply?: string | null
+          reply_at?: string | null
+          text?: string
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -183,6 +216,25 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      reply_suggestion: {
+        Args: { _id: string; _password: string; _reply: string }
+        Returns: {
+          created_at: string
+          id: string
+          reply: string | null
+          reply_at: string | null
+          text: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "suggestions"
           isOneToOne: true
           isSetofReturn: false
         }

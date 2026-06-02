@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, Lock, ChevronRight, Flame, MessageSquare } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -54,7 +54,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
-  const [fullstackScroll, setFullstackScroll] = useState(0);
 
   useEffect(() => { if (user) updateStreak(); }, []);
 
@@ -67,10 +66,6 @@ const Dashboard = () => {
     else setPromoMsg('❌ Invalid code');
     setTimeout(() => setPromoMsg(''), 3000);
   };
-
-  const visibleFullstack = FULLSTACK_LESSONS.slice(fullstackScroll, fullstackScroll + 5);
-  const canScrollDown = fullstackScroll + 5 < FULLSTACK_LESSONS.length;
-  const canScrollUp = fullstackScroll > 0;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
@@ -144,7 +139,7 @@ const Dashboard = () => {
         {/* Computer & Networking — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
-          onClick={() => navigate('/n-lesson/net-1')}
+          onClick={() => navigate('/networking')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -166,66 +161,55 @@ const Dashboard = () => {
           <p className="text-[10px] text-muted-foreground mt-2">Hardware → OS → Networking → Security · 10 lessons</p>
         </motion.button>
 
-        {/* Full Stack Frontend Development (locked, show 5, scrollable) */}
-        <motion.div
+        {/* Full Stack Frontend Development — UNLOCKED */}
+        <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-          className="glass-card p-5 rounded-2xl opacity-60"
+          onClick={() => navigate('/fullstack')}
+          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent-orange/10 flex items-center justify-center text-xl">🚀</div>
+              <div className="w-12 h-12 rounded-xl bg-accent-orange/15 flex items-center justify-center text-2xl border border-accent-orange/30">
+                🚀
+              </div>
               <div>
-                <p className="text-sm font-bold font-display text-foreground">Full Stack Frontend Dev</p>
-                <p className="text-[9px] text-muted-foreground">{FULLSTACK_LESSONS.length} lessons • Locked</p>
+                <p className="text-base font-bold font-display text-foreground">Full Stack Frontend Dev</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {FULLSTACK_LESSONS.slice(0, 4).map(l => (
+                    <span key={l.step} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{l.label}</span>
+                  ))}
+                </div>
               </div>
             </div>
-            <Lock className="w-4 h-4 text-muted-foreground" />
+            <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <div className="space-y-1.5">
-            {visibleFullstack.map(item => (
-              <div key={item.step} className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-secondary/20 border border-border/20">
-                <span className="text-sm">{item.icon}</span>
-                <span className="text-xs text-muted-foreground font-medium">{item.step}. {item.label}</span>
-                <Lock className="w-3 h-3 text-muted-foreground/50 ml-auto" />
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center gap-2 mt-3">
-            <button disabled={!canScrollUp} onClick={() => setFullstackScroll(s => Math.max(0, s - 5))}
-              className="text-[10px] text-muted-foreground disabled:opacity-30 hover:text-primary transition-colors px-2 py-1">
-              ▲ Previous
-            </button>
-            <span className="text-[10px] text-muted-foreground">{fullstackScroll + 1}-{Math.min(fullstackScroll + 5, FULLSTACK_LESSONS.length)} of {FULLSTACK_LESSONS.length}</span>
-            <button disabled={!canScrollDown} onClick={() => setFullstackScroll(s => Math.min(FULLSTACK_LESSONS.length - 5, s + 5))}
-              className="text-[10px] text-muted-foreground disabled:opacity-30 hover:text-primary transition-colors px-2 py-1">
-              ▼ Next
-            </button>
-          </div>
-        </motion.div>
+          <p className="text-[10px] text-muted-foreground mt-2">HTML → CSS → JS → React → Deploy · {FULLSTACK_LESSONS.length} lessons</p>
+        </motion.button>
 
-        {/* Freelance Box (locked) */}
-        <motion.div
+        {/* Freelance & Clients — UNLOCKED */}
+        <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
-          className="glass-card p-5 rounded-2xl opacity-60"
+          onClick={() => navigate('/freelance')}
+          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center text-xl">💼</div>
+              <div className="w-12 h-12 rounded-xl bg-yellow-500/15 flex items-center justify-center text-2xl border border-yellow-500/30">
+                💼
+              </div>
               <div>
-                <p className="text-sm font-bold font-display text-foreground">Freelance & Clients</p>
-                <p className="text-[9px] text-muted-foreground">{FREELANCE_LESSONS.length} lessons • Locked</p>
+                <p className="text-base font-bold font-display text-foreground">Freelance & Clients</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {FREELANCE_LESSONS.slice(0, 4).map(l => (
+                    <span key={l.step} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{l.label}</span>
+                  ))}
+                </div>
               </div>
             </div>
-            <Lock className="w-4 h-4 text-muted-foreground" />
+            <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {FREELANCE_LESSONS.map(l => (
-              <span key={l.step} className="text-[9px] px-2 py-1 rounded-lg bg-secondary/20 border border-border/20 text-muted-foreground flex items-center gap-1">
-                <span>{l.icon}</span> {l.label}
-              </span>
-            ))}
-          </div>
-        </motion.div>
+          <p className="text-[10px] text-muted-foreground mt-2">Niche → Pitch → Price → Deliver · {FREELANCE_LESSONS.length} lessons</p>
+        </motion.button>
 
         {/* Suggestions tile */}
         <motion.button

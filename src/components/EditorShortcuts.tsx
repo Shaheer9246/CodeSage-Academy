@@ -1,4 +1,5 @@
-import { MutableRefObject } from 'react';
+import { MutableRefObject, useEffect, useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Props {
   editorRef: MutableRefObject<any>;
@@ -25,6 +26,36 @@ const SHORTCUTS: { label: string; insert: string; cursor?: number }[] = [
 ];
 
 export default function EditorShortcuts({ editorRef }: Props) {
+  const isMobile = useIsMobile();
+  const [focused, setFocused] = useState(false);
+  const [bottomOffset, setBottomOffset] = useState(0);
+
+  // Track editor focus to know when keyboard is up
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || !editor.onDidFocusEditorText) return;
+    const d1 = editor.onDidFocusEditorText(() => setFocused(true));
+    const d2 = editor.onDidBlurEditorText(() => setTimeout(() => setFocused(false), 100));
+    return () => { d1.dispose(); d2.dispose(); };
+  }, [editorRef.current]);
+
+  // Track on-screen keyboard via visualViewport
+  useEffect(() => {
+    if (!isMobile || typeof window === 'undefined' || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    const update = () => {
+      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setBottomOffset(offset);
+    };
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    update();
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [isMobile]);
+
   const insert = (text: string, cursorBack?: number) => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -40,13 +71,14 @@ export default function EditorShortcuts({ editorRef }: Props) {
     editor.focus();
   };
 
-  return (
-    <div className="flex items-center gap-1 px-2 py-1.5 border-t border-border/40 bg-card/60 backdrop-blur-md overflow-x-auto flex-shrink-0">
+  const bar = (
+    <div className="flex items-center gap-1 px-2 py-1.5 border-t border-border/40 bg-card/95 backdrop-blur-md overflow-x-auto flex-shrink-0">
       {SHORTCUTS.map(s => (
         <button
           key={s.label}
           onMouseDown={(e) => { e.preventDefault(); insert(s.insert, s.cursor); }}
-          className="flex-shrink-0 min-w-[36px] h-7 px-2 rounded-md bg-secondary/60 hover:bg-primary/20 border border-border/30 hover:border-primary/40 text-[11px] font-mono text-muted-foreground hover:text-primary transition-colors"
+          onTouchStart={(e) => { e.preventDefault(); insert(s.insert, s.cursor); }}
+          className="flex-shrink-0 min-w-[36px] h-8 px-2 rounded-md bg-secondary/60 hover:bg-primary/20 border border-border/30 hover:border-primary/40 text-[11px] font-mono text-muted-foreground hover:text-primary transition-colors"
           title={`Insert ${s.label}`}
         >
           {s.label}
@@ -54,4 +86,19 @@ export default function EditorShortcuts({ editorRef }: Props) {
       ))}
     </div>
   );
+
+  // Mobile + keyboard open → floating fixed above keyboard
+  if (isMobile && focused && bottomOffset > 50) {
+    return (
+      <div
+        className="fixed left-0 right-0 z-50 shadow-2xl"
+        style={{ bottom: `${bottomOffset}px` }}
+      >
+        {bar}
+      </div>
+    );
+  }
+
+  // Desktop or mobile without keyboard → inline
+  return bar;
 }
