@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { useEffect } from 'react';
-import { Code2, Rocket, BookOpen, Wifi, Briefcase, Sparkles, Terminal } from 'lucide-react';
+import { Code2, Rocket, BookOpen, Wifi, Briefcase, Sparkles, Terminal, Compass } from 'lucide-react';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -70,6 +70,13 @@ const Welcome = () => {
             >
               <Code2 className="w-4 h-4 text-primary" />
               Just Edit Code
+            </button>
+            <button
+              onClick={() => navigate('/trip')}
+              className="w-full bg-transparent border border-primary/30 text-foreground font-display font-semibold text-sm py-3 rounded-2xl hover:bg-primary/5 hover:border-primary/60 transition-all flex items-center justify-center gap-2 neon-glow"
+            >
+              <Compass className="w-4 h-4 text-primary" />
+              Take a Trip
             </button>
           </div>
 
