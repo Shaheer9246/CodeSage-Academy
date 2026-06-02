@@ -7,6 +7,7 @@ import { UserProvider, useUser } from "@/contexts/UserContext";
 import AppShell from "@/components/AppShell";
 import Auth from "./pages/Auth";
 import Welcome from "./pages/Welcome";
+import Trip from "./pages/Trip";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Learn from "./pages/Learn";
@@ -80,6 +81,7 @@ const App = () => (
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
               <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
+              <Route path="/trip" element={<Trip />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppShell>
