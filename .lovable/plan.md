@@ -1,83 +1,89 @@
-# CodeSage — 5-Item Restructure Plan
 
-## 1. Fix top spacing (small)
-The huge gap above "Learning Path" header on `/learn` (and similar pages) comes from `AppShell` adding mobile top padding while pages also have their own padding. Audit:
-- `src/components/AppShell.tsx` — remove/reduce duplicate top padding for mobile
-- `src/pages/Learn.tsx`, `Dashboard.tsx`, `Roadmap.tsx`, `QuestionsPage.tsx`, `CommunityPage.tsx`, `SettingsPage.tsx` — make sure the first element sits flush with safe-area top.
+## 1. Suggestions box → shared backend
 
-## 2. Mobile Playground = 4 tabs (small)
-Restructure `src/pages/Playground.tsx` for mobile (keep desktop split layout):
-- **Files** tab — folder/file tree (HTML/CSS/JS files, add/rename/delete)
-- **Code** tab — Monaco editor for the active file
-- **Preview** tab — live iframe preview
-- **Recent** tab — list of recently edited snippets pulled from `localStorage` with a yellow warning banner: *"These are saved only in your browser cache. Export them to keep them safe."* + an Export (download .zip/.html) button per item.
+Move suggestions from `localStorage` to Lovable Cloud so everyone sees the same feed.
 
-## 3. Pre-login intro page (small)
-New `src/pages/Welcome.tsx` shown at `/` (replaces current `Index` redirect):
-- Brief pitch: what CodeSage is, who it's for, what you'll learn (HTML/CSS/JS → React → Networking → Freelancing).
-- Two buttons:
-  - **Start Learning** → `/auth`
-  - **Just Edit Code** → `/playground` (allow guest access to playground)
-- Update `src/App.tsx` route table; allow `/playground` without auth.
+**New table `public.suggestions`**
+- `id uuid pk`, `user_id uuid` (auth.uid), `username text`, `text text` (≤500 chars), `reply text` (nullable), `reply_at timestamptz`, `created_at`, `updated_at`
+- Trigger: auto-update `updated_at`
+- Trigger: enforce one suggestion per user per UTC day on INSERT (raises if a row exists for `user_id` with `date_trunc('day', created_at) = current_date`)
+- RLS:
+  - SELECT: everyone authenticated (`true`)
+  - INSERT: `auth.uid() = user_id`
+  - UPDATE own row text: `auth.uid() = user_id` (cannot touch `reply`/`reply_at` — enforced by trigger that rejects updates to those columns unless caller is admin)
+  - DELETE: own row only
+- Admin reply RPC: `reply_suggestion(_id uuid, _reply text, _password text)` — SECURITY DEFINER, checks `_password = 'codesage-admin-2026'`, sets `reply` and `reply_at`. Password kept server-side; never sent on regular reads.
+- GRANTs: SELECT/INSERT/UPDATE/DELETE to authenticated; ALL to service_role.
 
-## 4. Post-lesson celebration page (medium)
-New `src/pages/LessonComplete.tsx` at `/lesson/:id/complete`:
-- Confetti + "Lesson Complete!" headline
-- Recap: 3-4 bullet points of "what you learned" pulled from the lesson's `keyTakeaways` field
-- XP earned (+50), Sage Coins (+10), streak status, new level if leveled up
-- Buttons: **Next Lesson →**, **Back to Roadmap**, **Review Lesson**
-After clicking "Complete" in `LessonPage.tsx`, navigate here instead of straight to next lesson.
+**Suggestions.tsx rework**
+- Load list via realtime channel on `public.suggestions` (live updates).
+- Submit button disabled if user already has a row today (query check). Error toast "You can only post one suggestion per day."
+- Each row: if `row.user_id === auth.uid()` show inline edit (textarea + Save) → updates own row.
+- Reply button visible to everyone; clicking opens a small password input (hidden by default). On submit calls `reply_suggestion` RPC. Wrong password → toast error. Correct → reply appears for all users.
+- Remove the persistent "Admin mode" unlock and localStorage logic.
 
-## 5. Full lesson restructure (LARGE — main focus)
-Rebuild the lesson data model and renderer to match the PDF format.
+## 2. Computer & Networking landing page
 
-### New lesson schema (`src/data/lessons.ts`)
-```ts
-type Lesson = {
-  id, title, track, module, order,
-  philosophy: string,        // "I. The Core Philosophy" — short intro
-  concepts: Concept[],       // "II. Detailed Technical Breakdown" — multiple sub-topics with beginner/advanced views
-  practical: {               // "III. Practical Lab"
-    title, instructions[], goal,
-    starterCode?: { html, css, js }   // optional — opens in embedded editor
-  },
-  quiz: QuizQuestion[],      // "IV. Mastery Quiz" — 4 MCQs
-  keyTakeaways: string[],    // for the Complete page
-  xpReward: 50,
-}
-```
+Currently the dashboard tile jumps straight to `/n-lesson/net-1`. Replace with a learning-path page like Frontend's `/learn`.
 
-### New `LessonPage.tsx` flow (4 sequential sections)
-1. **Concept** tab — read philosophy + concepts (with "Beginner View" / "Advanced View" toggle per concept)
-2. **Practical** tab — instructions on the left, embedded Monaco + live preview on the right (mobile = sub-tabs)
-3. **Quiz** tab — must score 3/4 to pass; retry on fail
-4. On pass → navigate to `/lesson/:id/complete`
+- New route `/networking` → `NetworkingLearn.tsx`
+  - Header: "Computer & Networking Fundamentals", progress bar (completed networking lessons / total).
+  - List all 10 lessons from `NETWORKING_LESSONS`, with lock/check/play states using `isNetworkingLessonUnlocked`.
+  - Clicking a lesson → `/n-lesson/:id` (already exists with concept/practical/quiz tabs).
+- Dashboard: change Networking tile `onClick` to `navigate('/networking')`.
 
-### Content to seed (from the attached PDF — Computer & Networking Module 1)
-Add all 10 lessons fully written:
-1. Hardware Architecture for Developers
-2. Operating Systems
-3. The Command Line
-4. IP Addressing
-5. DNS & DHCP
-6. The OSI Model
-7. Protocols (TCP/UDP/HTTP/SMTP/SSH/FTP)
-8. Web Security Basics
-9. The Browser (Rendering Engine, V8, Storage)
-10. Servers & Cloud
+## 3. Mobile keyboard shortcut bar
 
-Plus extend Frontend track lessons (HTML/CSS/JS) into the same Concept→Practical→Quiz format using existing content as the philosophy/concepts.
+`EditorShortcuts` exists but on mobile the device keyboard covers it.
 
-### Roadmap update
-- Update `Roadmap.tsx` so the **Networking track is unlocked** with these 10 nodes (Frontend already there).
-- Each roadmap node maps to a lesson id; clicking goes to `/lesson/:id` and follows the new flow.
-- Group nodes by Module with milestone banners every ~5 lessons.
+- Wrap shortcut bar so on mobile (`md:` breakpoint) it uses `position: fixed; left:0; right:0; bottom:0; z-index:50` and uses `env(safe-area-inset-bottom)`.
+- Only render the fixed version while the Monaco editor is focused (track focus via `onDidFocusEditorText` / `onDidBlurEditorText` in `CodeEditor`).
+- Use `visualViewport` listener to set `bottom = window.innerHeight - visualViewport.height + visualViewport.offsetTop` so the bar sits exactly above the on-screen keyboard.
+- Desktop unchanged (inline below editor).
+- Applies automatically to LessonPage, NetworkingLessonPage, and Playground since they all use `<CodeEditor>`.
+
+## 4. Freelance & Client — full module
+
+Create `src/data/freelanceLessons.ts` mirroring `networkingLessons.ts` schema (concepts/practical/quiz/keyTakeaways) for the 8 freelance topics already listed (Find Niche, Portfolio, Branding, Platforms, Outreach, Pricing, Contracts, Management).
+
+- New page `FreelanceLessonPage.tsx` — copy structure from `NetworkingLessonPage` (3 tabs lesson/practical/test).
+- New landing `FreelanceLearn.tsx` like step 2 above.
+- Routes: `/freelance` and `/f-lesson/:id`.
+- Dashboard: unlock Freelance tile (remove `opacity-60` + Lock), wire to `/freelance`.
+- Lesson IDs prefixed `free-1`…`free-8`; sequential unlock (free-1 always unlocked, others require previous completed).
+
+## 5. Full Stack Frontend Dev — full module
+
+Create `src/data/fullstackLessons.ts` for the 20 topics already listed. Each lesson:
+- Standard concept + practical + quiz (same schema as networking) **plus** a `code` block `{ starterHtml, starterCss, starterJs, expected }` for hands-on lessons (HTML/CSS/JS/Flexbox/Grid/React/etc.).
+- For non-code lessons (Architecture, Terminal, Git, GitHub, NPM, Deployment, Security, Testing) the code block is optional.
+
+- New page `FullstackLessonPage.tsx` — same 3-tab structure but the **Practical** tab renders a Monaco editor + LivePreview side-by-side (mobile: Code / Preview tabs), reusing existing `CodeEditor` and `LivePreview` components.
+- New landing `FullstackLearn.tsx`.
+- Routes: `/fullstack` and `/fs-lesson/:id`.
+- Dashboard: unlock Full Stack tile, replace the scrollable preview with a single navigate button to `/fullstack`.
 
 ## Technical notes
-- Lesson data file will grow large — split into `src/data/lessons/frontend.ts`, `src/data/lessons/networking.ts`, then re-export from `src/data/lessons.ts`.
-- Quiz state stored in component; pass result up to `UserContext` to award XP via existing `addXp`/`addCoins`.
-- Confetti: use a tiny custom CSS animation (no new dep) or `canvas-confetti` (~3kb).
-- Guest playground: `Playground.tsx` should not require `user`; use `localStorage` for guest snippets.
 
-## Order of execution (today)
-1 → 3 → 2 → 4 → 5 (small wins first, then the big lesson restructure last so we have all infrastructure ready).
+- All new lessons store completion via existing `completeLesson(id)` RPC (`award_lesson`) — no DB schema change needed for unlock tracking; just use unique IDs (`net-*`, `free-*`, `fs-*`).
+- Quiz pass threshold reuses networking convention (≥3 of 5 correct, or ≥70% — match what networking uses).
+- Realtime: enable on suggestions with `ALTER PUBLICATION supabase_realtime ADD TABLE public.suggestions;` inside the migration.
+- Admin password check happens server-side in the RPC — never exposed to client code/network unless user explicitly types it.
+
+## Files
+
+**New**
+- `src/data/freelanceLessons.ts`
+- `src/data/fullstackLessons.ts`
+- `src/pages/NetworkingLearn.tsx`
+- `src/pages/FreelanceLearn.tsx`
+- `src/pages/FreelanceLessonPage.tsx`
+- `src/pages/FullstackLearn.tsx`
+- `src/pages/FullstackLessonPage.tsx`
+- Migration: suggestions table + RLS + RPC + realtime
+
+**Edited**
+- `src/pages/Suggestions.tsx` (rewrite to use cloud + realtime)
+- `src/pages/Dashboard.tsx` (unlock 3 tiles, new routes)
+- `src/components/CodeEditor.tsx` + `src/components/EditorShortcuts.tsx` (mobile floating keyboard bar)
+- `src/App.tsx` (5 new routes)
