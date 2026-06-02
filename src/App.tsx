@@ -14,6 +14,11 @@ import Learn from "./pages/Learn";
 import LessonPage from "./pages/LessonPage";
 import LessonComplete from "./pages/LessonComplete";
 import NetworkingLessonPage from "./pages/NetworkingLessonPage";
+import NetworkingLearn from "./pages/NetworkingLearn";
+import FreelanceLearn from "./pages/FreelanceLearn";
+import FreelanceLessonPage from "./pages/FreelanceLessonPage";
+import FullstackLearn from "./pages/FullstackLearn";
+import FullstackLessonPage from "./pages/FullstackLessonPage";
 import Playground from "./pages/Playground";
 import Challenges from "./pages/Challenges";
 import Roadmap from "./pages/Roadmap";
@@ -72,6 +77,11 @@ const App = () => (
               <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
               <Route path="/lesson/:id/complete" element={<ProtectedRoute><LessonComplete /></ProtectedRoute>} />
               <Route path="/n-lesson/:id" element={<ProtectedRoute><NetworkingLessonPage /></ProtectedRoute>} />
+              <Route path="/networking" element={<ProtectedRoute><NetworkingLearn /></ProtectedRoute>} />
+              <Route path="/freelance" element={<ProtectedRoute><FreelanceLearn /></ProtectedRoute>} />
+              <Route path="/f-lesson/:id" element={<ProtectedRoute><FreelanceLessonPage /></ProtectedRoute>} />
+              <Route path="/fullstack" element={<ProtectedRoute><FullstackLearn /></ProtectedRoute>} />
+              <Route path="/fs-lesson/:id" element={<ProtectedRoute><FullstackLessonPage /></ProtectedRoute>} />
               <Route path="/playground" element={<Playground />} />
               <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
               <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
