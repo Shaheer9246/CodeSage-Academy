@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, Lock, ChevronRight, Flame, MessageSquare } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -54,7 +54,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
-  const [fullstackScroll, setFullstackScroll] = useState(0);
 
   useEffect(() => { if (user) updateStreak(); }, []);
 
@@ -67,10 +66,6 @@ const Dashboard = () => {
     else setPromoMsg('❌ Invalid code');
     setTimeout(() => setPromoMsg(''), 3000);
   };
-
-  const visibleFullstack = FULLSTACK_LESSONS.slice(fullstackScroll, fullstackScroll + 5);
-  const canScrollDown = fullstackScroll + 5 < FULLSTACK_LESSONS.length;
-  const canScrollUp = fullstackScroll > 0;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
