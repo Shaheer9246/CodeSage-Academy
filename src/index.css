@@ -196,45 +196,66 @@
   background-size: 60px 60px;
 }
 
-/* Glass cards */
+/* Glass cards — transparent + glowing across all themes */
 .glass-card {
-  background: hsl(var(--glass) / 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid hsl(var(--glass-border) / 0.3);
+  background: hsl(var(--glass) / 0.18);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid hsl(var(--primary) / 0.18);
   border-radius: 1rem;
+  box-shadow:
+    0 0 0 1px hsl(var(--primary) / 0.04) inset,
+    0 8px 32px -12px hsl(var(--primary) / 0.25),
+    0 0 24px -6px hsl(var(--primary) / 0.18);
 }
 
 .glass-card-hover {
-  background: hsl(var(--glass) / 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid hsl(var(--glass-border) / 0.3);
+  background: hsl(var(--glass) / 0.18);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid hsl(var(--primary) / 0.18);
   border-radius: 1rem;
+  box-shadow:
+    0 0 0 1px hsl(var(--primary) / 0.04) inset,
+    0 8px 32px -12px hsl(var(--primary) / 0.25),
+    0 0 24px -6px hsl(var(--primary) / 0.18);
   transition: all 0.3s ease;
 }
 
 .glass-card-hover:hover {
-  border-color: hsl(var(--glass-border) / 0.5);
-  box-shadow: 0 0 20px hsl(145 90% 55% / 0.05);
+  border-color: hsl(var(--primary) / 0.45);
+  box-shadow:
+    0 0 0 1px hsl(var(--primary) / 0.08) inset,
+    0 12px 40px -10px hsl(var(--primary) / 0.4),
+    0 0 40px -4px hsl(var(--primary) / 0.35);
 }
 
 /* Neon glow utilities */
+/* Neon glow utilities — use theme primary so all 4 themes glow */
 .neon-glow {
-  box-shadow: var(--neon-glow);
+  box-shadow:
+    0 0 10px hsl(var(--primary) / 0.35),
+    0 0 24px hsl(var(--primary) / 0.18);
 }
 
 .neon-glow-strong {
-  box-shadow: var(--neon-glow-strong);
+  box-shadow:
+    0 0 14px hsl(var(--primary) / 0.55),
+    0 0 40px hsl(var(--primary) / 0.3),
+    0 0 80px hsl(var(--primary) / 0.15);
 }
 
 .neon-text {
-  text-shadow: 0 0 8px hsl(145 90% 55% / 0.5), 0 0 20px hsl(145 90% 55% / 0.2);
+  text-shadow:
+    0 0 10px hsl(var(--primary) / 0.55),
+    0 0 24px hsl(var(--primary) / 0.25);
 }
 
 .neon-border {
-  border-color: hsl(145 90% 55% / 0.3);
-  box-shadow: 0 0 6px hsl(145 90% 55% / 0.15), inset 0 0 6px hsl(145 90% 55% / 0.05);
+  border-color: hsl(var(--primary) / 0.35);
+  box-shadow:
+    0 0 8px hsl(var(--primary) / 0.2),
+    inset 0 0 8px hsl(var(--primary) / 0.08);
 }
 
 /* Gradient text */
