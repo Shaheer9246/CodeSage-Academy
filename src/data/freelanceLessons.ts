@@ -150,7 +150,7 @@ export const FREELANCE_LESSONS: FreelanceLesson[] = [
       { question: 'Best cold email opener?', options: ['"Hope you\'re well!"','Specific reference to their recent work','"Quick question?"','Long bio about yourself'], correctIndex: 1 },
       { question: 'Best CTA in a cold email?', options: ['"Book a 30-min discovery call"','A simple yes/no question','Send a contract','Three different links'], correctIndex: 1 },
       { question: 'When do most replies arrive?', options: ['First message','After 2nd-3rd follow-up','Never','Random'], correctIndex: 1 },
-      { question: 'Audit hook means:', offer: '','options': ['Free audit before asking for money','A scam','Required by law','Fancy term for resume'], correctIndex: 0 } as any,
+      { question: 'Audit hook means:', options: ['Free audit before asking for money','A scam','Required by law','Fancy term for resume'], correctIndex: 0 },
     ],
     keyTakeaways: ['Research > volume','Lead with value','Easiest next step wins','Follow up 2-3 times'],
   },
