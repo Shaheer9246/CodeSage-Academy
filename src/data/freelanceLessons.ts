@@ -244,6 +244,126 @@ export const FREELANCE_LESSONS: FreelanceLesson[] = [
     ],
     keyTakeaways: ['Weekly status = fewer pings','One source of truth','Boundaries upfront','Always ask for referrals'],
   },
+  {
+    id: 'free-9', module: 'Module 1: Freelance & Clients', order: 9,
+    title: 'Discovery Calls & Scoping', icon: '🔍',
+    philosophy: 'Most failed projects are scoped wrong, not built wrong. A great discovery call replaces 20 hours of guesswork with 30 minutes of structured questions.',
+    concepts: [
+      { title: '1. The Five Questions', beginner: 'What problem? Who else has tried? Budget range? Deadline? What does "done" mean?', advanced: 'These five expose 90% of red flags. If they can\'t answer "what does done mean?" don\'t take the gig.' },
+      { title: '2. Listen, Don\'t Sell', beginner: 'Talk 30% of the time, listen 70%.', advanced: 'Clients hire the listener, not the loudest. Mirror their language back in the proposal.' },
+      { title: '3. Red Flags', beginner: '"Should be quick", "we don\'t have a budget yet", "we\'ll figure it out later".', advanced: 'Decision-by-committee, no clear point of contact, vague feedback in writing — all signal pain ahead. Charge more or walk.' },
+      { title: '4. Document Everything', beginner: 'Send a recap email within 24h. Confirm scope in writing.', advanced: 'Loom recordings + meeting notes in shared doc = single source of truth. Prevents "I never said that" moments.' },
+    ],
+    practical: {
+      title: 'Run Your First Discovery Call',
+      intro: 'A 30-minute script.',
+      steps: [
+        'Send a calendar link with the five questions in advance.',
+        'On the call: ask, listen, take notes.',
+        'End with: budget, timeline, decision process.',
+        'Within 24h, send a written recap.',
+        'Within 48h, send the proposal.',
+      ],
+      goal: 'You leave with enough to write an accurate proposal.',
+    },
+    quiz: [
+      { question: 'Worst red flag?', options: ['Tight deadline','No definition of "done"','Small budget','Far away'], correctIndex: 1 },
+      { question: 'Best listen:speak ratio?', options: ['90:10','70:30','50:50','30:70'], correctIndex: 1 },
+      { question: 'Send recap within:', options: ['1 week','24 hours','1 month','Never'], correctIndex: 1 },
+      { question: 'Decision by committee:', options: ['Faster','Often a red flag','Required','Bonus'], correctIndex: 1 },
+    ],
+    keyTakeaways: ['Five core questions','Listen >> talk','Document in writing','Red flags = walk or charge more'],
+  },
+  {
+    id: 'free-10', module: 'Module 1: Freelance & Clients', order: 10,
+    title: 'Invoicing, Taxes & Payments', icon: '🧾',
+    philosophy: 'The work is half the job; getting paid on time is the other half. Smooth payments come from professional invoices, clear terms, and basic tax discipline.',
+    concepts: [
+      { title: '1. Invoice Anatomy', beginner: 'Your info, client info, line items, total, due date, payment method, invoice #.', advanced: 'Sequential numbers (INV-2026-001). Net-7 over Net-30 reduces float. Include late-fee clause.' },
+      { title: '2. Payment Rails', beginner: 'Stripe, Wise, PayPal — pick based on client geography.', advanced: 'Wise has the cheapest international FX. Stripe for US clients. Crypto only if you trust the client.' },
+      { title: '3. Deposits', beginner: 'Always charge 30-50% upfront.', advanced: 'For long projects, milestone billing (25/25/25/25). Reduces collection risk + improves your cash flow.' },
+      { title: '4. Taxes (Basics)', beginner: 'Set aside ~25-30% of every invoice for taxes.', advanced: 'Open a dedicated tax savings account. Quarterly estimated payments avoid surprises. Hire an accountant year 1.' },
+    ],
+    practical: {
+      title: 'Send a Real Invoice',
+      intro: 'Pick a tool + send today.',
+      steps: [
+        'Sign up for Stripe Invoicing or Wise (both free).',
+        'Create your business profile.',
+        'Build template: line items, terms, payment link.',
+        'Send first invoice. Set Net-7 + 1.5%/month late fee.',
+        'Open a separate "Taxes" savings account today.',
+      ],
+      goal: 'You can invoice in under 5 minutes.',
+    },
+    quiz: [
+      { question: 'Best deposit %?', options: ['0%','30-50% upfront','100% on completion','Negotiate after'], correctIndex: 1 },
+      { question: 'Cheapest int. FX?', options: ['PayPal','Wise','Bank wire','Bitcoin'], correctIndex: 1 },
+      { question: 'Tax savings rate?', options: ['10%','~25-30% of every invoice','50%','None'], correctIndex: 1 },
+      { question: 'Late-fee clause is:', options: ['Rude','Standard + recommended','Illegal','Optional and bad'], correctIndex: 1 },
+    ],
+    keyTakeaways: ['Always charge upfront','Stripe/Wise for payments','Tax-savings account from day 1','Late fees in writing'],
+  },
+  {
+    id: 'free-11', module: 'Module 1: Freelance & Clients', order: 11,
+    title: 'Handling Difficult Clients & Scope Creep', icon: '🛡️',
+    philosophy: 'Every freelancer eventually meets the impossible client. Your defense isn\'t aggression — it\'s contracts, written process, and the calm willingness to walk.',
+    concepts: [
+      { title: '1. Scope Creep', beginner: 'Small "tiny" extras add up to weeks of free work.', advanced: 'Every change goes through Change Request: write spec, quote new $, get approval. No exceptions.' },
+      { title: '2. The "Just One Thing"', beginner: 'Push back politely with: "Happy to add. Here\'s a quote."', advanced: 'Train the client early. If you do 1 free favor, they\'ll ask 10. If you charge once, they stop asking.' },
+      { title: '3. Communication Breakdowns', beginner: 'Move from chat to email when stakes rise.', advanced: 'Always summarize verbal agreements in email. "Per our call, you\'ll send X by Friday." Locks reality in writing.' },
+      { title: '4. Firing a Client', beginner: 'It\'s OK to end the relationship.', advanced: 'Give 30-day notice. Be professional. "It\'s not a fit" is a complete sentence. Sometimes losing money saves your sanity.' },
+    ],
+    practical: {
+      title: 'Write Your Change Request Template',
+      intro: 'One-page doc.',
+      steps: [
+        'Headers: Request, Impact (time/cost), Approval signature.',
+        'Save as PDF/Google Doc.',
+        'Reply to next out-of-scope ask with: "Great idea! I\'ll prep a CR for it."',
+        'Send filled CR + new quote.',
+        'Don\'t start work until signed.',
+      ],
+      goal: 'You stop bleeding hours to scope creep.',
+    },
+    quiz: [
+      { question: 'Defense vs scope creep?', options: ['Anger','Change Request process','Working harder','Silence'], correctIndex: 1 },
+      { question: '"Just one thing" reply?', options: ['Sure, free!','Happy to — here\'s a quote','No','Ignore'], correctIndex: 1 },
+      { question: 'Lock verbal agreements via:', options: ['Phone','Recap email','Tweet','Memory'], correctIndex: 1 },
+      { question: 'Firing a client is:', options: ['Never OK','Sometimes the healthy choice','Always bad','Illegal'], correctIndex: 1 },
+    ],
+    keyTakeaways: ['Use Change Requests','Charge for "just one thing"','Confirm everything in writing','Walking away is a tool']
+  },
+  {
+    id: 'free-12', module: 'Module 1: Freelance & Clients', order: 12,
+    title: 'Scaling: From Solo to Agency', icon: '🏢',
+    philosophy: 'There\'s a ceiling on hours-for-dollars. Scaling means productizing your work, hiring others, or raising rates until you can\'t.',
+    concepts: [
+      { title: '1. Raise Rates First', beginner: 'Easiest scale: charge more. Old clients grandfathered; new ones pay new rate.', advanced: 'Aim for a 20% rate increase every 6 months until you start losing leads. That\'s your market ceiling.' },
+      { title: '2. Productize', beginner: 'Turn services into fixed packages. "Logo design — $1500".', advanced: 'Productized services scale because they\'re repeatable. Less haggling, faster decisions, higher margins.' },
+      { title: '3. First Hire', beginner: 'Hire for what you hate or are bad at first (admin, editing).', advanced: 'Contractor > employee for year 1. Less commitment, more flexibility. Train via Loom-recorded SOPs.' },
+      { title: '4. Becoming an Agency', beginner: 'When 80% of your time is client work managed by you, not done by you.', advanced: 'Many freelancers earn more solo with high rates than running a stressed-out 5-person agency. Choose deliberately.' },
+    ],
+    practical: {
+      title: 'Pick Your Scale Path',
+      intro: 'Three options.',
+      steps: [
+        'A: Raise rates 20% on next new client.',
+        'B: Define one productized service + landing page.',
+        'C: List 3 tasks you hate; budget to hire next month.',
+        'Commit to one path for 90 days.',
+        'Review the numbers — did income/hour go up?',
+      ],
+      goal: 'You break the hours-for-dollars ceiling.',
+    },
+    quiz: [
+      { question: 'Easiest scale?', options: ['Hire','Raise rates','Marketing','Coffee'], correctIndex: 1 },
+      { question: 'Productizing means:', options: ['Going to work','Fixed-scope packages','Free trials','Outsourcing all'], correctIndex: 1 },
+      { question: 'Best first hire?', options: ['Coder','Someone for what you hate','Marketer','VC'], correctIndex: 1 },
+      { question: 'Agency is right when:', options: ['Always','You enjoy managing >building','Day 1','Never'], correctIndex: 1 },
+    ],
+    keyTakeaways: ['Raise rates regularly','Productize for leverage','Hire what you hate','Solo isn\'t a bad path']
+  },
 ];
 
 export const getFreelanceLessonById = (id: string): FreelanceLesson | undefined =>
