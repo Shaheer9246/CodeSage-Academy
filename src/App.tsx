@@ -19,6 +19,11 @@ import FreelanceLearn from "./pages/FreelanceLearn";
 import FreelanceLessonPage from "./pages/FreelanceLessonPage";
 import FullstackLearn from "./pages/FullstackLearn";
 import FullstackLessonPage from "./pages/FullstackLessonPage";
+import PythonLearn from "./pages/PythonLearn";
+import PythonLessonPage from "./pages/PythonLessonPage";
+import LocalLearn from "./pages/LocalLearn";
+import LocalLessonPage from "./pages/LocalLessonPage";
+import Tour from "./pages/Tour";
 import Playground from "./pages/Playground";
 import Challenges from "./pages/Challenges";
 import Roadmap from "./pages/Roadmap";
@@ -82,6 +87,11 @@ const App = () => (
               <Route path="/f-lesson/:id" element={<ProtectedRoute><FreelanceLessonPage /></ProtectedRoute>} />
               <Route path="/fullstack" element={<ProtectedRoute><FullstackLearn /></ProtectedRoute>} />
               <Route path="/fs-lesson/:id" element={<ProtectedRoute><FullstackLessonPage /></ProtectedRoute>} />
+              <Route path="/python" element={<ProtectedRoute><PythonLearn /></ProtectedRoute>} />
+              <Route path="/py-lesson/:id" element={<ProtectedRoute><PythonLessonPage /></ProtectedRoute>} />
+              <Route path="/local" element={<ProtectedRoute><LocalLearn /></ProtectedRoute>} />
+              <Route path="/local-lesson/:id" element={<ProtectedRoute><LocalLessonPage /></ProtectedRoute>} />
+              <Route path="/tour" element={<ProtectedRoute><Tour /></ProtectedRoute>} />
               <Route path="/playground" element={<Playground />} />
               <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
               <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />

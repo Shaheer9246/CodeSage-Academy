@@ -139,7 +139,7 @@ const Dashboard = () => {
         {/* Computer & Networking — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
-          onClick={() => navigate('/networking')}
+          onClick={() => navigate('/networking?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ const Dashboard = () => {
         {/* Full Stack Frontend Development — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-          onClick={() => navigate('/fullstack')}
+          onClick={() => navigate('/fullstack?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -189,7 +189,7 @@ const Dashboard = () => {
         {/* Freelance & Clients — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
-          onClick={() => navigate('/freelance')}
+          onClick={() => navigate('/freelance?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -208,7 +208,57 @@ const Dashboard = () => {
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">Niche → Pitch → Price → Deliver · {FREELANCE_LESSONS.length} lessons</p>
+          <p className="text-[10px] text-muted-foreground mt-2">Niche → Pitch → Price → Deliver · 12 lessons</p>
+        </motion.button>
+
+        {/* Python Programming — NEW */}
+        <motion.button
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+          onClick={() => navigate('/python?from=dashboard')}
+          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-yellow-400/15 flex items-center justify-center text-2xl border border-yellow-400/30">
+                🐍
+              </div>
+              <div>
+                <p className="text-base font-bold font-display text-foreground">Python Programming</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {['Syntax','Functions','OOP','async'].map(t => (
+                    <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-2">Beginner → Advanced → Capstone · 20 lessons</p>
+        </motion.button>
+
+        {/* Local-Only Coding — NEW */}
+        <motion.button
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
+          onClick={() => navigate('/local?from=dashboard')}
+          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-400/15 flex items-center justify-center text-2xl border border-emerald-400/30">
+                🏠
+              </div>
+              <div>
+                <p className="text-base font-bold font-display text-foreground">Local-Only Coding</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {['DOM','localStorage','PWA','Notes app'].map(t => (
+                    <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-2">No backend, no server, no cost · 15 lessons</p>
         </motion.button>
 
         {/* Suggestions tile */}
