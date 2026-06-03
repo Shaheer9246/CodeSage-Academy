@@ -1,89 +1,121 @@
+# Major Update — 8 Areas
 
-## 1. Suggestions box → shared backend
+A big batch, but each piece is contained. Done in one pass.
 
-Move suggestions from `localStorage` to Lovable Cloud so everyone sees the same feed.
+## 1. Expand Existing Tracks (Full Stack Frontend + Freelance)
 
-**New table `public.suggestions`**
-- `id uuid pk`, `user_id uuid` (auth.uid), `username text`, `text text` (≤500 chars), `reply text` (nullable), `reply_at timestamptz`, `created_at`, `updated_at`
-- Trigger: auto-update `updated_at`
-- Trigger: enforce one suggestion per user per UTC day on INSERT (raises if a row exists for `user_id` with `date_trunc('day', created_at) = current_date`)
-- RLS:
-  - SELECT: everyone authenticated (`true`)
-  - INSERT: `auth.uid() = user_id`
-  - UPDATE own row text: `auth.uid() = user_id` (cannot touch `reply`/`reply_at` — enforced by trigger that rejects updates to those columns unless caller is admin)
-  - DELETE: own row only
-- Admin reply RPC: `reply_suggestion(_id uuid, _reply text, _password text)` — SECURITY DEFINER, checks `_password = 'codesage-admin-2026'`, sets `reply` and `reply_at`. Password kept server-side; never sent on regular reads.
-- GRANTs: SELECT/INSERT/UPDATE/DELETE to authenticated; ALL to service_role.
+**Full Stack Frontend Dev** — current 20 lessons cover the basics. Add 8 more to make it truly export-ready:
+- `fs-21` TypeScript fundamentals
+- `fs-22` React Router & navigation patterns
+- `fs-23` State management (Zustand/Context patterns)
+- `fs-24` Forms & validation (react-hook-form + zod)
+- `fs-25` Accessibility (a11y, ARIA, keyboard nav)
+- `fs-26` Performance (lazy loading, memoization, bundle size)
+- `fs-27` Animations (CSS transitions, Framer Motion basics)
+- `fs-28` Real-world project: build a full SPA
 
-**Suggestions.tsx rework**
-- Load list via realtime channel on `public.suggestions` (live updates).
-- Submit button disabled if user already has a row today (query check). Error toast "You can only post one suggestion per day."
-- Each row: if `row.user_id === auth.uid()` show inline edit (textarea + Save) → updates own row.
-- Reply button visible to everyone; clicking opens a small password input (hidden by default). On submit calls `reply_suggestion` RPC. Wrong password → toast error. Correct → reply appears for all users.
-- Remove the persistent "Admin mode" unlock and localStorage logic.
+**Freelance & Clients** — current 8 are good but shallow. Add 4 more:
+- `free-9` Discovery calls & scoping
+- `free-10` Invoicing, taxes, payments
+- `free-11` Handling difficult clients & scope creep
+- `free-12` Scaling: from freelancer to agency
 
-## 2. Computer & Networking landing page
+All new lessons use the same `concepts/practical/quiz/keyTakeaways` schema with depth (beginner + advanced for every concept).
 
-Currently the dashboard tile jumps straight to `/n-lesson/net-1`. Replace with a learning-path page like Frontend's `/learn`.
+## 2. Challenges — 4 Difficulty Tiers
 
-- New route `/networking` → `NetworkingLearn.tsx`
-  - Header: "Computer & Networking Fundamentals", progress bar (completed networking lessons / total).
-  - List all 10 lessons from `NETWORKING_LESSONS`, with lock/check/play states using `isNetworkingLessonUnlocked`.
-  - Clicking a lesson → `/n-lesson/:id` (already exists with concept/practical/quiz tabs).
-- Dashboard: change Networking tile `onClick` to `navigate('/networking')`.
+Restructure `Challenges.tsx`:
+- Add `'Complex'` to the difficulty type
+- Group UI into 4 tabs: **Easy · Medium · Hard · Complex**
+- Add ~6 new challenges per tier so each has 5–8 entries
+- Complex tier = multi-feature mini-projects (e.g. "Build a Kanban board", "Real-time clock + theme switcher", "Image carousel with keyboard nav")
 
-## 3. Mobile keyboard shortcut bar
+## 3. Playground Improvements
 
-`EditorShortcuts` exists but on mobile the device keyboard covers it.
+a. **4th file preview** — when active file is a standalone `.html`, render its own content in the preview instead of the default html+css+js combo. Detect: if `activeFile.lang === 'html'` and id is not `'html'`, use that file's content directly.
 
-- Wrap shortcut bar so on mobile (`md:` breakpoint) it uses `position: fixed; left:0; right:0; bottom:0; z-index:50` and uses `env(safe-area-inset-bottom)`.
-- Only render the fixed version while the Monaco editor is focused (track focus via `onDidFocusEditorText` / `onDidBlurEditorText` in `CodeEditor`).
-- Use `visualViewport` listener to set `bottom = window.innerHeight - visualViewport.height + visualViewport.offsetTop` so the bar sits exactly above the on-screen keyboard.
-- Desktop unchanged (inline below editor).
-- Applies automatically to LessonPage, NetworkingLessonPage, and Playground since they all use `<CodeEditor>`.
+b. **Mobile text selection** — wrap mobile preview/code areas with `user-select: text` + `-webkit-user-callout: default` so iOS/Android show cut/copy/paste menu. Add a long-press helper hint.
 
-## 4. Freelance & Client — full module
+c. **ZIP upload** — add JSZip-based handler. On `.zip` upload, replace `DEFAULT_FILES` with the extracted file tree (any folder count). Preview uses the uploaded `index.html` as entry.
 
-Create `src/data/freelanceLessons.ts` mirroring `networkingLessons.ts` schema (concepts/practical/quiz/keyTakeaways) for the 8 freelance topics already listed (Find Niche, Portfolio, Branding, Platforms, Outreach, Pricing, Contracts, Management).
+d. **Top selector** — add a segmented control: **Single file** | **Multi-file project** at the top of the header. Single = one editable HTML file with auto-preview. Multi = current behavior.
 
-- New page `FreelanceLessonPage.tsx` — copy structure from `NetworkingLessonPage` (3 tabs lesson/practical/test).
-- New landing `FreelanceLearn.tsx` like step 2 above.
-- Routes: `/freelance` and `/f-lesson/:id`.
-- Dashboard: unlock Freelance tile (remove `opacity-60` + Lock), wire to `/freelance`.
-- Lesson IDs prefixed `free-1`…`free-8`; sequential unlock (free-1 always unlocked, others require previous completed).
+e. **Console dock button** — when console panel is detached/floating, add a "Dock to bottom" button (↓ icon) to return it inline.
 
-## 5. Full Stack Frontend Dev — full module
+## 4. New-User Round Trip
 
-Create `src/data/fullstackLessons.ts` for the 20 topics already listed. Each lesson:
-- Standard concept + practical + quiz (same schema as networking) **plus** a `code` block `{ starterHtml, starterCss, starterJs, expected }` for hands-on lessons (HTML/CSS/JS/Flexbox/Grid/React/etc.).
-- For non-code lessons (Architecture, Terminal, Git, GitHub, NPM, Deployment, Security, Testing) the code block is optional.
+After first successful signup → before Onboarding, show `Tour.tsx` (modal carousel):
+- 7 slides explaining: Dashboard, Tracks, Lessons, Playground, Challenges, Community, Suggestions
+- Buttons: **Skip** / **Next** / **Finish**
+- Mark `profile.has_seen_tour = true` (new column) so it never replays
 
-- New page `FullstackLessonPage.tsx` — same 3-tab structure but the **Practical** tab renders a Monaco editor + LivePreview side-by-side (mobile: Code / Preview tabs), reusing existing `CodeEditor` and `LivePreview` components.
-- New landing `FullstackLearn.tsx`.
-- Routes: `/fullstack` and `/fs-lesson/:id`.
-- Dashboard: unlock Full Stack tile, replace the scrollable preview with a single navigate button to `/fullstack`.
+Migration: add `has_seen_tour boolean default false` to `profiles`.
 
-## Technical notes
+## 5. Guest Mode for `/trip`
 
-- All new lessons store completion via existing `completeLesson(id)` RPC (`award_lesson`) — no DB schema change needed for unlock tracking; just use unique IDs (`net-*`, `free-*`, `fs-*`).
-- Quiz pass threshold reuses networking convention (≥3 of 5 correct, or ≥70% — match what networking uses).
-- Realtime: enable on suggestions with `ALTER PUBLICATION supabase_realtime ADD TABLE public.suggestions;` inside the migration.
-- Admin password check happens server-side in the RPC — never exposed to client code/network unless user explicitly types it.
+Currently `/trip` is a static tour. Change behavior:
+- "Take a Trip" → navigates to `/dashboard?guest=1`
+- Dashboard detects `guest=1` (no auth) and renders normally
+- Guest can click **Frontend Development** → see lesson list → open **lesson 1 only**
+- After completing lesson 1, modal: "Sign up to keep going" → `/auth`
+- Other tiles (Roadmap, Questions, Community, Profile, other tracks past lesson 1) → click shows toast "Log in to access" + redirect to `/auth`
 
-## Files
+Implement via a `GuestContext` wrapper that fakes a minimal user object and gates routes.
 
-**New**
-- `src/data/freelanceLessons.ts`
-- `src/data/fullstackLessons.ts`
-- `src/pages/NetworkingLearn.tsx`
-- `src/pages/FreelanceLearn.tsx`
-- `src/pages/FreelanceLessonPage.tsx`
-- `src/pages/FullstackLearn.tsx`
-- `src/pages/FullstackLessonPage.tsx`
-- Migration: suggestions table + RLS + RPC + realtime
+## 6. Admin Powers on Suggestions
 
-**Edited**
-- `src/pages/Suggestions.tsx` (rewrite to use cloud + realtime)
-- `src/pages/Dashboard.tsx` (unlock 3 tiles, new routes)
-- `src/components/CodeEditor.tsx` + `src/components/EditorShortcuts.tsx` (mobile floating keyboard bar)
-- `src/App.tsx` (5 new routes)
+Extend `reply_suggestion` RPC pattern with two new RPCs:
+- `admin_edit_suggestion(_id, _text, _password)` — edits any user's message text
+- `admin_delete_suggestion(_id, _password)` — deletes any message
+
+Both check the same password (`codesage-admin-2026`), SECURITY DEFINER.
+
+UI: when admin password is entered in the reply dialog, also show Edit/Delete buttons on every suggestion card.
+
+## 7. Smarter Back Navigation
+
+In `NetworkingLearn.tsx`, `FreelanceLearn.tsx`, `FullstackLearn.tsx`:
+- Read `?from=dashboard` query param when navigated from Dashboard
+- Back button → if entered via Dashboard, go to `/roadmap` instead of `/dashboard`
+- Update Dashboard tile links to include `?from=dashboard`
+
+## 8. Two New Tracks: Python + Local-Only Coding
+
+**Python track** (`src/data/pythonLessons.ts`, `PythonLearn.tsx`, `PythonLessonPage.tsx`, routes `/python`, `/py-lesson/:id`):
+- 20 lessons: syntax → variables → control flow → functions → data structures → OOP → modules → file I/O → error handling → list comprehensions → decorators → generators → virtual envs → pip → requests → JSON/CSV → web scraping → automation scripts → testing → mini-project
+- Uses lesson page same layout as Networking (concepts / practical / quiz tabs — no live editor since no Python runtime)
+
+**Local-Only Coding** (`localLessons.ts`, `LocalLearn.tsx`, `LocalLessonPage.tsx`, routes `/local`, `/local-lesson/:id`):
+- 15 lessons focused on no-server / no-deploy coding: HTML+CSS+JS files on disk, localStorage, IndexedDB, File API, service workers (offline), PWA basics, building a local journal, local task manager, local note-taking app, etc.
+- Uses Fullstack-style page (live editor + preview) since everything runs in browser
+
+Add both tiles to Dashboard with the same pattern as existing track tiles.
+
+## Technical Section
+
+**New files:**
+- `src/data/pythonLessons.ts`, `src/data/localLessons.ts`
+- `src/pages/PythonLearn.tsx`, `src/pages/PythonLessonPage.tsx`
+- `src/pages/LocalLearn.tsx`, `src/pages/LocalLessonPage.tsx`
+- `src/pages/Tour.tsx` (new-user round trip)
+- `src/contexts/GuestContext.tsx`
+
+**Edited:**
+- `src/data/fullstackLessons.ts` (+8 lessons)
+- `src/data/freelanceLessons.ts` (+4 lessons)
+- `src/pages/Challenges.tsx` (4 tiers + new challenges)
+- `src/pages/Playground.tsx` (zip, single/multi toggle, 4th-file preview, mobile select, console dock)
+- `src/pages/Suggestions.tsx` (admin edit/delete UI)
+- `src/pages/Dashboard.tsx` (2 new tiles, `?from=dashboard` links, guest mode)
+- `src/pages/NetworkingLearn.tsx`, `FreelanceLearn.tsx`, `FullstackLearn.tsx` (smart back)
+- `src/pages/Trip.tsx` → wire "Take a Trip" to `/dashboard?guest=1`
+- `src/pages/Auth.tsx` (route new signups to Tour first)
+- `src/App.tsx` (new routes + GuestProvider)
+
+**Migrations:**
+- `ALTER TABLE profiles ADD COLUMN has_seen_tour boolean DEFAULT false`
+- Two new RPCs: `admin_edit_suggestion`, `admin_delete_suggestion`
+
+**Dependencies:** add `jszip` for ZIP upload.
+
+After approval I'll batch-create the files and run the migration.

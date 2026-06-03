@@ -25,6 +25,7 @@ export type Database = {
           experience_level: string | null
           goal: string | null
           has_job: string | null
+          has_seen_tour: boolean | null
           id: string
           last_active_date: string | null
           level: number | null
@@ -48,6 +49,7 @@ export type Database = {
           experience_level?: string | null
           goal?: string | null
           has_job?: string | null
+          has_seen_tour?: boolean | null
           id: string
           last_active_date?: string | null
           level?: number | null
@@ -71,6 +73,7 @@ export type Database = {
           experience_level?: string | null
           goal?: string | null
           has_job?: string | null
+          has_seen_tour?: boolean | null
           id?: string
           last_active_date?: string | null
           level?: number | null
@@ -124,6 +127,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_suggestion: {
+        Args: { _id: string; _password: string }
+        Returns: boolean
+      }
+      admin_edit_suggestion: {
+        Args: { _id: string; _password: string; _text: string }
+        Returns: {
+          created_at: string
+          id: string
+          reply: string | null
+          reply_at: string | null
+          text: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "suggestions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       award_lesson: {
         Args: { _lesson_id: string }
         Returns: {
@@ -136,6 +162,7 @@ export type Database = {
           experience_level: string | null
           goal: string | null
           has_job: string | null
+          has_seen_tour: boolean | null
           id: string
           last_active_date: string | null
           level: number | null
@@ -168,6 +195,7 @@ export type Database = {
           experience_level: string | null
           goal: string | null
           has_job: string | null
+          has_seen_tour: boolean | null
           id: string
           last_active_date: string | null
           level: number | null
@@ -200,6 +228,7 @@ export type Database = {
           experience_level: string | null
           goal: string | null
           has_job: string | null
+          has_seen_tour: boolean | null
           id: string
           last_active_date: string | null
           level: number | null
@@ -251,6 +280,7 @@ export type Database = {
           experience_level: string | null
           goal: string | null
           has_job: string | null
+          has_seen_tour: boolean | null
           id: string
           last_active_date: string | null
           level: number | null
