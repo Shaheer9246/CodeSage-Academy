@@ -36,8 +36,7 @@ const Welcome = () => {
             without the price tag.
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed mb-8">
-            Learn coding, networking, and freelancing through bite-sized lessons,
-            real practice, and a code playground — all in one place.
+            Learn coding, networking, freelancing, Python and local-only web — bite-sized lessons, real practice, all in one place.
           </p>
 
           <div className="space-y-2 mb-8">
@@ -45,9 +44,11 @@ const Welcome = () => {
               { icon: Code2, label: 'HTML / CSS / JavaScript → React' },
               { icon: Wifi, label: 'Computer & Networking fundamentals' },
               { icon: Briefcase, label: 'Freelancing & career skills' },
+              { icon: BookOpen, label: 'Python — beginner to advanced' },
+              { icon: Code2, label: 'Local-only coding (no server, no cost)' },
               { icon: BookOpen, label: 'Concept → Practice → Quiz format' },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 glass-card px-3 py-2.5 rounded-xl">
+              <div key={i} className="flex items-center gap-3 glass-card px-3 py-2.5 rounded-xl hover:border-primary/40 hover:neon-glow transition-all">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <item.icon className="w-4 h-4 text-primary" />
                 </div>
@@ -59,24 +60,21 @@ const Welcome = () => {
           <div className="space-y-3">
             <button
               onClick={() => navigate('/auth')}
-              className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:neon-glow-strong hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
-              <Rocket className="w-4 h-4" />
-              Start Learning
+              <Rocket className="w-4 h-4" /> Start Learning
             </button>
             <button
               onClick={() => navigate('/playground')}
-              className="w-full glass-card border border-border/50 text-foreground font-display font-semibold text-sm py-3.5 rounded-2xl hover:border-primary/30 transition-all flex items-center justify-center gap-2"
+              className="w-full glass-card border border-border/50 text-foreground font-display font-semibold text-sm py-3.5 rounded-2xl hover:border-primary/40 hover:neon-glow transition-all flex items-center justify-center gap-2"
             >
-              <Code2 className="w-4 h-4 text-primary" />
-              Just Edit Code
+              <Code2 className="w-4 h-4 text-primary" /> Just Edit Code
             </button>
             <button
               onClick={() => navigate('/trip')}
-              className="w-full bg-transparent border border-primary/30 text-foreground font-display font-semibold text-sm py-3 rounded-2xl hover:bg-primary/5 hover:border-primary/60 transition-all flex items-center justify-center gap-2 neon-glow"
+              className="w-full bg-transparent border border-primary/30 text-foreground font-display font-semibold text-sm py-3 rounded-2xl hover:bg-primary/5 hover:border-primary/60 hover:neon-glow transition-all flex items-center justify-center gap-2"
             >
-              <Compass className="w-4 h-4 text-primary" />
-              Take a Trip
+              <Compass className="w-4 h-4 text-primary" /> Take a Trip
             </button>
           </div>
 
