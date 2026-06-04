@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const FULLSTACK_LESSONS = [
   { step: 1, label: 'Web Architecture', icon: '🏗️' },
@@ -50,10 +51,11 @@ const NETWORKING_LESSONS = [
 ];
 
 const Dashboard = () => {
-  const { user, updateStreak, applyPromoCode } = useUser();
+  const { user, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
   const navigate = useNavigate();
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
+  const [showShop, setShowShop] = useState(false);
 
   useEffect(() => { if (user) updateStreak(); }, []);
 
@@ -67,22 +69,66 @@ const Dashboard = () => {
     setTimeout(() => setPromoMsg(''), 3000);
   };
 
+  const handleBuyFreeze = async () => {
+    if ((user.xp || 0) < 10) { toast.error('Need 10 XP to buy a Streak Freeze'); return; }
+    const ok = await buyFreezeStreak();
+    if (ok) { toast.success('❄️ Streak Freeze active — one missed day is forgiven'); setShowShop(false); }
+    else toast.error('Could not purchase freeze');
+  };
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
       <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/3 blur-[150px] pointer-events-none" />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         className="relative z-10 max-w-2xl mx-auto p-4 space-y-4"
       >
-        {/* Welcome */}
-        <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <h1 className="text-xl font-bold font-display">
-            Welcome Back, <span className="text-primary neon-text">{user.name}</span>
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Continue your coding journey</p>
+        {/* Welcome + XP/Streak pills */}
+        <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold font-display truncate">
+              Welcome Back, <span className="text-primary neon-text">{user.name}</span>
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Continue your coding journey</p>
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <button onClick={() => setShowShop(true)}
+              className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
+              <Zap className="w-3.5 h-3.5 text-primary" />
+              <span className="text-xs font-bold text-primary">{user.xp || 0}</span>
+            </button>
+            <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
+              <Flame className="w-3.5 h-3.5 text-orange-400" />
+              <span className="text-xs font-bold text-orange-400">{user.streakCount}d</span>
+            </div>
+          </div>
         </motion.div>
+
+        {showShop && (
+          <div className="glass-card rounded-2xl p-4 border border-primary/30 neon-glow space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                <Snowflake className="w-4 h-4 text-primary" /> XP Shop
+              </h3>
+              <button onClick={() => setShowShop(false)} className="text-muted-foreground hover:text-foreground">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex items-center justify-between gap-3 bg-secondary/30 rounded-xl p-3">
+              <div className="min-w-0">
+                <p className="text-sm font-display font-semibold text-foreground">Streak Freeze ❄️</p>
+                <p className="text-[10px] text-muted-foreground">Forgive one missed day. Active until tomorrow.</p>
+              </div>
+              <button onClick={handleBuyFreeze} disabled={(user.xp || 0) < 10}
+                className="bg-primary text-primary-foreground text-xs font-display font-semibold px-3 py-2 rounded-xl disabled:opacity-30 hover:neon-glow whitespace-nowrap">
+                10 XP
+              </button>
+            </div>
+            {user.streakFreezeUntil && (
+              <p className="text-[10px] text-emerald-400">❄️ Freeze active until {user.streakFreezeUntil}</p>
+            )}
+          </div>
+        )}
 
         {/* 2 Action Boxes: Challenges + Code Editor */}
         <div className="grid grid-cols-2 gap-3">
