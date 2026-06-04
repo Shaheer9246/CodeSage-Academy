@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getLocalLessonById, isLocalLessonUnlocked } from '@/data/localLessons';
 import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, Code2, Eye } from 'lucide-react';
@@ -36,11 +37,12 @@ const LocalLessonPage = () => {
   const passed = correctCount >= 3;
   const allAnswered = lesson.quiz.every((_, i) => answers[i] !== undefined);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
-      completeLesson(lesson.id);
-      setTimeout(() => navigate(`/lesson/${lesson.id}/complete`), 800);
+      await completeLesson(lesson.id);
+      toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
+      setTimeout(() => navigate('/dashboard'), 900);
     }
   };
 
