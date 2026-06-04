@@ -25,6 +25,8 @@ export interface UserProfile {
   xp: number;
   level: number;
   sageCoins: number;
+  hasSeenTour: boolean;
+  streakFreezeUntil: string | null;
 }
 
 interface UserContextType {
@@ -46,6 +48,9 @@ interface UserContextType {
   addXp: (amount: number) => void;
   addCoins: (amount: number) => void;
   toggleDarkMode: () => void;
+  buyFreezeStreak: () => Promise<boolean>;
+  markTourSeen: () => Promise<void>;
+  resetTour: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -79,6 +84,8 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     xp: row.xp || 0,
     level: row.level || 1,
     sageCoins: row.sage_coins || 0,
+    hasSeenTour: !!row.has_seen_tour,
+    streakFreezeUntil: row.streak_freeze_until || null,
   };
 }
 
