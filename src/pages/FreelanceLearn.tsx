@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { FREELANCE_LESSONS, isFreelanceLessonUnlocked } from '@/data/freelanceLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 const FreelanceLearn = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const backTo = sp.get('from') === 'roadmap' ? '/roadmap' : '/dashboard';
   if (!user) { navigate('/auth'); return null; }
 
   const completed = FREELANCE_LESSONS.filter(l => user.completedLessons.includes(l.id)).length;
@@ -19,7 +21,7 @@ const FreelanceLearn = () => {
 
       <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground">
+          <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">

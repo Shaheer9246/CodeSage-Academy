@@ -25,6 +25,8 @@ export interface UserProfile {
   xp: number;
   level: number;
   sageCoins: number;
+  hasSeenTour: boolean;
+  streakFreezeUntil: string | null;
 }
 
 interface UserContextType {
@@ -46,6 +48,9 @@ interface UserContextType {
   addXp: (amount: number) => void;
   addCoins: (amount: number) => void;
   toggleDarkMode: () => void;
+  buyFreezeStreak: () => Promise<boolean>;
+  markTourSeen: () => Promise<void>;
+  resetTour: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -79,6 +84,8 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     xp: row.xp || 0,
     level: row.level || 1,
     sageCoins: row.sage_coins || 0,
+    hasSeenTour: !!row.has_seen_tour,
+    streakFreezeUntil: row.streak_freeze_until || null,
   };
 }
 
@@ -123,7 +130,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           streakCount: 0, lastActiveDate: '',
           badges: [], completedLessons: [], completedTests: [],
           unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-          xp: 0, level: 1, sageCoins: 0,
+          xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, streakFreezeUntil: null,
         };
         // Try to insert the profile
         const { error: insertError } = await supabase.from('profiles').insert({
@@ -147,7 +154,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         streakCount: 0, lastActiveDate: '',
         badges: [], completedLessons: [], completedTests: [],
         unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-        xp: 0, level: 1, sageCoins: 0,
+        xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, streakFreezeUntil: null,
       });
     }
     setLoading(false);
@@ -290,12 +297,27 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
-  const addXp = (_amount: number) => {
-    // XP is server-managed via RPCs. No-op on client to prevent inflation.
+  const addXp = (_amount: number) => {};
+  const addCoins = (_amount: number) => {};
+
+  const buyFreezeStreak = async (): Promise<boolean> => {
+    if (!user) return false;
+    const { data, error } = await supabase.rpc('buy_freeze_streak' as any);
+    if (error || !data) return false;
+    applyServerProfile(data);
+    return true;
   };
 
-  const addCoins = (_amount: number) => {
-    // Coins are server-managed via RPCs. No-op on client to prevent inflation.
+  const markTourSeen = async () => {
+    if (!user) return;
+    try { await supabase.from('profiles').update({ has_seen_tour: true } as any).eq('id', user.id); } catch {}
+    setUser({ ...user, hasSeenTour: true });
+  };
+
+  const resetTour = async () => {
+    if (!user) return;
+    try { await supabase.from('profiles').update({ has_seen_tour: false } as any).eq('id', user.id); } catch {}
+    setUser({ ...user, hasSeenTour: false });
   };
 
   return (
@@ -303,6 +325,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       user, loading, isLoggedIn, isOnboarded, login, signup, completeOnboarding,
       completeLesson, completeTest, addBadge, updateStreak, applyPromoCode,
       updateUser, logout, deleteAccount, toggleDarkMode, addXp, addCoins,
+      buyFreezeStreak, markTourSeen, resetTour,
     }}>
       {children}
     </UserContext.Provider>

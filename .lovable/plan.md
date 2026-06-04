@@ -1,121 +1,73 @@
-# Major Update — 8 Areas
+# Implementation Plan — 9 Items
 
-A big batch, but each piece is contained. Done in one pass.
+## 1. Suggestions: wire admin edit/delete UI
+In `Suggestions.tsx`, every card gets two new admin buttons next to "Reply": **Edit (admin)** and **Delete (admin)**. Clicking opens an inline password + text field that calls `admin_edit_suggestion` / `admin_delete_suggestion` RPCs already deployed. Success toast + realtime refresh handles the rest.
 
-## 1. Expand Existing Tracks (Full Stack Frontend + Freelance)
+## 2. Challenges: 4 tiers + ~24 new
+Rewrite `Challenges.tsx`:
+- Add tier `'Complex'` to the `difficulty` union.
+- Top tab bar: **Easy · Medium · Hard · Complex** (filter state).
+- Append ~24 new challenges (6 per tier). Complex tier = mini-projects (calculator, weather widget mock, kanban, mini-blog, quiz app, image-carousel).
+- Show difficulty count per tab and a tier color (green / yellow / orange / purple).
 
-**Full Stack Frontend Dev** — current 20 lessons cover the basics. Add 8 more to make it truly export-ready:
-- `fs-21` TypeScript fundamentals
-- `fs-22` React Router & navigation patterns
-- `fs-23` State management (Zustand/Context patterns)
-- `fs-24` Forms & validation (react-hook-form + zod)
-- `fs-25` Accessibility (a11y, ARIA, keyboard nav)
-- `fs-26` Performance (lazy loading, memoization, bundle size)
-- `fs-27` Animations (CSS transitions, Framer Motion basics)
-- `fs-28` Real-world project: build a full SPA
+## 3. Playground upgrades
+In `Playground.tsx`:
+- **ZIP upload**: new "Upload ZIP" button → uses already-installed `jszip` to read `.html/.css/.js` files into the workspace.
+- **Single/Multi toggle** at top: Single mode hides Files panel and uses one combined `.html` doc; Multi keeps current 3-file workflow.
+- **4th-file preview**: if a 4th custom `.html` file exists, add a "Preview this file" eye icon on its file row that swaps the preview source.
+- **Mobile cut/copy/paste bar**: add three buttons in `EditorShortcuts` mobile bar that call `document.execCommand` on the active Monaco selection.
+- **Console dock-back**: when console is detached/floating, add a small ◰ "Dock" button to re-anchor it to the bottom panel.
 
-**Freelance & Clients** — current 8 are good but shallow. Add 4 more:
-- `free-9` Discovery calls & scoping
-- `free-10` Invoicing, taxes, payments
-- `free-11` Handling difficult clients & scope creep
-- `free-12` Scaling: from freelancer to agency
+## 4. Auth → /tour for brand-new users
+In `UserContext.fetchProfile`, after fetching/creating a profile check `has_seen_tour === false`. If false and we just signed up (no `name` yet), navigate to `/tour` once. `Tour.tsx` already calls an RPC stub to flip `has_seen_tour` on Finish/Skip — wire it through a `profiles.update({ has_seen_tour: true })` (allowed by the new column-level GRANT).
 
-All new lessons use the same `concepts/practical/quiz/keyTakeaways` schema with depth (beginner + advanced for every concept).
+## 5. Trip = real Dashboard in guest mode + Welcome glow + 2 new tiles
+- Replace `/trip` to redirect to `/dashboard?guest=1`.
+- New `GuestContext` provider wraps the app; `Dashboard.tsx` reads the query param, renders normally with a banner "Guest mode — sign up to save progress". Clicking any tile other than Lesson 1 of Frontend → toast + redirect to `/auth`.
+- `Welcome.tsx`: add two more feature rows (**Python**, **Local-only coding**) so all 6 tracks show.
+- **Glow on hover**: every Welcome button + every Dashboard tile gets `hover:neon-glow hover:border-primary/60 transition-all` so an arrow/hover triggers a glow halo.
 
-## 2. Challenges — 4 Difficulty Tiers
+## 6. Smart-back for Freelance & Fullstack learn pages
+Mirror what Networking already does:
+- Read `?from` query param.
+- Back button → `/roadmap` when `from=roadmap`, else `/dashboard`.
+- Dashboard tiles for Freelance/Fullstack pass no `from` (default dashboard). Roadmap tiles pass `?from=roadmap`.
 
-Restructure `Challenges.tsx`:
-- Add `'Complex'` to the difficulty type
-- Group UI into 4 tabs: **Easy · Medium · Hard · Complex**
-- Add ~6 new challenges per tier so each has 5–8 entries
-- Complex tier = multi-feature mini-projects (e.g. "Build a Kanban board", "Real-time clock + theme switcher", "Image carousel with keyboard nav")
+## 7. Post-lesson → Dashboard (no Urrhhh page)
+For **Python**, **Local**, **Freelance**, **Fullstack** lesson pages: on submit-success, skip the `/lesson-complete/:id` redirect — show a small inline "Lesson complete ✓ +XP" toast and `navigate('/dashboard')`.
 
-## 3. Playground Improvements
+For **Networking** and **Frontend Dev** lesson pages: keep `LessonComplete.tsx` but replace the current "Roadmap · Review" pair with **3 buttons**: `Lesson Path` (→ `/learn` or `/networking`), `Review` (→ same lesson), `Next Lesson` (existing, moved into the row). Removes the standalone giant Next button on top.
 
-a. **4th file preview** — when active file is a standalone `.html`, render its own content in the preview instead of the default html+css+js combo. Detect: if `activeFile.lang === 'html'` and id is not `'html'`, use that file's content directly.
+## 8. Settings power tools
+Below the theme buttons in `SettingsPage.tsx`, add 3 grouped sections:
 
-b. **Mobile text selection** — wrap mobile preview/code areas with `user-select: text` + `-webkit-user-callout: default` so iOS/Android show cut/copy/paste menu. Add a long-press helper hint.
+**Execution Control** (glass-card)
+- Toggle: *Auto-Run Preview* (writes `codesage_autorun` to localStorage; Playground/Lesson previews read it).
+- Button: *Reset Runtime* (clears preview iframe + workspace caches, not XP).
 
-c. **ZIP upload** — add JSZip-based handler. On `.zip` upload, replace `DEFAULT_FILES` with the extracted file tree (any folder count). Preview uses the uploaded `index.html` as entry.
+**Data & Workspace**
+- Button: *Export All Workspaces (.zip)* — uses `jszip` to zip Playground recents + current files.
+- Button: *Clear Sandbox Cache* — wipes `codesage_playground_recent` + autosave only.
 
-d. **Top selector** — add a segmented control: **Single file** | **Multi-file project** at the top of the header. Single = one editable HTML file with auto-preview. Multi = current behavior.
+**Onboarding**
+- Button: *Replay Tour* → flip `has_seen_tour` to false and `navigate('/tour')`.
 
-e. **Console dock button** — when console panel is detached/floating, add a "Dock to bottom" button (↓ icon) to return it inline.
+## 9. XP rebalance + Freeze Streak + Dashboard XP bar
+Server changes (migration):
+- `award_lesson`: change `_profile.xp + 50` → `+ 5`, `sage_coins + 10` → `+ 2`. Level formula stays.
+- New RPC `buy_freeze_streak()`: deducts 10 XP, sets a new profile column `streak_freeze_until date` to tomorrow. Validates `xp >= 10`.
+- New column `profiles.streak_freeze_until date`.
+- `update_streak` respects `streak_freeze_until` — if yesterday was a freeze day, treat as continuous.
 
-## 4. New-User Round Trip
+UI:
+- `Dashboard.tsx` top header (right of welcome): two pills — `⚡ {xp} XP` and `🔥 {streakCount}d`. Tapping XP pill opens a tiny "Shop" sheet with one item: **Freeze Streak — 10 XP** button → calls `buy_freeze_streak` RPC.
+- `UserContext` exposes `buyFreezeStreak()` wrapper.
 
-After first successful signup → before Onboarding, show `Tour.tsx` (modal carousel):
-- 7 slides explaining: Dashboard, Tracks, Lessons, Playground, Challenges, Community, Suggestions
-- Buttons: **Skip** / **Next** / **Finish**
-- Mark `profile.has_seen_tour = true` (new column) so it never replays
+---
 
-Migration: add `has_seen_tour boolean default false` to `profiles`.
-
-## 5. Guest Mode for `/trip`
-
-Currently `/trip` is a static tour. Change behavior:
-- "Take a Trip" → navigates to `/dashboard?guest=1`
-- Dashboard detects `guest=1` (no auth) and renders normally
-- Guest can click **Frontend Development** → see lesson list → open **lesson 1 only**
-- After completing lesson 1, modal: "Sign up to keep going" → `/auth`
-- Other tiles (Roadmap, Questions, Community, Profile, other tracks past lesson 1) → click shows toast "Log in to access" + redirect to `/auth`
-
-Implement via a `GuestContext` wrapper that fakes a minimal user object and gates routes.
-
-## 6. Admin Powers on Suggestions
-
-Extend `reply_suggestion` RPC pattern with two new RPCs:
-- `admin_edit_suggestion(_id, _text, _password)` — edits any user's message text
-- `admin_delete_suggestion(_id, _password)` — deletes any message
-
-Both check the same password (`codesage-admin-2026`), SECURITY DEFINER.
-
-UI: when admin password is entered in the reply dialog, also show Edit/Delete buttons on every suggestion card.
-
-## 7. Smarter Back Navigation
-
-In `NetworkingLearn.tsx`, `FreelanceLearn.tsx`, `FullstackLearn.tsx`:
-- Read `?from=dashboard` query param when navigated from Dashboard
-- Back button → if entered via Dashboard, go to `/roadmap` instead of `/dashboard`
-- Update Dashboard tile links to include `?from=dashboard`
-
-## 8. Two New Tracks: Python + Local-Only Coding
-
-**Python track** (`src/data/pythonLessons.ts`, `PythonLearn.tsx`, `PythonLessonPage.tsx`, routes `/python`, `/py-lesson/:id`):
-- 20 lessons: syntax → variables → control flow → functions → data structures → OOP → modules → file I/O → error handling → list comprehensions → decorators → generators → virtual envs → pip → requests → JSON/CSV → web scraping → automation scripts → testing → mini-project
-- Uses lesson page same layout as Networking (concepts / practical / quiz tabs — no live editor since no Python runtime)
-
-**Local-Only Coding** (`localLessons.ts`, `LocalLearn.tsx`, `LocalLessonPage.tsx`, routes `/local`, `/local-lesson/:id`):
-- 15 lessons focused on no-server / no-deploy coding: HTML+CSS+JS files on disk, localStorage, IndexedDB, File API, service workers (offline), PWA basics, building a local journal, local task manager, local note-taking app, etc.
-- Uses Fullstack-style page (live editor + preview) since everything runs in browser
-
-Add both tiles to Dashboard with the same pattern as existing track tiles.
-
-## Technical Section
-
-**New files:**
-- `src/data/pythonLessons.ts`, `src/data/localLessons.ts`
-- `src/pages/PythonLearn.tsx`, `src/pages/PythonLessonPage.tsx`
-- `src/pages/LocalLearn.tsx`, `src/pages/LocalLessonPage.tsx`
-- `src/pages/Tour.tsx` (new-user round trip)
-- `src/contexts/GuestContext.tsx`
-
-**Edited:**
-- `src/data/fullstackLessons.ts` (+8 lessons)
-- `src/data/freelanceLessons.ts` (+4 lessons)
-- `src/pages/Challenges.tsx` (4 tiers + new challenges)
-- `src/pages/Playground.tsx` (zip, single/multi toggle, 4th-file preview, mobile select, console dock)
-- `src/pages/Suggestions.tsx` (admin edit/delete UI)
-- `src/pages/Dashboard.tsx` (2 new tiles, `?from=dashboard` links, guest mode)
-- `src/pages/NetworkingLearn.tsx`, `FreelanceLearn.tsx`, `FullstackLearn.tsx` (smart back)
-- `src/pages/Trip.tsx` → wire "Take a Trip" to `/dashboard?guest=1`
-- `src/pages/Auth.tsx` (route new signups to Tour first)
-- `src/App.tsx` (new routes + GuestProvider)
-
-**Migrations:**
-- `ALTER TABLE profiles ADD COLUMN has_seen_tour boolean DEFAULT false`
-- Two new RPCs: `admin_edit_suggestion`, `admin_delete_suggestion`
-
-**Dependencies:** add `jszip` for ZIP upload.
-
-After approval I'll batch-create the files and run the migration.
+## Technical notes
+- New migration: lower XP rewards, `streak_freeze_until` column, `buy_freeze_streak` RPC, GRANT EXECUTE to authenticated.
+- Files created: `src/contexts/GuestContext.tsx`, `src/components/FreezeStreakSheet.tsx`.
+- Files edited: `Suggestions.tsx`, `Challenges.tsx`, `Playground.tsx`, `EditorShortcuts.tsx`, `Auth.tsx`, `UserContext.tsx`, `Welcome.tsx`, `Trip.tsx`, `Dashboard.tsx`, `FreelanceLearn.tsx`, `FullstackLearn.tsx`, `FreelanceLessonPage.tsx`, `FullstackLessonPage.tsx`, `PythonLessonPage.tsx`, `LocalLessonPage.tsx`, `LessonComplete.tsx`, `SettingsPage.tsx`, `App.tsx`.
+- No new dependencies (jszip already installed).
+- No changes to existing lesson data files.
