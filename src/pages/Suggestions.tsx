@@ -207,9 +207,15 @@ const Suggestions = () => {
                     </p>
                   </div>
                   {isMine && !isEditing && (
-                    <button onClick={() => startEdit(s)} className="text-muted-foreground hover:text-primary p-1" title="Edit">
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => startEdit(s)} className="text-muted-foreground hover:text-primary p-1" title="Edit">
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => { if (confirm('Delete your suggestion?')) deleteOwn(s.id); }}
+                        className="text-muted-foreground hover:text-destructive p-1" title="Delete">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   )}
                 </div>
 
