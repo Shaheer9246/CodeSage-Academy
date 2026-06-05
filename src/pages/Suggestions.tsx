@@ -109,12 +109,25 @@ const Suggestions = () => {
 
   const submitAdminDelete = async (id: string) => {
     if (!adminDeletePw) return;
-    const { error } = await supabase.rpc('admin_delete_suggestion' as any, {
+    const { data, error } = await supabase.rpc('admin_delete_suggestion' as any, {
       _id: id, _password: adminDeletePw,
     });
     if (error) { toast.error('Wrong password'); return; }
+    if (data === false) { toast.error('Delete failed'); return; }
     toast.success('Suggestion deleted');
     setAdminDeleteId(null); setAdminDeletePw('');
+    // Optimistic + refresh — realtime may lag
+    setItems(prev => prev.filter(s => s.id !== id));
+    refresh();
+  };
+
+  const deleteOwn = async (id: string) => {
+    const { error } = await supabase.from('suggestions' as any).delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Deleted');
+    setItems(prev => prev.filter(s => s.id !== id));
+    setPostedToday(false);
+    refresh();
   };
 
   return (
