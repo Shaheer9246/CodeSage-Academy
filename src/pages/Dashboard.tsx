@@ -152,7 +152,7 @@ const Dashboard = () => {
         </motion.div>
 
 
-        {showShop && (
+        {showShop && user && (
           <div className="glass-card rounded-2xl p-4 border border-primary/30 neon-glow space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
