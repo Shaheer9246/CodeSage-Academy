@@ -72,14 +72,6 @@ const Dashboard = () => {
   if (!user && !isGuest) { navigate('/auth'); return null; }
   if (user && !user.name && !isGuest) { navigate('/onboarding'); return null; }
 
-  // Guest tile gate — only Frontend Lesson 1 allowed
-  const guestGate = (allowedPath: string | null) => (e: React.MouseEvent) => {
-    if (!isGuest) return;
-    if (allowedPath) return; // allowed
-    e.preventDefault(); e.stopPropagation();
-    toast.info('Sign up to unlock this — it takes 10 seconds ✨');
-    navigate('/auth');
-  };
 
   const handlePromo = async () => {
     const ok = await applyPromoCode(promoInput);
