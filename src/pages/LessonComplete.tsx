@@ -158,17 +158,15 @@ const LessonComplete = () => {
             <BookOpen className="w-3.5 h-3.5 text-primary" /> Lesson Path
           </button>
           <button
-            onClick={() => navigate(isNetworking ? `/n-lesson/${lesson.id}` : `/lesson/${lesson.id}`)}
+            onClick={() => navigate(reviewPath)}
             className="glass-card border border-border/50 text-foreground text-[11px] py-2.5 rounded-xl hover:border-primary/40 hover:neon-glow transition-all flex flex-col items-center justify-center gap-1"
           >
             <RotateCcw className="w-3.5 h-3.5 text-primary" /> Review
           </button>
-          {nextLesson ? (
+          {nextPath ? (
             <button
-              onClick={() => {
-                if (nextLesson.id.startsWith('net-')) navigate(`/n-lesson/${nextLesson.id}`);
-                else navigate(`/lesson/${nextLesson.id}`);
-              }}
+              onClick={() => navigate(nextPath)}
+              title={nextTitle || 'Next'}
               className="bg-primary text-primary-foreground text-[11px] font-semibold py-2.5 rounded-xl neon-glow hover:opacity-90 flex flex-col items-center justify-center gap-1"
             >
               <ArrowRight className="w-3.5 h-3.5" /> Next
