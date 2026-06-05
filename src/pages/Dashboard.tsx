@@ -95,6 +95,20 @@ const Dashboard = () => {
     else toast.error('Could not purchase freeze');
   };
 
+  const go = (path: string) => () => {
+    if (isGuest) {
+      toast.info('Sign up to unlock this — it takes 10 seconds ✨');
+      navigate('/auth');
+      return;
+    }
+    navigate(path);
+  };
+
+  // Display name/values: real for users, fake for guests
+  const displayName = user?.name || 'Explorer';
+  const xp = user?.xp || 0;
+  const streak = user?.streakCount || 0;
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
       <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/3 blur-[150px] pointer-events-none" />
@@ -102,26 +116,49 @@ const Dashboard = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         className="relative z-10 max-w-2xl mx-auto p-4 space-y-4"
       >
+        {isGuest && (
+          <div className="glass-card rounded-2xl border border-primary/40 p-3 flex items-center gap-3 neon-glow">
+            <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <UserPlus className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-display font-bold text-foreground">You're touring as a guest 👋</p>
+              <p className="text-[10px] text-muted-foreground">Sign up to save progress, earn XP, unlock lessons.</p>
+            </div>
+            <button onClick={() => navigate('/auth')}
+              className="bg-primary text-primary-foreground text-[11px] font-display font-bold px-3 py-1.5 rounded-xl whitespace-nowrap">
+              Sign Up
+            </button>
+          </div>
+        )}
+
         {/* Welcome + XP/Streak pills */}
         <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-xl font-bold font-display truncate">
-              Welcome Back, <span className="text-primary neon-text">{user.name}</span>
+              {isGuest ? 'Welcome to ' : 'Welcome Back, '}<span className="text-primary neon-text">{isGuest ? 'CodeSage' : displayName}</span>
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Continue your coding journey</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{isGuest ? 'Tap any tile for a preview' : 'Continue your coding journey'}</p>
           </div>
           <div className="flex gap-2 flex-shrink-0">
-            <button onClick={() => setShowShop(true)}
+            <button onClick={() => isGuest ? navigate('/auth') : setShowShop(true)}
               className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
               <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-bold text-primary">{user.xp || 0}</span>
+              <span className="text-xs font-bold text-primary">{xp}</span>
             </button>
             <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span className="text-xs font-bold text-orange-400">{user.streakCount}d</span>
+              <span className="text-xs font-bold text-orange-400">{streak}d</span>
             </div>
+            {!isGuest && (
+              <button onClick={() => navigate('/roadmap')} title="Roadmap"
+                className="flex items-center gap-1 bg-secondary/40 border border-border/40 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
+                <Map className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </motion.div>
+
 
         {showShop && (
           <div className="glass-card rounded-2xl p-4 border border-primary/30 neon-glow space-y-3">
