@@ -109,12 +109,25 @@ const Suggestions = () => {
 
   const submitAdminDelete = async (id: string) => {
     if (!adminDeletePw) return;
-    const { error } = await supabase.rpc('admin_delete_suggestion' as any, {
+    const { data, error } = await supabase.rpc('admin_delete_suggestion' as any, {
       _id: id, _password: adminDeletePw,
     });
     if (error) { toast.error('Wrong password'); return; }
+    if (data === false) { toast.error('Delete failed'); return; }
     toast.success('Suggestion deleted');
     setAdminDeleteId(null); setAdminDeletePw('');
+    // Optimistic + refresh — realtime may lag
+    setItems(prev => prev.filter(s => s.id !== id));
+    refresh();
+  };
+
+  const deleteOwn = async (id: string) => {
+    const { error } = await supabase.from('suggestions' as any).delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Deleted');
+    setItems(prev => prev.filter(s => s.id !== id));
+    setPostedToday(false);
+    refresh();
   };
 
   return (
@@ -194,9 +207,15 @@ const Suggestions = () => {
                     </p>
                   </div>
                   {isMine && !isEditing && (
-                    <button onClick={() => startEdit(s)} className="text-muted-foreground hover:text-primary p-1" title="Edit">
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => startEdit(s)} className="text-muted-foreground hover:text-primary p-1" title="Edit">
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => { if (confirm('Delete your suggestion?')) deleteOwn(s.id); }}
+                        className="text-muted-foreground hover:text-destructive p-1" title="Delete">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   )}
                 </div>
 

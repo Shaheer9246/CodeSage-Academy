@@ -2,8 +2,27 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getLessonById, getAllLessons } from '@/data/lessons';
-import { getNetworkingLessonById } from '@/data/networkingLessons';
+import { NETWORKING_LESSONS } from '@/data/networkingLessons';
+import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
+import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
+import { PYTHON_LESSONS } from '@/data/pythonLessons';
+import { LOCAL_LESSONS } from '@/data/localLessons';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
+
+type Track = { prefix: string; path: string; list: Array<{ id: string; title: string }> };
+
+const TRACKS: Track[] = [
+  { prefix: 'net-',   path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'free-',  path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'fs-',    path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'py-',    path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'local-', path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+];
+
+const TRACK_HOME: Record<string, string> = {
+  'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
+  'py-': '/python', 'local-': '/local',
+};
 
 const LessonComplete = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,7 +30,16 @@ const LessonComplete = () => {
   const { user } = useUser();
   const [showConfetti, setShowConfetti] = useState(true);
 
-  const lesson = id ? (getLessonById(id) || getNetworkingLessonById(id)) : undefined;
+  // Find lesson + track
+  let lesson: any = id ? getLessonById(id) : undefined;
+  let track: Track | undefined;
+  if (!lesson && id) {
+    track = TRACKS.find(t => id.startsWith(t.prefix));
+    if (track) {
+      const found = track.list.find(l => l.id === id);
+      if (found) lesson = { id: found.id, title: found.title };
+    }
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setShowConfetti(false), 3000);
@@ -21,16 +49,36 @@ const LessonComplete = () => {
   if (!user) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/dashboard" replace />;
 
-  const all = getAllLessons();
-  const idx = all.findIndex(l => l.id === lesson.id);
-  const nextLesson = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
-  const takeaways: string[] = (lesson as any).keyTakeaways || [
-    `You learned ${lesson.title.toLowerCase()}`,
+  // Determine path/nextLesson
+  let lessonPath = '/learn';
+  let reviewPath = `/lesson/${lesson.id}`;
+  let nextPath: string | null = null;
+  let nextTitle: string | null = null;
+
+  if (track) {
+    lessonPath = TRACK_HOME[track.prefix];
+    reviewPath = `${track.path}/${lesson.id}`;
+    const idx = track.list.findIndex(l => l.id === lesson.id);
+    if (idx >= 0 && idx < track.list.length - 1) {
+      const nxt = track.list[idx + 1];
+      nextPath = `${track.path}/${nxt.id}`;
+      nextTitle = nxt.title;
+    }
+  } else {
+    const all = getAllLessons();
+    const idx = all.findIndex(l => l.id === lesson.id);
+    if (idx >= 0 && idx < all.length - 1) {
+      const nxt = all[idx + 1];
+      nextPath = `/lesson/${nxt.id}`;
+      nextTitle = nxt.title;
+    }
+  }
+
+  const takeaways: string[] = lesson.keyTakeaways || [
+    `You learned ${String(lesson.title).toLowerCase()}`,
     'You completed the practice challenge',
     'You earned XP and Sage Coins',
   ];
-  const isNetworking = lesson.id.startsWith('net-');
-  const lessonPath = isNetworking ? '/networking' : '/learn';
   const isLeveledUp = (user.xp - 5) > 0 && Math.floor((user.xp - 5) / 200) < Math.floor(user.xp / 200);
 
   return (
@@ -110,17 +158,15 @@ const LessonComplete = () => {
             <BookOpen className="w-3.5 h-3.5 text-primary" /> Lesson Path
           </button>
           <button
-            onClick={() => navigate(isNetworking ? `/n-lesson/${lesson.id}` : `/lesson/${lesson.id}`)}
+            onClick={() => navigate(reviewPath)}
             className="glass-card border border-border/50 text-foreground text-[11px] py-2.5 rounded-xl hover:border-primary/40 hover:neon-glow transition-all flex flex-col items-center justify-center gap-1"
           >
             <RotateCcw className="w-3.5 h-3.5 text-primary" /> Review
           </button>
-          {nextLesson ? (
+          {nextPath ? (
             <button
-              onClick={() => {
-                if (nextLesson.id.startsWith('net-')) navigate(`/n-lesson/${nextLesson.id}`);
-                else navigate(`/lesson/${nextLesson.id}`);
-              }}
+              onClick={() => navigate(nextPath)}
+              title={nextTitle || 'Next'}
               className="bg-primary text-primary-foreground text-[11px] font-semibold py-2.5 rounded-xl neon-glow hover:opacity-90 flex flex-col items-center justify-center gap-1"
             >
               <ArrowRight className="w-3.5 h-3.5" /> Next

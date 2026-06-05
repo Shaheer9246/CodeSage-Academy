@@ -42,7 +42,7 @@ const LocalLessonPage = () => {
     if (correctCount >= 3) {
       await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
-      setTimeout(() => navigate('/dashboard'), 900);
+      navigate('/complete/' + lesson.id);
     }
   };
 

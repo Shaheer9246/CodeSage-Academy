@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -51,16 +51,27 @@ const NETWORKING_LESSONS = [
 ];
 
 const Dashboard = () => {
-  const { user, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
+  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isGuest = searchParams.get('guest') === '1';
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [showShop, setShowShop] = useState(false);
 
-  useEffect(() => { if (user) updateStreak(); }, []);
+  useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
 
-  if (!user) { navigate('/auth'); return null; }
-  if (!user.name) { navigate('/onboarding'); return null; }
+  // Brand-new users → tour redirect (item 4)
+  useEffect(() => {
+    if (user && !isGuest && user.name && user.hasSeenTour === false) {
+      navigate('/tour', { replace: true });
+    }
+  }, [user, isGuest, navigate]);
+
+  if (loading) return null;
+  if (!user && !isGuest) { navigate('/auth'); return null; }
+  if (user && !user.name && !isGuest) { navigate('/onboarding'); return null; }
+
 
   const handlePromo = async () => {
     const ok = await applyPromoCode(promoInput);
@@ -70,11 +81,25 @@ const Dashboard = () => {
   };
 
   const handleBuyFreeze = async () => {
-    if ((user.xp || 0) < 10) { toast.error('Need 10 XP to buy a Streak Freeze'); return; }
+    if ((user?.xp || 0) < 10) { toast.error('Need 10 XP to buy a Streak Freeze'); return; }
     const ok = await buyFreezeStreak();
     if (ok) { toast.success('❄️ Streak Freeze active — one missed day is forgiven'); setShowShop(false); }
     else toast.error('Could not purchase freeze');
   };
+
+  const go = (path: string) => () => {
+    if (isGuest) {
+      toast.info('Sign up to unlock this — it takes 10 seconds ✨');
+      navigate('/auth');
+      return;
+    }
+    navigate(path);
+  };
+
+  // Display name/values: real for users, fake for guests
+  const displayName = user?.name || 'Explorer';
+  const xp = user?.xp || 0;
+  const streak = user?.streakCount || 0;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
@@ -83,28 +108,51 @@ const Dashboard = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         className="relative z-10 max-w-2xl mx-auto p-4 space-y-4"
       >
+        {isGuest && (
+          <div className="glass-card rounded-2xl border border-primary/40 p-3 flex items-center gap-3 neon-glow">
+            <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <UserPlus className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-display font-bold text-foreground">You're touring as a guest 👋</p>
+              <p className="text-[10px] text-muted-foreground">Sign up to save progress, earn XP, unlock lessons.</p>
+            </div>
+            <button onClick={() => navigate('/auth')}
+              className="bg-primary text-primary-foreground text-[11px] font-display font-bold px-3 py-1.5 rounded-xl whitespace-nowrap">
+              Sign Up
+            </button>
+          </div>
+        )}
+
         {/* Welcome + XP/Streak pills */}
         <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-xl font-bold font-display truncate">
-              Welcome Back, <span className="text-primary neon-text">{user.name}</span>
+              {isGuest ? 'Welcome to ' : 'Welcome Back, '}<span className="text-primary neon-text">{isGuest ? 'CodeSage' : displayName}</span>
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Continue your coding journey</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{isGuest ? 'Tap any tile for a preview' : 'Continue your coding journey'}</p>
           </div>
           <div className="flex gap-2 flex-shrink-0">
-            <button onClick={() => setShowShop(true)}
+            <button onClick={() => isGuest ? navigate('/auth') : setShowShop(true)}
               className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
               <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-bold text-primary">{user.xp || 0}</span>
+              <span className="text-xs font-bold text-primary">{xp}</span>
             </button>
             <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span className="text-xs font-bold text-orange-400">{user.streakCount}d</span>
+              <span className="text-xs font-bold text-orange-400">{streak}d</span>
             </div>
+            {!isGuest && (
+              <button onClick={() => navigate('/roadmap')} title="Roadmap"
+                className="flex items-center gap-1 bg-secondary/40 border border-border/40 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
+                <Map className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </motion.div>
 
-        {showShop && (
+
+        {showShop && user && (
           <div className="glass-card rounded-2xl p-4 border border-primary/30 neon-glow space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
@@ -134,7 +182,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-2 gap-3">
           <motion.button
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-            onClick={() => navigate('/challenges')}
+            onClick={go('/challenges')}
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
@@ -146,7 +194,7 @@ const Dashboard = () => {
 
           <motion.button
             initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
-            onClick={() => navigate('/playground')}
+            onClick={go('/playground')}
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
@@ -160,7 +208,7 @@ const Dashboard = () => {
         {/* Frontend Development Box */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-          onClick={() => navigate('/learn')}
+          onClick={go('/learn')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -185,7 +233,7 @@ const Dashboard = () => {
         {/* Computer & Networking — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
-          onClick={() => navigate('/networking?from=dashboard')}
+          onClick={go('/networking?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -210,7 +258,7 @@ const Dashboard = () => {
         {/* Full Stack Frontend Development — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-          onClick={() => navigate('/fullstack?from=dashboard')}
+          onClick={go('/fullstack?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -235,7 +283,7 @@ const Dashboard = () => {
         {/* Freelance & Clients — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
-          onClick={() => navigate('/freelance?from=dashboard')}
+          onClick={go('/freelance?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -260,7 +308,7 @@ const Dashboard = () => {
         {/* Python Programming — NEW */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-          onClick={() => navigate('/python?from=dashboard')}
+          onClick={go('/python?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -285,7 +333,7 @@ const Dashboard = () => {
         {/* Local-Only Coding — NEW */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
-          onClick={() => navigate('/local?from=dashboard')}
+          onClick={go('/local?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -310,7 +358,7 @@ const Dashboard = () => {
         {/* Suggestions tile */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-          onClick={() => navigate('/suggestions')}
+          onClick={go('/suggestions')}
           className="w-full glass-card p-4 rounded-2xl text-left hover:neon-border transition-all flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 flex items-center justify-center flex-shrink-0">

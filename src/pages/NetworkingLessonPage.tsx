@@ -29,7 +29,7 @@ const NetworkingLessonPage = () => {
     setSubmitted(true);
     if (correctCount >= 3) {
       completeLesson(lesson.id);
-      setTimeout(() => navigate(`/lesson/${lesson.id}/complete`), 800);
+      setTimeout(() => navigate('/complete/' + lesson.id), 800);
     }
   };
 

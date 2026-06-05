@@ -86,12 +86,12 @@ const LessonPage = () => {
     setChallengeResult(passed ? 'pass' : 'fail');
     if (passed) {
       completeLesson(lesson.id);
-      setTimeout(() => navigate(`/lesson/${lesson.id}/complete`), 600);
+      setTimeout(() => navigate('/complete/' + lesson.id), 600);
     }
   };
 
   const goToNext = () => {
-    navigate(`/lesson/${lesson.id}/complete`);
+    navigate('/complete/' + lesson.id);
   };
 
   const skipToNext = () => {
