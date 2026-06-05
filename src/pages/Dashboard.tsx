@@ -182,7 +182,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-2 gap-3">
           <motion.button
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-            onClick={() => navigate('/challenges')}
+            onClick={go('/challenges')}
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
@@ -194,7 +194,7 @@ const Dashboard = () => {
 
           <motion.button
             initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
-            onClick={() => navigate('/playground')}
+            onClick={go('/playground')}
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
@@ -208,7 +208,7 @@ const Dashboard = () => {
         {/* Frontend Development Box */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-          onClick={() => navigate('/learn')}
+          onClick={go('/learn')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -233,7 +233,7 @@ const Dashboard = () => {
         {/* Computer & Networking — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
-          onClick={() => navigate('/networking?from=dashboard')}
+          onClick={go('/networking?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -258,7 +258,7 @@ const Dashboard = () => {
         {/* Full Stack Frontend Development — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-          onClick={() => navigate('/fullstack?from=dashboard')}
+          onClick={go('/fullstack?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -283,7 +283,7 @@ const Dashboard = () => {
         {/* Freelance & Clients — UNLOCKED */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
-          onClick={() => navigate('/freelance?from=dashboard')}
+          onClick={go('/freelance?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -308,7 +308,7 @@ const Dashboard = () => {
         {/* Python Programming — NEW */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-          onClick={() => navigate('/python?from=dashboard')}
+          onClick={go('/python?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -333,7 +333,7 @@ const Dashboard = () => {
         {/* Local-Only Coding — NEW */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
-          onClick={() => navigate('/local?from=dashboard')}
+          onClick={go('/local?from=dashboard')}
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -358,7 +358,7 @@ const Dashboard = () => {
         {/* Suggestions tile */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-          onClick={() => navigate('/suggestions')}
+          onClick={go('/suggestions')}
           className="w-full glass-card p-4 rounded-2xl text-left hover:neon-border transition-all flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 flex items-center justify-center flex-shrink-0">
