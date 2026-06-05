@@ -51,16 +51,35 @@ const NETWORKING_LESSONS = [
 ];
 
 const Dashboard = () => {
-  const { user, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
+  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isGuest = searchParams.get('guest') === '1';
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [showShop, setShowShop] = useState(false);
 
-  useEffect(() => { if (user) updateStreak(); }, []);
+  useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
 
-  if (!user) { navigate('/auth'); return null; }
-  if (!user.name) { navigate('/onboarding'); return null; }
+  // Brand-new users → tour redirect (item 4)
+  useEffect(() => {
+    if (user && !isGuest && user.name && user.hasSeenTour === false) {
+      navigate('/tour', { replace: true });
+    }
+  }, [user, isGuest, navigate]);
+
+  if (loading) return null;
+  if (!user && !isGuest) { navigate('/auth'); return null; }
+  if (user && !user.name && !isGuest) { navigate('/onboarding'); return null; }
+
+  // Guest tile gate — only Frontend Lesson 1 allowed
+  const guestGate = (allowedPath: string | null) => (e: React.MouseEvent) => {
+    if (!isGuest) return;
+    if (allowedPath) return; // allowed
+    e.preventDefault(); e.stopPropagation();
+    toast.info('Sign up to unlock this — it takes 10 seconds ✨');
+    navigate('/auth');
+  };
 
   const handlePromo = async () => {
     const ok = await applyPromoCode(promoInput);
@@ -70,7 +89,7 @@ const Dashboard = () => {
   };
 
   const handleBuyFreeze = async () => {
-    if ((user.xp || 0) < 10) { toast.error('Need 10 XP to buy a Streak Freeze'); return; }
+    if ((user?.xp || 0) < 10) { toast.error('Need 10 XP to buy a Streak Freeze'); return; }
     const ok = await buyFreezeStreak();
     if (ok) { toast.success('❄️ Streak Freeze active — one missed day is forgiven'); setShowShop(false); }
     else toast.error('Could not purchase freeze');
