@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getLessonById, getAllLessons, isLessonUnlocked } from '@/data/lessons';
@@ -53,9 +54,9 @@ const LessonPage = () => {
     }
   }, [lesson?.id]);
 
-  if (!user) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('frontend', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/learn" replace />;
-  if (!isLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/learn" replace />;
+  if (!isLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/learn" replace />;
 
   const currentCode = fileTab === 'html' ? htmlCode : fileTab === 'css' ? cssCode : jsCode;
   const setCurrentCode = (val: string) => {
@@ -85,7 +86,7 @@ const LessonPage = () => {
     const passed = lesson.challenge.validationKeywords.every(kw => allCode.includes(normalizeCode(kw)));
     setChallengeResult(passed ? 'pass' : 'fail');
     if (passed) {
-      completeLesson(lesson.id);
+      if (user) completeLesson(lesson.id);
       setTimeout(() => navigate('/complete/' + lesson.id), 600);
     }
   };

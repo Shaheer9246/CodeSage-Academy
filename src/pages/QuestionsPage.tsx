@@ -1,266 +1,341 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, RotateCcw, Clock, Award, Target, BookOpen, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Question {
   q: string;
   options: string[];
-  answer: number; // index of correct option
+  answer: number;
+  topic: string;
 }
 
-const QUESTION_BATCHES: Question[][] = [
-  // Batch 1 - Computer Basics
-  [
-    { q: 'What does CPU stand for?', options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Program Utility', 'Core Processing Unit'], answer: 0 },
-    { q: 'Which of these is an input device?', options: ['Monitor', 'Printer', 'Keyboard', 'Speaker'], answer: 2 },
-    { q: 'What does RAM stand for?', options: ['Read Access Memory', 'Random Access Memory', 'Run Application Memory', 'Rapid Access Module'], answer: 1 },
-    { q: 'What is the brain of a computer?', options: ['RAM', 'Hard Drive', 'CPU', 'GPU'], answer: 2 },
-    { q: 'Which protocol is used to browse the web?', options: ['FTP', 'SMTP', 'HTTP', 'SSH'], answer: 2 },
-    { q: 'What does HTML stand for?', options: ['Hyper Text Markup Language', 'High Tech Modern Language', 'Hyper Transfer Markup Language', 'Home Tool Markup Language'], answer: 0 },
-    { q: 'What is an IP address?', options: ['Internet Protocol address', 'Internal Program address', 'Internet Packet address', 'Input Process address'], answer: 0 },
-    { q: 'Which layer of OSI model handles routing?', options: ['Physical', 'Data Link', 'Network', 'Transport'], answer: 2 },
-    { q: 'What does DNS stand for?', options: ['Domain Name System', 'Digital Network Service', 'Data Name Server', 'Domain Network System'], answer: 0 },
-    { q: 'Which tag is used for the largest heading in HTML?', options: ['<heading>', '<h6>', '<h1>', '<head>'], answer: 2 },
-  ],
-  // Batch 2 - Networking
-  [
-    { q: 'What is a firewall?', options: ['A type of virus', 'Network security system', 'A web browser', 'A programming language'], answer: 1 },
-    { q: 'How many layers does the OSI model have?', options: ['5', '6', '7', '4'], answer: 2 },
-    { q: 'What is a MAC address?', options: ['Email address', 'Hardware address', 'IP address', 'Web address'], answer: 1 },
-    { q: 'What does LAN stand for?', options: ['Large Area Network', 'Local Access Node', 'Local Area Network', 'Long Area Network'], answer: 2 },
-    { q: 'Which port does HTTP use by default?', options: ['21', '22', '443', '80'], answer: 3 },
-    { q: 'What is a router?', options: ['A type of cable', 'Forwards data packets between networks', 'A web server', 'An operating system'], answer: 1 },
-    { q: 'What does TCP stand for?', options: ['Transfer Control Protocol', 'Transmission Control Protocol', 'Technical Control Program', 'Total Connection Protocol'], answer: 1 },
-    { q: 'Which CSS property changes text color?', options: ['font-color', 'text-color', 'color', 'foreground'], answer: 2 },
-    { q: 'What is localhost?', options: ['A remote server', 'Your own computer', 'A cloud service', 'A domain name'], answer: 1 },
-    { q: 'What does the <p> tag do in HTML?', options: ['Creates a page', 'Creates a paragraph', 'Creates a picture', 'Creates a panel'], answer: 1 },
-  ],
-  // Batch 3 - HTML & Web Basics
-  [
-    { q: 'Which tag creates a link?', options: ['<link>', '<a>', '<href>', '<url>'], answer: 1 },
-    { q: 'What is CSS used for?', options: ['Database management', 'Styling web pages', 'Server scripting', 'Network security'], answer: 1 },
-    { q: 'What does the <img> tag need?', options: ['href attribute', 'src attribute', 'link attribute', 'url attribute'], answer: 1 },
-    { q: 'Which is NOT a programming language?', options: ['Python', 'HTML', 'Java', 'JavaScript'], answer: 1 },
-    { q: 'What creates a numbered list?', options: ['<ul>', '<nl>', '<ol>', '<list>'], answer: 2 },
-    { q: 'Which attribute opens link in new tab?', options: ['target="_new"', 'target="_blank"', 'new="true"', 'open="_blank"'], answer: 1 },
-    { q: 'What is the correct HTML element for inserting a line break?', options: ['<break>', '<lb>', '<br>', '<newline>'], answer: 2 },
-    { q: 'What does the <strong> tag do?', options: ['Makes text italic', 'Makes text bold', 'Makes text underlined', 'Makes text bigger'], answer: 1 },
-    { q: 'Where do you put JavaScript in HTML?', options: ['<javascript>', '<js>', '<script>', '<code>'], answer: 2 },
-    { q: 'What is a boolean value?', options: ['A number', 'True or False', 'A string', 'An array'], answer: 1 },
-  ],
-  // Batch 4 - CSS
-  [
-    { q: 'Which property changes background color?', options: ['bgcolor', 'background-color', 'color-background', 'bg-color'], answer: 1 },
-    { q: 'What does "margin" do in CSS?', options: ['Adds space inside element', 'Adds space outside element', 'Changes font size', 'Changes border'], answer: 1 },
-    { q: 'How do you select an element by ID?', options: ['.myId', '#myId', '*myId', '@myId'], answer: 1 },
-    { q: 'Which display value hides an element?', options: ['hidden', 'none', 'invisible', 'collapse'], answer: 1 },
-    { q: 'What is flexbox?', options: ['A JavaScript library', 'A CSS layout model', 'An HTML tag', 'A browser'], answer: 1 },
-    { q: 'How do you make text italic in CSS?', options: ['font-style: italic', 'text-style: italic', 'font: italic', 'style: italic'], answer: 0 },
-    { q: 'Which unit is relative to parent font size?', options: ['px', 'em', 'cm', 'pt'], answer: 1 },
-    { q: 'What does z-index control?', options: ['Font size', 'Element stacking order', 'Margin', 'Opacity'], answer: 1 },
-    { q: 'How do you select all <p> elements?', options: ['#p', '.p', 'p', '*p'], answer: 2 },
-    { q: 'What is "padding" in CSS?', options: ['Space outside element', 'Space inside element', 'Border width', 'Text spacing'], answer: 1 },
-  ],
-  // Batch 5 - JavaScript Basics
-  [
-    { q: 'Which keyword declares a variable in JS?', options: ['var', 'variable', 'v', 'dim'], answer: 0 },
-    { q: 'What does === do?', options: ['Assignment', 'Strict equality check', 'Loose equality', 'Not equal'], answer: 1 },
-    { q: 'How do you write a comment in JS?', options: ['<!-- comment -->', '// comment', '** comment **', '## comment'], answer: 1 },
-    { q: 'What is an array?', options: ['A single value', 'A function', 'An ordered list of values', 'A CSS property'], answer: 2 },
-    { q: 'How do you print to the console?', options: ['print()', 'console.log()', 'log()', 'echo()'], answer: 1 },
-    { q: 'What is a function?', options: ['A CSS selector', 'Reusable block of code', 'An HTML tag', 'A data type'], answer: 1 },
-    { q: 'What does NaN mean?', options: ['Not a Name', 'Not a Number', 'No Answer Needed', 'New Array Number'], answer: 1 },
-    { q: 'Which loop runs at least once?', options: ['for', 'while', 'do...while', 'forEach'], answer: 2 },
-    { q: 'What is "null" in JavaScript?', options: ['Zero', 'Undefined', 'Intentional absence of value', 'An error'], answer: 2 },
-    { q: 'How do you create an object?', options: ['[]', '()', '{}', '<>'], answer: 2 },
-  ],
-  // Batch 6 - More Networking
-  [
-    { q: 'What is bandwidth?', options: ['A type of cable', 'Data transfer capacity', 'A protocol', 'A server type'], answer: 1 },
-    { q: 'What is HTTPS?', options: ['Insecure HTTP', 'Secure HTTP', 'A file format', 'A server'], answer: 1 },
-    { q: 'What does WAN stand for?', options: ['Wide Area Network', 'Web Access Node', 'Wireless Area Network', 'World Access Network'], answer: 0 },
-    { q: 'What is a subnet mask?', options: ['A firewall setting', 'Divides IP into network/host', 'A type of virus', 'A browser plugin'], answer: 1 },
-    { q: 'What is ping used for?', options: ['Testing network connectivity', 'Sending emails', 'Creating websites', 'Downloading files'], answer: 0 },
-    { q: 'What is a gateway?', options: ['A web page', 'Entry point to another network', 'A database', 'An HTML element'], answer: 1 },
-    { q: 'Which protocol transfers files?', options: ['HTTP', 'FTP', 'SMTP', 'DNS'], answer: 1 },
-    { q: 'What is an ethernet cable?', options: ['Power cable', 'Wired network cable', 'USB cable', 'Audio cable'], answer: 1 },
-    { q: 'What does ISP stand for?', options: ['Internet Service Provider', 'Internal System Program', 'Internet Safety Protocol', 'Input Signal Processor'], answer: 0 },
-    { q: 'What is cloud computing?', options: ['Weather forecasting', 'Remote computing services', 'A programming language', 'A type of hardware'], answer: 1 },
-  ],
-  // Batch 7 - DOM & Events
-  [
-    { q: 'What is the DOM?', options: ['A CSS framework', 'Document Object Model', 'A JavaScript library', 'A server'], answer: 1 },
-    { q: 'How do you get an element by ID?', options: ['getElement()', 'document.getElementById()', 'findById()', 'select()'], answer: 1 },
-    { q: 'What is an event listener?', options: ['A CSS property', 'Waits for user actions', 'A server', 'An HTML tag'], answer: 1 },
-    { q: 'Which event fires on a click?', options: ['onhover', 'onclick', 'onpress', 'ontouch'], answer: 1 },
-    { q: 'What is event bubbling?', options: ['Events flow from child to parent', 'Events only fire once', 'Events go from parent to child', 'Events are cancelled'], answer: 0 },
-    { q: 'How do you change text content?', options: ['innerHTML', 'textContent', 'Both A and B', 'setText()'], answer: 2 },
-    { q: 'What is querySelector?', options: ['A database query', 'Selects first matching element', 'A CSS property', 'An HTML tag'], answer: 1 },
-    { q: 'What does preventDefault() do?', options: ['Stops the default action', 'Prevents CSS', 'Deletes element', 'Stops JavaScript'], answer: 0 },
-    { q: 'Which method adds a class?', options: ['addClass()', 'classList.add()', 'setClass()', 'appendClass()'], answer: 1 },
-    { q: 'What creates a new HTML element?', options: ['document.createElement()', 'new Element()', 'makeElement()', 'buildElement()'], answer: 0 },
-  ],
-  // Batch 8 - Git & Version Control
-  [
-    { q: 'What is Git?', options: ['A programming language', 'A version control system', 'A web browser', 'A CSS framework'], answer: 1 },
-    { q: 'What does "git init" do?', options: ['Deletes a repo', 'Initializes a new repo', 'Clones a repo', 'Pushes code'], answer: 1 },
-    { q: 'What does "git commit" do?', options: ['Uploads code', 'Saves a snapshot', 'Deletes files', 'Creates a branch'], answer: 1 },
-    { q: 'What is a branch in Git?', options: ['A copy of the code', 'A separate line of development', 'A file', 'A commit'], answer: 1 },
-    { q: 'What does "git push" do?', options: ['Downloads code', 'Uploads commits to remote', 'Merges branches', 'Creates files'], answer: 1 },
-    { q: 'What is GitHub?', options: ['A Git command', 'A hosting platform for Git repos', 'A text editor', 'A language'], answer: 1 },
-    { q: 'What does "git clone" do?', options: ['Creates a branch', 'Copies a remote repo locally', 'Deletes a repo', 'Merges code'], answer: 1 },
-    { q: 'What is a merge conflict?', options: ['A Git error', 'When two changes conflict', 'A broken commit', 'A deleted branch'], answer: 1 },
-    { q: 'What file tells Git what to ignore?', options: ['.gitconfig', '.gitignore', '.gitskip', '.gitexclude'], answer: 1 },
-    { q: 'What is a pull request?', options: ['A Git download', 'A request to merge changes', 'A branch deletion', 'A commit'], answer: 1 },
-  ],
-  // Batch 9 - React Basics
-  [
-    { q: 'What is React?', options: ['A CSS framework', 'A JavaScript library for UI', 'A database', 'A server language'], answer: 1 },
-    { q: 'What is JSX?', options: ['JavaScript XML syntax', 'A CSS preprocessor', 'A Node module', 'A testing tool'], answer: 0 },
-    { q: 'What is a component in React?', options: ['A CSS class', 'A reusable UI piece', 'An HTML tag', 'A database table'], answer: 1 },
-    { q: 'What hook manages state?', options: ['useEffect', 'useState', 'useRef', 'useMemo'], answer: 1 },
-    { q: 'What are props?', options: ['CSS properties', 'Data passed to components', 'JavaScript variables', 'HTML attributes'], answer: 1 },
-    { q: 'What does useEffect do?', options: ['Manages state', 'Handles side effects', 'Creates routes', 'Styles components'], answer: 1 },
-    { q: 'How do you render a list in React?', options: ['for loop', '.map()', 'while loop', 'forEach()'], answer: 1 },
-    { q: 'What is the virtual DOM?', options: ['The actual DOM', 'A lightweight copy of the DOM', 'A CSS model', 'A database'], answer: 1 },
-    { q: 'What is conditional rendering?', options: ['Rendering CSS conditionally', 'Showing UI based on conditions', 'A hook type', 'Server rendering'], answer: 1 },
-    { q: 'What creates a React app?', options: ['npm init', 'create-react-app', 'react-new', 'npm start'], answer: 1 },
-  ],
-  // Batch 10 - Mixed Advanced
-  [
-    { q: 'What is an API?', options: ['A programming language', 'Application Programming Interface', 'A browser', 'A CSS property'], answer: 1 },
-    { q: 'What does JSON stand for?', options: ['JavaScript Object Notation', 'Java Standard Object Naming', 'JavaScript Online Node', 'Java Script Open Network'], answer: 0 },
-    { q: 'What is async/await?', options: ['A CSS feature', 'Handles asynchronous code', 'An HTML tag', 'A Git command'], answer: 1 },
-    { q: 'What is npm?', options: ['A browser', 'Node Package Manager', 'A database', 'A CSS framework'], answer: 1 },
-    { q: 'What is responsive design?', options: ['Fast loading', 'Adapting to screen sizes', 'Server-side rendering', 'A JavaScript pattern'], answer: 1 },
-    { q: 'What is localStorage?', options: ['Server storage', 'Browser storage for key-value data', 'A database', 'Cloud storage'], answer: 1 },
-    { q: 'What does fetch() do?', options: ['Creates elements', 'Makes HTTP requests', 'Styles pages', 'Manages state'], answer: 1 },
-    { q: 'What is a Promise?', options: ['A CSS value', 'An object representing async result', 'An HTML element', 'A variable type'], answer: 1 },
-    { q: 'What is TypeScript?', options: ['A new language', 'JavaScript with types', 'A CSS preprocessor', 'A testing framework'], answer: 1 },
-    { q: 'What is deployment?', options: ['Writing code', 'Making app available to users', 'Testing code', 'Designing UI'], answer: 1 },
-  ],
+const BANK: Question[] = [
+  // Computer basics
+  { topic: 'Computer Basics', q: 'What does CPU stand for?', options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Program Utility', 'Core Processing Unit'], answer: 0 },
+  { topic: 'Computer Basics', q: 'Which is an input device?', options: ['Monitor', 'Printer', 'Keyboard', 'Speaker'], answer: 2 },
+  { topic: 'Computer Basics', q: 'What does RAM stand for?', options: ['Read Access Memory', 'Random Access Memory', 'Run App Memory', 'Rapid Access Module'], answer: 1 },
+  { topic: 'Computer Basics', q: 'What is the brain of a computer?', options: ['RAM', 'Hard Drive', 'CPU', 'GPU'], answer: 2 },
+  // Networking
+  { topic: 'Networking', q: 'Which protocol browses the web?', options: ['FTP', 'SMTP', 'HTTP', 'SSH'], answer: 2 },
+  { topic: 'Networking', q: 'How many layers does OSI have?', options: ['5', '6', '7', '4'], answer: 2 },
+  { topic: 'Networking', q: 'Default HTTP port?', options: ['21', '22', '443', '80'], answer: 3 },
+  { topic: 'Networking', q: 'What is localhost?', options: ['Remote server', 'Your own computer', 'Cloud service', 'Domain'], answer: 1 },
+  { topic: 'Networking', q: 'DNS stands for?', options: ['Domain Name System', 'Digital Network Service', 'Data Name Server', 'Domain Network System'], answer: 0 },
+  { topic: 'Networking', q: 'HTTPS is?', options: ['Insecure HTTP', 'Secure HTTP', 'File format', 'Server'], answer: 1 },
+  // HTML
+  { topic: 'HTML', q: 'Largest heading tag?', options: ['<heading>', '<h6>', '<h1>', '<head>'], answer: 2 },
+  { topic: 'HTML', q: 'Tag that creates a link?', options: ['<link>', '<a>', '<href>', '<url>'], answer: 1 },
+  { topic: 'HTML', q: 'The <img> tag needs?', options: ['href', 'src', 'link', 'url'], answer: 1 },
+  { topic: 'HTML', q: 'Numbered list tag?', options: ['<ul>', '<nl>', '<ol>', '<list>'], answer: 2 },
+  // CSS
+  { topic: 'CSS', q: 'Property that changes background color?', options: ['bgcolor', 'background-color', 'color-background', 'bg-color'], answer: 1 },
+  { topic: 'CSS', q: 'Select an element by ID?', options: ['.id', '#id', '*id', '@id'], answer: 1 },
+  { topic: 'CSS', q: 'Which value hides an element?', options: ['hidden', 'none', 'invisible', 'collapse'], answer: 1 },
+  { topic: 'CSS', q: 'Flexbox is?', options: ['JS library', 'CSS layout model', 'HTML tag', 'Browser'], answer: 1 },
+  // JavaScript
+  { topic: 'JavaScript', q: 'Declares a variable?', options: ['var', 'variable', 'v', 'dim'], answer: 0 },
+  { topic: 'JavaScript', q: '=== does what?', options: ['Assignment', 'Strict equality', 'Loose equality', 'Not equal'], answer: 1 },
+  { topic: 'JavaScript', q: 'JS comment syntax?', options: ['<!-- -->', '// x', '** x **', '## x'], answer: 1 },
+  { topic: 'JavaScript', q: 'Print to console?', options: ['print()', 'console.log()', 'log()', 'echo()'], answer: 1 },
+  // DOM
+  { topic: 'DOM', q: 'DOM stands for?', options: ['CSS framework', 'Document Object Model', 'JS library', 'Server'], answer: 1 },
+  { topic: 'DOM', q: 'Click event handler attribute?', options: ['onhover', 'onclick', 'onpress', 'ontouch'], answer: 1 },
+  { topic: 'DOM', q: 'Selects first matching element?', options: ['queryAll', 'querySelector', 'findOne', 'select'], answer: 1 },
+  // Git
+  { topic: 'Git', q: 'Git is?', options: ['Language', 'Version control', 'Browser', 'CSS framework'], answer: 1 },
+  { topic: 'Git', q: '"git commit" does?', options: ['Uploads', 'Saves snapshot', 'Deletes files', 'Creates branch'], answer: 1 },
+  { topic: 'Git', q: 'A branch is?', options: ['Code copy', 'Separate dev line', 'A file', 'A commit'], answer: 1 },
+  // React
+  { topic: 'React', q: 'React is?', options: ['CSS framework', 'JS library for UI', 'Database', 'Server lang'], answer: 1 },
+  { topic: 'React', q: 'State hook?', options: ['useEffect', 'useState', 'useRef', 'useMemo'], answer: 1 },
+  { topic: 'React', q: 'Props are?', options: ['CSS props', 'Data passed to components', 'JS vars', 'HTML attrs'], answer: 1 },
+  // APIs
+  { topic: 'APIs', q: 'API stands for?', options: ['App Programming Interface', 'Application Programming Interface', 'Active Process Index', 'Auto Program Input'], answer: 1 },
+  { topic: 'APIs', q: 'JSON stands for?', options: ['JavaScript Object Notation', 'Java Standard Object Naming', 'JS Online Node', 'JS Open Network'], answer: 0 },
+  { topic: 'APIs', q: 'fetch() does?', options: ['Creates element', 'Makes HTTP requests', 'Styles pages', 'Manages state'], answer: 1 },
 ];
+
+type Mode = 'menu' | 'exam' | 'result';
+interface AnswerLog { qIdx: number; chosen: number; correct: boolean; }
+
+const EXAM_LENGTHS = [10, 20, 30];
+const EXAM_SECONDS_PER_Q = 30;
+
+function pickQuestions(count: number, topic: string | 'All'): Question[] {
+  const pool = topic === 'All' ? BANK : BANK.filter(q => q.topic === topic);
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+const ALL_TOPICS = Array.from(new Set(BANK.map(q => q.topic)));
 
 const QuestionsPage = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<Mode>('menu');
+  const [length, setLength] = useState(10);
+  const [topic, setTopic] = useState<string | 'All'>('All');
 
-  // Determine today's batch
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-  const batchIndex = dayOfYear % QUESTION_BATCHES.length;
-  const questions = QUESTION_BATCHES[batchIndex];
-
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
+  const [logs, setLogs] = useState<AnswerLog[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
-  const [answered, setAnswered] = useState<boolean[]>(new Array(10).fill(false));
-  const [correct, setCorrect] = useState(0);
-  const [showResult, setShowResult] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (mode !== 'exam') return;
+    timerRef.current = window.setInterval(() => {
+      setSecondsLeft(s => {
+        if (s <= 1) { finishExam(); return 0; }
+        return s - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
 
   if (!user) { navigate('/auth'); return null; }
 
-  const question = questions[currentQ];
-
-  const handleSelect = (idx: number) => {
-    if (answered[currentQ]) return;
-    setSelected(idx);
-    const newAnswered = [...answered];
-    newAnswered[currentQ] = true;
-    setAnswered(newAnswered);
-    if (idx === question.answer) setCorrect(c => c + 1);
-  };
-
-  const handleNext = () => {
-    if (currentQ < 9) {
-      setCurrentQ(c => c + 1);
-      setSelected(null);
-    } else {
-      setShowResult(true);
-    }
-  };
-
-  const handleRetry = () => {
+  const startExam = () => {
+    const qs = pickQuestions(length, topic);
+    if (qs.length === 0) return;
+    setQuestions(qs);
     setCurrentQ(0);
+    setLogs([]);
     setSelected(null);
-    setAnswered(new Array(10).fill(false));
-    setCorrect(0);
-    setShowResult(false);
+    setSecondsLeft(qs.length * EXAM_SECONDS_PER_Q);
+    setMode('exam');
   };
 
-  if (showResult) {
+  const recordAnswer = (idx: number) => {
+    if (selected !== null) return;
+    setSelected(idx);
+    const correct = idx === questions[currentQ].answer;
+    setLogs(prev => [...prev, { qIdx: currentQ, chosen: idx, correct }]);
+  };
+
+  const nextQ = () => {
+    if (currentQ + 1 >= questions.length) finishExam();
+    else { setCurrentQ(currentQ + 1); setSelected(null); }
+  };
+
+  const finishExam = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setMode('result');
+  };
+
+  const restart = () => { setMode('menu'); setLogs([]); setSelected(null); setCurrentQ(0); };
+
+  // ===== MENU =====
+  if (mode === 'menu') {
     return (
-      <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card p-8 rounded-2xl text-center max-w-sm w-full">
-          <div className="text-5xl mb-4">{correct >= 7 ? '🎉' : correct >= 5 ? '👍' : '📚'}</div>
-          <h2 className="text-2xl font-bold font-display text-foreground mb-2">Quiz Complete!</h2>
-          <p className="text-3xl font-bold text-primary mb-1">{correct}/10</p>
-          <p className="text-sm text-muted-foreground mb-4">
-            {correct >= 7 ? 'Excellent! Great knowledge!' : correct >= 5 ? 'Good effort! Keep learning!' : 'Keep practicing, you\'ll get there!'}
-          </p>
-          <p className="text-[10px] text-muted-foreground mb-4">Batch {batchIndex + 1} of {QUESTION_BATCHES.length} • New questions tomorrow</p>
-          <button onClick={handleRetry} className="flex items-center gap-2 mx-auto bg-primary text-primary-foreground px-6 py-2.5 rounded-lg font-semibold text-sm">
-            <RotateCcw className="w-4 h-4" /> Retry
-          </button>
-        </motion.div>
+      <div className="min-h-screen bg-background grid-bg p-4">
+        <div className="max-w-lg mx-auto space-y-4">
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold font-display text-foreground">Exam Simulator</h1>
+              <p className="text-xs text-muted-foreground">Timed multiple-choice quizzes with deep results.</p>
+            </div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-5 space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Length</label>
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                {EXAM_LENGTHS.map(n => (
+                  <button key={n} onClick={() => setLength(n)}
+                    className={`py-2.5 rounded-xl border text-sm font-semibold ${
+                      length === n ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-secondary/20 border-border/30 text-foreground'
+                    }`}>
+                    {n} questions
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2">Time limit: 30 seconds per question.</p>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Topic</label>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {(['All', ...ALL_TOPICS] as const).map(t => (
+                  <button key={t} onClick={() => setTopic(t)}
+                    className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${
+                      topic === t ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-secondary/20 border-border/30 text-muted-foreground'
+                    }`}>{t}</button>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={startExam}
+              className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90">
+              <Play className="w-4 h-4" /> Start Exam
+            </button>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4 text-xs text-muted-foreground">
+            <BookOpen className="w-4 h-4 text-primary mb-2" />
+            Results show your score, accuracy by topic, and a review sheet of every question you missed.
+          </div>
+        </div>
       </div>
     );
   }
 
+  // ===== EXAM =====
+  if (mode === 'exam') {
+    const q = questions[currentQ];
+    const mm = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
+    const ss = (secondsLeft % 60).toString().padStart(2, '0');
+    return (
+      <div className="min-h-screen bg-background grid-bg p-4">
+        <div className="max-w-lg mx-auto space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-mono">Question {currentQ + 1}/{questions.length}</span>
+            <div className={`flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded-full ${secondsLeft < 30 ? 'bg-destructive/15 text-destructive' : 'bg-primary/10 text-primary'}`}>
+              <Clock className="w-3.5 h-3.5" /> {mm}:{ss}
+            </div>
+          </div>
+
+          <div className="flex gap-1">
+            {questions.map((_, i) => (
+              <div key={i} className={`flex-1 h-1 rounded-full ${
+                i < currentQ ? 'bg-primary/40' : i === currentQ ? 'bg-primary' : 'bg-secondary/30'
+              }`} />
+            ))}
+          </div>
+
+          <motion.div key={currentQ} initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="glass-card p-5 rounded-2xl">
+            <p className="text-[10px] text-primary mb-1 font-mono uppercase tracking-wider">{q.topic}</p>
+            <p className="text-sm font-semibold text-foreground mb-4">{q.q}</p>
+            <div className="space-y-2">
+              {q.options.map((opt, i) => {
+                const isCorrect = i === q.answer;
+                const isPicked = selected === i;
+                const showResult = selected !== null;
+                return (
+                  <button key={i} onClick={() => recordAnswer(i)}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-xs font-medium transition-all border ${
+                      showResult && isCorrect ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' :
+                      showResult && isPicked && !isCorrect ? 'bg-red-500/15 border-red-500/40 text-red-400' :
+                      'bg-secondary/20 border-border/30 text-foreground hover:bg-secondary/40'
+                    }`}>
+                    <span className="mr-2 font-mono">{String.fromCharCode(65 + i)}.</span>{opt}
+                    {showResult && isCorrect && <CheckCircle2 className="w-4 h-4 inline ml-2" />}
+                    {showResult && isPicked && !isCorrect && <XCircle className="w-4 h-4 inline ml-2" />}
+                  </button>
+                );
+              })}
+            </div>
+            {selected !== null && (
+              <button onClick={nextQ}
+                className="mt-4 w-full bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-semibold">
+                {currentQ + 1 < questions.length ? 'Next' : 'See Results'}
+              </button>
+            )}
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ===== RESULT =====
+  const total = questions.length;
+  const correct = logs.filter(l => l.correct).length;
+  const pct = Math.round((correct / total) * 100);
+  const passed = pct >= 70;
+
+  const topicBreakdown: Record<string, { right: number; total: number }> = {};
+  logs.forEach(l => {
+    const t = questions[l.qIdx].topic;
+    if (!topicBreakdown[t]) topicBreakdown[t] = { right: 0, total: 0 };
+    topicBreakdown[t].total++;
+    if (l.correct) topicBreakdown[t].right++;
+  });
+
+  const missed = logs.filter(l => !l.correct);
+
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <div className="max-w-lg mx-auto p-4 space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold font-display text-foreground">Daily Questions</h1>
-          <span className="text-xs text-muted-foreground font-mono">Batch {batchIndex + 1}</span>
+    <div className="min-h-screen bg-background grid-bg p-4">
+      <div className="max-w-lg mx-auto space-y-4">
+        <div className="glass-card rounded-2xl p-6 text-center">
+          <Award className={`w-10 h-10 mx-auto mb-2 ${passed ? 'text-emerald-400' : 'text-warning'}`} />
+          <h2 className="text-2xl font-bold font-display text-foreground">{passed ? 'Passed!' : 'Keep studying'}</h2>
+          <p className="text-4xl font-bold text-primary mt-2 font-mono">{correct}/{total}</p>
+          <p className="text-xs text-muted-foreground mt-1">{pct}% accuracy</p>
+          <span className={`inline-block mt-3 px-3 py-1 rounded-full text-[11px] font-semibold ${passed ? 'bg-emerald-500/15 text-emerald-400' : 'bg-warning/15 text-warning'}`}>
+            {passed ? 'PASS · ≥70%' : 'FAIL · need 70%'}
+          </span>
         </div>
 
-        {/* Progress dots */}
-        <div className="flex gap-1.5 justify-center">
-          {questions.map((_, i) => (
-            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all ${
-              i === currentQ ? 'bg-primary scale-125' : answered[i] ? 'bg-primary/40' : 'bg-secondary/50'
-            }`} />
-          ))}
-        </div>
-
-        {/* Question */}
-        <motion.div key={currentQ} initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="glass-card p-5 rounded-2xl">
-          <p className="text-xs text-muted-foreground mb-1 font-mono">Question {currentQ + 1}/10</p>
-          <p className="text-sm font-semibold text-foreground mb-4">{question.q}</p>
-
+        <div className="glass-card rounded-2xl p-5">
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+            <Target className="w-4 h-4 text-primary" /> Topic Strengths
+          </h3>
           <div className="space-y-2">
-            {question.options.map((opt, i) => {
-              const isAnswered = answered[currentQ];
-              const isCorrectOption = i === question.answer;
-              const isSelected = selected === i;
+            {Object.entries(topicBreakdown).map(([t, d]) => {
+              const tp = Math.round((d.right / d.total) * 100);
+              const tier = tp >= 80 ? 'Mastered' : tp >= 50 ? 'Solid' : 'Needs Review';
+              const cls = tp >= 80 ? 'text-emerald-400' : tp >= 50 ? 'text-primary' : 'text-warning';
               return (
-                <button key={i} onClick={() => handleSelect(i)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-xs font-medium transition-all border ${
-                    isAnswered && isCorrectOption ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' :
-                    isAnswered && isSelected && !isCorrectOption ? 'bg-red-500/15 border-red-500/40 text-red-400' :
-                    isSelected ? 'bg-primary/10 border-primary/30 text-primary' :
-                    'bg-secondary/20 border-border/30 text-foreground hover:bg-secondary/40'
-                  }`}
-                >
-                  <span className="mr-2 font-mono">{String.fromCharCode(65 + i)}.</span>
-                  {opt}
-                  {isAnswered && isCorrectOption && <CheckCircle2 className="w-4 h-4 inline ml-2" />}
-                  {isAnswered && isSelected && !isCorrectOption && <XCircle className="w-4 h-4 inline ml-2" />}
-                </button>
+                <div key={t} className="flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="font-semibold text-foreground truncate">{t}</span>
+                      <span className={`font-mono ${cls}`}>{tp}% · {tier}</span>
+                    </div>
+                    <div className="h-1.5 bg-secondary/30 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${tp >= 80 ? 'bg-emerald-400' : tp >= 50 ? 'bg-primary' : 'bg-warning'}`} style={{ width: `${tp}%` }} />
+                    </div>
+                  </div>
+                </div>
               );
             })}
           </div>
+        </div>
 
-          {answered[currentQ] && (
-            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              onClick={handleNext}
-              className="mt-4 w-full bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
-              {currentQ < 9 ? <>Next <ArrowRight className="w-4 h-4" /></> : 'See Results'}
-            </motion.button>
-          )}
-        </motion.div>
+        {missed.length > 0 && (
+          <div className="glass-card rounded-2xl p-5">
+            <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+              <BookOpen className="w-4 h-4 text-primary" /> Review Sheet ({missed.length})
+            </h3>
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+              {missed.map(l => {
+                const q = questions[l.qIdx];
+                return (
+                  <div key={l.qIdx} className="bg-secondary/15 rounded-xl p-3 border border-border/30">
+                    <p className="text-[10px] text-muted-foreground font-mono mb-1">{q.topic}</p>
+                    <p className="text-xs font-semibold text-foreground mb-2">{q.q}</p>
+                    <div className="space-y-1 text-[11px]">
+                      <div className="flex items-start gap-2 text-red-400">
+                        <XCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                        <span>You chose: {q.options[l.chosen]}</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                        <span>Correct: {q.options[q.answer]}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <button onClick={restart} className="flex-1 bg-secondary/30 text-foreground py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+            <RotateCcw className="w-4 h-4" /> Another Exam
+          </button>
+          <button onClick={() => navigate('/dashboard')} className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl text-sm font-semibold">
+            Done
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
@@ -28,9 +29,9 @@ const FullstackLessonPage = () => {
   const [activeFile, setActiveFile] = useState<'html' | 'css' | 'js'>('html');
   const [mobileLab, setMobileLab] = useState<MobileLab>('code');
 
-  if (!user) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('fullstack', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/fullstack" replace />;
-  if (!isFullstackLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/fullstack" replace />;
+  if (!isFullstackLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/fullstack" replace />;
 
   const code = lesson.practical.code;
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
@@ -40,7 +41,7 @@ const FullstackLessonPage = () => {
   const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
-      await completeLesson(lesson.id);
+      if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate('/complete/' + lesson.id);
     }

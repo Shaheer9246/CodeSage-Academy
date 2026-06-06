@@ -1,11 +1,12 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Upload, ArrowLeft, Play, Eye, EyeOff, Sun, Moon, Plus, Trash2, Edit3, Check, X, FolderOpen, Save, AlertTriangle, Files, Code as CodeIcon, History } from 'lucide-react';
+import { Download, Upload, ArrowLeft, Play, Eye, EyeOff, Sun, Moon, Plus, Trash2, Edit3, Check, X, FolderOpen, Save, AlertTriangle, Files, Code as CodeIcon, History, Layers, FileText } from 'lucide-react';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
 import { useIsMobile } from '@/hooks/use-mobile';
+import JSZip from 'jszip';
 
 interface FileItem { id: string; name: string; lang: string; content: string; }
 interface RecentSnapshot { id: string; name: string; date: string; html: string; css: string; js: string; }
@@ -27,7 +28,6 @@ const Playground = () => {
   const [activeFileId, setActiveFileId] = useState('html');
   const [consoleLogs, setConsoleLogs] = useState<{ type: string; message: string }[]>([]);
   const [showPreview, setShowPreview] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
   const [editorTheme, setEditorTheme] = useState<'vs-dark' | 'light'>('vs-dark');
   const [fontSize, setFontSize] = useState(14);
   const [showSidebar, setShowSidebar] = useState(true);
@@ -36,12 +36,28 @@ const Playground = () => {
   const [renameValue, setRenameValue] = useState('');
   const [mobileTab, setMobileTab] = useState<MobileTab>('code');
   const [recents, setRecents] = useState<RecentSnapshot[]>([]);
+  // NEW: single vs multi file mode + custom preview source
+  const [multiMode, setMultiMode] = useState<boolean>(() => {
+    try { return localStorage.getItem('codesage_pg_multi') !== '0'; } catch { return true; }
+  });
+  const [previewSrcId, setPreviewSrcId] = useState<string>('html'); // which HTML file to preview
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const zipInputRef = useRef<HTMLInputElement>(null);
 
   const activeFile = files.find(f => f.id === activeFileId) || files[0];
-  const currentHtml = files.find(f => f.id === 'html')?.content || '';
+  const currentHtml = files.find(f => f.id === previewSrcId)?.content
+                   || files.find(f => f.id === 'html')?.content || '';
   const currentCss = files.find(f => f.id === 'css')?.content || '';
   const currentJs = files.find(f => f.id === 'js')?.content || '';
+
+  // Toggle multi-file mode persistence
+  useEffect(() => {
+    try { localStorage.setItem('codesage_pg_multi', multiMode ? '1' : '0'); } catch {}
+    if (!multiMode) setShowSidebar(false);
+  }, [multiMode]);
+
+  // List of HTML-ish files for "Preview source" selector
+  const htmlFiles = useMemo(() => files.filter(f => f.lang === 'html' || f.name.endsWith('.html')), [files]);
 
   // Load recents
   useEffect(() => {
@@ -122,6 +138,33 @@ const Playground = () => {
     e.target.value = '';
   };
 
+  // ZIP upload — extract text-like files
+  const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const zip = await JSZip.loadAsync(buf);
+      const added: FileItem[] = [];
+      const entries = Object.values(zip.files).filter((z: any) => !z.dir);
+      for (const z of entries) {
+        const name = (z as any).name.split('/').pop() || (z as any).name;
+        const ext = name.split('.').pop()?.toLowerCase() || '';
+        if (!['html', 'htm', 'css', 'js', 'jsx', 'ts', 'tsx', 'json', 'md', 'txt', 'svg'].includes(ext)) continue;
+        const content = await (z as any).async('string');
+        const lang = ext === 'css' ? 'css' : (ext === 'js' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') ? 'javascript' : 'html';
+        added.push({ id: `zip-${Date.now()}-${name}`, name, lang, content });
+      }
+      if (added.length === 0) { alert('No text files found in zip.'); return; }
+      setFiles(prev => [...prev, ...added]);
+      setMultiMode(true);
+      setShowSidebar(true);
+    } catch (err) {
+      alert('Could not read this zip file.');
+    }
+    e.target.value = '';
+  };
+
   const addNewFile = () => {
     const name = `file-${files.length + 1}.html`;
     const newFile: FileItem = { id: `custom-${Date.now()}`, name, lang: 'html', content: '' };
@@ -135,6 +178,7 @@ const Playground = () => {
     if (['html', 'css', 'js'].includes(id)) return;
     setFiles(prev => prev.filter(f => f.id !== id));
     if (activeFileId === id) setActiveFileId('html');
+    if (previewSrcId === id) setPreviewSrcId('html');
   };
 
   const startRename = (f: FileItem) => { setRenamingId(f.id); setRenameValue(f.name); };
@@ -207,8 +251,12 @@ const Playground = () => {
                 <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Files</span>
                 <div className="flex gap-1">
                   <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js" className="hidden" />
+                  <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip" className="hidden" />
                   <button onClick={() => fileInputRef.current?.click()} className="text-[10px] flex items-center gap-1 text-muted-foreground bg-secondary/40 px-2 py-1 rounded">
                     <Upload className="w-3 h-3" /> Import
+                  </button>
+                  <button onClick={() => zipInputRef.current?.click()} className="text-[10px] flex items-center gap-1 text-muted-foreground bg-secondary/40 px-2 py-1 rounded">
+                    <FileText className="w-3 h-3" /> ZIP
                   </button>
                   <button onClick={addNewFile} className="text-[10px] flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded">
                     <Plus className="w-3 h-3" /> New
@@ -380,9 +428,24 @@ const Playground = () => {
             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           </button>
           <div className="w-px h-4 bg-border/30 mx-1" />
+          <button onClick={() => setMultiMode(m => !m)} title={multiMode ? 'Switch to single-file mode' : 'Switch to multi-file mode'}
+            className={`flex items-center gap-1 text-[10px] px-1.5 py-1 rounded ${multiMode ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/30'}`}>
+            <Layers className="w-3 h-3" /> {multiMode ? 'Multi' : 'Single'}
+          </button>
+          {htmlFiles.length > 1 && (
+            <select value={previewSrcId} onChange={e => setPreviewSrcId(e.target.value)} title="Preview source"
+              className="bg-secondary/40 border border-border/30 rounded text-[10px] text-muted-foreground px-1.5 py-1 focus:outline-none">
+              {htmlFiles.map(f => <option key={f.id} value={f.id}>▶ {f.name}</option>)}
+            </select>
+          )}
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js,.jsx" className="hidden" />
+          <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip" className="hidden" />
           <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Upload className="w-3 h-3" /> Import
+          </button>
+          <button onClick={() => zipInputRef.current?.click()} title="Upload project ZIP"
+            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
+            <FileText className="w-3 h-3" /> ZIP
           </button>
           <button onClick={handleExport} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Download className="w-3 h-3" /> Export

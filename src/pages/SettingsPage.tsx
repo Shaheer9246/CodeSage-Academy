@@ -1,10 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAllLessons } from '@/data/lessons';
 import { motion } from 'framer-motion';
 import { applyTheme, getTheme, THEMES, ThemeName } from '@/lib/theme';
+import { Switch } from '@/components/ui/switch';
+import { resetGuestLessons } from '@/lib/guestGate';
+import JSZip from 'jszip';
+import { toast } from 'sonner';
 
 const BADGE_INFO: Record<string, { icon: string; label: string }> = {
   'lite': { icon: '🌱', label: 'Lite Coder' },
@@ -34,17 +38,62 @@ const ACHIEVEMENTS = [
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const { user, logout, deleteAccount } = useUser();
+  const { user, logout, deleteAccount, resetTour } = useUser();
   const [theme, setTheme] = useState<ThemeName>('dark');
+  const [autoRun, setAutoRun] = useState<boolean>(() => {
+    try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
+  });
 
   useEffect(() => { setTheme(getTheme()); }, []);
+  useEffect(() => { try { localStorage.setItem('codesage_autorun', autoRun ? '1' : '0'); } catch {} }, [autoRun]);
 
-  const changeTheme = (t: ThemeName) => {
-    setTheme(t);
-    applyTheme(t);
+  const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
+
+  const handleReplayTour = async () => {
+    await resetTour();
+    navigate('/tour');
+  };
+
+  const handleResetRuntime = () => {
+    if (!confirm('Reset runtime caches? Clears playground recents, snapshots, and guest progress.')) return;
+    try {
+      localStorage.removeItem('codesage_playground_recent');
+      localStorage.removeItem('codesage_pg_multi');
+      resetGuestLessons();
+      toast.success('Runtime caches cleared.');
+    } catch { toast.error('Could not clear caches.'); }
+  };
+
+  const handleClearSandbox = () => {
+    if (!confirm('Clear ALL non-account local data (theme, playground, caches)? Your account/progress stay.')) return;
+    try {
+      const keep = ['supabase.auth.token'];
+      Object.keys(localStorage).forEach(k => { if (!keep.includes(k)) localStorage.removeItem(k); });
+      toast.success('Sandbox cleared.');
+    } catch {}
+  };
+
+  const handleExportWorkspace = async () => {
+    try {
+      const zip = new JSZip();
+      const playground = localStorage.getItem('codesage_playground_recent') || '[]';
+      zip.file('playground-recents.json', playground);
+      zip.file('profile.json', JSON.stringify({
+        name: user?.name, xp: user?.xp, streak: user?.streakCount,
+        completedLessons: user?.completedLessons, badges: user?.badges,
+      }, null, 2));
+      zip.file('README.txt', 'CodeSage workspace export — generated from Settings.');
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `codesage-workspace-${Date.now()}.zip`; a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Workspace exported.');
+    } catch { toast.error('Export failed.'); }
   };
 
   if (!user) { navigate('/auth'); return null; }
+
 
   const joinDate = user.joinDate ? new Date(user.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
   const totalLessons = getAllLessons().length;
@@ -201,6 +250,50 @@ const SettingsPage = () => {
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Power Tools */}
+        <div className="glass-card rounded-2xl p-5">
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+            <Wrench className="w-4 h-4 text-primary" /> Power Tools
+          </h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground">Auto-Run Preview</p>
+                <p className="text-[10px] text-muted-foreground">Live preview refreshes as you type in Playground.</p>
+              </div>
+              <Switch checked={autoRun} onCheckedChange={setAutoRun} />
+            </div>
+            <button onClick={handleReplayTour} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
+              <PlayCircle className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-foreground">Replay Tour</p>
+                <p className="text-[10px] text-muted-foreground">Rewatch the onboarding carousel.</p>
+              </div>
+            </button>
+            <button onClick={handleExportWorkspace} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
+              <Download className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-foreground">Export Workspace (.zip)</p>
+                <p className="text-[10px] text-muted-foreground">Download your profile snapshot & playground recents.</p>
+              </div>
+            </button>
+            <button onClick={handleResetRuntime} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
+              <RefreshCw className="w-4 h-4 text-warning flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-foreground">Reset Runtime</p>
+                <p className="text-[10px] text-muted-foreground">Clear playground snapshots & guest progress.</p>
+              </div>
+            </button>
+            <button onClick={handleClearSandbox} className="w-full flex items-center gap-3 bg-red-500/5 rounded-xl px-3 py-2.5 border border-red-500/20 hover:bg-red-500/10 transition-colors text-left">
+              <Eraser className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-red-400">Clear Sandbox</p>
+                <p className="text-[10px] text-muted-foreground">Wipe all local cache (theme, settings, etc).</p>
+              </div>
+            </button>
           </div>
         </div>
 
