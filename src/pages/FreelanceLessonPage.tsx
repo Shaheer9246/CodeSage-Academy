@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
@@ -18,7 +19,7 @@ const FreelanceLessonPage = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  if (!user) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('freelance', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/freelance" replace />;
   if (!isFreelanceLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/freelance" replace />;
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
@@ -28,7 +29,7 @@ const LocalLessonPage = () => {
   const [activeFile, setActiveFile] = useState<'html' | 'css' | 'js'>('html');
   const [mobileLab, setMobileLab] = useState<MobileLab>('code');
 
-  if (!user) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('local', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/local" replace />;
   if (!isLocalLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/local" replace />;
 
