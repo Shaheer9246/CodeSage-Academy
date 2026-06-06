@@ -40,9 +40,11 @@ export default function EditorShortcuts({ editorRef }: Props) {
   useEffect(() => {
     if (!isMobile || typeof window === 'undefined' || !window.visualViewport) return;
     const vv = window.visualViewport;
-    const update = () => {
-      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setBottomOffset(offset);
+   const update = () => {
+      // Calculate exactly how much the native keyboard pushed up the viewport
+      const offset = window.innerHeight - vv.height;
+      // Ensure we only set an offset if the keyboard is actually visible
+      setBottomOffset(offset > 40 ? offset : 0);
     };
     vv.addEventListener('resize', update);
     vv.addEventListener('scroll', update);
@@ -127,9 +129,9 @@ export default function EditorShortcuts({ editorRef }: Props) {
     </div>
   );
 
-  if (isMobile && focused && bottomOffset > 50) {
+ if (isMobile && focused) {
     return (
-      <div className="fixed left-0 right-0 z-50 shadow-2xl" style={{ bottom: `${bottomOffset}px` }}>
+      <div className="fixed left-0 right-0 z-50 shadow-2xl transition-all duration-75" style={{ bottom: `${bottomOffset}px` }}>
         {bar}
       </div>
     );
