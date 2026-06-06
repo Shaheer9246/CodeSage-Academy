@@ -11,7 +11,7 @@ const KEY = 'codesage_guest_lesson_taken';
  */
 export function useGuestLessonGate(track: string, lessonId: string | undefined) {
   const [sp] = useSearchParams();
-  const isGuest = sp.get('guest') === '1';
+  const isGuest = sp.get('guest') === '1' || window.location.search.includes('guest=1') || window.location.pathname.includes('/trip');
   const navigate = useNavigate();
 
   useEffect(() => {
