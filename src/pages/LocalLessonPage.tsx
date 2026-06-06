@@ -31,7 +31,7 @@ const LocalLessonPage = () => {
 
   const { isGuest: __pgGuest } = useGuestLessonGate('local', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/local" replace />;
-  if (!isLocalLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/local" replace />;
+  if (!isLocalLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/local" replace />;
 
   const code = lesson.practical.code;
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
@@ -41,7 +41,7 @@ const LocalLessonPage = () => {
   const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
-      await completeLesson(lesson.id);
+      await if (user) completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate('/complete/' + lesson.id);
     }

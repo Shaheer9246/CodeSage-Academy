@@ -21,7 +21,7 @@ const PythonLessonPage = () => {
 
   const { isGuest: __pgGuest } = useGuestLessonGate('python', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/python" replace />;
-  if (!isPythonLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/python" replace />;
+  if (!isPythonLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/python" replace />;
 
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
   const passed = correctCount >= 3;
@@ -30,7 +30,7 @@ const PythonLessonPage = () => {
   const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
-      await completeLesson(lesson.id);
+      await if (user) completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate('/complete/' + lesson.id);
     }

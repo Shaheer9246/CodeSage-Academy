@@ -21,7 +21,7 @@ const FreelanceLessonPage = () => {
 
   const { isGuest: __pgGuest } = useGuestLessonGate('freelance', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/freelance" replace />;
-  if (!isFreelanceLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/freelance" replace />;
+  if (!isFreelanceLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/freelance" replace />;
 
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
   const passed = correctCount >= 3;
@@ -30,7 +30,7 @@ const FreelanceLessonPage = () => {
   const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
-      await completeLesson(lesson.id);
+      await if (user) completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate('/complete/' + lesson.id);
     }
