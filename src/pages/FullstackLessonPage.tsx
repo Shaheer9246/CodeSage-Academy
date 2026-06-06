@@ -41,7 +41,7 @@ const FullstackLessonPage = () => {
   const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
-      await if (user) completeLesson(lesson.id);
+      if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate('/complete/' + lesson.id);
     }
