@@ -54,13 +54,22 @@ function LoadingScreen() {
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, loading } = useUser();
 
-  // Check if the guest parameter is present in the URL
+  // Check if they are a guest via URL or if they are trying to view a lesson page
   const urlParams = new URLSearchParams(window.location.search);
-  const isGuestMode = urlParams.get("guest") === "1" || window.location.pathname === "/trip";
+  const isGuestMode = 
+    urlParams.get("guest") === "1" || 
+    window.location.search.includes("guest=1") ||
+    window.location.pathname === "/trip" ||
+    window.location.pathname.includes("/lesson/") ||
+    window.location.pathname.includes("/fs-lesson/") ||
+    window.location.pathname.includes("/n-lesson/") ||
+    window.location.pathname.includes("/f-lesson/") ||
+    window.location.pathname.includes("/py-lesson/") ||
+    window.location.pathname.includes("/local-lesson/");
 
   if (loading) return <LoadingScreen />;
 
-  // FIX: If they aren't logged in, BUT they are a guest, pass them through!
+  // Only redirect to login if they aren't logged in AND aren't allowed guest access
   if (!isLoggedIn && !isGuestMode) {
     return <Navigate to="/auth" replace />;
   }
