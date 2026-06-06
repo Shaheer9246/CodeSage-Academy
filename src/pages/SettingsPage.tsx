@@ -253,6 +253,50 @@ const SettingsPage = () => {
           </div>
         </div>
 
+        {/* Power Tools */}
+        <div className="glass-card rounded-2xl p-5">
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
+            <Wrench className="w-4 h-4 text-primary" /> Power Tools
+          </h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground">Auto-Run Preview</p>
+                <p className="text-[10px] text-muted-foreground">Live preview refreshes as you type in Playground.</p>
+              </div>
+              <Switch checked={autoRun} onCheckedChange={setAutoRun} />
+            </div>
+            <button onClick={handleReplayTour} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
+              <PlayCircle className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-foreground">Replay Tour</p>
+                <p className="text-[10px] text-muted-foreground">Rewatch the onboarding carousel.</p>
+              </div>
+            </button>
+            <button onClick={handleExportWorkspace} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
+              <Download className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-foreground">Export Workspace (.zip)</p>
+                <p className="text-[10px] text-muted-foreground">Download your profile snapshot & playground recents.</p>
+              </div>
+            </button>
+            <button onClick={handleResetRuntime} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
+              <RefreshCw className="w-4 h-4 text-warning flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-foreground">Reset Runtime</p>
+                <p className="text-[10px] text-muted-foreground">Clear playground snapshots & guest progress.</p>
+              </div>
+            </button>
+            <button onClick={handleClearSandbox} className="w-full flex items-center gap-3 bg-red-500/5 rounded-xl px-3 py-2.5 border border-red-500/20 hover:bg-red-500/10 transition-colors text-left">
+              <Eraser className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-red-400">Clear Sandbox</p>
+                <p className="text-[10px] text-muted-foreground">Wipe all local cache (theme, settings, etc).</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
         {/* Actions */}
         <div className="space-y-2">
           <button onClick={async () => { await logout(); navigate('/auth'); }}
