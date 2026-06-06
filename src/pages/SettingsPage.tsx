@@ -1,10 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAllLessons } from '@/data/lessons';
 import { motion } from 'framer-motion';
 import { applyTheme, getTheme, THEMES, ThemeName } from '@/lib/theme';
+import { Switch } from '@/components/ui/switch';
+import { resetGuestLessons } from '@/lib/guestGate';
+import JSZip from 'jszip';
+import { toast } from 'sonner';
 
 const BADGE_INFO: Record<string, { icon: string; label: string }> = {
   'lite': { icon: '🌱', label: 'Lite Coder' },
