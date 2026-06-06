@@ -38,17 +38,62 @@ const ACHIEVEMENTS = [
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const { user, logout, deleteAccount } = useUser();
+  const { user, logout, deleteAccount, resetTour } = useUser();
   const [theme, setTheme] = useState<ThemeName>('dark');
+  const [autoRun, setAutoRun] = useState<boolean>(() => {
+    try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
+  });
 
   useEffect(() => { setTheme(getTheme()); }, []);
+  useEffect(() => { try { localStorage.setItem('codesage_autorun', autoRun ? '1' : '0'); } catch {} }, [autoRun]);
 
-  const changeTheme = (t: ThemeName) => {
-    setTheme(t);
-    applyTheme(t);
+  const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
+
+  const handleReplayTour = async () => {
+    await resetTour();
+    navigate('/tour');
+  };
+
+  const handleResetRuntime = () => {
+    if (!confirm('Reset runtime caches? Clears playground recents, snapshots, and guest progress.')) return;
+    try {
+      localStorage.removeItem('codesage_playground_recent');
+      localStorage.removeItem('codesage_pg_multi');
+      resetGuestLessons();
+      toast.success('Runtime caches cleared.');
+    } catch { toast.error('Could not clear caches.'); }
+  };
+
+  const handleClearSandbox = () => {
+    if (!confirm('Clear ALL non-account local data (theme, playground, caches)? Your account/progress stay.')) return;
+    try {
+      const keep = ['supabase.auth.token'];
+      Object.keys(localStorage).forEach(k => { if (!keep.includes(k)) localStorage.removeItem(k); });
+      toast.success('Sandbox cleared.');
+    } catch {}
+  };
+
+  const handleExportWorkspace = async () => {
+    try {
+      const zip = new JSZip();
+      const playground = localStorage.getItem('codesage_playground_recent') || '[]';
+      zip.file('playground-recents.json', playground);
+      zip.file('profile.json', JSON.stringify({
+        name: user?.name, xp: user?.xp, streak: user?.streakCount,
+        completedLessons: user?.completedLessons, badges: user?.badges,
+      }, null, 2));
+      zip.file('README.txt', 'CodeSage workspace export — generated from Settings.');
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `codesage-workspace-${Date.now()}.zip`; a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Workspace exported.');
+    } catch { toast.error('Export failed.'); }
   };
 
   if (!user) { navigate('/auth'); return null; }
+
 
   const joinDate = user.joinDate ? new Date(user.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
   const totalLessons = getAllLessons().length;
