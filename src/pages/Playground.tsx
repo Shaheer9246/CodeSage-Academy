@@ -424,9 +424,24 @@ const Playground = () => {
             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           </button>
           <div className="w-px h-4 bg-border/30 mx-1" />
+          <button onClick={() => setMultiMode(m => !m)} title={multiMode ? 'Switch to single-file mode' : 'Switch to multi-file mode'}
+            className={`flex items-center gap-1 text-[10px] px-1.5 py-1 rounded ${multiMode ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/30'}`}>
+            <Layers className="w-3 h-3" /> {multiMode ? 'Multi' : 'Single'}
+          </button>
+          {htmlFiles.length > 1 && (
+            <select value={previewSrcId} onChange={e => setPreviewSrcId(e.target.value)} title="Preview source"
+              className="bg-secondary/40 border border-border/30 rounded text-[10px] text-muted-foreground px-1.5 py-1 focus:outline-none">
+              {htmlFiles.map(f => <option key={f.id} value={f.id}>▶ {f.name}</option>)}
+            </select>
+          )}
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js,.jsx" className="hidden" />
+          <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip" className="hidden" />
           <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Upload className="w-3 h-3" /> Import
+          </button>
+          <button onClick={() => zipInputRef.current?.click()} title="Upload project ZIP"
+            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
+            <FileText className="w-3 h-3" /> ZIP
           </button>
           <button onClick={handleExport} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Download className="w-3 h-3" /> Export
