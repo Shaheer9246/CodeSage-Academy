@@ -17,27 +17,48 @@ const q = (question: string, options: string[], correctIndex: number, explanatio
 
 export const PYTHON_LESSONS: PythonLesson[] = [
   L('py-1', 1, 'Python Setup & Syntax', '🐍',
-    'Python reads almost like English — and that\'s its superpower. Before you write logic, set up the environment correctly so the language stays out of your way.',
+    'Welcome! Python reads almost like simple English—and that is its true superpower. Before we write complex programs, let\'s learn how to open a direct chat line with Python and see how it speaks back to us.',
     [
-      { title: '1. Install Python 3', beginner: 'Download from python.org or use brew/apt. Always use Python 3 — Python 2 is dead.', advanced: 'Use pyenv to manage multiple versions per project. macOS system Python is a trap — never touch it.' },
-      { title: '2. The REPL', beginner: 'Type `python` in your terminal. You get an interactive prompt.', advanced: 'Use ipython for syntax highlighting and tab completion. Jupyter notebooks for data work.' },
-      { title: '3. Indentation IS Syntax', beginner: 'Python uses spaces (4 conventionally) to group code — no braces.', advanced: 'Mixing tabs/spaces = IndentationError. Configure your editor to insert spaces always (PEP 8).' },
-      { title: '4. print() & comments', beginner: '`print("hi")` outputs text. `#` starts a comment.', advanced: 'f-strings (`f"value = {x}"`) are the modern way to format. Avoid `%` and `.format()` in new code.' },
+      { 
+        title: '1. What is Python?', 
+        beginner: 'Think of Python as a friendly translator. You write instructions using plain words, and Python translates them behind the scenes into a binary language that your computer\'s processor chip can execute.', 
+        advanced: 'Python is an interpreted, high-level language. Source code is compiled down to bytecode (.pyc files) which runs inside the platform-agnostic Python Virtual Machine (PVM).' 
+      },
+      { 
+        title: '2. The REPL (Your Instant Python Chat)', 
+        beginner: 'The REPL is an instant messaging prompt where you text Python directly. You type a single line of code, hit Enter, and Python reads it and replies immediately! Look for the three arrows ">>>" on your screen—that is Python saying "I am listening!"', 
+        advanced: 'REPL stands for Read-Eval-Print Loop. It accepts expressions, evaluates their memory references, prints results to stdout, and loops back to the input prompt context.' 
+      },
+      { 
+        title: '3. Indentation IS Syntax', 
+        beginner: 'Other languages trap their code inside messy curly brackets {}. Python throws brackets away and uses clean vertical spacing (4 spaces or hitting Tab) to align matching code blocks. Keeping your lines aligned is mandatory!', 
+        advanced: 'Mixing tabs and spaces triggers an IndentationError at parsing time. PEP 8 rules dictate using spaces exclusively to guarantee multi-platform layout consistency.' 
+      },
+      { 
+        title: '4. print() & Comments', 
+        beginner: 'The print() command tells your computer to display text out loud on your output panel. If you start a line with a hashtag #, Python will completely ignore it—letting you write secret notes and explanations to yourself.', 
+        advanced: 'Modern string interpolation uses f-strings (f"value = {x}"). This optimizes memory formatting runtime speed compared to legacy % or .format() operators.' 
+      },
     ],
-    { title: 'Your First Script', intro: 'Make Python say hello.', steps: [
-      'Install Python 3 from python.org.',
-      'Open a terminal, type `python3` to enter REPL.',
-      'Type `print("hello world")` — see the output.',
-      'Exit with `exit()`. Create `hello.py` with the same line.',
-      'Run `python3 hello.py` from terminal.',
-    ], goal: 'You\'ve written and executed your first .py file.' },
+    { 
+      title: 'Your First Live Conversation', 
+      intro: 'Let\'s wake up Python inside the playground terminal and make it speak to you.', 
+      steps: [
+        'Look at the dark interactive terminal box on the right side of your screen.',
+        'Type the word: python3 and press the Enter key to launch the environment.',
+        'Verify the listening sign: Look closely for the >>> arrows to appear on the line.',
+        'Type your first message: print("Hello World") and press Enter.',
+        'Watch Python display Hello World back to you! When done, type exit() and hit Enter to say goodbye.'
+      ], 
+      goal: 'You have successfully entered the REPL, executed your first direct command, and shut down the chat safely.' 
+    },
     [
-      q('Python 3 vs 2:', ['Python 2 still supported','Python 3 is the only modern choice','They\'re identical','Python 2 is faster'], 1),
-      q('Indentation in Python is:', ['Cosmetic','Mandatory syntax','Optional','Only for functions'], 1),
-      q('Modern string formatting:', ['% operator','.format()','f-strings','+ concatenation'], 2),
-      q('Best way to check Python version?', ['python --version','python3 --version','Both work','Neither'], 2),
+      q('What do the three arrows (>>>) mean in your terminal window?', ['Python is broken','Python is active and listening for your code input','The computer is shutting down','A file is saving'], 1, 'The >>> prompt indicates that the Python REPL scratchpad is successfully open and waiting for you to type an instruction.'),
+      q('How does Python know which lines of code belong inside a block?', ['Using pairs of curly brackets {}','Using clean spacing and text alignment (Indentation)','Using semicolons at the end of every sentence','It guesses randomly'], 1, 'Python uses strict spacing/indentation instead of brackets to group structural code paths together.'),
+      q('What is the modern, standard way to inject variables into text strings?', ['Glue strings together with the + sign','Use f-strings like f"Hello {name}"','Type the value out manually each time','Use the old % operator'], 1, 'f-strings are the absolute cleanest, fastest way to safely interpolate variables into your Python text strings.'),
+      q('How do you leave a line note inside your file that Python will ignore?', ['Wrap sentences in regular parentheses','Start the line with a hashtag symbol (#)','Write it in all CAPITAL letters','Put it inside square brackets'], 1, 'The # symbol creates a human-readable comment line that Python completely skips over during execution.')
     ],
-    ['Use Python 3 always','Indentation = syntax','f-strings for formatting','Run scripts with python3 file.py']
+    ['Python text reads naturally like English','The >>> indicator means Python is ready for input','Indentation defines visual code structure','Use f-strings for clean variable interpolation']
   ),
 
   L('py-2', 2, 'Variables & Data Types', '📦',
