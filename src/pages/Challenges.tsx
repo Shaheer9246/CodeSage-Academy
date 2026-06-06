@@ -67,7 +67,7 @@ const Challenges = () => {
             </button>
             <Trophy className="w-4 h-4 text-primary flex-shrink-0" />
             <span className="text-foreground font-semibold text-xs truncate">{selected.title}</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 bg-${tierInfo.color}/20 text-${tierInfo.color}`}>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 ${tierInfo.chip}`}>
               {tierInfo.icon} {selected.tier} · +{selected.xp} XP
             </span>
           </div>
@@ -149,7 +149,7 @@ const Challenges = () => {
             return (
               <button key={t} onClick={() => setActiveTier(t)}
                 className={`px-2 py-3 rounded-xl border text-xs font-semibold transition-all ${
-                  active ? `bg-${info.color}/20 border-${info.color}/40 text-${info.color}` : 'bg-secondary/20 border-border/30 text-muted-foreground hover:border-primary/30'
+                  active ? `${info.tab}` : 'bg-secondary/20 border-border/30 text-muted-foreground hover:border-primary/30'
                 }`}>
                 <div className="text-base mb-0.5">{info.icon}</div>
                 <div>{info.label}</div>
@@ -177,7 +177,7 @@ const Challenges = () => {
                   <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.description}</p>
                 </div>
               </div>
-              <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium flex-shrink-0 ml-2 bg-${info.color}/20 text-${info.color}`}>
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium flex-shrink-0 ml-2 ${info.chip}`}>
                 +{c.xp} XP
               </span>
             </button>
