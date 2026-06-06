@@ -251,8 +251,12 @@ const Playground = () => {
                 <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Files</span>
                 <div className="flex gap-1">
                   <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js" className="hidden" />
+                  <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip" className="hidden" />
                   <button onClick={() => fileInputRef.current?.click()} className="text-[10px] flex items-center gap-1 text-muted-foreground bg-secondary/40 px-2 py-1 rounded">
                     <Upload className="w-3 h-3" /> Import
+                  </button>
+                  <button onClick={() => zipInputRef.current?.click()} className="text-[10px] flex items-center gap-1 text-muted-foreground bg-secondary/40 px-2 py-1 rounded">
+                    <FileText className="w-3 h-3" /> ZIP
                   </button>
                   <button onClick={addNewFile} className="text-[10px] flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded">
                     <Plus className="w-3 h-3" /> New
