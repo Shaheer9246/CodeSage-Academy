@@ -28,7 +28,6 @@ const Playground = () => {
   const [activeFileId, setActiveFileId] = useState('html');
   const [consoleLogs, setConsoleLogs] = useState<{ type: string; message: string }[]>([]);
   const [showPreview, setShowPreview] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
   const [editorTheme, setEditorTheme] = useState<'vs-dark' | 'light'>('vs-dark');
   const [fontSize, setFontSize] = useState(14);
   const [showSidebar, setShowSidebar] = useState(true);
@@ -37,12 +36,28 @@ const Playground = () => {
   const [renameValue, setRenameValue] = useState('');
   const [mobileTab, setMobileTab] = useState<MobileTab>('code');
   const [recents, setRecents] = useState<RecentSnapshot[]>([]);
+  // NEW: single vs multi file mode + custom preview source
+  const [multiMode, setMultiMode] = useState<boolean>(() => {
+    try { return localStorage.getItem('codesage_pg_multi') !== '0'; } catch { return true; }
+  });
+  const [previewSrcId, setPreviewSrcId] = useState<string>('html'); // which HTML file to preview
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const zipInputRef = useRef<HTMLInputElement>(null);
 
   const activeFile = files.find(f => f.id === activeFileId) || files[0];
-  const currentHtml = files.find(f => f.id === 'html')?.content || '';
+  const currentHtml = files.find(f => f.id === previewSrcId)?.content
+                   || files.find(f => f.id === 'html')?.content || '';
   const currentCss = files.find(f => f.id === 'css')?.content || '';
   const currentJs = files.find(f => f.id === 'js')?.content || '';
+
+  // Toggle multi-file mode persistence
+  useEffect(() => {
+    try { localStorage.setItem('codesage_pg_multi', multiMode ? '1' : '0'); } catch {}
+    if (!multiMode) setShowSidebar(false);
+  }, [multiMode]);
+
+  // List of HTML-ish files for "Preview source" selector
+  const htmlFiles = useMemo(() => files.filter(f => f.lang === 'html' || f.name.endsWith('.html')), [files]);
 
   // Load recents
   useEffect(() => {
