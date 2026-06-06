@@ -10,7 +10,7 @@ const ConsolePanel = ({ logs, onClear }: ConsolePanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={`flex flex-col bg-card border-t border-border transition-all ${isOpen ? 'h-full' : 'h-8'}`}>
+    <div className={`flex flex-col bg-card border-t border-border transition-all ${isOpen ? 'h-[40vh]' : 'h-8'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between px-3 py-1.5 border-b border-border cursor-pointer hover:bg-secondary/50 transition-colors flex-shrink-0"
