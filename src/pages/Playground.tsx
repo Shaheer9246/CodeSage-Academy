@@ -1,11 +1,12 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Upload, ArrowLeft, Play, Eye, EyeOff, Sun, Moon, Plus, Trash2, Edit3, Check, X, FolderOpen, Save, AlertTriangle, Files, Code as CodeIcon, History } from 'lucide-react';
+import { Download, Upload, ArrowLeft, Play, Eye, EyeOff, Sun, Moon, Plus, Trash2, Edit3, Check, X, FolderOpen, Save, AlertTriangle, Files, Code as CodeIcon, History, Layers, FileText } from 'lucide-react';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
 import { useIsMobile } from '@/hooks/use-mobile';
+import JSZip from 'jszip';
 
 interface FileItem { id: string; name: string; lang: string; content: string; }
 interface RecentSnapshot { id: string; name: string; date: string; html: string; css: string; js: string; }
