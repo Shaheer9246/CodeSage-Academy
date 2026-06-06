@@ -226,9 +226,9 @@ export const CHALLENGES: ChallengeDef[] = [
   },
 ];
 
-export const TIER_INFO: Record<Tier, { color: string; label: string; icon: string }> = {
-  Easy:    { color: 'success',     label: 'Easy',    icon: '🌱' },
-  Medium:  { color: 'warning',     label: 'Medium',  icon: '⚡' },
-  Hard:    { color: 'destructive', label: 'Hard',    icon: '🔥' },
-  Complex: { color: 'primary',     label: 'Complex', icon: '💎' },
+export const TIER_INFO: Record<Tier, { label: string; icon: string; chip: string; tab: string }> = {
+  Easy:    { label: 'Easy',    icon: '🌱', chip: 'bg-success/20 text-success',         tab: 'bg-success/20 border-success/40 text-success' },
+  Medium:  { label: 'Medium',  icon: '⚡', chip: 'bg-warning/20 text-warning',         tab: 'bg-warning/20 border-warning/40 text-warning' },
+  Hard:    { label: 'Hard',    icon: '🔥', chip: 'bg-destructive/20 text-destructive', tab: 'bg-destructive/20 border-destructive/40 text-destructive' },
+  Complex: { label: 'Complex', icon: '💎', chip: 'bg-primary/20 text-primary',         tab: 'bg-primary/20 border-primary/40 text-primary' },
 };
