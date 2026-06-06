@@ -87,8 +87,20 @@ const Dashboard = () => {
     else toast.error('Could not purchase freeze');
   };
 
+  // Guest mode: redirect track tiles to first lesson with ?guest=1 (one taste per track)
+  const GUEST_FIRST_LESSON: Record<string, string> = {
+    '/learn':       '/lesson/html-1?guest=1',
+    '/networking':  '/networking/net-1?guest=1',
+    '/fullstack':   '/fullstack/fs-1?guest=1',
+    '/freelance':   '/freelance/free-1?guest=1',
+    '/python':      '/python/py-1?guest=1',
+    '/local':       '/local/local-1?guest=1',
+  };
+
   const go = (path: string) => () => {
     if (isGuest) {
+      const guestPath = GUEST_FIRST_LESSON[path];
+      if (guestPath) { navigate(guestPath); return; }
       toast.info('Sign up to unlock this — it takes 10 seconds ✨');
       navigate('/auth');
       return;
