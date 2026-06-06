@@ -138,6 +138,33 @@ const Playground = () => {
     e.target.value = '';
   };
 
+  // ZIP upload — extract text-like files
+  const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const zip = await JSZip.loadAsync(buf);
+      const added: FileItem[] = [];
+      const entries = Object.values(zip.files).filter((z: any) => !z.dir);
+      for (const z of entries) {
+        const name = (z as any).name.split('/').pop() || (z as any).name;
+        const ext = name.split('.').pop()?.toLowerCase() || '';
+        if (!['html', 'htm', 'css', 'js', 'jsx', 'ts', 'tsx', 'json', 'md', 'txt', 'svg'].includes(ext)) continue;
+        const content = await (z as any).async('string');
+        const lang = ext === 'css' ? 'css' : (ext === 'js' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') ? 'javascript' : 'html';
+        added.push({ id: `zip-${Date.now()}-${name}`, name, lang, content });
+      }
+      if (added.length === 0) { alert('No text files found in zip.'); return; }
+      setFiles(prev => [...prev, ...added]);
+      setMultiMode(true);
+      setShowSidebar(true);
+    } catch (err) {
+      alert('Could not read this zip file.');
+    }
+    e.target.value = '';
+  };
+
   const addNewFile = () => {
     const name = `file-${files.length + 1}.html`;
     const newFile: FileItem = { id: `custom-${Date.now()}`, name, lang: 'html', content: '' };
@@ -151,6 +178,7 @@ const Playground = () => {
     if (['html', 'css', 'js'].includes(id)) return;
     setFiles(prev => prev.filter(f => f.id !== id));
     if (activeFileId === id) setActiveFileId('html');
+    if (previewSrcId === id) setPreviewSrcId('html');
   };
 
   const startRename = (f: FileItem) => { setRenamingId(f.id); setRenameValue(f.name); };
