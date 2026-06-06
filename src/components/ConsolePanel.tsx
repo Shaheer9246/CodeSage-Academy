@@ -1,4 +1,4 @@
-import { Terminal, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Terminal, Trash2, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface ConsolePanelProps {
@@ -31,7 +31,20 @@ const ConsolePanel = ({ logs, onClear }: ConsolePanelProps) => {
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
-          {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />}
+         {isOpen ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Stops the bar from toggling back open
+                setIsOpen(false);
+              }}
+              className="p-0.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+              title="Close console"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+          )}
         </div>
       </button>
       {isOpen && (
