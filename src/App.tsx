@@ -52,26 +52,26 @@ function LoadingScreen() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, loading } = useUser();
-
-  // Check if they are a guest via URL or if they are trying to view a lesson page
+  const { isLoggedIn, isOnboarded, loading } = useUser();
+  
+  // 1. Keep the guest/public route logic
   const urlParams = new URLSearchParams(window.location.search);
-  const isGuestMode = 
-    urlParams.get("guest") === "1" || 
-    window.location.search.includes("guest=1") ||
-    window.location.pathname === "/trip" ||
-    window.location.pathname.includes("/lesson/") ||
-    window.location.pathname.includes("/fs-lesson/") ||
-    window.location.pathname.includes("/n-lesson/") ||
-    window.location.pathname.includes("/f-lesson/") ||
-    window.location.pathname.includes("/py-lesson/") ||
-    window.location.pathname.includes("/local-lesson/");
+  const isGuestMode = urlParams.get("guest") === "1" || window.location.search.includes("guest=1") || window.location.pathname === "/trip" || window.location.pathname.includes("/lesson/");
 
   if (loading) return <LoadingScreen />;
 
-  // Only redirect to login if they aren't logged in AND aren't allowed guest access
-  if (!isLoggedIn && !isGuestMode) {
-    return <Navigate to="/auth" replace />;
+  // 2. Redirect to auth if not logged in and not a guest
+  if (!isLoggedIn && !isGuestMode) return <Navigate to="/auth" replace />;
+
+  // 3. THE FIX: Redirect to onboarding if not onboarded
+  // We explicitly check if they are trying to access a restricted page
+  if (isLoggedIn && !isOnboarded && window.location.pathname !== "/onboarding" && window.location.pathname !== "/questions") {
+    return <Navigate to="/questions" replace />;
+  }
+
+  // 4. THE FIX: Prevent looping back to onboarding if already done
+  if (isLoggedIn && isOnboarded && window.location.pathname === "/onboarding") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -96,7 +96,7 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
               <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
               <Route path="/complete/:id" element={<ProtectedRoute><LessonComplete /></ProtectedRoute>} />
               <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
