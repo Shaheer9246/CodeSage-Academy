@@ -71,15 +71,16 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     email,
     name: row.name || '',
     studying: row.studying || '',
-    hasJob: row.has_job || '', // 👍 FIX: Map snake_case to camelCase hasJob
+    hasJob: row.has_job || '', 
     dob: row.dob || '',
     goal: row.goal || '',
-    experienceLevel: row.experience_level || '', // 👍 FIX: Map snake_case to camelCase experienceLevel
+    experienceLevel: row.experience_level || '', 
     joinDate: row.created_at || '',
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    isOnboarded: !!row.is_onboarded || localOnboarded, 
+    // 👍 FIX: If it is null (old user), default to true. If false (new user), stay false.
+    isOnboarded: (row.is_onboarded ?? true) || localOnboarded, 
     hasSeenTour: !!row.has_seen_tour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
@@ -104,9 +105,9 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     experience_level: p.experienceLevel,
     dark_mode: p.darkMode,
     is_onboarded: p.isOnboarded,
+    has_seen_tour: p.hasSeenTour, // 👍 FIX: Persist tour completion packet
   };
 }
-
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,29 +124,34 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
       if (data) {
         setUser(dbRowToProfile(data, authUser.email || ''));
-      } else {
-        const defaultProfile: UserProfile = {
-          id: authUser.id,
-          username: authUser.user_metadata?.username || '',
-          email: authUser.email || '',
-          name: '', studying: '', hasJob: '', dob: '', goal: '', experienceLevel: '',
-          joinDate: new Date().toISOString(),
-          streakCount: 0, lastActiveDate: '',
-          badges: [], completedLessons: [], completedTests: [],
-          unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-          xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, 
-          isOnboarded: localOnboarded, 
-          streakFreezeUntil: null,
-        };
-        const { error: insertError } = await supabase.from('profiles').insert({
-          id: authUser.id,
-          username: authUser.user_metadata?.username || '',
-        });
-        if (insertError) {
-          console.error('Profile insert error:', insertError.message);
-        }
-        setUser(defaultProfile);
-      }
+      // Find this block inside fetchProfile where new profiles are inserted:
+} else {
+  const defaultProfile: UserProfile = {
+    id: authUser.id,
+    username: authUser.user_metadata?.username || '',
+    email: authUser.email || '',
+    name: '', studying: '', hasJob: '', dob: '', goal: '', experienceLevel: '',
+    joinDate: new Date().toISOString(),
+    streakCount: 0, lastActiveDate: '',
+    badges: [], completedLessons: [], completedTests: [],
+    unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
+    xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, 
+    isOnboarded: localOnboarded, 
+    streakFreezeUntil: null,
+  };
+  
+  // 👍 FIX: Explicitly send is_onboarded as false so new signups don't bypass it
+  const { error: insertError } = await supabase.from('profiles').insert({
+    id: authUser.id,
+    username: authUser.user_metadata?.username || '',
+    is_onboarded: false, 
+  });
+  
+  if (insertError) {
+    console.error('Profile insert error:', insertError.message);
+  }
+  setUser(defaultProfile);
+}
     } catch (err) {
       console.error('Failed to fetch profile:', err);
       setUser({
@@ -235,7 +241,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // 1. Drop immediate hardware backup into browser localStorage 
     localStorage.setItem(`codesage_onboarded_${user.id}`, 'true');
     
-    const updatedProfile = { ...user, ...data, isOnboarded: true };
+    // Keep hasSeenTour as false here so new signups DO get the tour!
+    const updatedProfile = { ...user, ...data, isOnboarded: true, hasSeenTour: false };
     setUser(updatedProfile);
     
     try {
@@ -257,9 +264,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           .eq('id', user.id);
       }
     } catch (err) {
-      console.error('Onboarding cloud save error (local fallback handles this):', err);
+      console.error('Onboarding cloud save error:', err);
     }
   };
+  
 
   const applyServerProfile = (row: any) => {
   if (!user || !row) return;
