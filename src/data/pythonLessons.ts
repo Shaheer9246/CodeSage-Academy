@@ -17,7 +17,7 @@ const q = (question: string, options: string[], correctIndex: number, explanatio
 
 export const PYTHON_TRACK_NOTICE = {
   type: "track-notice",
-  notice: "🖥️ **This track does not have a Python preview yet.** In this lesson, you will dive into and understand the core philosophy of Python!"
+  notice: "🖥️ Python Track Status: This track is currently under development. In this module, we are focusing on establishing your core programming foundation. Please proceed through the available lessons to build your skills; we are actively updating the preview environment and will notify you as soon as the interactive compiler is fully integrated."
 };
 
 export const PYTHON_LESSONS: PythonLesson[] = [
