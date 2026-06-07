@@ -420,6 +420,10 @@ const Dashboard = () => {
           {promoMsg && <p className="text-xs mt-2 font-mono">{promoMsg}</p>}
         </div>
       </motion.div>
+
+      {showTour && (
+        <DashboardTour steps={TOUR_STEPS} onFinish={() => { markTourSeen(); }} />
+      )}
     </div>
   );
 };
