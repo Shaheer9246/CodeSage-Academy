@@ -21,6 +21,8 @@ export interface UserProfile {
   completedTests: string[];
   unlockedSections: string[];
   promoCodes: string[];
+  isOnboarded: boolean; // Add this line
+  hasSeenTour: boolean;
   darkMode: boolean;
   xp: number;
   level: number;
@@ -76,6 +78,8 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
+    isOnboarded: !!row.is_onboarded, // Ensure this matches your database column name
+    hasSeenTour: !!row.has_seen_tour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
     unlockedSections: row.unlocked_sections || ['frontend'],
@@ -199,7 +203,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchProfile]);
 
   const isLoggedIn = !!user;
-  const isOnboarded = !!user?.name;
+ // This checks if the 'isOnboarded' property exists on your user object
+const isOnboarded = !!user?.isOnboarded;
 
   const updateProfile = (updated: UserProfile) => {
     setUser(updated);
