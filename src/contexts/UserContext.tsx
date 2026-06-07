@@ -164,7 +164,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (syncTimer.current) clearTimeout(syncTimer.current);
     syncTimer.current = setTimeout(async () => {
       try {
-        await supabase.from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
+        await supabase.from('profiles').update(profileToDbUpdate(profile) as any).eq('id', profile.id);
       } catch (err) {
         console.error('Failed to sync profile:', err);
       }
