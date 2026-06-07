@@ -71,7 +71,7 @@ const NETWORKING_LESSONS = [
 ];
 
 const Dashboard = () => {
-  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
+  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak, markTourSeen } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuest = searchParams.get('guest') === '1';
@@ -81,9 +81,8 @@ const Dashboard = () => {
 
   useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
 
-  // Brand-new users → in-page dashboard tour overlay
+  // Brand-new users → in-page dashboard tour overlay (replaces /tour redirect)
   const showTour = !!user && !isGuest && !!user.name && user.hasSeenTour === false;
-  const { markTourSeen } = useUser();
 
   if (loading) return null;
   if (!user && !isGuest) { navigate('/auth'); return null; }
