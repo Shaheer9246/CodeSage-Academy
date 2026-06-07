@@ -36,7 +36,7 @@ interface UserContextType {
   isOnboarded: boolean;
   login: (email: string, password: string) => Promise<string | null>;
   signup: (username: string, email: string, password: string) => Promise<string | null>;
-  completeOnboarding: (data: Partial<UserProfile>) => Promise<void>; // Turned Async
+  completeOnboarding: (data: Partial<UserProfile>) => Promise<void>;
   completeLesson: (lessonId: string) => Promise<void>;
   completeTest: (testId: string) => Promise<void>;
   addBadge: (badge: string) => void;
@@ -62,6 +62,9 @@ export const useUser = () => {
 };
 
 function dbRowToProfile(row: any, email: string): UserProfile {
+  // SAFETY NET: Check local storage status as secondary source of truth
+  const localOnboarded = localStorage.getItem(`codesage_onboarded_${row.id}`) === 'true';
+  
   return {
     id: row.id,
     username: row.username || '',
@@ -76,7 +79,7 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    isOnboarded: !!row.is_onboarded, 
+    isOnboarded: !!row.is_onboarded || localOnboarded, // Direct fallback check
     hasSeenTour: !!row.has_seen_tour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
@@ -100,7 +103,7 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     goal: p.goal,
     experience_level: p.experienceLevel,
     dark_mode: p.darkMode,
-    is_onboarded: p.isOnboarded, // Ensured consistency
+    is_onboarded: p.isOnboarded,
   };
 }
 
@@ -110,6 +113,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const syncTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const fetchProfile = useCallback(async (authUser: User) => {
+    // Check backup local storage status early
+    const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
+    
     try {
       const { data, error } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
       if (error && error.code !== 'PGRST116') {
@@ -127,7 +133,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           streakCount: 0, lastActiveDate: '',
           badges: [], completedLessons: [], completedTests: [],
           unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-          xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, isOnboarded: false, streakFreezeUntil: null,
+          xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, 
+          isOnboarded: localOnboarded, 
+          streakFreezeUntil: null,
         };
         const { error: insertError } = await supabase.from('profiles').insert({
           id: authUser.id,
@@ -149,7 +157,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         streakCount: 0, lastActiveDate: '',
         badges: [], completedLessons: [], completedTests: [],
         unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-        xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, isOnboarded: false, streakFreezeUntil: null,
+        xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, 
+        isOnboarded: localOnboarded, 
+        streakFreezeUntil: null,
       });
     }
     setLoading(false);
@@ -191,8 +201,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchProfile]);
 
   const isLoggedIn = !!user;
-  
-  // FIX: Stricter boolean check to avoid unexpected falsy states
   const isOnboarded = user?.isOnboarded === true;
 
   const updateProfile = (updated: UserProfile) => {
@@ -221,38 +229,35 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
- // FIX: Added database write check with fallback option for custom columns
   const completeOnboarding = async (data: Partial<UserProfile>) => {
     if (!user) return;
+    
+    // 1. Drop immediate hardware backup into browser localStorage 
+    localStorage.setItem(`codesage_onboarded_${user.id}`, 'true');
+    
     const updatedProfile = { ...user, ...data, isOnboarded: true };
+    setUser(updatedProfile);
     
     try {
       const dbData = profileToDbUpdate(updatedProfile);
       
-      // 1. Attempt to write full questionnaire data to Supabase
+      // 2. Fire full profile sync out to Supabase
       const { error } = await supabase
         .from('profiles')
         .update(dbData as any)
         .eq('id', user.id);
         
       if (error) {
-        console.warn('Full profile sync failed. Attempting onboarding-only fallback...', error.message);
+        console.warn('Backend custom column update rejected, firing isolation save...', error.message);
         
-        // 2. FALLBACK: If custom columns are missing, save just the critical onboarding flag
-        const { error: fallbackError } = await supabase
+        // 3. Fallback: Save just the critical boolean
+        await supabase
           .from('profiles')
           .update({ is_onboarded: true } as any)
           .eq('id', user.id);
-          
-        if (fallbackError) throw fallbackError;
       }
-      
-      // 3. Update local React state ONLY after a successful database write confirmation
-      setUser(updatedProfile);
     } catch (err) {
-      console.error('Critical Onboarding Sync Error:', err);
-      // Desperate fallback to let the user through if the database is completely locked
-      setUser(updatedProfile);
+      console.error('Onboarding cloud save error (local fallback handles this):', err);
     }
   };
 
@@ -298,12 +303,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
+    if (user) localStorage.removeItem(`codesage_onboarded_${user.id}`);
     await supabase.auth.signOut();
     setUser(null);
   };
 
   const deleteAccount = async () => {
     if (!user) return;
+    localStorage.removeItem(`codesage_onboarded_${user.id}`);
     try { await supabase.functions.invoke('delete-account'); } catch (err) { console.error(err); }
     await supabase.auth.signOut();
     setUser(null);
