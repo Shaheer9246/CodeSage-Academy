@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -52,24 +52,31 @@ function LoadingScreen() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  // 1. ADD isOnboarded here
   const { isLoggedIn, isOnboarded, loading } = useUser();
+  const location = useLocation(); 
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const isGuestMode = urlParams.get("guest") === "1" || window.location.search.includes("guest=1") || window.location.pathname === "/trip" || window.location.pathname.includes("/lesson/");
+  const urlParams = new URLSearchParams(location.search);
+  const isGuestMode = 
+    urlParams.get("guest") === "1" || 
+    location.search.includes("guest=1") || 
+    location.pathname === "/trip" || 
+    location.pathname.includes("/lesson/");
 
   if (loading) return <LoadingScreen />;
 
-  // 2. Redirect to auth if not logged in and not a guest
+  // Redirect to auth if not logged in and not a guest
   if (!isLoggedIn && !isGuestMode) return <Navigate to="/auth" replace />;
 
-  // 3. THE FIX: If logged in but NOT onboarded, force them to questions
-  if (isLoggedIn && !isOnboarded && window.location.pathname !== "/questions") {
-    return <Navigate to="/questions" replace />;
+  // Define paths allowed during the onboarding phase
+  const isAllowedUnonboardedPath = location.pathname === "/questions" || location.pathname === "/onboarding";
+
+  // If logged in but NOT onboarded, force them to the start of onboarding if they wander off
+  if (isLoggedIn && !isOnboarded && !isAllowedUnonboardedPath) {
+    return <Navigate to="/questions" replace />; 
   }
 
-  // 4. THE FIX: If already onboarded, prevent them from going back to questions
-  if (isLoggedIn && isOnboarded && window.location.pathname === "/questions") {
+  // If already onboarded, prevent them from going back to onboarding flows
+  if (isLoggedIn && isOnboarded && isAllowedUnonboardedPath) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -78,9 +85,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AuthRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, isOnboarded, loading } = useUser();
+  
   if (loading) return <LoadingScreen />;
+  
   if (isLoggedIn && isOnboarded) return <Navigate to="/dashboard" replace />;
-  if (isLoggedIn && !isOnboarded) return <Navigate to="/onboarding" replace />;
+  if (isLoggedIn && !isOnboarded) return <Navigate to="/questions" replace />; 
+  
   return <>{children}</>;
 }
 
