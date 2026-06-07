@@ -58,22 +58,21 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
 
   return (
     <div className="h-full flex flex-col">
-     // Replace the block at line 61 with this:
-{lesson.notice && (
-  <div className="bg-amber-50 border-b border-amber-200 p-6 m-4 rounded-lg text-amber-900 shadow-sm flex items-start gap-3">
-    <span className="text-xl">💡</span>
-    <p className="font-medium text-sm leading-relaxed">{lesson.notice}</p>
-  </div>
-)}
+      {'notice' in lesson && lesson.notice && (
+        <div className="bg-amber-50 border-b border-amber-200 p-6 m-4 rounded-lg text-amber-900 shadow-sm flex items-start gap-3">
+          <span className="text-xl">💡</span>
+          <p className="font-medium text-sm leading-relaxed">{lesson.notice}</p>
+        </div>
+      )}
       <div className="px-4 py-2 border-b border-border flex items-center gap-2 text-xs text-muted-foreground">
         <span className="text-primary font-semibold">⚡</span>
-        <span className="uppercase tracking-wider">{lesson.topic}</span>
+        <span className="uppercase tracking-wider">{'topic' in lesson ? lesson.topic : 'Error'}</span>
         <span>•</span>
         <span>LESSON {lessonIndex + 1}/{totalLessons}</span>
       </div>
 
       <div className="flex-1 overflow-auto p-4">
-        <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
+        <div dangerouslySetInnerHTML={{ __html: renderContent('content' in lesson ? lesson.content : (lesson as any).message || '') }} />
       </div>
 
       <div className="flex items-center justify-between px-4 py-2 border-t border-border">
@@ -87,7 +86,7 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
           ))}
         </div>
         <div className="flex gap-2">
-          {lesson.challenge && (
+          {'challenge' in lesson && lesson.challenge && (
             <button onClick={onStartChallenge}
               className="text-xs bg-gradient-to-r from-primary to-accent text-primary-foreground px-3 py-1 rounded hover:opacity-90 transition-opacity">
               Challenge
