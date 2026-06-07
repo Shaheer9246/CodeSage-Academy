@@ -52,9 +52,9 @@ function LoadingScreen() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  // 1. ADD isOnboarded here
   const { isLoggedIn, isOnboarded, loading } = useUser();
   
-  // 1. Keep the guest/public route logic
   const urlParams = new URLSearchParams(window.location.search);
   const isGuestMode = urlParams.get("guest") === "1" || window.location.search.includes("guest=1") || window.location.pathname === "/trip" || window.location.pathname.includes("/lesson/");
 
@@ -63,14 +63,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   // 2. Redirect to auth if not logged in and not a guest
   if (!isLoggedIn && !isGuestMode) return <Navigate to="/auth" replace />;
 
-  // 3. THE FIX: Redirect to onboarding if not onboarded
-  // We explicitly check if they are trying to access a restricted page
-  if (isLoggedIn && !isOnboarded && window.location.pathname !== "/onboarding" && window.location.pathname !== "/questions") {
+  // 3. THE FIX: If logged in but NOT onboarded, force them to questions
+  if (isLoggedIn && !isOnboarded && window.location.pathname !== "/questions") {
     return <Navigate to="/questions" replace />;
   }
 
-  // 4. THE FIX: Prevent looping back to onboarding if already done
-  if (isLoggedIn && isOnboarded && window.location.pathname === "/onboarding") {
+  // 4. THE FIX: If already onboarded, prevent them from going back to questions
+  if (isLoggedIn && isOnboarded && window.location.pathname === "/questions") {
     return <Navigate to="/dashboard" replace />;
   }
 
