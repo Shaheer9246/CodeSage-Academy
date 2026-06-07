@@ -1,7 +1,7 @@
 import { Lesson } from '@/data/lessons';
 
 interface LessonContentProps {
-  lesson: Lesson;
+  lesson: Lesson | { type: string; message: string }; 
   lessonIndex: number;
   totalLessons: number;
   onPrev: () => void;
