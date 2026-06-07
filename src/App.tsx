@@ -97,17 +97,6 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function AuthRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, isOnboarded, loading } = useUser();
-  
-  if (loading) return <LoadingScreen />;
-  
-  if (isLoggedIn && isOnboarded) return <Navigate to="/dashboard" replace />;
-  if (isLoggedIn && !isOnboarded) return <Navigate to="/questions" replace />; 
-  
-  return <>{children}</>;
-}
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <UserProvider>
