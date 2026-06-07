@@ -58,6 +58,12 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
 
   return (
     <div className="h-full flex flex-col">
+      {lesson.notice && (
+      <div className="bg-amber-50 border-b border-amber-200 p-4 text-amber-900 text-sm flex gap-2">
+        <span>💡</span>
+        <p className="font-medium">{lesson.notice}</p>
+      </div>
+    )}
       <div className="px-4 py-2 border-b border-border flex items-center gap-2 text-xs text-muted-foreground">
         <span className="text-primary font-semibold">⚡</span>
         <span className="uppercase tracking-wider">{lesson.topic}</span>
