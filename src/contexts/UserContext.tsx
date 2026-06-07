@@ -77,8 +77,8 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    isOnboarded: !!row.is_onboarded, // Ensure this matches your database column name
-    hasSeenTour: !!row.has_seen_tour,
+    isOnboarded: !!row.is_onboarded,
+    hasSeenTour: !!row.has_seen_tour, // Keep only this one
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
     unlockedSections: row.unlocked_sections || ['frontend'],
@@ -87,7 +87,6 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     xp: row.xp || 0,
     level: row.level || 1,
     sageCoins: row.sage_coins || 0,
-    hasSeenTour: !!row.has_seen_tour,
     streakFreezeUntil: row.streak_freeze_until || null,
   };
 }
