@@ -15,23 +15,23 @@ const steps = [
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const { user, isOnboarded, completeOnboarding } = useUser();
+  const { user, completeOnboarding } = useUser();
   const navigate = useNavigate();
 
-  if (!user) { navigate('/auth'); return null; }
-  if (isOnboarded) { navigate('/dashboard'); return null; }
+  // If the user isn't loaded yet, show nothing (ProtectedRoute handles the redirect)
+  if (!user) return null;
 
   const current = steps[step];
   const value = answers[current.key] || '';
   const canContinue = value.trim().length > 0;
 
-  // FIX: Make this function async-safe to eliminate the race condition
   const handleNext = async () => {
     if (step < steps.length - 1) {
       setStep(step + 1);
     } else { 
-      // Safely await DB write completion before forcing router adjustments
+      // 1. Safely wait for the database write to finish completely
       await completeOnboarding(answers); 
+      // 2. Perform a single, clean programmatic redirect
       navigate('/dashboard'); 
     }
   };
