@@ -16,6 +16,12 @@ const q = (question: string, options: string[], correctIndex: number, explanatio
   ({ question, options, correctIndex, explanation });
 
 export const PYTHON_LESSONS: PythonLesson[] = [
+  
+  {
+    type: "track-notice",
+    message: "🖥️ **This track does not have a Python preview yet, so you have to do it in your terminal.** In this lesson, you will dive into and understand the core philosophy of Python!"
+  },
+  
   L('py-1', 1, 'Python Setup & Syntax', '🐍',
     'Welcome! Python reads almost like simple English—and that is its true superpower. Before we write complex programs, let\'s learn how to open a direct chat line with Python and see how it speaks back to us.',
     [
