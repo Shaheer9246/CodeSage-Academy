@@ -15,14 +15,14 @@ const L = (
 const q = (question: string, options: string[], correctIndex: number, explanation?: string): QuizQuestion =>
   ({ question, options, correctIndex, explanation });
 
-
-
-export const PYTHON_LESSONS: PythonLesson[] = [
-
-  export const PYTHON_TRACK_NOTICE = {
+export const PYTHON_TRACK_NOTICE = {
   type: "track-notice",
   notice: "🖥️ **This track does not have a Python preview yet.** In this lesson, you will dive into and understand the core philosophy of Python!"
 };
+
+export const PYTHON_LESSONS: PythonLesson[] = [
+
+  
  
   L('py-1', 1, 'Python Setup & Syntax', '🐍',
     'Welcome! Python reads almost like simple English—and that is its true superpower. Before we write complex programs, let\'s learn how to open a direct chat line with Python and see how it speaks back to us.',
