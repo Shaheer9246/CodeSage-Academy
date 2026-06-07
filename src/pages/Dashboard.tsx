@@ -211,6 +211,7 @@ const Dashboard = () => {
           <motion.button
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
             onClick={go('/challenges')}
+          data-tour="challenges"
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
@@ -223,6 +224,7 @@ const Dashboard = () => {
           <motion.button
             initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
             onClick={go('/playground')}
+          data-tour="playground"
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
@@ -237,6 +239,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
           onClick={go('/learn')}
+          data-tour="frontend"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -262,6 +265,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
           onClick={go('/networking?from=dashboard')}
+          data-tour="networking"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -287,6 +291,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
           onClick={go('/fullstack?from=dashboard')}
+          data-tour="fullstack"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -312,6 +317,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
           onClick={go('/freelance?from=dashboard')}
+          data-tour="freelance"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -337,6 +343,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
           onClick={go('/python?from=dashboard')}
+          data-tour="python"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -362,6 +369,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
           onClick={go('/local?from=dashboard')}
+          data-tour="local"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
