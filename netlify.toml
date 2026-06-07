@@ -2,6 +2,10 @@
   publish = "dist"
   command = "npm run build"
 
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_PROJECT_ID,VITE_SUPABASE_PUBLISHABLE_KEY,VITE_SUPABASE_URL"
+  SECRETS_SCAN_OMIT_PATHS = "dist/**,.env"
+
 [[headers]]
   for = "/*.js"
   [headers.values]
