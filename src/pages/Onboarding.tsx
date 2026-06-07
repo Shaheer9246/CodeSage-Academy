@@ -26,8 +26,13 @@ const Onboarding = () => {
   const canContinue = value.trim().length > 0;
 
   const handleNext = () => {
-    if (step < steps.length - 1) setStep(step + 1);
-    else { completeOnboarding(answers); navigate('/dashboard'); }
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else { 
+      // THE FIX: Explicitly set isOnboarded to true
+      completeOnboarding({ ...answers, isOnboarded: true }); 
+      navigate('/dashboard'); 
+    }
   };
 
   return (
