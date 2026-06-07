@@ -11,8 +11,9 @@ const PythonLearn = () => {
   const fromDashboard = params.get('from') === 'dashboard';
   if (!user) { navigate('/auth'); return null; }
 
-  const completed = PYTHON_LESSONS.filter(l => user.completedLessons.includes(l.id)).length;
-  const total = PYTHON_LESSONS.length;
+const lessonList = PYTHON_LESSONS.filter(l => !('type' in l));
+const completed = lessonList.filter(l => user.completedLessons.includes(l.id)).length;
+const total = lessonList.length;
   const progress = Math.round((completed / total) * 100);
 
   return (
@@ -47,7 +48,7 @@ const PythonLearn = () => {
         </div>
 
         <div className="space-y-2">
-          {PYTHON_LESSONS.map((lesson, i) => {
+         {lessonList.map((lesson, i) => {
             const isCompleted = user.completedLessons.includes(lesson.id);
             const isUnlocked = isPythonLessonUnlocked(lesson.id, user.completedLessons);
             return (
