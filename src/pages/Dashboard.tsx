@@ -78,11 +78,24 @@ const Dashboard = () => {
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [showShop, setShowShop] = useState(false);
+  
+  // 👍 ADD THIS: Local state to give animations time to complete
+  const [tourReady, setTourReady] = useState(false);
 
   useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
 
   // Brand-new users → in-page dashboard tour overlay (replaces /tour redirect)
   const showTour = !!user && !isGuest && !!user.name && user.hasSeenTour === false;
+
+  // 👍 ADD THIS: Trigger a small delay timer if the tour needs to be shown
+  useEffect(() => {
+    if (showTour) {
+      const timer = setTimeout(() => {
+        setTourReady(true);
+      }, 600); // 600ms covers all your tile delay animations (max is 0.45s)
+      return () => clearTimeout(timer);
+    }
+  }, [showTour]);
 
   if (loading) return null;
   if (!user && !isGuest) { navigate('/auth'); return null; }
@@ -407,7 +420,7 @@ const Dashboard = () => {
           <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
         </motion.button>
 
-        {/* Promo Code */}
+    {/* Promo Code */}
         <div className="glass-card p-4 rounded-2xl">
           <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">promo_code</h3>
           <div className="flex gap-2">
@@ -421,7 +434,7 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
-      {showTour && (
+      {showTour && tourReady && (
         <DashboardTour steps={TOUR_STEPS} onFinish={() => { markTourSeen(); }} />
       )}
     </div>
