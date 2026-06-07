@@ -10,6 +10,7 @@ export interface Lesson {
   initialCss?: string;
   initialJs?: string;
   initialJsx?: string;
+  notice?: string;
   language: 'html' | 'css' | 'javascript' | 'typescript';
   challenge?: {
     instruction: string;
