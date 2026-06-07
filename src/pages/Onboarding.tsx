@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ChevronRight, Sprout, Rocket, Code2, Settings, Pen, Terminal } from 'lucide-react';
+import { ChevronRight, Sprout, Rocket, Code2, Pen, Terminal } from 'lucide-react';
 
 const steps = [
   { key: 'name', question: 'What is your name?', placeholder: 'Enter your full name', type: 'text' },
@@ -25,23 +25,22 @@ const Onboarding = () => {
   const value = answers[current.key] || '';
   const canContinue = value.trim().length > 0;
 
-  const handleNext = () => {
+  // FIX: Make this function async-safe to eliminate the race condition
+  const handleNext = async () => {
     if (step < steps.length - 1) {
       setStep(step + 1);
     } else { 
-      // THE FIX: Explicitly set isOnboarded to true
-      completeOnboarding({ ...answers, isOnboarded: true }); 
+      // Safely await DB write completion before forcing router adjustments
+      await completeOnboarding(answers); 
       navigate('/dashboard'); 
     }
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden ambient-grid">
-      {/* Glow */}
       <div className="absolute top-[-15%] left-[20%] w-[400px] h-[400px] rounded-full bg-primary/4 blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-lg relative z-10 animate-fade-in">
-        {/* Logo */}
         <div className="text-center mb-5">
           <div className="flex items-center justify-center gap-2 mb-1">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center neon-glow border border-primary/20">
@@ -51,7 +50,6 @@ const Onboarding = () => {
           </div>
         </div>
 
-        {/* Progress bar */}
         <div className="flex gap-1.5 mb-5 max-w-xs mx-auto">
           {steps.map((_, i) => (
             <div key={i} className={`flex-1 h-1 rounded-full transition-all duration-500 ${
@@ -60,7 +58,6 @@ const Onboarding = () => {
           ))}
         </div>
 
-        {/* Main content */}
         <div className="glass-card rounded-2xl p-6 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           
@@ -119,8 +116,8 @@ const Onboarding = () => {
           {current.type === 'expCards' && (
             <div className="space-y-2">
               {[
-                { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5 text-primary" />, emoji: '🌱' },
-                { val: 'Experienced', icon: <Rocket className="w-5 h-5 text-primary" />, emoji: '🚀' },
+                { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5 text-primary" /> },
+                { val: 'Experienced', icon: <Rocket className="w-5 h-5 text-primary" /> },
               ].map(e => (
                 <button key={e.val} onClick={() => setAnswers({ ...answers, experienceLevel: e.val })}
                   className={`w-full flex items-center gap-3 px-5 py-4 rounded-xl border transition-all text-sm font-mono ${
