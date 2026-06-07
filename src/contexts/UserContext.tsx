@@ -71,15 +71,15 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     email,
     name: row.name || '',
     studying: row.studying || '',
-    hasJob: row.has_job || '',
+    hasJob: row.has_job || '', // 👍 FIX: Map snake_case to camelCase hasJob
     dob: row.dob || '',
     goal: row.goal || '',
-    experienceLevel: row.experience_level || '',
+    experienceLevel: row.experience_level || '', // 👍 FIX: Map snake_case to camelCase experienceLevel
     joinDate: row.created_at || '',
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    isOnboarded: !!row.is_onboarded || localOnboarded, // Direct fallback check
+    isOnboarded: !!row.is_onboarded || localOnboarded, 
     hasSeenTour: !!row.has_seen_tour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
@@ -262,9 +262,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const applyServerProfile = (row: any) => {
-    if (!user || !row) return;
-    setUser(dbRowToProfile(row, user.email));
-  };
+  if (!user || !row) return;
+  
+  // 👍 FIX: Extract the first element if the database response arrives wrapped in an array
+  const singleRow = Array.isArray(row) ? row[0] : row;
+  if (!singleRow) return;
+
+  setUser(dbRowToProfile(singleRow, user.email));
+};
 
   const completeLesson = async (lessonId: string) => {
     if (!user) return;
