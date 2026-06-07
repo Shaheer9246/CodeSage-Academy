@@ -4,6 +4,18 @@ import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import DashboardTour, { TourStep } from '@/components/DashboardTour';
+
+const TOUR_STEPS: TourStep[] = [
+  { target: 'frontend',   title: 'Frontend Development', body: 'Learn HTML, CSS, and JavaScript from absolute zero — your first real website by lesson 5.' },
+  { target: 'networking', title: 'Computer & Networking', body: 'How the machine and the internet actually work — hardware, OS, DNS, HTTP, security.' },
+  { target: 'fullstack',  title: 'Full Stack Frontend', body: 'Go deeper: React, hooks, APIs, testing, performance, and deployment in 28 lessons.' },
+  { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn your skills into income — pick a niche, pitch, price, contract, and deliver.' },
+  { target: 'python',     title: 'Python Programming', body: 'From syntax to OOP, async, and a capstone project. Great as a second language.' },
+  { target: 'local',      title: 'Local-Only Coding', body: 'Build real apps with zero backend — DOM, localStorage, PWAs, offline-first.' },
+  { target: 'challenges', title: 'Challenges', body: 'Bite-sized coding puzzles across 4 difficulty tiers. Earn XP and badges.' },
+  { target: 'playground', title: 'Code Editor', body: 'A real in-browser editor with live preview, ZIP import, console, and snapshots.' },
+];
 
 const FULLSTACK_LESSONS = [
   { step: 1, label: 'Web Architecture', icon: '🏗️' },
