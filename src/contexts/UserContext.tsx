@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import { useToast } from '@/hooks/use-toast';
 
 export interface UserProfile {
   id: string;
@@ -21,7 +20,7 @@ export interface UserProfile {
   completedTests: string[];
   unlockedSections: string[];
   promoCodes: string[];
-  isOnboarded: boolean; // Add this line
+  isOnboarded: boolean; 
   darkMode: boolean;
   xp: number;
   level: number;
@@ -37,7 +36,7 @@ interface UserContextType {
   isOnboarded: boolean;
   login: (email: string, password: string) => Promise<string | null>;
   signup: (username: string, email: string, password: string) => Promise<string | null>;
-  completeOnboarding: (data: Partial<UserProfile>) => void;
+  completeOnboarding: (data: Partial<UserProfile>) => Promise<void>; // Turned Async
   completeLesson: (lessonId: string) => Promise<void>;
   completeTest: (testId: string) => Promise<void>;
   addBadge: (badge: string) => void;
@@ -77,8 +76,8 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    isOnboarded: !!row.is_onboarded,
-    hasSeenTour: !!row.has_seen_tour, // Keep only this one
+    isOnboarded: !!row.is_onboarded, 
+    hasSeenTour: !!row.has_seen_tour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
     unlockedSections: row.unlocked_sections || ['frontend'],
@@ -92,9 +91,6 @@ function dbRowToProfile(row: any, email: string): UserProfile {
 }
 
 function profileToDbUpdate(p: UserProfile): Record<string, any> {
-  // Only includes columns the user is allowed to update directly.
-  // Gamification fields (xp, level, coins, badges, streak, completed_*, unlocked_*, promo_codes)
-  // are server-managed via SECURITY DEFINER RPCs.
   return {
     username: p.username,
     name: p.name,
@@ -104,10 +100,9 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     goal: p.goal,
     experience_level: p.experienceLevel,
     dark_mode: p.darkMode,
-    is_onboarded: p.isOnboarded,
+    is_onboarded: p.isOnboarded, // Ensured consistency
   };
 }
-
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -123,7 +118,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (data) {
         setUser(dbRowToProfile(data, authUser.email || ''));
       } else {
-        // Profile doesn't exist yet — create a default one
         const defaultProfile: UserProfile = {
           id: authUser.id,
           username: authUser.user_metadata?.username || '',
@@ -135,7 +129,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
           xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, isOnboarded: false, streakFreezeUntil: null,
         };
-        // Try to insert the profile
         const { error: insertError } = await supabase.from('profiles').insert({
           id: authUser.id,
           username: authUser.user_metadata?.username || '',
@@ -147,7 +140,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (err) {
       console.error('Failed to fetch profile:', err);
-      // Fallback: create local-only profile so the app still works
       setUser({
         id: authUser.id,
         username: authUser.user_metadata?.username || '',
@@ -176,8 +168,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
-    
-    // Set up auth listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       if (session?.user) {
@@ -188,7 +178,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     });
     
-    // Then check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       if (session?.user) {
@@ -202,8 +191,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchProfile]);
 
   const isLoggedIn = !!user;
- // This checks if the 'isOnboarded' property exists on your user object
-const isOnboarded = !!user?.isOnboarded;
+  
+  // FIX: Stricter boolean check to avoid unexpected falsy states
+  const isOnboarded = user?.isOnboarded === true;
 
   const updateProfile = (updated: UserProfile) => {
     setUser(updated);
@@ -231,9 +221,24 @@ const isOnboarded = !!user?.isOnboarded;
     }
   };
 
-  const completeOnboarding = (data: Partial<UserProfile>) => {
+  // FIX: Direct sync bypassing the debounce timer for onboarding
+  const completeOnboarding = async (data: Partial<UserProfile>) => {
     if (!user) return;
-    updateProfile({ ...user, ...data });
+    const updatedProfile = { ...user, ...data, isOnboarded: true };
+    
+    // 1. Update local React state instantly
+    setUser(updatedProfile);
+    
+    // 2. Await immediate Supabase write
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(profileToDbUpdate(updatedProfile) as any)
+        .eq('id', user.id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Critical Onboarding Sync Error:', err);
+    }
   };
 
   const applyServerProfile = (row: any) => {
@@ -255,10 +260,7 @@ const isOnboarded = !!user?.isOnboarded;
     applyServerProfile(data);
   };
 
-  const addBadge = (_badge: string) => {
-    // Badges are awarded server-side via award_lesson / complete_test / update_streak RPCs.
-    // This client-only helper is intentionally a no-op now.
-  };
+  const addBadge = (_badge: string) => {};
 
   const updateStreak = async () => {
     if (!user) return;
@@ -287,11 +289,7 @@ const isOnboarded = !!user?.isOnboarded;
 
   const deleteAccount = async () => {
     if (!user) return;
-    try {
-      await supabase.functions.invoke('delete-account');
-    } catch (err) {
-      console.error('delete-account failed', err);
-    }
+    try { await supabase.functions.invoke('delete-account'); } catch (err) { console.error(err); }
     await supabase.auth.signOut();
     setUser(null);
   };
