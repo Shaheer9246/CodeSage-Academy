@@ -4,6 +4,18 @@ import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import DashboardTour, { TourStep } from '@/components/DashboardTour';
+
+const TOUR_STEPS: TourStep[] = [
+  { target: 'frontend',   title: 'Frontend Development', body: 'Learn HTML, CSS, and JavaScript from absolute zero — your first real website by lesson 5.' },
+  { target: 'networking', title: 'Computer & Networking', body: 'How the machine and the internet actually work — hardware, OS, DNS, HTTP, security.' },
+  { target: 'fullstack',  title: 'Full Stack Frontend', body: 'Go deeper: React, hooks, APIs, testing, performance, and deployment in 28 lessons.' },
+  { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn your skills into income — pick a niche, pitch, price, contract, and deliver.' },
+  { target: 'python',     title: 'Python Programming', body: 'From syntax to OOP, async, and a capstone project. Great as a second language.' },
+  { target: 'local',      title: 'Local-Only Coding', body: 'Build real apps with zero backend — DOM, localStorage, PWAs, offline-first.' },
+  { target: 'challenges', title: 'Challenges', body: 'Bite-sized coding puzzles across 4 difficulty tiers. Earn XP and badges.' },
+  { target: 'playground', title: 'Code Editor', body: 'A real in-browser editor with live preview, ZIP import, console, and snapshots.' },
+];
 
 const FULLSTACK_LESSONS = [
   { step: 1, label: 'Web Architecture', icon: '🏗️' },
@@ -59,7 +71,7 @@ const NETWORKING_LESSONS = [
 ];
 
 const Dashboard = () => {
-  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak } = useUser();
+  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak, markTourSeen } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuest = searchParams.get('guest') === '1';
@@ -69,12 +81,8 @@ const Dashboard = () => {
 
   useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
 
-  // Brand-new users → tour redirect (item 4)
-  useEffect(() => {
-    if (user && !isGuest && user.name && user.hasSeenTour === false) {
-      navigate('/tour', { replace: true });
-    }
-  }, [user, isGuest, navigate]);
+  // Brand-new users → in-page dashboard tour overlay (replaces /tour redirect)
+  const showTour = !!user && !isGuest && !!user.name && user.hasSeenTour === false;
 
   if (loading) return null;
   if (!user && !isGuest) { navigate('/auth'); return null; }
@@ -203,6 +211,7 @@ const Dashboard = () => {
           <motion.button
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
             onClick={go('/challenges')}
+          data-tour="challenges"
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
@@ -215,6 +224,7 @@ const Dashboard = () => {
           <motion.button
             initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
             onClick={go('/playground')}
+          data-tour="playground"
             className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
@@ -229,6 +239,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
           onClick={go('/learn')}
+          data-tour="frontend"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -254,6 +265,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
           onClick={go('/networking?from=dashboard')}
+          data-tour="networking"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -279,6 +291,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
           onClick={go('/fullstack?from=dashboard')}
+          data-tour="fullstack"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -304,6 +317,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
           onClick={go('/freelance?from=dashboard')}
+          data-tour="freelance"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -329,6 +343,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
           onClick={go('/python?from=dashboard')}
+          data-tour="python"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -354,6 +369,7 @@ const Dashboard = () => {
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
           onClick={go('/local?from=dashboard')}
+          data-tour="local"
           className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
         >
           <div className="flex items-center justify-between">
@@ -404,6 +420,10 @@ const Dashboard = () => {
           {promoMsg && <p className="text-xs mt-2 font-mono">{promoMsg}</p>}
         </div>
       </motion.div>
+
+      {showTour && (
+        <DashboardTour steps={TOUR_STEPS} onFinish={() => { markTourSeen(); }} />
+      )}
     </div>
   );
 };
