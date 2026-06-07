@@ -26,6 +26,14 @@ const FULLSTACK_LESSONS = [
   { step: 18, label: 'Testing', icon: '🧪' },
   { step: 19, label: 'Security', icon: '🛡️' },
   { step: 20, label: 'Deployment', icon: '🚀' },
+  { step: 21, label: 'TypeScript', icon: '🟦' },
+  { step: 22, label: 'Navigation', icon: '🧭' },
+  { step: 23, label: 'State Mgmt', icon: '🧠' },
+  { step: 24, label: 'Forms', icon: '📋' },
+  { step: 25, label: 'Accessibility', icon: '♿' },
+  { step: 26, label: 'Performance', icon: '⚡' },
+  { step: 27, label: 'Animations', icon: '🎬' },
+  { step: 28, label: 'Capstone', icon: '🏆' },
 ];
 
 const FREELANCE_LESSONS = [
