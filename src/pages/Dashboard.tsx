@@ -81,12 +81,9 @@ const Dashboard = () => {
 
   useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
 
-  // Brand-new users → tour redirect (item 4)
-  useEffect(() => {
-    if (user && !isGuest && user.name && user.hasSeenTour === false) {
-      navigate('/tour', { replace: true });
-    }
-  }, [user, isGuest, navigate]);
+  // Brand-new users → in-page dashboard tour overlay
+  const showTour = !!user && !isGuest && !!user.name && user.hasSeenTour === false;
+  const { markTourSeen } = useUser();
 
   if (loading) return null;
   if (!user && !isGuest) { navigate('/auth'); return null; }
