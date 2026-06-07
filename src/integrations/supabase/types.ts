@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_secrets: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      lesson_registry: {
+        Row: {
+          id: string
+        }
+        Insert: {
+          id: string
+        }
+        Update: {
+          id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           badges: string[] | null
@@ -92,6 +122,24 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          sections: string[]
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          sections: string[]
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          sections?: string[]
+        }
+        Relationships: []
+      }
       suggestions: {
         Row: {
           created_at: string
@@ -122,6 +170,18 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string
+        }
+        Relationships: []
+      }
+      test_registry: {
+        Row: {
+          id: string
+        }
+        Insert: {
+          id: string
+        }
+        Update: {
+          id?: string
         }
         Relationships: []
       }
