@@ -104,6 +104,7 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     goal: p.goal,
     experience_level: p.experienceLevel,
     dark_mode: p.darkMode,
+    is_onboarded: p.isOnboarded,
   };
 }
 
