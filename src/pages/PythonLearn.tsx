@@ -47,32 +47,45 @@ const total = lessonList.length;
           </div>
         </div>
 
-        <div className="space-y-2">
-         {lessonList.map((lesson, i) => {
-            const isCompleted = user.completedLessons.includes(lesson.id);
-            const isUnlocked = isPythonLessonUnlocked(lesson.id, user.completedLessons);
-            return (
-              <motion.button key={lesson.id}
-                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.02 }}
-                onClick={() => isUnlocked && navigate(`/py-lesson/${lesson.id}`)}
-                disabled={!isUnlocked}
-                className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all ${
-                  isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
-                }`}>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl border ${
-                  isCompleted ? 'bg-success/15 border-success/30' : 'bg-primary/10 border-primary/20'
-                }`}>{lesson.icon}</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-mono text-muted-foreground uppercase">Lesson {lesson.order}</p>
-                  <p className="text-sm font-display font-semibold text-foreground truncate">{lesson.title}</p>
-                </div>
-                {isCompleted ? <Check className="w-4 h-4 text-success" /> :
-                 isUnlocked ? <ChevronRight className="w-4 h-4 text-primary" /> :
-                 <Lock className="w-4 h-4 text-muted-foreground" />}
-              </motion.button>
-            );
-          })}
+       <div className="space-y-2">
+  {/* Inject the notice at the top of the list */}
+  {PYTHON_LESSONS.filter(l => 'type' in l).map((notice, idx) => (
+    <div key={idx} className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded shadow-sm text-amber-900 mb-4">
+      <p className="font-medium text-sm leading-relaxed">
+        {(notice as any).notice}
+      </p>
+    </div>
+  ))}
+
+  {/* Render your filtered lesson list as before */}
+  {lessonList.map((lesson, i) => {
+    const isCompleted = user.completedLessons.includes(lesson.id);
+    const isUnlocked = isPythonLessonUnlocked(lesson.id, user.completedLessons);
+    return (
+      <motion.button 
+        key={lesson.id}
+        initial={{ opacity: 0, x: -10 }} 
+        animate={{ opacity: 1, x: 0 }} 
+        transition={{ delay: i * 0.02 }}
+        onClick={() => isUnlocked && navigate(`/py-lesson/${lesson.id}`)}
+        disabled={!isUnlocked}
+        className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all ${
+          isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
+        }`}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl border ${
+          isCompleted ? 'bg-success/15 border-success/30' : 'bg-primary/10 border-primary/20'
+        }`}>{lesson.icon}</div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-mono text-muted-foreground uppercase">Lesson {lesson.order}</p>
+          <p className="text-sm font-display font-semibold text-foreground truncate">{lesson.title}</p>
         </div>
+        {isCompleted ? <Check className="w-4 h-4 text-success" /> :
+         isUnlocked ? <ChevronRight className="w-4 h-4 text-primary" /> :
+         <Lock className="w-4 h-4 text-muted-foreground" />}
+      </motion.button>
+    );
+  })}
+</div>
       </motion.div>
     </div>
   );
