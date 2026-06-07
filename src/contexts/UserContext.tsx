@@ -22,7 +22,6 @@ export interface UserProfile {
   unlockedSections: string[];
   promoCodes: string[];
   isOnboarded: boolean; // Add this line
-  hasSeenTour: boolean;
   darkMode: boolean;
   xp: number;
   level: number;
@@ -134,7 +133,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           streakCount: 0, lastActiveDate: '',
           badges: [], completedLessons: [], completedTests: [],
           unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-          xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, streakFreezeUntil: null,
+          xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, isOnboarded: false, streakFreezeUntil: null,
         };
         // Try to insert the profile
         const { error: insertError } = await supabase.from('profiles').insert({
@@ -158,7 +157,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         streakCount: 0, lastActiveDate: '',
         badges: [], completedLessons: [], completedTests: [],
         unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-        xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, streakFreezeUntil: null,
+        xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, isOnboarded: false, streakFreezeUntil: null,
       });
     }
     setLoading(false);
