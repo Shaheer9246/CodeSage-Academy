@@ -658,10 +658,54 @@ export const PYTHON_LESSONS: PythonLesson[] = [
       q('How can you optimize performance when your application needs to make dozens of consecutive HTTP requests to the exact same host domain?', ['Re-import the requests module inside a loop','Initialize a persistent connection track using `requests.Session()`','Run the script on a faster operating system','Use string formatting to speed up the url'], 1, 'An active `Session()` instance enables connection pooling under the hood, recycling the same underlying TCP connection to skip costly handshake rituals on consecutive requests.'),
       q('Which modern library acts as an excellent drop-in alternative to `requests` while adding native async support?', ['flask','httpx','django','urllib3'], 1, 'The `httpx` package shares an identical semantic interface with classic requests while introducing asynchronous client workflows for non-blocking network applications.')
     ],
-    ['Requests makes interacting with remote REST APIs trivial','Always define explicit timeout limits on network operations to prevent script freezing','Utilize Session objects to enable connection pooling benefits across multi-calls','Transition to httpx to implement asynchronous non-blocking connection streams']
+   ['Requests makes interacting with remote REST APIs trivial','Always define explicit timeout limits on network operations to prevent script freezing','Utilize Session objects to enable connection pooling benefits across multi-calls','Transition to httpx to implement asynchronous non-blocking connection streams']
   ),
 
-    ),
+  L('py-15', 15, 'Dates, Times & Timezones', '⏰',
+    'Time is one of the most deceptively complex concepts in computer science. Between leap years, daylight saving time, and global timezones, handling dates manually is a nightmare. Python provides robust built-in tools to manage the flow of time safely!',
+    [
+      { 
+        title: '1. The Time Machine (datetime)', 
+        beginner: 'The `datetime` module is your main clock. You can ask Python for the exact current time by writing `datetime.now()`. It bundles the year, month, day, hour, minute, and second into one single, clean object!', 
+        advanced: 'Never rely on local system time for structural backend logic. Always operate using UTC (Coordinated Universal Time) via `datetime.now(timezone.utc)` to prevent data corruption when servers migrate across geographic regions.' 
+      },
+      { 
+        title: '2. Formatting Time (strftime & strptime)', 
+        beginner: 'Computers read time differently than humans. Use `.strftime()` (String Format Time) to turn a computer date into a readable string like "Monday, January 5th". Use `.strptime()` (String Parse Time) to translate a human string back into computer data!', 
+        advanced: 'Memorize the C-standard format codes. `%Y` yields a 4-digit year, while `%y` yields 2 digits. Improperly parsing localized date strings without explicitly declaring the locale format risks critical cross-platform parsing failures.' 
+      },
+      { 
+        title: '3. Time Travel (timedelta)', 
+        beginner: 'If you want to know what the date will be exactly 30 days from now, you can\'t just add +30 to a month (what if it rolls over to a new year?). Instead, you add a `timedelta(days=30)` object, and Python calculates the exact future calendar date perfectly!', 
+        advanced: 'The `timedelta` object normalizes all inputs down to days, seconds, and microseconds exclusively under the hood. It fully supports native mathematical operators, allowing you to seamlessly add, subtract, or divide time periods.' 
+      },
+      { 
+        title: '4. The Timezone Trap (zoneinfo)', 
+        beginner: 'A time without a timezone is called "naive"—it\'s dangerous because nobody knows where in the world it belongs! Always make your times "aware" by attaching a timezone lock using Python\'s modern `zoneinfo` module, like `ZoneInfo("America/New_York")`.', 
+        advanced: 'Python 3.9+ introduced `zoneinfo` natively, deprecating legacy third-party libraries like `pytz`. Always store timestamps in your database in raw UTC, and only cast them to local target `ZoneInfo` states at the very last second during frontend UI rendering.' 
+      },
+    ],
+    { 
+      title: 'The Global Flight Tracker', 
+      intro: 'Let\'s build a time-travel script that calculates exactly when a flight will land in a completely different global timezone.', 
+      steps: [
+        'Open your interactive terminal prompt (>>>).',
+        'Import the core time tools by typing: `from datetime import datetime, timedelta` and `from zoneinfo import ZoneInfo`.',
+        'Lock down your current local departure time: Type `now = datetime.now(ZoneInfo("America/Los_Angeles"))`.',
+        'Create a flight duration modifier: Type `flight_time = timedelta(hours=5, minutes=30)`.',
+        'Add them together to calculate arrival: Type `landing_la = now + flight_time`.',
+        'Instantly convert that landing time to the destination\'s local timezone: Type `landing_ny = landing_la.astimezone(ZoneInfo("America/New_York"))` and print it!'
+      ], 
+      goal: 'You successfully generated timezone-aware objects, performed safe calendar math, and translated temporal coordinates across global regions.' 
+    },
+    [
+      q('Why is it highly recommended to save all database timestamps exclusively in UTC (Coordinated Universal Time)?', ['UTC takes up less hard drive storage space','UTC never changes for Daylight Saving Time, preventing massive data scheduling collisions','UTC automatically translates text into different languages','It is required by the HTTP network protocol'], 1, 'UTC provides a single, immutable anchor point for time. Local timezones shift constantly due to politics and daylight saving, causing overlapping scheduling bugs.'),
+      q('Which string command allows you to parse a human-readable text sentence (like "2024-05-12") back into a functional Python datetime object?', ['strftime()','strptime()','timestamp()','isoformat()'], 1, 'The `strptime` (String Parse Time) method translates custom formatted string text back into a valid computational datetime object.'),
+      q('What built-in object allows you to safely add exactly 14 days to a current date without breaking the calendar month?', ['A standard integer (+14)','A timedelta object','A math.ceil() function','A tuple array'], 1, 'The `timedelta` class represents a specific duration of time, automatically handling complex leap-year and month-rollover math when added to a datetime object.'),
+      q('What is the modern, built-in Python module used to attach strict geographic timezone rules to a naive datetime object?', ['pytz','zoneinfo','os.time','sys.clock'], 1, 'Introduced natively in Python 3.9, the `zoneinfo` module hooks directly into the official IANA Time Zone Database to calculate precise regional timezone offsets.')
+    ],
+    ['Always store data in UTC; only convert to local timezones for UI viewing','Use strftime to format dates out to strings, and strptime to parse strings into dates','Use timedelta objects to perform safe calendar math without breaking month rollovers','Use the modern zoneinfo module to make naive datetime objects timezone-aware']
+  ),
 
  L('py-16', 16, 'Regular Expressions', '🔎',
     'Regular Expressions (Regex) look like a chaotic mess of punctuation, but they are actually a highly efficient pattern-matching language. Think of regex like a high-tech metal detector calibrated to find specific hidden text targets—like emails, phone numbers, or dates—inside a mountain of messy raw documents!',
