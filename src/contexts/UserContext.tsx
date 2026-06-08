@@ -182,28 +182,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }, 500);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     let mounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
+      
       if (session?.user) {
-        setTimeout(() => { if (mounted) fetchProfile(session.user); }, 0);
+        await fetchProfile(session.user);
       } else {
         setUser(null);
         setLoading(false);
       }
     });
     
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      if (session?.user) {
-        fetchProfile(session.user);
-      } else {
-        setLoading(false);
-      }
-    });
-    
-    return () => { mounted = false; subscription.unsubscribe(); };
+    return () => { 
+      mounted = false; 
+      subscription.unsubscribe(); 
+    };
   }, [fetchProfile]);
 
   const isLoggedIn = !!user;
