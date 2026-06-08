@@ -4,7 +4,7 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getFullstackLessonById, isFullstackLessonUnlocked } from '@/data/fullstackLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, Code2, Eye } from 'lucide-react';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, Code2, Eye, type LucideIcon } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -47,7 +47,7 @@ const FullstackLessonPage = () => {
     }
   };
 
-  const SECTIONS: { key: Section; icon: any; label: string }[] = [
+  const SECTIONS: { key: Section; icon: LucideIcon; label: string }[] = [
     { key: 'concept', icon: BookOpen, label: 'Lesson' },
     { key: 'practical', icon: FlaskConical, label: 'Practical' },
     { key: 'quiz', icon: ClipboardCheck, label: 'Test' },

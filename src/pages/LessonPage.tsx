@@ -43,7 +43,7 @@ const LessonPage = () => {
   useEffect(() => {
     if (lesson) {
       setHtmlCode(lesson.initialCode);
-      setCssCode(lesson.initialCss || 'body { font-family: Arial; padding: 20px; background: #0f0a2e; color: #e0e0e0; }');
+      setCssCode(lesson.initialCss || 'body { font-family: Arial; padding: 20px; background: #0f0a2e; color: #e0e0e; }');
       setJsCode(lesson.initialJs || '');
       setConsoleLogs([]);
       setShowChallenge(false);
@@ -52,7 +52,7 @@ const LessonPage = () => {
       setFileTab('html');
       setMobileView('lesson');
     }
-  }, [lesson?.id]);
+  }, [lesson]);
 
   const { isGuest: __pgGuest } = useGuestLessonGate('frontend', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/learn" replace />;

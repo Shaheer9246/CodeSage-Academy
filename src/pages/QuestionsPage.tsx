@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, XCircle, RotateCcw, Clock, Award, Target, BookOpen, Play } from 'lucide-react';
@@ -85,6 +85,11 @@ const QuestionsPage = () => {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const timerRef = useRef<number | null>(null);
 
+  const finishExam = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setMode('result');
+  }, []);
+
   useEffect(() => {
     if (mode !== 'exam') return;
     timerRef.current = window.setInterval(() => {
@@ -94,10 +99,9 @@ const QuestionsPage = () => {
       });
     }, 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+  }, [mode, finishExam]);
 
-  if (!user) { navigate('/auth'); return null; }
+  const restart = () => { setMode('menu'); setLogs([]); setSelected(null); setCurrentQ(0); };
 
   const startExam = () => {
     const qs = pickQuestions(length, topic);
@@ -122,12 +126,7 @@ const QuestionsPage = () => {
     else { setCurrentQ(currentQ + 1); setSelected(null); }
   };
 
-  const finishExam = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setMode('result');
-  };
-
-  const restart = () => { setMode('menu'); setLogs([]); setSelected(null); setCurrentQ(0); };
+  if (!user) { navigate('/auth'); return null; }
 
   // ===== MENU =====
   if (mode === 'menu') {

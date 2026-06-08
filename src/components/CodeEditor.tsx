@@ -12,7 +12,7 @@ interface CodeEditorProps {
 }
 
 const CodeEditor = ({ code, onChange, language = 'html', theme = 'vs-dark', fontSize = 14, showShortcuts = true }: CodeEditorProps) => {
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<unknown>(null);
 
   return (
     <div className="h-full flex flex-col">

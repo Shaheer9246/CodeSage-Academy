@@ -140,14 +140,20 @@ const Roadmap = () => {
   const navigate = useNavigate();
   const [activeTrack, setActiveTrack] = useState('frontend');
   const currentRef = useRef<HTMLDivElement>(null);
-
-  if (!user) { navigate('/auth'); return null; }
-
-  const completedLessons = user.completedLessons;
+  const shouldRedirect = !user;
 
   useEffect(() => {
-    setTimeout(() => currentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
-  }, [activeTrack]);
+    if (shouldRedirect) {
+      navigate('/auth');
+      return;
+    }
+    const timer = setTimeout(() => currentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
+    return () => clearTimeout(timer);
+  }, [shouldRedirect, navigate, activeTrack]);
+
+  if (!user) return null;
+
+  const completedLessons = user.completedLessons;
 
   const handleNodeClick = (node: TrackNode) => {
     if (node.lessonIds.length > 0 && !node.locked) {

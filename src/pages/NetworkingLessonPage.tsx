@@ -3,7 +3,7 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getNetworkingLessonById, isNetworkingLessonUnlocked, NETWORKING_LESSONS } from '@/data/networkingLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb } from 'lucide-react';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
 
 type Section = 'concept' | 'practical' | 'quiz';
 
@@ -34,7 +34,7 @@ const NetworkingLessonPage = () => {
     }
   };
 
-  const SECTIONS: { key: Section; icon: any; label: string }[] = [
+  const SECTIONS: { key: Section; icon: LucideIcon; label: string }[] = [
     { key: 'concept', icon: BookOpen, label: 'Concept' },
     { key: 'practical', icon: FlaskConical, label: 'Practical' },
     { key: 'quiz', icon: ClipboardCheck, label: 'Quiz' },

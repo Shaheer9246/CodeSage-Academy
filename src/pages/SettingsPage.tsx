@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@/contexts/UserContext';
+import { useUser, type UserProfile } from '@/contexts/UserContext';
 import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAllLessons } from '@/data/lessons';
@@ -9,6 +9,14 @@ import { Switch } from '@/components/ui/switch';
 import { resetGuestLessons } from '@/lib/guestGate';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
+
+type Achievement = {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  check: (u: UserProfile) => boolean;
+};
 
 const BADGE_INFO: Record<string, { icon: string; label: string }> = {
   'lite': { icon: '🌱', label: 'Lite Coder' },
@@ -25,15 +33,15 @@ const BADGE_INFO: Record<string, { icon: string; label: string }> = {
   'css-wizard': { icon: '🎨', label: 'CSS Wizard' },
 };
 
-const ACHIEVEMENTS = [
-  { id: 'first-lesson', label: 'First Lesson', icon: '🎯', description: 'Complete your first lesson', check: (u: any) => u.completedLessons.length >= 1 },
-  { id: 'five-lessons', label: '5 Lessons', icon: '📚', description: 'Complete 5 lessons', check: (u: any) => u.completedLessons.length >= 5 },
-  { id: 'ten-lessons', label: '10 Lessons', icon: '🏅', description: 'Complete 10 lessons', check: (u: any) => u.completedLessons.length >= 10 },
-  { id: 'streak-3', label: '3-Day Streak', icon: '🔥', description: 'Maintain a 3-day streak', check: (u: any) => u.streakCount >= 3 },
-  { id: 'streak-7', label: '7-Day Streak', icon: '⚡', description: '7 days in a row', check: (u: any) => u.streakCount >= 7 },
-  { id: 'test-pass', label: 'Test Ace', icon: '📜', description: 'Pass a level test', check: (u: any) => u.completedTests?.length >= 1 },
-  { id: 'all-html', label: 'HTML Master', icon: '📄', description: 'Complete all HTML lessons', check: (u: any) => u.completedLessons.filter((l: string) => l.startsWith('html')).length >= 6 },
-  { id: 'all-css', label: 'CSS Wizard', icon: '🎨', description: 'Complete all CSS lessons', check: (u: any) => u.completedLessons.filter((l: string) => l.startsWith('css')).length >= 6 },
+const ACHIEVEMENTS: Achievement[] = [
+  { id: 'first-lesson', label: 'First Lesson', icon: '🎯', description: 'Complete your first lesson', check: u => u.completedLessons.length >= 1 },
+  { id: 'five-lessons', label: '5 Lessons', icon: '📚', description: 'Complete 5 lessons', check: u => u.completedLessons.length >= 5 },
+  { id: 'ten-lessons', label: '10 Lessons', icon: '🏅', description: 'Complete 10 lessons', check: u => u.completedLessons.length >= 10 },
+  { id: 'streak-3', label: '3-Day Streak', icon: '🔥', description: 'Maintain a 3-day streak', check: u => u.streakCount >= 3 },
+  { id: 'streak-7', label: '7-Day Streak', icon: '⚡', description: '7 days in a row', check: u => u.streakCount >= 7 },
+  { id: 'test-pass', label: 'Test Ace', icon: '📜', description: 'Pass a level test', check: u => u.completedTests?.length >= 1 },
+  { id: 'all-html', label: 'HTML Master', icon: '📄', description: 'Complete all HTML lessons', check: u => u.completedLessons.filter(l => l.startsWith('html')).length >= 6 },
+  { id: 'all-css', label: 'CSS Wizard', icon: '🎨', description: 'Complete all CSS lessons', check: u => u.completedLessons.filter(l => l.startsWith('css')).length >= 6 },
 ];
 
 const SettingsPage = () => {
@@ -45,7 +53,13 @@ const SettingsPage = () => {
   });
 
   useEffect(() => { setTheme(getTheme()); }, []);
-  useEffect(() => { try { localStorage.setItem('codesage_autorun', autoRun ? '1' : '0'); } catch {} }, [autoRun]);
+  useEffect(() => {
+    try {
+      localStorage.setItem('codesage_autorun', autoRun ? '1' : '0');
+    } catch (error) {
+      console.warn('Failed to persist autoRun setting', error);
+    }
+  }, [autoRun]);
 
   const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
 
@@ -61,7 +75,9 @@ const SettingsPage = () => {
       localStorage.removeItem('codesage_pg_multi');
       resetGuestLessons();
       toast.success('Runtime caches cleared.');
-    } catch { toast.error('Could not clear caches.'); }
+    } catch {
+      toast.error('Could not clear caches.');
+    }
   };
 
   const handleClearSandbox = () => {
@@ -70,7 +86,9 @@ const SettingsPage = () => {
       const keep = ['supabase.auth.token'];
       Object.keys(localStorage).forEach(k => { if (!keep.includes(k)) localStorage.removeItem(k); });
       toast.success('Sandbox cleared.');
-    } catch {}
+    } catch (error) {
+      console.warn('Could not clear sandbox localStorage', error);
+    }
   };
 
   const handleExportWorkspace = async () => {

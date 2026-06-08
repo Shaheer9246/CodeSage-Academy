@@ -31,12 +31,18 @@ export function useGuestLessonGate(track: string, lessonId: string | undefined) 
         map[track] = lessonId;
         localStorage.setItem(KEY, JSON.stringify(map));
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Guest gate localStorage unavailable', error);
+    }
   }, [isGuest, lessonId, track, navigate]);
 
   return { isGuest };
 }
 
 export function resetGuestLessons() {
-  try { localStorage.removeItem(KEY); } catch {}
+  try {
+    localStorage.removeItem(KEY);
+  } catch (error) {
+    console.warn('Unable to reset guest lesson persistence', error);
+  }
 }

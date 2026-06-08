@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { getLessonById, getAllLessons } from '@/data/lessons';
+import { getLessonById, getAllLessons, type Lesson } from '@/data/lessons';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
@@ -31,7 +31,7 @@ const LessonComplete = () => {
   const [showConfetti, setShowConfetti] = useState(true);
 
   // Find lesson + track
-  let lesson: any = id ? getLessonById(id) : undefined;
+  let lesson: Lesson | { id: string; title: string; keyTakeaways?: string[] } | undefined = id ? getLessonById(id) : undefined;
   let track: Track | undefined;
   if (!lesson && id) {
     track = TRACKS.find(t => id.startsWith(t.prefix));

@@ -4,7 +4,7 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getFreelanceLessonById, isFreelanceLessonUnlocked } from '@/data/freelanceLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb } from 'lucide-react';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
 
 type Section = 'concept' | 'practical' | 'quiz';
 
@@ -36,7 +36,7 @@ const FreelanceLessonPage = () => {
     }
   };
 
-  const SECTIONS: { key: Section; icon: any; label: string }[] = [
+  const SECTIONS: { key: Section; icon: LucideIcon; label: string }[] = [
     { key: 'concept', icon: BookOpen, label: 'Lesson' },
     { key: 'practical', icon: FlaskConical, label: 'Practical' },
     { key: 'quiz', icon: ClipboardCheck, label: 'Test' },

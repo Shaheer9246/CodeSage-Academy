@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -61,26 +62,61 @@ export const useUser = () => {
   return ctx;
 };
 
-function dbRowToProfile(row: any, email: string): UserProfile {
+type DbProfileRow = {
+  id: string;
+  username?: string | null;
+  name?: string | null;
+  studying?: string | null;
+  has_job?: string | null;
+  dob?: string | null;
+  goal?: string | null;
+  experience_level?: string | null;
+  created_at?: string | null;
+  streak_count?: number | null;
+  last_active_date?: string | null;
+  badges?: string[] | null;
+  completed_lessons?: string[] | null;
+  completed_tests?: string[] | null;
+  unlocked_sections?: string[] | null;
+  promo_codes?: string[] | null;
+  dark_mode?: boolean | null;
+  xp?: number | null;
+  level?: number | null;
+  sage_coins?: number | null;
+  streak_freeze_until?: string | null;
+};
+
+type DbProfileUpdate = Partial<{
+  username: string;
+  name: string;
+  studying: string;
+  has_job: string;
+  dob: string;
+  goal: string;
+  experience_level: string;
+  dark_mode: boolean;
+}>;
+
+function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
   const localOnboarded = localStorage.getItem(`codesage_onboarded_${row.id}`) === 'true';
   const localTourSeen = localStorage.getItem(`codesage_tour_seen_${row.id}`) === 'true';
-  
+
   return {
     id: row.id,
     username: row.username || '',
     email,
     name: row.name || '',
     studying: row.studying || '',
-    hasJob: row.has_job || '', 
+    hasJob: row.has_job || '',
     dob: row.dob || '',
     goal: row.goal || '',
-    experienceLevel: row.experience_level || '', 
+    experienceLevel: row.experience_level || '',
     joinDate: row.created_at || '',
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
     // If they have a name in the database OR local storage says true, they are onboarded!
-    isOnboarded: localOnboarded || !!row.name, 
+    isOnboarded: localOnboarded || !!row.name,
     hasSeenTour: localTourSeen,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
@@ -94,7 +130,7 @@ function dbRowToProfile(row: any, email: string): UserProfile {
   };
 }
 
-function profileToDbUpdate(p: UserProfile): Record<string, any> {
+function profileToDbUpdate(p: UserProfile): DbProfileUpdate {
   return {
     username: p.username,
     name: p.name,
@@ -110,70 +146,70 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const syncTimer = useRef<ReturnType<typeof setTimeout>>();
+  const syncTimer = useRef<ReturnType<typeof window.setTimeout>>();
 
   const fetchProfile = useCallback(async (authUser: User) => {
-    // Check backup local storage status early
     const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
-    
+
+    const buildDefaultProfile = (): UserProfile => ({
+      id: authUser.id,
+      username: authUser.user_metadata?.username || '',
+      email: authUser.email || '',
+      name: '',
+      studying: '',
+      hasJob: '',
+      dob: '',
+      goal: '',
+      experienceLevel: '',
+      joinDate: new Date().toISOString(),
+      streakCount: 0,
+      lastActiveDate: '',
+      badges: [],
+      completedLessons: [],
+      completedTests: [],
+      unlockedSections: ['frontend'],
+      promoCodes: [],
+      darkMode: true,
+      xp: 0,
+      level: 1,
+      sageCoins: 0,
+      hasSeenTour: false,
+      isOnboarded: localOnboarded,
+      streakFreezeUntil: null,
+    });
+
     try {
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
+      const { data, error } = await supabase.from<DbProfileRow>('profiles').select('*').eq('id', authUser.id).single();
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error.message);
       }
       if (data) {
         setUser(dbRowToProfile(data, authUser.email || ''));
-      // Find this block inside fetchProfile where new profiles are inserted:
-} else {
-  const defaultProfile: UserProfile = {
-    id: authUser.id,
-    username: authUser.user_metadata?.username || '',
-    email: authUser.email || '',
-    name: '', studying: '', hasJob: '', dob: '', goal: '', experienceLevel: '',
-    joinDate: new Date().toISOString(),
-    streakCount: 0, lastActiveDate: '',
-    badges: [], completedLessons: [], completedTests: [],
-    unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-    xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, 
-    isOnboarded: localOnboarded, 
-    streakFreezeUntil: null,
-  };
-  
- const { error: insertError } = await supabase.from('profiles').insert({
-    id: authUser.id,
-    username: authUser.user_metadata?.username || '',
-  });
-  
-  if (insertError) {
-    console.error('Profile insert error:', insertError.message);
-  }
-  setUser(defaultProfile);
-}
-    } catch (err) {
+      } else {
+        const defaultProfile = buildDefaultProfile();
+        const { error: insertError } = await supabase.from<DbProfileRow>('profiles').insert({
+          id: authUser.id,
+          username: authUser.user_metadata?.username || '',
+        });
+        if (insertError) {
+          console.error('Profile insert error:', insertError.message);
+        }
+        setUser(defaultProfile);
+      }
+    } catch (err: unknown) {
       console.error('Failed to fetch profile:', err);
-      setUser({
-        id: authUser.id,
-        username: authUser.user_metadata?.username || '',
-        email: authUser.email || '',
-        name: '', studying: '', hasJob: '', dob: '', goal: '', experienceLevel: '',
-        joinDate: new Date().toISOString(),
-        streakCount: 0, lastActiveDate: '',
-        badges: [], completedLessons: [], completedTests: [],
-        unlockedSections: ['frontend'], promoCodes: [], darkMode: true,
-        xp: 0, level: 1, sageCoins: 0, hasSeenTour: false, 
-        isOnboarded: localOnboarded, 
-        streakFreezeUntil: null,
-      });
+      setUser(buildDefaultProfile());
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const syncToDb = useCallback((profile: UserProfile) => {
     if (syncTimer.current) clearTimeout(syncTimer.current);
-    syncTimer.current = setTimeout(async () => {
+    syncTimer.current = window.setTimeout(async () => {
       try {
-        await supabase.from('profiles').update(profileToDbUpdate(profile) as any).eq('id', profile.id);
-      } catch (err) {
+        await supabase.from<DbProfileRow>('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
+      } catch (err: unknown) {
         console.error('Failed to sync profile:', err);
       }
     }, 500);
@@ -211,8 +247,9 @@ useEffect(() => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       return error ? error.message : null;
-    } catch (err: any) {
-      return err?.message || 'Network error — please check your connection';
+    } catch (err: unknown) {
+      if (err instanceof Error) return err.message;
+      return 'Network error — please check your connection';
     }
   };
 
@@ -223,8 +260,9 @@ useEffect(() => {
         options: { data: { username } },
       });
       return error ? error.message : null;
-    } catch (err: any) {
-      return err?.message || 'Network error — please check your connection';
+    } catch (err: unknown) {
+      if (err instanceof Error) return err.message;
+      return 'Network error — please check your connection';
     }
   };
 
@@ -239,22 +277,21 @@ useEffect(() => {
     
     try {
       const dbData = profileToDbUpdate(updatedProfile);
-      await supabase.from('profiles').update(dbData as any).eq('id', user.id);
-    } catch (err) {
+      await supabase.from<DbProfileRow>('profiles').update(dbData).eq('id', user.id);
+    } catch (err: unknown) {
       console.error('Onboarding cloud save error:', err);
     }
   };
   
 
-  const applyServerProfile = (row: any) => {
-  if (!user || !row) return;
-  
-  // 👍 FIX: Extract the first element if the database response arrives wrapped in an array
-  const singleRow = Array.isArray(row) ? row[0] : row;
-  if (!singleRow) return;
+  const applyServerProfile = (row: DbProfileRow | DbProfileRow[] | null) => {
+    if (!user || !row) return;
 
-  setUser(dbRowToProfile(singleRow, user.email));
-};
+    const singleRow = Array.isArray(row) ? row[0] : row;
+    if (!singleRow) return;
+
+    setUser(dbRowToProfile(singleRow, user.email));
+  };
 
   const completeLesson = async (lessonId: string) => {
     if (!user) return;
@@ -270,7 +307,9 @@ useEffect(() => {
     applyServerProfile(data);
   };
 
-  const addBadge = (_badge: string) => {};
+  const addBadge = (_badge: string) => {
+    // no-op placeholder for future badge logic
+  };
 
   const updateStreak = async () => {
     if (!user) return;
@@ -301,7 +340,11 @@ useEffect(() => {
   const deleteAccount = async () => {
     if (!user) return;
     localStorage.removeItem(`codesage_onboarded_${user.id}`);
-    try { await supabase.functions.invoke('delete-account'); } catch (err) { console.error(err); }
+    try {
+      await supabase.functions.invoke('delete-account');
+    } catch (err: unknown) {
+      console.error(err);
+    }
     await supabase.auth.signOut();
     setUser(null);
   };
@@ -311,12 +354,16 @@ useEffect(() => {
     updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
-  const addXp = (_amount: number) => {};
-  const addCoins = (_amount: number) => {};
+  const addXp = (_amount: number) => {
+    // no-op placeholder for future experience gain logic
+  };
+  const addCoins = (_amount: number) => {
+    // no-op placeholder for future coin gain logic
+  };
 
   const buyFreezeStreak = async (): Promise<boolean> => {
     if (!user) return false;
-    const { data, error } = await supabase.rpc('buy_freeze_streak' as any);
+    const { data, error } = await supabase.rpc('buy_freeze_streak');
     if (error || !data) return false;
     applyServerProfile(data);
     return true;

@@ -82,7 +82,10 @@ const Dashboard = () => {
   // 👍 ADD THIS: Local state to give animations time to complete
   const [tourReady, setTourReady] = useState(false);
 
-  useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest]);
+  useEffect(() => {
+    if (!user || isGuest) return;
+    updateStreak();
+  }, [isGuest, user, updateStreak]);
 
   // Brand-new users → in-page dashboard tour overlay (replaces /tour redirect)
   const showTour = !!user && !isGuest && !!user.name && user.hasSeenTour === false;

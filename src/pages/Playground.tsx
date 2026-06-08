@@ -52,7 +52,11 @@ const Playground = () => {
 
   // Toggle multi-file mode persistence
   useEffect(() => {
-    try { localStorage.setItem('codesage_pg_multi', multiMode ? '1' : '0'); } catch {}
+    try {
+      localStorage.setItem('codesage_pg_multi', multiMode ? '1' : '0');
+    } catch (error) {
+      console.warn('Unable to persist playground mode', error);
+    }
     if (!multiMode) setShowSidebar(false);
   }, [multiMode]);
 
@@ -64,7 +68,9 @@ const Playground = () => {
     try {
       const raw = localStorage.getItem(RECENT_KEY);
       if (raw) setRecents(JSON.parse(raw));
-    } catch {}
+    } catch (error) {
+      console.warn('Unable to load recent playground snapshots', error);
+    }
   }, []);
 
   // Auto-save snapshot every 30s of edits
@@ -82,10 +88,14 @@ const Playground = () => {
       };
       const next = [snap, ...recents].slice(0, 10);
       setRecents(next);
-      try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch {}
+      try {
+        localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+      } catch (error) {
+        console.warn('Unable to save recent playground snapshot', error);
+      }
     }, 30000);
     return () => clearTimeout(t);
-  }, [currentHtml, currentCss, currentJs]);
+  }, [currentHtml, currentCss, currentJs, recents]);
 
   const handleConsoleLog = useCallback((log: { type: string; message: string }) => {
     setConsoleLogs(prev => [...prev, log]);
@@ -108,7 +118,7 @@ const Playground = () => {
   }, []);
 
   const handleExport = () => {
-    const fullHtml = `<!DOCTYPE html><html><head><style>${currentCss}</style></head><body>${currentHtml.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<head>[\s\S]*?<\/head>|<\/?body[^>]*>/gi, '')}<script>${currentJs}<\/script></body></html>`;
+    const fullHtml = `<!DOCTYPE html><html><head><style>${currentCss}</style></head><body>${currentHtml.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<head>[\s\S]*?<\/head>|<\/?body[^>]*>/gi, '')}<script>${currentJs}</script></body></html>`;
     const blob = new Blob([fullHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -146,12 +156,12 @@ const Playground = () => {
       const buf = await file.arrayBuffer();
       const zip = await JSZip.loadAsync(buf);
       const added: FileItem[] = [];
-      const entries = Object.values(zip.files).filter((z: any) => !z.dir);
+          const entries = Object.values(zip.files).filter((z): z is { name: string; dir: boolean; async: (type: string) => Promise<string> } => !z.dir);
       for (const z of entries) {
-        const name = (z as any).name.split('/').pop() || (z as any).name;
+        const name = z.name.split('/').pop() || z.name;
         const ext = name.split('.').pop()?.toLowerCase() || '';
         if (!['html', 'htm', 'css', 'js', 'jsx', 'ts', 'tsx', 'json', 'md', 'txt', 'svg'].includes(ext)) continue;
-        const content = await (z as any).async('string');
+        const content = await z.async('string');
         const lang = ext === 'css' ? 'css' : (ext === 'js' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') ? 'javascript' : 'html';
         added.push({ id: `zip-${Date.now()}-${name}`, name, lang, content });
       }
@@ -160,6 +170,7 @@ const Playground = () => {
       setMultiMode(true);
       setShowSidebar(true);
     } catch (err) {
+      console.error(err);
       alert('Could not read this zip file.');
     }
     e.target.value = '';
@@ -202,7 +213,7 @@ const Playground = () => {
   };
 
   const exportRecent = (snap: RecentSnapshot) => {
-    const fullHtml = `<!DOCTYPE html><html><head><style>${snap.css}</style></head><body>${snap.html}<script>${snap.js}<\/script></body></html>`;
+    const fullHtml = `<!DOCTYPE html><html><head><style>${snap.css}</style></head><body>${snap.html}<script>${snap.js}</script></body></html>`;
     const blob = new Blob([fullHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -213,13 +224,21 @@ const Playground = () => {
   const deleteRecent = (id: string) => {
     const next = recents.filter(r => r.id !== id);
     setRecents(next);
-    try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch {}
+    try {
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+    } catch (error) {
+      console.warn('Unable to update recent playground snapshots', error);
+    }
   };
 
   const clearRecents = () => {
     if (!confirm('Clear all auto-saved snapshots?')) return;
     setRecents([]);
-    try { localStorage.removeItem(RECENT_KEY); } catch {}
+    try {
+      localStorage.removeItem(RECENT_KEY);
+    } catch (error) {
+      console.warn('Unable to clear recent playground snapshots', error);
+    }
   };
 
   // ===== MOBILE LAYOUT =====

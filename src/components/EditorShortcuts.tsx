@@ -1,8 +1,19 @@
-import { MutableRefObject, useEffect, useState } from 'react';
+import { MutableRefObject, useCallback, useEffect, useState } from 'react';
 import { Copy, Scissors, ClipboardPaste } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-interface Props { editorRef: MutableRefObject<any>; }
+type MonacoEditor = {
+  onDidFocusEditorText: (callback: () => void) => { dispose: () => void };
+  onDidBlurEditorText: (callback: () => void) => { dispose: () => void };
+  getSelection: () => unknown;
+  getModel: () => unknown;
+  executeEdits: (source: string, edits: Array<{ range: unknown; text: string; forceMoveMarkers: boolean }>) => void;
+  getPosition: () => { lineNumber: number; column: number } | null;
+  setPosition: (position: { lineNumber: number; column: number }) => void;
+  focus: () => void;
+};
+
+interface Props { editorRef: MutableRefObject<unknown>; }
 
 const SHORTCUTS: { label: string; insert: string; cursor?: number }[] = [
   { label: '<>',  insert: '<>',  cursor: 1 },
@@ -29,13 +40,18 @@ export default function EditorShortcuts({ editorRef }: Props) {
   const [focused, setFocused] = useState(false);
   const [bottomOffset, setBottomOffset] = useState(0);
 
+  const getEditor = useCallback(
+    (): MonacoEditor | null => editorRef.current as MonacoEditor | null,
+    [editorRef],
+  );
+
   useEffect(() => {
-    const editor = editorRef.current;
+    const editor = getEditor();
     if (!editor || !editor.onDidFocusEditorText) return;
     const d1 = editor.onDidFocusEditorText(() => setFocused(true));
     const d2 = editor.onDidBlurEditorText(() => setTimeout(() => setFocused(false), 100));
     return () => { d1.dispose(); d2.dispose(); };
-  }, [editorRef.current]);
+  }, [getEditor]);
 
   useEffect(() => {
     if (!isMobile || typeof window === 'undefined' || !window.visualViewport) return;
@@ -56,7 +72,7 @@ export default function EditorShortcuts({ editorRef }: Props) {
   }, [isMobile]);
 
   const insert = (text: string, cursorBack?: number) => {
-    const editor = editorRef.current;
+    const editor = getEditor();
     if (!editor) return;
     const sel = editor.getSelection();
     if (!sel) return;
@@ -69,7 +85,7 @@ export default function EditorShortcuts({ editorRef }: Props) {
   };
 
   const getSelectedText = (): string => {
-    const editor = editorRef.current;
+    const editor = getEditor();
     if (!editor) return '';
     const sel = editor.getSelection();
     const model = editor.getModel();
@@ -80,20 +96,26 @@ export default function EditorShortcuts({ editorRef }: Props) {
   const doCopy = async () => {
     const text = getSelectedText();
     if (!text) return;
-    try { await navigator.clipboard.writeText(text); } catch {}
-    editorRef.current?.focus();
+    try { await navigator.clipboard.writeText(text); } catch {
+      // Ignore clipboard write failures on unsupported browsers.
+    }
+    getEditor()?.focus();
   };
   const doCut = async () => {
     const text = getSelectedText();
     if (!text) return;
-    try { await navigator.clipboard.writeText(text); } catch {}
+    try { await navigator.clipboard.writeText(text); } catch {
+      // Ignore clipboard write failures on unsupported browsers.
+    }
     insert('', 0);
   };
   const doPaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
       if (text) insert(text);
-    } catch {}
+    } catch {
+      // Ignore clipboard paste failures on unsupported browsers.
+    }
   };
 
   const bar = (

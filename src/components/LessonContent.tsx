@@ -72,7 +72,7 @@ const LessonContent = ({ lesson, lessonIndex, totalLessons, onPrev, onNext, onSt
       </div>
 
       <div className="flex-1 overflow-auto p-4">
-        <div dangerouslySetInnerHTML={{ __html: renderContent('content' in lesson ? lesson.content : (lesson as any).message || '') }} />
+        <div dangerouslySetInnerHTML={{ __html: renderContent('content' in lesson ? lesson.content : lesson.message || '') }} />
       </div>
 
       <div className="flex items-center justify-between px-4 py-2 border-t border-border">

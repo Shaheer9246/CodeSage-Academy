@@ -14,6 +14,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
     const timer = setTimeout(() => {
       if (!iframeRef.current) return;
 
+      const closeScriptTag = '</scr' + 'ipt>';
       const consoleOverride = `
         <script>
           (function() {
@@ -36,13 +37,13 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
               window.parent.postMessage({ type: 'console-log', logType: 'error', message: 'Error: ' + msg + ' (line ' + line + ')' }, '*');
             };
           })();
-        <\/script>
+        ${closeScriptTag}
       `;
 
       // Escape any literal "</script>" inside user JS so it doesn't break out
-      const safeJs = (js || '').replace(/<\/script/gi, '<\\/script');
+      const safeJs = (js || '').replace(/<\/script/gi, '</scr' + 'ipt');
       // Same for CSS </style>
-      const safeCss = (css || '').replace(/<\/style/gi, '<\\/style');
+      const safeCss = (css || '').replace(/<\/style/gi, '</sty' + 'le');
 
       let finalHtml = html.trim();
 
@@ -60,7 +61,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
 </head>
 <body>
   ${finalHtml}
-  <script>${safeJs}<\/script>
+  <script>${safeJs}${closeScriptTag}
 </body>
 </html>`;
       } else {
@@ -83,12 +84,12 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
         }
 
         if (finalHtml.match(/src=["']script\.js["']/i)) {
-          finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, `<script>${safeJs}<\/script>`);
+          finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, `<script>${safeJs}</script>`);
         } else if (safeJs.trim()) {
           if (finalHtml.match(/<\/body>/i)) {
-            finalHtml = finalHtml.replace(/<\/body>/i, `<script>${safeJs}<\/script></body>`);
+            finalHtml = finalHtml.replace(/<\/body>/i, `<script>${safeJs}</script></body>`);
           } else {
-            finalHtml = finalHtml + `<script>${safeJs}<\/script>`;
+            finalHtml = finalHtml + `<script>${safeJs}</script>`;
           }
         }
       }

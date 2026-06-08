@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronRight, X } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export default function DashboardTour({ steps, onFinish }: Props) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const step = steps[i];
 
-  const measure = () => {
+  const measure = useCallback(() => {
     if (!step) return;
     const el = document.querySelector<HTMLElement>(`[data-tour="${step.target}"]`);
     if (!el) { setRect(null); return; }
@@ -30,9 +30,11 @@ export default function DashboardTour({ steps, onFinish }: Props) {
       const r = el.getBoundingClientRect();
       setRect(r);
     }, 350);
-  };
+  }, [step]);
 
-  useLayoutEffect(() => { measure(); /* eslint-disable-next-line */ }, [i]);
+  useLayoutEffect(() => {
+    measure();
+  }, [measure]);
 
   useEffect(() => {
     const onResize = () => measure();
