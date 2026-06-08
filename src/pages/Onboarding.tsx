@@ -30,9 +30,9 @@ const Onboarding = () => {
       setStep(step + 1);
     } else { 
       // 1. Safely wait for the database write to finish completely
-      await completeOnboarding(answers); 
-      // 2. Perform a single, clean programmatic redirect
-      navigate('/dashboard'); 
+await completeOnboarding(answers); 
+// 2. Perform a single, clean programmatic redirect
+navigate('/tour'); 
     }
   };
 
