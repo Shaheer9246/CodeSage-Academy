@@ -67,18 +67,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   // Redirect to auth if not logged in and not a guest
   if (!isLoggedIn && !isGuestMode) return <Navigate to="/auth" replace />;
 
-  // Define paths allowed during the onboarding phase (only /onboarding now)
-  const isAllowedUnonboardedPath = location.pathname === "/onboarding";
+  // Define paths allowed during the onboarding phase (both onboarding and tour)
+const isAllowedUnonboardedPath = 
+  location.pathname === "/onboarding" || 
+  location.pathname === "/tour";
 
-  // THE FIX: If logged in but NOT onboarded, force them to /onboarding
-  if (isLoggedIn && !isOnboarded && !isAllowedUnonboardedPath) {
-    return <Navigate to="/onboarding" replace />; 
-  }
+// If logged in but NOT onboarded, force them to /onboarding (unless they are already on the tour)
+if (isLoggedIn && !isOnboarded && !isAllowedUnonboardedPath) {
+  return <Navigate to="/onboarding" replace />; 
+}
 
-  // THE FIX: If already onboarded, prevent them from going back to onboarding
-  if (isLoggedIn && isOnboarded && isAllowedUnonboardedPath) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // THE FIX: If already onboarded, prevent them from going back to onboarding questions
+if (isLoggedIn && isOnboarded && location.pathname === "/onboarding") {
+  return <Navigate to="/dashboard" replace />;
+}
 
   return <>{children}</>;
 }
