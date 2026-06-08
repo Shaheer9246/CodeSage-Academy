@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -97,10 +97,9 @@ const Dashboard = () => {
     }
   }, [showTour]);
 
-  if (loading) return null;
-  if (!user && !isGuest) { navigate('/auth'); return null; }
-  if (user && !user.name && !isGuest) { navigate('/onboarding'); return null; }
-
+ if (loading) return null;
+if (!user && !isGuest) return <Navigate to="/auth" replace />;
+if (user && !user.name && !isGuest) return <Navigate to="/onboarding" replace />;
 
   const handlePromo = async () => {
     const ok = await applyPromoCode(promoInput);
