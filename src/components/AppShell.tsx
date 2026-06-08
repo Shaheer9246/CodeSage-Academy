@@ -16,7 +16,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { user, logout } = useUser();
 
-  const noShellRoutes = ['/auth', '/onboarding'];
+  const noShellRoutes = ['/auth', '/onboarding', '/tour'];
   if (noShellRoutes.some(r => location.pathname.startsWith(r))) {
     return <>{children}</>;
   }
