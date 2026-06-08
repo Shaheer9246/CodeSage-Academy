@@ -62,8 +62,8 @@ export const useUser = () => {
 };
 
 function dbRowToProfile(row: any, email: string): UserProfile {
-  // SAFETY NET: Check local storage status as secondary source of truth
   const localOnboarded = localStorage.getItem(`codesage_onboarded_${row.id}`) === 'true';
+  const localTourSeen = localStorage.getItem(`codesage_tour_seen_${row.id}`) === 'true';
   
   return {
     id: row.id,
@@ -79,9 +79,9 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    // 👍 FIX: If it is null (old user), default to true. If false (new user), stay false.
-    isOnboarded: (row.is_onboarded ?? (row.name ? true : false)) || localOnboarded, 
-    hasSeenTour: !!row.has_seen_tour,
+    // If they have a name in the database OR local storage says true, they are onboarded!
+    isOnboarded: localOnboarded || !!row.name, 
+    hasSeenTour: localTourSeen,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
     unlockedSections: row.unlocked_sections || ['frontend'],
@@ -104,10 +104,9 @@ function profileToDbUpdate(p: UserProfile): Record<string, any> {
     goal: p.goal,
     experience_level: p.experienceLevel,
     dark_mode: p.darkMode,
-    is_onboarded: p.isOnboarded,
-    has_seen_tour: p.hasSeenTour, // 👍 FIX: Persist tour completion packet
   };
 }
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,11 +139,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     streakFreezeUntil: null,
   };
   
-  // 👍 FIX: Explicitly send is_onboarded as false so new signups don't bypass it
-  const { error: insertError } = await supabase.from('profiles').insert({
+ const { error: insertError } = await supabase.from('profiles').insert({
     id: authUser.id,
     username: authUser.user_metadata?.username || '',
-    is_onboarded: false, 
   });
   
   if (insertError) {
@@ -231,34 +228,18 @@ useEffect(() => {
     }
   };
 
-  const completeOnboarding = async (data: Partial<UserProfile>) => {
+ const completeOnboarding = async (data: Partial<UserProfile>) => {
     if (!user) return;
     
-    // 1. Drop immediate hardware backup into browser localStorage 
     localStorage.setItem(`codesage_onboarded_${user.id}`, 'true');
+    localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
     
-    // Keep hasSeenTour as false here so new signups DO get the tour!
     const updatedProfile = { ...user, ...data, isOnboarded: true, hasSeenTour: false };
     setUser(updatedProfile);
     
     try {
       const dbData = profileToDbUpdate(updatedProfile);
-      
-      // 2. Fire full profile sync out to Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .update(dbData as any)
-        .eq('id', user.id);
-        
-      if (error) {
-        console.warn('Backend custom column update rejected, firing isolation save...', error.message);
-        
-        // 3. Fallback: Save just the critical boolean
-        await supabase
-          .from('profiles')
-          .update({ is_onboarded: true } as any)
-          .eq('id', user.id);
-      }
+      await supabase.from('profiles').update(dbData as any).eq('id', user.id);
     } catch (err) {
       console.error('Onboarding cloud save error:', err);
     }
@@ -341,15 +322,15 @@ useEffect(() => {
     return true;
   };
 
-  const markTourSeen = async () => {
+ const markTourSeen = async () => {
     if (!user) return;
-    try { await supabase.from('profiles').update({ has_seen_tour: true } as any).eq('id', user.id); } catch {}
+    localStorage.setItem(`codesage_tour_seen_${user.id}`, 'true');
     setUser({ ...user, hasSeenTour: true });
   };
 
   const resetTour = async () => {
     if (!user) return;
-    try { await supabase.from('profiles').update({ has_seen_tour: false } as any).eq('id', user.id); } catch {}
+    localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
     setUser({ ...user, hasSeenTour: false });
   };
 
