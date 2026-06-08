@@ -80,7 +80,7 @@ function dbRowToProfile(row: any, email: string): UserProfile {
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
     // 👍 FIX: If it is null (old user), default to true. If false (new user), stay false.
-    isOnboarded: (row.is_onboarded ?? true) || localOnboarded, 
+    isOnboarded: (row.is_onboarded ?? (row.name ? true : false)) || localOnboarded, 
     hasSeenTour: !!row.has_seen_tour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
