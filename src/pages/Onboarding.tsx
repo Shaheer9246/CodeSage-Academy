@@ -15,6 +15,7 @@ const steps = [
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
   const { user, completeOnboarding } = useUser();
   const navigate = useNavigate();
 
@@ -23,18 +24,24 @@ const Onboarding = () => {
 
   const current = steps[step];
   const value = answers[current.key] || '';
-  const canContinue = value.trim().length > 0;
+  const canContinue = value.trim().length > 0 && !submitting;
 
   const handleNext = async () => {
     if (step < steps.length - 1) {
       setStep(step + 1);
-    } else { 
-      // 1. Safely wait for the database write to finish completely
-await completeOnboarding(answers); 
-// 2. Perform a single, clean programmatic redirect
-navigate('/tour'); 
+      return;
+    }
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await completeOnboarding(answers);
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      console.error('Onboarding submit failed', err);
+      setSubmitting(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden ambient-grid">
