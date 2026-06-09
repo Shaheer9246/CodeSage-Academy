@@ -53,37 +53,31 @@ function LoadingScreen() {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, isOnboarded, loading } = useUser();
-  const location = useLocation(); 
-  
+  const location = useLocation();
+
   const urlParams = new URLSearchParams(location.search);
-  const isGuestMode = 
-    urlParams.get("guest") === "1" || 
-    location.search.includes("guest=1") || 
-    location.pathname === "/trip" || 
+  const isGuestMode =
+    urlParams.get("guest") === "1" ||
+    location.pathname === "/trip" ||
     location.pathname.includes("/lesson/");
 
   if (loading) return <LoadingScreen />;
 
-  // Redirect to auth if not logged in and not a guest
   if (!isLoggedIn && !isGuestMode) return <Navigate to="/auth" replace />;
 
-  // Define paths allowed during the onboarding phase (both onboarding and tour)
-const isAllowedUnonboardedPath = 
-  location.pathname === "/onboarding" || 
-  location.pathname === "/tour";
+  // Not onboarded → only allow /onboarding.
+  if (isLoggedIn && !isOnboarded && location.pathname !== "/onboarding") {
+    return <Navigate to="/onboarding" replace />;
+  }
 
-// If logged in but NOT onboarded, force them to /onboarding (unless they are already on the tour)
-if (isLoggedIn && !isOnboarded && !isAllowedUnonboardedPath) {
-  return <Navigate to="/onboarding" replace />; 
-}
-
-  // THE FIX: If already onboarded, prevent them from going back to onboarding questions
-if (isLoggedIn && isOnboarded && location.pathname === "/onboarding") {
-  return <Navigate to="/dashboard" replace />;
-}
+  // Already onboarded → keep them out of /onboarding.
+  if (isLoggedIn && isOnboarded && location.pathname === "/onboarding") {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return <>{children}</>;
 }
+
 
 function AuthRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, isOnboarded, loading } = useUser();
