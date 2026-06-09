@@ -88,21 +88,19 @@ const Dashboard = () => {
   }, [isGuest, user, updateStreak]);
 
   // Brand-new users → in-page dashboard tour overlay (replaces /tour redirect)
-  const showTour = !!user && !isGuest && !!user.name && user.hasSeenTour === false;
+  const showTour = !!user && !isGuest && user.isOnboarded === true && user.hasSeenTour === false;
 
-  // 👍 ADD THIS: Trigger a small delay timer if the tour needs to be shown
+  // Trigger a small delay timer if the tour needs to be shown
   useEffect(() => {
-    if (showTour) {
-      const timer = setTimeout(() => {
-        setTourReady(true);
-      }, 600); // 600ms covers all your tile delay animations (max is 0.45s)
-      return () => clearTimeout(timer);
-    }
+    if (!showTour) { setTourReady(false); return; }
+    const timer = setTimeout(() => setTourReady(true), 600);
+    return () => clearTimeout(timer);
   }, [showTour]);
 
  if (loading) return null;
 if (!user && !isGuest) return <Navigate to="/auth" replace />;
-if (user && !user.name && !isGuest) return <Navigate to="/onboarding" replace />;
+if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" replace />;
+
 
   const handlePromo = async () => {
     const ok = await applyPromoCode(promoInput);
