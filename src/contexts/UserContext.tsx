@@ -84,6 +84,7 @@ type DbProfileRow = {
   level?: number | null;
   sage_coins?: number | null;
   streak_freeze_until?: string | null;
+  has_seen_tour?: boolean | null;
 };
 
 type DbProfileUpdate = Partial<{
@@ -95,11 +96,20 @@ type DbProfileUpdate = Partial<{
   goal: string;
   experience_level: string;
   dark_mode: boolean;
+  has_seen_tour: boolean;
 }>;
 
 function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
   const localOnboarded = localStorage.getItem(`codesage_onboarded_${row.id}`) === 'true';
   const localTourSeen = localStorage.getItem(`codesage_tour_seen_${row.id}`) === 'true';
+
+  // DB is the source of truth; localStorage is just a cache/fallback.
+  const isOnboarded = !!row.name || localOnboarded;
+  const hasSeenTour = row.has_seen_tour === true || (row.has_seen_tour == null && localTourSeen);
+
+  // Refresh local cache so future loads are consistent.
+  if (isOnboarded) localStorage.setItem(`codesage_onboarded_${row.id}`, 'true');
+  localStorage.setItem(`codesage_tour_seen_${row.id}`, hasSeenTour ? 'true' : 'false');
 
   return {
     id: row.id,
@@ -115,9 +125,8 @@ function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
     streakCount: row.streak_count || 0,
     lastActiveDate: row.last_active_date || '',
     badges: row.badges || [],
-    // If they have a name in the database OR local storage says true, they are onboarded!
-    isOnboarded: localOnboarded || !!row.name,
-    hasSeenTour: localTourSeen,
+    isOnboarded,
+    hasSeenTour,
     completedLessons: row.completed_lessons || [],
     completedTests: row.completed_tests || [],
     unlockedSections: row.unlocked_sections || ['frontend'],
@@ -140,13 +149,14 @@ function profileToDbUpdate(p: UserProfile): DbProfileUpdate {
     goal: p.goal,
     experience_level: p.experienceLevel,
     dark_mode: p.darkMode,
+    has_seen_tour: p.hasSeenTour,
   };
 }
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const syncTimer = useRef<ReturnType<typeof window.setTimeout>>();
+  const syncTimer = useRef<number | undefined>(undefined);
 
   const fetchProfile = useCallback(async (authUser: User) => {
     const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
@@ -179,7 +189,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     });
 
     try {
-      const { data, error } = await supabase.from<DbProfileRow>('profiles').select('*').eq('id', authUser.id).single();
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error.message);
       }
@@ -187,7 +197,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUser(dbRowToProfile(data, authUser.email || ''));
       } else {
         const defaultProfile = buildDefaultProfile();
-        const { error: insertError } = await supabase.from<DbProfileRow>('profiles').insert({
+        const { error: insertError } = await supabase.from('profiles').insert({
           id: authUser.id,
           username: authUser.user_metadata?.username || '',
         });
@@ -208,7 +218,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (syncTimer.current) clearTimeout(syncTimer.current);
     syncTimer.current = window.setTimeout(async () => {
       try {
-        await supabase.from<DbProfileRow>('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
+        await supabase.from('profiles').update(profileToDbUpdate(profile)).eq('id', profile.id);
       } catch (err: unknown) {
         console.error('Failed to sync profile:', err);
       }
@@ -266,22 +276,26 @@ useEffect(() => {
     }
   };
 
- const completeOnboarding = async (data: Partial<UserProfile>) => {
+  const completeOnboarding = async (data: Partial<UserProfile>) => {
     if (!user) return;
-    
+
     localStorage.setItem(`codesage_onboarded_${user.id}`, 'true');
     localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
-    
+
     const updatedProfile = { ...user, ...data, isOnboarded: true, hasSeenTour: false };
-    setUser(updatedProfile);
-    
+
     try {
       const dbData = profileToDbUpdate(updatedProfile);
-      await supabase.from<DbProfileRow>('profiles').update(dbData).eq('id', user.id);
+      const { error } = await supabase.from('profiles').update(dbData).eq('id', user.id);
+      if (error) console.error('Onboarding cloud save error:', error.message);
     } catch (err: unknown) {
       console.error('Onboarding cloud save error:', err);
     }
+
+    // Set state AFTER the DB write so the route guard only flips once.
+    setUser(updatedProfile);
   };
+
   
 
   const applyServerProfile = (row: DbProfileRow | DbProfileRow[] | null) => {
@@ -332,10 +346,11 @@ useEffect(() => {
   };
 
   const logout = async () => {
-    if (user) localStorage.removeItem(`codesage_onboarded_${user.id}`);
+    // Keep onboarded/tour cache so the next login goes straight to the dashboard.
     await supabase.auth.signOut();
     setUser(null);
   };
+
 
   const deleteAccount = async () => {
     if (!user) return;
@@ -369,17 +384,32 @@ useEffect(() => {
     return true;
   };
 
- const markTourSeen = async () => {
+  const markTourSeen = async () => {
     if (!user) return;
     localStorage.setItem(`codesage_tour_seen_${user.id}`, 'true');
     setUser({ ...user, hasSeenTour: true });
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ has_seen_tour: true })
+        .eq('id', user.id);
+      if (error) console.error('markTourSeen failed:', error.message);
+    } catch (err) {
+      console.error('markTourSeen failed:', err);
+    }
   };
 
   const resetTour = async () => {
     if (!user) return;
     localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
     setUser({ ...user, hasSeenTour: false });
+    try {
+      await supabase.from('profiles').update({ has_seen_tour: false }).eq('id', user.id);
+    } catch (err) {
+      console.error('resetTour failed:', err);
+    }
   };
+
 
   return (
     <UserContext.Provider value={{
