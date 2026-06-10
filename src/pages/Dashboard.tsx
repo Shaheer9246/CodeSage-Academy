@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -219,32 +219,44 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           </div>
         )}
 
-        {/* 2 Action Boxes: Challenges + Code Editor */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* 3 Action Boxes: Challenges + Code Editor + Exams */}
+        <div className="grid grid-cols-3 gap-3">
           <motion.button
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
             onClick={go('/challenges')}
           data-tour="challenges"
-            className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
+            className="glass-card p-3 rounded-2xl text-left hover:neon-border transition-all group"
           >
-            <div className="w-10 h-10 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
-              <Zap className="w-5 h-5 text-accent-orange" />
+            <div className="w-9 h-9 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
+              <Zap className="w-4 h-4 text-accent-orange" />
             </div>
-            <p className="text-sm font-bold font-display text-foreground">Challenges</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Test your skills</p>
+            <p className="text-[11px] font-bold font-display text-foreground leading-tight">Challenges</p>
+            <p className="text-[9px] text-muted-foreground mt-0.5">Test skills</p>
+          </motion.button>
+
+          <motion.button
+            initial={{ x: 0, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.12 }}
+            onClick={go('/playground')}
+          data-tour="playground"
+            className="glass-card p-3 rounded-2xl text-left hover:neon-border transition-all group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
+              <Code className="w-4 h-4 text-primary" />
+            </div>
+            <p className="text-[11px] font-bold font-display text-foreground leading-tight">Editor</p>
+            <p className="text-[9px] text-muted-foreground mt-0.5">Playground</p>
           </motion.button>
 
           <motion.button
             initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
-            onClick={go('/playground')}
-          data-tour="playground"
-            className="glass-card p-4 rounded-2xl text-left hover:neon-border transition-all group"
+            onClick={go('/exams')}
+            className="glass-card p-3 rounded-2xl text-left hover:neon-border transition-all group"
           >
-            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
-              <Code className="w-5 h-5 text-primary" />
+            <div className="w-9 h-9 rounded-xl bg-accent-blue/15 flex items-center justify-center mb-2">
+              <HelpCircle className="w-4 h-4 text-accent-blue" />
             </div>
-            <p className="text-sm font-bold font-display text-foreground">Code Editor</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Playground</p>
+            <p className="text-[11px] font-bold font-display text-foreground leading-tight">Exams</p>
+            <p className="text-[9px] text-muted-foreground mt-0.5">Quiz tests</p>
           </motion.button>
         </div>
 
