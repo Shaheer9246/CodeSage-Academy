@@ -8,8 +8,11 @@ const PythonLearn = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const fromDashboard = params.get('from') === 'dashboard';
+  const from = params.get('from');
+  const fromQs = from ? `?from=${from}` : '';
+  const fromDashboard = from === 'dashboard';
   if (!user) { navigate('/auth'); return null; }
+
 
 const lessonList = PYTHON_LESSONS.filter(l => !('type' in l));
 const completed = lessonList.filter(l => user.completedLessons.includes(l.id)).length;
@@ -67,7 +70,7 @@ const total = lessonList.length;
         initial={{ opacity: 0, x: -10 }} 
         animate={{ opacity: 1, x: 0 }} 
         transition={{ delay: i * 0.02 }}
-        onClick={() => isUnlocked && navigate(`/py-lesson/${lesson.id}`)}
+        onClick={() => isUnlocked && navigate(`/py-lesson/${lesson.id}${fromQs}`)}
         disabled={!isUnlocked}
         className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all ${
           isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
