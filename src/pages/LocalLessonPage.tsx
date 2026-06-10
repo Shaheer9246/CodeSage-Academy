@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getLocalLessonById, isLocalLessonUnlocked } from '@/data/localLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, Code2, Eye, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, Eye, type LucideIcon } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 type Section = 'concept' | 'practical' | 'quiz';
-type MobileLab = 'code' | 'preview';
+
 
 const LocalLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
   const isMobile = useIsMobile();
+  const [sp] = useSearchParams();
+  const from = sp.get('from');
+  const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/local?from=dashboard' : '/local';
+
 
   const lesson = id ? getLocalLessonById(id) : undefined;
   const [section, setSection] = useState<Section>('concept');
@@ -27,7 +31,7 @@ const LocalLessonPage = () => {
   const [css, setCss] = useState(lesson?.practical.code?.css || '');
   const [js, setJs] = useState(lesson?.practical.code?.js || '');
   const [activeFile, setActiveFile] = useState<'html' | 'css' | 'js'>('html');
-  const [mobileLab, setMobileLab] = useState<MobileLab>('code');
+  
 
   const { isGuest: __pgGuest } = useGuestLessonGate('local', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/local" replace />;
@@ -76,7 +80,7 @@ const LocalLessonPage = () => {
   return (
     <div className="min-h-screen bg-background grid-bg">
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/80 border-b border-border/30 px-3 py-2.5 flex items-center gap-3">
-        <button onClick={() => navigate('/local')} className="text-muted-foreground hover:text-foreground p-1">
+        <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground p-1">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1 min-w-0">
@@ -160,27 +164,22 @@ const LocalLessonPage = () => {
             {code && (
               <div className="glass-card rounded-2xl overflow-hidden">
                 {isMobile ? (
-                  <>
-                    <div className="flex border-b border-border/40 bg-card/60">
-                      <button onClick={() => setMobileLab('code')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs ${mobileLab === 'code' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
-                        <Code2 className="w-3.5 h-3.5" /> Code
-                      </button>
-                      <button onClick={() => setMobileLab('preview')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs ${mobileLab === 'preview' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
-                        <Eye className="w-3.5 h-3.5" /> Preview
-                      </button>
+                  <div className="flex flex-col" style={{ height: '85vh' }}>
+                    <div className="h-1/2 min-h-0 border-b border-border/40">{Editor}</div>
+                    <div className="h-1/2 min-h-0">
+                      <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5">
+                        <Eye className="w-3 h-3" /> Preview
+                      </div>
+                      <LivePreview html={html} css={css} js={js} />
                     </div>
-                    <div style={{ height: '60vh' }}>
-                      {mobileLab === 'code' ? Editor : <LivePreview html={html} css={css} js={js} />}
-                    </div>
-                  </>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-2" style={{ height: '60vh' }}>
                     <div className="border-r border-border/40">{Editor}</div>
                     <LivePreview html={html} css={css} js={js} />
                   </div>
                 )}
+
               </div>
             )}
 
