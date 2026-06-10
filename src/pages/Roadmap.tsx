@@ -135,6 +135,15 @@ function getNodeStatus(node: TrackNode, completedLessons: string[]): 'locked' | 
   return 'upcoming';
 }
 
+function computeStatuses(nodes: TrackNode[], completedLessons: string[]): Array<'locked' | 'completed' | 'current' | 'upcoming'> {
+  const base = nodes.map(n => getNodeStatus(n, completedLessons));
+  // First node that is plain 'upcoming' (after all completed) becomes 'current'
+  const firstUpcomingIdx = base.findIndex(s => s === 'upcoming');
+  if (firstUpcomingIdx !== -1) base[firstUpcomingIdx] = 'current';
+  return base;
+}
+
+
 const Roadmap = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -200,8 +209,11 @@ const Roadmap = () => {
 
         <div className="relative py-4">
           <div className="space-y-3 relative z-10">
-            {activeNodes.map((node, i) => {
-              const status = getNodeStatus(node, completedLessons);
+            {(() => {
+              const statuses = computeStatuses(activeNodes, completedLessons);
+              return activeNodes.map((node, i) => {
+              const status = statuses[i];
+
               const isLeft = i % 2 === 0;
               const isCurrent = status === 'current';
 
@@ -275,9 +287,11 @@ const Roadmap = () => {
                   )}
                 </div>
               );
-            })}
+              });
+            })()}
           </div>
         </div>
+
       </motion.div>
     </div>
   );
