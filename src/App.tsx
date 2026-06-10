@@ -125,7 +125,7 @@ const App = () => (
               <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
               <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
+              <Route path="/exams" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
               <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
