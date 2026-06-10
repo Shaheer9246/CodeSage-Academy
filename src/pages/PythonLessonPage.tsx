@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
@@ -12,6 +12,10 @@ const PythonLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
+  const [sp] = useSearchParams();
+  const from = sp.get('from');
+  const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/python?from=dashboard' : '/python';
+
 
   const lesson = id ? getPythonLessonById(id) : undefined;
   const [section, setSection] = useState<Section>('concept');
@@ -45,7 +49,7 @@ const PythonLessonPage = () => {
   return (
     <div className="min-h-screen bg-background grid-bg">
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/80 border-b border-border/30 px-3 py-2.5 flex items-center gap-3">
-        <button onClick={() => navigate('/python')} className="text-muted-foreground hover:text-foreground p-1">
+        <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground p-1">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1 min-w-0">
