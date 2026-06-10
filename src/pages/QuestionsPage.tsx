@@ -3,6 +3,7 @@ import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, XCircle, RotateCcw, Clock, Award, Target, BookOpen, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Question {
   q: string;
@@ -139,7 +140,7 @@ const QuestionsPage = () => {
             </button>
             <div>
               <h1 className="text-xl font-bold font-display text-foreground">Exam Simulator</h1>
-              <p className="text-xs text-muted-foreground">Timed multiple-choice quizzes with deep results.</p>
+              <p className="text-xs text-muted-foreground">Timed multiple-choice exams with deep results.</p>
             </div>
           </div>
 
@@ -179,7 +180,7 @@ const QuestionsPage = () => {
 
           <div className="glass-card rounded-2xl p-4 text-xs text-muted-foreground">
             <BookOpen className="w-4 h-4 text-primary mb-2" />
-            Results show your score, accuracy by topic, and a review sheet of every question you missed.
+            Results show your score, accuracy by topic, and a review sheet of every exam you missed.
           </div>
         </div>
       </div>
