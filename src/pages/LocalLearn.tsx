@@ -8,8 +8,11 @@ const LocalLearn = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const fromDashboard = params.get('from') === 'dashboard';
+  const from = params.get('from');
+  const fromQs = from ? `?from=${from}` : '';
+  const fromDashboard = from === 'dashboard';
   if (!user) { navigate('/auth'); return null; }
+
 
   const completed = LOCAL_LESSONS.filter(l => user.completedLessons.includes(l.id)).length;
   const total = LOCAL_LESSONS.length;
@@ -54,7 +57,7 @@ const LocalLearn = () => {
             return (
               <motion.button key={lesson.id}
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.02 }}
-                onClick={() => isUnlocked && navigate(`/local-lesson/${lesson.id}`)}
+                onClick={() => isUnlocked && navigate(`/local-lesson/${lesson.id}${fromQs}`)}
                 disabled={!isUnlocked}
                 className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all ${
                   isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
