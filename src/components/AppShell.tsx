@@ -6,7 +6,7 @@ import { useUser } from '@/contexts/UserContext';
 const NAV_ITEMS = [
   { path: '/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/roadmap', icon: Map, label: 'Roadmap' },
-  { path: '/questions', icon: HelpCircle, label: 'Questions' },
+  { path: '/exams', icon: HelpCircle, label: 'Exams' },
   { path: '/community', icon: Users, label: 'Community' },
   { path: '/settings', icon: User, label: 'Profile' },
 ];
