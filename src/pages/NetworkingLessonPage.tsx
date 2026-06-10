@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getNetworkingLessonById, isNetworkingLessonUnlocked, NETWORKING_LESSONS } from '@/data/networkingLessons';
 import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
@@ -10,6 +10,10 @@ type Section = 'concept' | 'practical' | 'quiz';
 const NetworkingLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const from = sp.get('from');
+  const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/networking?from=dashboard' : '/networking';
+
   const { user, completeLesson } = useUser();
 
   const lesson = id ? getNetworkingLessonById(id) : undefined;
@@ -44,7 +48,7 @@ const NetworkingLessonPage = () => {
     <div className="min-h-screen bg-background grid-bg">
       {/* Header */}
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/80 border-b border-border/30 px-3 py-2.5 flex items-center gap-3">
-        <button onClick={() => navigate('/roadmap')} className="text-muted-foreground hover:text-foreground p-1">
+        <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground p-1">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1 min-w-0">
