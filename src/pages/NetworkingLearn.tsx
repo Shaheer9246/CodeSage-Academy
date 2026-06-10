@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { NETWORKING_LESSONS, isNetworkingLessonUnlocked } from '@/data/networkingLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
@@ -7,7 +7,13 @@ import { motion } from 'framer-motion';
 const NetworkingLearn = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const from = sp.get('from');
+  const fromQs = from ? `?from=${from}` : '';
+  const backTo = from === 'roadmap' ? '/roadmap' : '/dashboard';
+
   if (!user) { navigate('/auth'); return null; }
+
 
   const completed = NETWORKING_LESSONS.filter(l => user.completedLessons.includes(l.id)).length;
   const total = NETWORKING_LESSONS.length;
@@ -19,9 +25,10 @@ const NetworkingLearn = () => {
 
       <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground">
+          <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </button>
+
           <div className="flex items-center gap-2">
             <span className="text-xl">🌐</span>
             <span className="text-sm font-bold font-display">Computer & Networking</span>
@@ -52,7 +59,7 @@ const NetworkingLearn = () => {
               <motion.button
                 key={lesson.id}
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
-                onClick={() => isUnlocked && navigate(`/n-lesson/${lesson.id}`)}
+                onClick={() => isUnlocked && navigate(`/n-lesson/${lesson.id}${fromQs}`)}
                 disabled={!isUnlocked}
                 className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all ${
                   isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
