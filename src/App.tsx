@@ -32,6 +32,7 @@ import SettingsPage from "./pages/SettingsPage";
 import QuestionsPage from "./pages/QuestionsPage";
 import CommunityPage from "./pages/CommunityPage";
 import Suggestions from "./pages/Suggestions";
+import CodeCrawler from "./pages/CodeCrawler";
 import NotFound from "./pages/NotFound";
 import { Loader2, Terminal } from "lucide-react";
 
@@ -128,6 +129,7 @@ const App = () => (
               <Route path="/exams" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
               <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
+              <Route path="/games/crawler" element={<ProtectedRoute><CodeCrawler /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
               <Route path="/trip" element={<Trip />} />
               <Route path="*" element={<NotFound />} />
