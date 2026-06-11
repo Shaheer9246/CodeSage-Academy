@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -259,6 +259,29 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             <p className="text-[9px] text-muted-foreground mt-0.5">Quiz tests</p>
           </motion.button>
         </div>
+
+        {/* Code Crawler — Game */}
+        <motion.button
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.17 }}
+          onClick={go('/games/crawler')}
+          className="w-full glass-card p-4 rounded-2xl text-left hover:neon-border transition-all relative overflow-hidden group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10 pointer-events-none" />
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-accent-orange/15 flex items-center justify-center border border-accent-orange/30 neon-glow">
+                <Gamepad2 className="w-5 h-5 text-accent-orange" />
+              </div>
+              <div>
+                <p className="text-base font-bold font-display text-foreground flex items-center gap-2">
+                  Code Crawler <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent-orange/15 text-accent-orange border border-accent-orange/30 font-mono">NEW</span>
+                </p>
+                <p className="text-[10px] text-muted-foreground">Maze runner · fix code at every gate</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </div>
+        </motion.button>
 
         {/* Frontend Development Box */}
         <motion.button
