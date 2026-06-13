@@ -153,9 +153,20 @@ function profileToDbUpdate(p: UserProfile): DbProfileUpdate {
   };
 }
 
+function readCachedProfile(): UserProfile | null {
+  try {
+    const cached = localStorage.getItem('codesage_cached_profile');
+    if (!cached) return null;
+    const parsed = JSON.parse(cached) as UserProfile;
+    return parsed && parsed.id ? parsed : null;
+  } catch { return null; }
+}
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Hydrate synchronously from cache so we never flash "initializing CodeSage"
+  // for a user that's already signed in.
+  const [user, setUser] = useState<UserProfile | null>(() => readCachedProfile());
+  const [loading, setLoading] = useState<boolean>(() => !readCachedProfile());
   const syncTimer = useRef<number | undefined>(undefined);
 
   const fetchProfile = useCallback(async (authUser: User) => {
@@ -228,12 +239,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 useEffect(() => {
     let mounted = true;
 
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       
       if (session?.user) {
         await fetchProfile(session.user);
       } else {
+        localStorage.removeItem('codesage_cached_profile');
         setUser(null);
         setLoading(false);
       }
@@ -245,8 +258,20 @@ useEffect(() => {
     };
   }, [fetchProfile]);
 
+
   const isLoggedIn = !!user;
   const isOnboarded = user?.isOnboarded === true;
+
+  // Keep a local cache of the profile for instant hydration on next load.
+  useEffect(() => {
+    try {
+      if (user) localStorage.setItem('codesage_cached_profile', JSON.stringify(user));
+      else localStorage.removeItem('codesage_cached_profile');
+    } catch {
+      // ignore quota errors
+    }
+  }, [user]);
+
 
   const updateProfile = (updated: UserProfile) => {
     setUser(updated);
