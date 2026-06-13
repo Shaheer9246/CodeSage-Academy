@@ -3,8 +3,10 @@ import { useUser } from '@/contexts/UserContext';
 import { PYTHON_LESSONS, PYTHON_TRACK_NOTICE, isPythonLessonUnlocked } from '@/data/pythonLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 const PythonLearn = () => {
+  useScrollTop();
   const { user } = useUser();
   const navigate = useNavigate();
   const [params] = useSearchParams();
