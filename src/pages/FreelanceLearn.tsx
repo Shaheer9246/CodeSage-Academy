@@ -3,8 +3,10 @@ import { useUser } from '@/contexts/UserContext';
 import { FREELANCE_LESSONS, isFreelanceLessonUnlocked } from '@/data/freelanceLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 const FreelanceLearn = () => {
+  useScrollTop();
   const { user } = useUser();
   const navigate = useNavigate();
   const [sp] = useSearchParams();
