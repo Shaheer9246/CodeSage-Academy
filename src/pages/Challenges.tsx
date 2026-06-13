@@ -60,19 +60,19 @@ const Challenges = () => {
     const tierInfo = TIER_INFO[selected.tier];
     return (
       <div className="h-screen flex flex-col bg-background overflow-hidden">
-        <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border">
-          <div className="flex items-center gap-2 min-w-0">
-            <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground">
+        <header className="flex items-center justify-between gap-2 px-2 sm:px-3 py-2 glass-card border-b border-border">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <Trophy className="w-4 h-4 text-primary flex-shrink-0" />
             <span className="text-foreground font-semibold text-xs truncate">{selected.title}</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 ${tierInfo.chip}`}>
-              {tierInfo.icon} {selected.tier} · +{selected.xp} XP
+            <span className={`text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${tierInfo.chip} hidden xs:inline-flex`}>
+              {tierInfo.icon} +{selected.xp} XP
             </span>
           </div>
-          <button onClick={check} className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 shadow-lg shadow-primary/20 flex-shrink-0">
-            Check My Code
+          <button onClick={check} className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold hover:opacity-90 shadow-lg shadow-primary/20 flex-shrink-0 whitespace-nowrap">
+            Check Code
           </button>
         </header>
 
@@ -141,7 +141,7 @@ const Challenges = () => {
 
       <div className="max-w-3xl mx-auto p-4 sm:p-6 space-y-4 relative z-10">
         {/* Tier tabs */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {TIERS.map(t => {
             const info = TIER_INFO[t];
             const count = CHALLENGES.filter(c => c.tier === t).length;
