@@ -164,14 +164,14 @@ const LocalLessonPage = () => {
             {code && (
               <div className="glass-card rounded-2xl overflow-hidden">
                 {isMobile ? (
-                  <div className="flex flex-col" style={{ height: '85vh' }}>
-                    <div className="h-1/2 min-h-0 border-b border-border/40">{Editor}</div>
-                    <div className="h-1/2 min-h-0">
+                  <div className="flex flex-col" style={{ height: '75vh' }}>
+                    <div className="h-[45%] min-h-0 border-b border-border/40">
                       <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5">
                         <Eye className="w-3 h-3" /> Preview
                       </div>
                       <LivePreview html={html} css={css} js={js} />
                     </div>
+                    <div className="h-[55%] min-h-0">{Editor}</div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2" style={{ height: '60vh' }}>
