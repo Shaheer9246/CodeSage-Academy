@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { Lock, Check, Flame } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
@@ -148,16 +148,12 @@ const Roadmap = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [activeTrack, setActiveTrack] = useState('frontend');
-  const currentRef = useRef<HTMLDivElement>(null);
   const shouldRedirect = !user;
 
   useEffect(() => {
-    if (shouldRedirect) {
-      navigate('/auth');
-      return;
-    }
-    const timer = setTimeout(() => currentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
-    return () => clearTimeout(timer);
+    if (shouldRedirect) { navigate('/auth'); return; }
+    // Always start at the top — don't auto-scroll to the current node.
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [shouldRedirect, navigate, activeTrack]);
 
   if (!user) return null;
@@ -230,43 +226,43 @@ const Roadmap = () => {
                   )}
 
                   <motion.div
-                    ref={isCurrent ? currentRef : undefined}
                     initial={{ opacity: 0, x: isLeft ? -30 : 30 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: Math.min(i * 0.02, 0.3), type: 'spring', stiffness: 100 }}
-                    className={`flex items-center gap-3 ${isLeft ? 'justify-start' : 'justify-end'}`}
+                    className={`flex items-center gap-2 ${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/30 rounded-2xl' : ''}`}
                   >
                     {!isLeft && <div className="flex-1" />}
                     <button onClick={status !== 'locked' ? () => handleNodeClick(node) : undefined}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all max-w-[85%] sm:max-w-[70%] ${
+                      className={`flex items-center gap-2 px-2.5 py-2 sm:px-4 sm:py-3 rounded-2xl border-2 transition-all w-[78%] sm:w-auto sm:max-w-[70%] ${
                         status === 'completed' ? 'bg-primary/8 border-primary/30 hover:border-primary/50' :
                         status === 'current' ? 'bg-primary/10 border-primary/40 neon-glow' :
                         status === 'upcoming' ? 'bg-secondary/20 border-border/30 hover:border-primary/20 opacity-70' :
                         'bg-secondary/10 border-border/20 opacity-30 cursor-not-allowed'
                       }`}>
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-base sm:text-lg flex-shrink-0 ${
                         status === 'completed' ? 'bg-primary/15' :
                         status === 'current' ? 'bg-primary/20' :
                         'bg-secondary/30'
                       }`}>
                         {status === 'locked' ? <Lock className="w-4 h-4 text-muted-foreground" /> : node.icon}
                       </div>
-                      <div className="text-left">
-                        <p className={`text-sm font-display font-semibold ${
+                      <div className="text-left min-w-0 flex-1">
+                        <p className={`text-xs sm:text-sm font-display font-semibold truncate ${
                           status === 'completed' ? 'text-foreground' :
                           status === 'current' ? 'text-primary' :
                           'text-muted-foreground'
                         }`}>{node.label}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground font-mono">
                           {status === 'completed' ? 'Complete ✓' :
                            status === 'current' ? 'In Progress →' :
                            status === 'upcoming' ? `Step ${node.step}` :
                            'Locked 🔒'}
                         </p>
                       </div>
-                      {status === 'completed' && <Check className="w-5 h-5 text-primary ml-auto flex-shrink-0" />}
+                      {status === 'completed' && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary ml-auto flex-shrink-0" />}
                     </button>
                     {isLeft && <div className="flex-1" />}
                   </motion.div>
+
 
                   {i < activeNodes.length - 1 && (
                     <div className="flex justify-center my-1">
