@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
-import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAllLessons } from '@/data/lessons';
 import { motion } from 'framer-motion';
@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { resetGuestLessons } from '@/lib/guestGate';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
+import AvatarPicker, { getStoredAvatar } from '@/components/AvatarPicker';
 
 type Achievement = {
   id: string;
@@ -51,8 +52,12 @@ const SettingsPage = () => {
   const [autoRun, setAutoRun] = useState<boolean>(() => {
     try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
   });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
 
   useEffect(() => { setTheme(getTheme()); }, []);
+  useEffect(() => { if (user?.id) setAvatarUrl(getStoredAvatar(user.id)); }, [user?.id]);
   useEffect(() => {
     try {
       localStorage.setItem('codesage_autorun', autoRun ? '1' : '0');
@@ -118,6 +123,18 @@ const SettingsPage = () => {
   const completedCount = user.completedLessons.length;
   const progress = totalLessons ? Math.round((completedCount / totalLessons) * 100) : 0;
 
+  // Track breakdown for detail dialogs
+  const lessonGroups = [
+    { key: 'frontend', label: 'Frontend', match: (id: string) => /^(html|css|js|react|multi|form|a11y|pro|proj)-/.test(id) },
+    { key: 'networking', label: 'Networking', match: (id: string) => id.startsWith('net-') },
+    { key: 'fullstack', label: 'Full Stack', match: (id: string) => id.startsWith('fs-') },
+    { key: 'freelance', label: 'Freelance', match: (id: string) => id.startsWith('free-') },
+    { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') },
+    { key: 'local', label: 'Local-Only', match: (id: string) => id.startsWith('local-') },
+    { key: 'challenges', label: 'Challenges', match: (id: string) => id.startsWith('challenge-') },
+    { key: 'crawler', label: 'Code Crawler', match: (id: string) => id.startsWith('crawler-') },
+  ].map(g => ({ ...g, count: user.completedLessons.filter(g.match).length }));
+
   // 7-day streak calendar
   const today = new Date();
   const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -135,6 +152,8 @@ const SettingsPage = () => {
     }
   };
 
+  const initials = (user.name || user.username || 'U').slice(0, 2).toUpperCase();
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto p-4 space-y-4">
@@ -143,12 +162,21 @@ const SettingsPage = () => {
         {/* Profile Card */}
         <div className="glass-card rounded-2xl p-5">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl border border-primary/20">
-              👤
+            <div className="relative">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl border border-primary/20 overflow-hidden">
+                {avatarUrl
+                  ? <img src={avatarUrl} alt="Avatar" className="w-full h-full" />
+                  : <span className="font-display font-bold text-primary">{initials}</span>}
+              </div>
+              <button onClick={() => setShowAvatarPicker(true)}
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center border-2 border-background hover:scale-110 transition-transform"
+                title="Edit avatar">
+                <Pencil className="w-3 h-3" />
+              </button>
             </div>
-            <div>
-              <h2 className="text-lg font-bold font-display text-foreground">{user.name}</h2>
-              <p className="text-xs text-muted-foreground font-mono">@{user.username}</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-bold font-display text-foreground truncate">{user.name}</h2>
+              <p className="text-xs text-muted-foreground font-mono truncate">@{user.username}</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -183,20 +211,20 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats (click for breakdown) */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="glass-card rounded-xl p-4 text-center">
+          <button onClick={() => setDetailModal('lessons')} className="glass-card rounded-xl p-4 text-center hover:neon-border transition-all">
             <p className="text-2xl font-bold text-primary font-mono">{completedCount}</p>
             <p className="text-[10px] text-muted-foreground">Lessons</p>
-          </div>
-          <div className="glass-card rounded-xl p-4 text-center">
+          </button>
+          <button onClick={() => setDetailModal('progress')} className="glass-card rounded-xl p-4 text-center hover:neon-border transition-all">
             <p className="text-2xl font-bold text-primary font-mono">{progress}%</p>
             <p className="text-[10px] text-muted-foreground">Progress</p>
-          </div>
-          <div className="glass-card rounded-xl p-4 text-center">
+          </button>
+          <button onClick={() => setDetailModal('xp')} className="glass-card rounded-xl p-4 text-center hover:neon-border transition-all">
             <p className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</p>
             <p className="text-[10px] text-muted-foreground">XP</p>
-          </div>
+          </button>
         </div>
 
         {/* Badges */}
@@ -326,7 +354,100 @@ const SettingsPage = () => {
             <Trash2 className="w-4 h-4" /> Delete Account
           </button>
         </div>
+
+        <div className="text-center pt-4 pb-2">
+          <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v1.0.0</p>
+        </div>
       </motion.div>
+
+      {showAvatarPicker && user && (
+        <AvatarPicker
+          userId={user.id}
+          initialSeed={user.username || user.id.slice(0, 8)}
+          onClose={() => setShowAvatarPicker(false)}
+          onSave={(url) => setAvatarUrl(url)}
+        />
+      )}
+
+      {detailModal && user && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setDetailModal(null)}>
+          <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-3 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                {detailModal === 'lessons' && <><BookOpen className="w-4 h-4 text-primary" /> Lessons by Track</>}
+                {detailModal === 'progress' && <><BarChart3 className="w-4 h-4 text-primary" /> Progress by Track</>}
+                {detailModal === 'xp' && <><Zap className="w-4 h-4 text-primary" /> XP Breakdown</>}
+              </h3>
+              <button onClick={() => setDetailModal(null)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
+            </div>
+
+            {detailModal === 'lessons' && (
+              <div className="space-y-1.5">
+                {lessonGroups.map(g => (
+                  <div key={g.key} className="flex items-center justify-between bg-secondary/20 rounded-lg px-3 py-2 border border-border/20">
+                    <span className="text-xs text-foreground">{g.label}</span>
+                    <span className="text-xs text-primary font-mono font-bold">{g.count}</span>
+                  </div>
+                ))}
+                <p className="text-[10px] text-muted-foreground text-center pt-2">Total: {completedCount} lessons completed</p>
+              </div>
+            )}
+
+            {detailModal === 'progress' && (
+              <div className="space-y-2">
+                {lessonGroups.filter(g => !['challenges', 'crawler'].includes(g.key)).map(g => {
+                  // approx denominators per track (matches data files)
+                  const totals: Record<string, number> = { frontend: 50, networking: 8, fullstack: 28, freelance: 8, python: 10, local: 12 };
+                  const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
+                  return (
+                    <div key={g.key}>
+                      <div className="flex items-center justify-between text-[11px] mb-1">
+                        <span className="text-foreground">{g.label}</span>
+                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
+                      </div>
+                      <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
+                        <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="pt-3 border-t border-border/20 grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-secondary/20 rounded-lg p-2">
+                    <p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</p>
+                    <p className="text-[9px] text-muted-foreground">Challenges</p>
+                  </div>
+                  <div className="bg-secondary/20 rounded-lg p-2">
+                    <p className="text-sm font-bold text-primary font-mono">{user.completedTests?.length || 0}</p>
+                    <p className="text-[9px] text-muted-foreground">Exams</p>
+                  </div>
+                  <div className="bg-secondary/20 rounded-lg p-2">
+                    <p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'crawler')?.count || 0}</p>
+                    <p className="text-[9px] text-muted-foreground">Crawler</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {detailModal === 'xp' && (
+              <div className="space-y-2">
+                <div className="flex items-baseline gap-2 bg-secondary/20 rounded-lg p-3">
+                  <span className="text-3xl font-bold text-primary font-mono">{user.xp || 0}</span>
+                  <span className="text-xs text-muted-foreground">total XP · level {user.level || 1}</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">XP sources:</p>
+                <ul className="space-y-1 text-[11px]">
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Lessons completed</span><span className="font-mono text-primary">{completedCount} × 5 XP</span></li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Exams passed</span><span className="font-mono text-primary">{user.completedTests?.length || 0} entries</span></li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Challenges solved</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</span></li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Crawler runs</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'crawler')?.count || 0} × 10 XP</span></li>
+                </ul>
+                <p className="text-[10px] text-muted-foreground text-center pt-2">Earn 10 XP for a Streak Freeze from the Dashboard XP Shop ❄️</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
