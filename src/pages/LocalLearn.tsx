@@ -3,8 +3,10 @@ import { useUser } from '@/contexts/UserContext';
 import { LOCAL_LESSONS, isLocalLessonUnlocked } from '@/data/localLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 const LocalLearn = () => {
+  useScrollTop();
   const { user } = useUser();
   const navigate = useNavigate();
   const [params] = useSearchParams();
