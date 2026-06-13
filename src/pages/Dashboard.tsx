@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2 } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2, Palette } from 'lucide-react';
+import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -78,6 +79,13 @@ const Dashboard = () => {
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [showShop, setShowShop] = useState(false);
+  const [theme, setTheme] = useState<ThemeName>(() => getTheme());
+  const cycleTheme = () => {
+    const idx = THEMES.findIndex(t => t.id === theme);
+    const next = THEMES[(idx + 1) % THEMES.length].id;
+    applyTheme(next); setTheme(next);
+    toast.success(`Theme: ${THEMES.find(t => t.id === next)?.label}`);
+  };
   
   // 👍 ADD THIS: Local state to give animations time to complete
   const [tourReady, setTourReady] = useState(false);
@@ -166,27 +174,27 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
         )}
 
         {/* Welcome + XP/Streak pills */}
-        <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold font-display truncate">
+        <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex flex-wrap items-center justify-between gap-2">
+          <div className="min-w-0 flex-1 basis-full sm:basis-auto">
+            <h1 className="text-lg sm:text-xl font-bold font-display truncate">
               {isGuest ? 'Welcome to ' : 'Welcome Back, '}<span className="text-primary neon-text">{isGuest ? 'CodeSage' : displayName}</span>
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">{isGuest ? 'Tap any tile for a preview' : 'Continue your coding journey'}</p>
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">{isGuest ? 'Tap any tile for a preview' : 'Continue your coding journey'}</p>
           </div>
-          <div className="flex gap-2 flex-shrink-0">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 flex-shrink-0">
             <button onClick={() => isGuest ? navigate('/auth') : setShowShop(true)}
-              className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-bold text-primary">{xp}</span>
+              className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full hover:neon-glow transition-all">
+              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
+              <span className="text-[11px] sm:text-xs font-bold text-primary">{xp}</span>
             </button>
-            <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
-              <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span className="text-xs font-bold text-orange-400">{streak}d</span>
+            <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full">
+              <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-400" />
+              <span className="text-[11px] sm:text-xs font-bold text-orange-400">{streak}d</span>
             </div>
             {!isGuest && (
-              <button onClick={() => navigate('/roadmap')} title="Roadmap"
-                className="flex items-center gap-1 bg-secondary/40 border border-border/40 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
-                <Map className="w-3.5 h-3.5 text-muted-foreground" />
+              <button onClick={cycleTheme} title={`Theme: ${THEMES.find(t => t.id === theme)?.label}`}
+                className="flex items-center gap-1 bg-secondary/40 border border-border/40 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full hover:neon-glow transition-all">
+                <Palette className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
               </button>
             )}
           </div>
