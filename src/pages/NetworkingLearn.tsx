@@ -3,8 +3,10 @@ import { useUser } from '@/contexts/UserContext';
 import { NETWORKING_LESSONS, isNetworkingLessonUnlocked } from '@/data/networkingLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 const NetworkingLearn = () => {
+  useScrollTop();
   const { user } = useUser();
   const navigate = useNavigate();
   const [sp] = useSearchParams();
