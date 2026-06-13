@@ -3,8 +3,10 @@ import { useUser } from '@/contexts/UserContext';
 import { allLevels, getAllLessons, isLessonUnlocked, getCompletedCount } from '@/data/lessons';
 import { ArrowLeft, Lock, Check, ChevronDown, ChevronRight, Flame, Trophy } from 'lucide-react';
 import { useState } from 'react';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 const Learn = () => {
+  useScrollTop();
   const { user } = useUser();
   const navigate = useNavigate();
   const [expandedLevel, setExpandedLevel] = useState<string>('basic');
