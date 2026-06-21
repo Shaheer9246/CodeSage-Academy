@@ -34,90 +34,90 @@ export interface NetworkingLesson {
 
 export const NETWORKING_LESSONS: NetworkingLesson[] = [
   {
-    id: 'net-1',
-    module: 'Module 1: Computer & Network Fundamentals',
-    order: 1,
-    title: 'Hardware Architecture for Developers',
-    icon: '🖥️',
-    philosophy:
-      'As a developer, you aren\'t just writing text — you are managing physical resources. Every variable lives in RAM, every loop consumes CPU cycles, every pixel is rendered by the GPU. Understanding the hardware "pantry" lets you write lean code that doesn\'t crash the user\'s device.',
-    concepts: [
-      {
-        title: '1. The Processor (CPU) — The Decision Maker',
-        beginner: 'It\'s a fast calculator. The CPU runs through a Fetch → Decode → Execute cycle for every instruction.',
-        advanced:
-          'Modern CPUs use multi-threading. A heavy JavaScript loop blocks the main thread and freezes your UI. Pros move heavy math to a Web Worker so it runs on a different core, keeping the UI smooth at 60fps.',
-      },
-      {
-        title: '2. Memory (RAM) — The Active Workspace',
-        beginner: 'It\'s where your open tabs live. Volatile — disappears when power is lost. Extremely fast.',
-        advanced:
-          'This is the Heap and Stack. A Memory Leak means your code keeps asking for RAM but never frees it. Eventually the browser runs out of space and the tab crashes with "Out of Memory."',
-      },
-      {
-        title: '3. Graphics (GPU) — The Visual Specialist',
-        beginner: 'Used for gaming and videos. It handles thousands of tiny tasks at once.',
-        advanced:
-          'In frontend, we use Hardware Acceleration. CSS like `will-change: transform;` or `transform: translate3d(0,0,0)` moves rendering from CPU to GPU, giving 60fps animations.',
-      },
-      {
-        title: '4. Storage (SSD) — The Permanent Library',
-        beginner: 'Where your files are saved. Persists when the power is off.',
-        advanced:
-          'I/O speed matters. Reading from SSD is ~100× slower than reading from RAM. Always cache hot data in memory so you don\'t hit the slow disk repeatedly.',
-      },
-    ],
-    practical: {
-      title: 'Hardware Inspection Lab',
-      intro: 'To be a professional you must know how to monitor the machine.',
-      steps: [
-        'Open Task Manager (Windows: Ctrl+Shift+Esc) or Activity Monitor (Mac: Cmd+Space → "Activity Monitor").',
-        'Open your browser and visit a 3D site like Google Earth — watch the GPU spike.',
-        'Now open 20 tabs of any news site — watch the RAM usage climb.',
-        'Force-quit one heavy tab and observe the memory drop instantly.',
-      ],
-      goal: 'A well-coded app uses minimum RAM while keeping CPU usage low when idle.',
+  id: 'net-1',
+  module: 'Module 1: Computer & Network Fundamentals',
+  order: 1,
+  title: 'Hardware Architecture for Developers',
+  icon: '🖥️',
+  philosophy:
+    'As a developer, you aren\'t just writing text — you are managing physical resources. Every variable lives in RAM, every loop consumes CPU cycles, every pixel is rendered by the GPU. Understanding the hardware "pantry" lets you write lean code that doesn\'t crash the user\'s device.',
+  concepts: [
+    {
+      title: '1. The Processor (CPU) — The Decision Maker',
+      beginner: 'It\'s a fast calculator. The CPU runs through a Fetch → Decode → Execute cycle for every instruction.',
+      advanced: 'Modern CPUs use multi-threading. A heavy JavaScript loop blocks the main thread and freezes your UI. Pros move heavy math to a Web Worker so it runs on a different core, keeping the UI smooth at 60fps.',
+      expertInsight: 'Understanding "Cache Locality" is the mark of an expert. When your code accesses data in a linear fashion, the CPU can predict the next move and pre-fetch it, drastically reducing wait times.'
     },
-    quiz: [
-      {
-        question: 'Which component handles thousands of small simultaneous calculations for animations?',
-        options: ['CPU', 'RAM', 'GPU', 'SSD'],
-        correctIndex: 2,
-        explanation: 'The GPU is built for massive parallel work — perfect for rendering pixels.',
-      },
-      {
-        question: 'A user\'s browser feels sluggish with high memory usage. Which resource is exhausted?',
-        options: ['Long-term storage', 'Random Access Memory (RAM)', 'Network bandwidth', 'Battery'],
-        correctIndex: 1,
-      },
-      {
-        question: 'Why do developers care about multi-core CPUs?',
-        options: [
-          'To make the computer look better',
-          'To run different parts of an app in parallel without slowing each other down',
-          'To increase storage capacity',
-          'To make the internet faster',
-        ],
-        correctIndex: 1,
-      },
-      {
-        question: 'What happens during a Memory Leak?',
-        options: [
-          'The computer leaks electricity',
-          'The SSD fills with junk',
-          'The app keeps consuming more RAM until the system crashes',
-          'The CPU overheats',
-        ],
-        correctIndex: 2,
-      },
+    {
+      title: '2. Memory (RAM) — The Active Workspace',
+      beginner: 'It\'s where your open tabs live. Volatile — disappears when power is lost. Extremely fast.',
+      advanced: 'This is the Heap and Stack. A Memory Leak means your code keeps asking for RAM but never frees it. Eventually the browser runs out of space and the tab crashes with "Out of Memory."',
+      expertInsight: 'Learn to use Chrome DevTools "Memory" tab to take heap snapshots. By identifying "Detached DOM nodes," you can stop leaks that would otherwise force your users to refresh their tabs.'
+    },
+    {
+      title: '3. Graphics (GPU) — The Visual Specialist',
+      beginner: 'Used for gaming and videos. It handles thousands of tiny tasks at once.',
+      advanced: 'In frontend, we use Hardware Acceleration. CSS like `will-change: transform;` or `transform: translate3d(0,0,0)` moves rendering from CPU to GPU, giving 60fps animations.',
+      expertInsight: 'Be careful! Excessive use of `will-change` creates too many layers in the GPU memory, which can actually cause "layer explosion" and slow down your site. Use it only when necessary.'
+    },
+    {
+      title: '4. Storage (SSD) — The Permanent Library',
+      beginner: 'Where your files are saved. Persists when the power is off.',
+      advanced: 'I/O speed matters. Reading from SSD is ~100× slower than reading from RAM. Always cache hot data in memory so you don\'t hit the slow disk repeatedly.',
+      expertInsight: 'With modern PWA development, use IndexedDB for large datasets. It acts as a bridge between the speed of RAM and the permanence of the SSD, allowing your app to feel instant even on slow networks.'
+    },
+  ],
+  practical: {
+    title: 'Hardware Inspection Lab',
+    intro: 'To be a professional you must know how to monitor the machine.',
+    steps: [
+      'Open Task Manager (Windows: Ctrl+Shift+Esc) or Activity Monitor (Mac: Cmd+Space → "Activity Monitor").',
+      'Open your browser and visit a 3D site like Google Earth — watch the GPU spike.',
+      'Now open 20 tabs of any news site — watch the RAM usage climb.',
+      'Force-quit one heavy tab and observe the memory drop instantly.',
     ],
-    keyTakeaways: [
-      'CPU runs Fetch → Decode → Execute; heavy JS blocks it — use Web Workers',
-      'RAM is fast but volatile; memory leaks crash tabs',
-      'GPU renders thousands of pixels in parallel — use CSS transforms for 60fps',
-      'SSD is ~100× slower than RAM — cache aggressively',
-    ],
+    goal: 'A well-coded app uses minimum RAM while keeping CPU usage low when idle.',
   },
+  quiz: [
+    {
+      question: 'Which component handles thousands of small simultaneous calculations for animations?',
+      options: ['CPU', 'RAM', 'GPU', 'SSD'],
+      correctIndex: 2,
+      explanation: 'The GPU is built for massive parallel work — perfect for rendering pixels.',
+    },
+    {
+      question: 'A user\'s browser feels sluggish with high memory usage. Which resource is exhausted?',
+      options: ['Long-term storage', 'Random Access Memory (RAM)', 'Network bandwidth', 'Battery'],
+      correctIndex: 1,
+    },
+    {
+      question: 'Why do developers care about multi-core CPUs?',
+      options: [
+        'To make the computer look better',
+        'To run different parts of an app in parallel without slowing each other down',
+        'To increase storage capacity',
+        'To make the internet faster',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'What happens during a Memory Leak?',
+      options: [
+        'The computer leaks electricity',
+        'The SSD fills with junk',
+        'The app keeps consuming more RAM until the system crashes',
+        'The CPU overheats',
+      ],
+      correctIndex: 2,
+    },
+  ],
+  keyTakeaways: [
+    'CPU runs Fetch → Decode → Execute; use Web Workers to prevent blocking.',
+    'RAM is for current state; use DevTools memory snapshots to fix leaks.',
+    'GPU is for parallel rendering; use CSS hardware acceleration sparingly.',
+    'SSD is slow compared to RAM; use IndexedDB to cache data intelligently.',
+  ],
+},
 
   {
     id: 'net-2',
