@@ -33,43 +33,38 @@ export interface NetworkingLesson {
 }
 
 export const NETWORKING_LESSONS: NetworkingLesson[] = [
-  {
+ {
   id: 'net-1',
   module: 'Module 1: Computer & Network Fundamentals',
   order: 1,
   title: 'Hardware Architecture for Developers',
   icon: '🖥️',
-  philosophy:
-    'As a developer, you aren\'t just writing text — you are managing physical resources. Every variable lives in RAM, every loop consumes CPU cycles, every pixel is rendered by the GPU. Understanding the hardware "pantry" lets you write lean code that doesn\'t crash the user\'s device.',
+  philosophy: 'Think of your hardware as your "Player Inventory." A weak inventory makes the game sluggish; an optimized one makes you unstoppable. Every line of code you write consumes resources from this stash.',
   concepts: [
     {
-      title: '1. The Processor (CPU) — The Decision Maker',
-      beginner: 'It\'s a fast calculator. The CPU runs through a Fetch → Decode → Execute cycle for every instruction.',
-      advanced: 'Modern CPUs use multi-threading. A heavy JavaScript loop blocks the main thread and freezes your UI. Pros move heavy math to a Web Worker so it runs on a different core, keeping the UI smooth at 60fps.',
-      expertInsight: 'Understanding "Cache Locality" is the mark of an expert. When your code accesses data in a linear fashion, the CPU can predict the next move and pre-fetch it, drastically reducing wait times.'
+      title: '1. The Processor (CPU) — The Main Engine',
+      beginner: 'The brain of the operation. It runs your code instruction by instruction, cycle by cycle.',
+      advanced: 'Heavy JS loops block the "Main Thread," causing UI lag. Pro-tip: Use Web Workers to offload heavy math to a "side-quest" CPU core, keeping your frame budget under 16ms to avoid jank.',
     },
     {
       title: '2. Memory (RAM) — The Active Workspace',
-      beginner: 'It\'s where your open tabs live. Volatile — disappears when power is lost. Extremely fast.',
-      advanced: 'This is the Heap and Stack. A Memory Leak means your code keeps asking for RAM but never frees it. Eventually the browser runs out of space and the tab crashes with "Out of Memory."',
-      expertInsight: 'Learn to use Chrome DevTools "Memory" tab to take heap snapshots. By identifying "Detached DOM nodes," you can stop leaks that would otherwise force your users to refresh their tabs.'
+      beginner: 'Your temporary "backpack." Stores data while the app is running; it clears itself when you quit.',
+      advanced: 'Memory Leaks occur when you keep items in your backpack you no longer need. Eventually, you run out of space and the tab crashes. Use Chrome’s Memory Heap Snapshot to find "detached nodes" and clean your inventory.',
     },
     {
       title: '3. Graphics (GPU) — The Visual Specialist',
-      beginner: 'Used for gaming and videos. It handles thousands of tiny tasks at once.',
-      advanced: 'In frontend, we use Hardware Acceleration. CSS like `will-change: transform;` or `transform: translate3d(0,0,0)` moves rendering from CPU to GPU, giving 60fps animations.',
-      expertInsight: 'Be careful! Excessive use of `will-change` creates too many layers in the GPU memory, which can actually cause "layer explosion" and slow down your site. Use it only when necessary.'
+      beginner: 'A team of artists specialized in drawing pixels really fast. Perfect for gaming and video.',
+      advanced: 'CSS `will-change` tells the GPU, "Hey, this item is about to move!" It prepares the GPU to handle animations without taxing the CPU. Use this buff sparingly, or you might cause "layer explosion" and slow down your site.',
     },
     {
       title: '4. Storage (SSD) — The Permanent Library',
-      beginner: 'Where your files are saved. Persists when the power is off.',
-      advanced: 'I/O speed matters. Reading from SSD is ~100× slower than reading from RAM. Always cache hot data in memory so you don\'t hit the slow disk repeatedly.',
-      expertInsight: 'With modern PWA development, use IndexedDB for large datasets. It acts as a bridge between the speed of RAM and the permanence of the SSD, allowing your app to feel instant even on slow networks.'
-    },
+      beginner: 'Your long-term vault. Saves data even after the power is gone.',
+      advanced: 'SSD access is 100x slower than RAM. Always cache frequently used items in memory so you don\'t have to run to the "library" constantly. Use IndexedDB for massive data sets—it’s like a smart index for your vault.',
+    }
   ],
   practical: {
     title: 'Hardware Inspection Lab',
-    intro: 'To be a professional you must know how to monitor the machine.',
+    intro: 'To be a professional, you must monitor your machine.',
     steps: [
       'Open Task Manager (Windows: Ctrl+Shift+Esc) or Activity Monitor (Mac: Cmd+Space → "Activity Monitor").',
       'Open your browser and visit a 3D site like Google Earth — watch the GPU spike.',
@@ -112,60 +107,55 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     },
   ],
   keyTakeaways: [
-    'CPU runs Fetch → Decode → Execute; use Web Workers to prevent blocking.',
+    'CPU runs instructions; use Web Workers to prevent blocking.',
     'RAM is for current state; use DevTools memory snapshots to fix leaks.',
     'GPU is for parallel rendering; use CSS hardware acceleration sparingly.',
     'SSD is slow compared to RAM; use IndexedDB to cache data intelligently.',
   ],
 },
-
-  {
+  
+ {
     id: 'net-2',
     module: 'Module 1: Computer & Network Fundamentals',
     order: 2,
     title: 'Operating Systems — The Software Manager',
     icon: '⚙️',
-    philosophy:
-      'An OS is the translator between your code and the hardware. Without it, you would have to write custom code just to turn on a single pixel. The OS manages resources so multiple apps can run without fighting over the CPU or RAM.',
+    philosophy: 'Think of the OS as the "Game Master." It controls the rules, manages resources, and ensures your app doesn\'t crash the machine while trying to play the game.',
     concepts: [
       {
         title: '1. The Kernel — The Heart of the OS',
-        beginner: 'The background engine that starts when you turn the computer on.',
-        advanced:
-          'The Kernel handles System Calls. When your JS asks to "Download a File," the browser asks the Kernel for permission to write to disk. The Kernel decides whether the action is safe.',
+        beginner: 'The background engine that starts when you turn the computer on; it controls the hardware.',
+        advanced: 'The Kernel is the ultimate Security Gatekeeper. When your code tries to access a file, it must send a "System Call." The Kernel checks your permissions first—this is why code can\'t just "poke" hardware directly, it must ask the Kernel for a permit.',
       },
       {
         title: '2. Process vs. Thread',
-        beginner: 'A Process is a running app. A Thread is a worker inside that app.',
-        advanced:
-          'Each process has its own private memory. A single process (Chrome) can have many threads (UI, audio, downloads). If one thread crashes it can take the whole process down — that\'s why Chrome runs each tab as a separate Process.',
+        beginner: 'A Process is a running app; a Thread is a worker doing a specific job inside that app.',
+        advanced: 'Each process lives in a private "memory bubble." If one thread crashes, it could kill the whole process. Modern browsers run each tab as a separate Process—this is a design "buff" that ensures one frozen tab doesn\'t crash your entire browser!',
       },
       {
         title: '3. Filesystems',
-        beginner: 'Just folders and files — NTFS on Windows, APFS on Mac.',
-        advanced:
-          'In Linux, "everything is a file." Devs must understand Absolute vs Relative paths so code finds its assets on every OS.',
+        beginner: 'The way your computer organizes files and folders (like a digital filing cabinet).',
+        advanced: 'On Linux/macOS, "everything is a file"—even your printer! Pro-tip: Always use "Relative Paths" (`./assets/img.png`) instead of absolute ones (`C:/Users/...`). This makes your code portable so it doesn\'t break when you move it to another machine.',
       },
     ],
     practical: {
       title: 'The "Process" Investigation',
-      intro: 'See how your OS manages threads and processes.',
+      intro: 'Time to peek behind the curtain at the OS Manager.',
       steps: [
-        'Open Task Manager (Windows) / Activity Monitor (Mac) and switch to the Processes tab.',
-        'Find Chrome / Brave — notice it isn\'t one row, it\'s dozens of sub-processes.',
-        'End Task on one of the smaller sub-processes.',
-        'Watch one specific tab or extension crash while the rest of the browser stays alive.',
+        'Open Task Manager (Windows) or Activity Monitor (Mac) and look at the Processes tab.',
+        'Find your browser—notice it isn\'t one row, it\'s a whole squad of sub-processes.',
+        'End one small sub-process and watch how only one tab or extension crashes while the others stay alive.',
       ],
-      goal: 'Your code never runs alone — it always competes for priority from the OS.',
+      goal: 'Understand that your code is just one player in a very crowded game.',
     },
     quiz: [
       {
-        question: 'What is the Kernel?',
+        question: 'What is the main job of the Kernel?',
         options: [
-          'The user interface where you click icons',
-          'The core of the OS that bridges hardware and software',
-          'A type of virus',
-          'The physical restart button',
+          'To provide a pretty desktop background',
+          'To act as the bridge between software and physical hardware',
+          'To play music',
+          'To store your login password',
         ],
         correctIndex: 1,
       },
@@ -201,57 +191,53 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       },
     ],
     keyTakeaways: [
-      'The Kernel is the bridge between hardware and software',
-      'Processes have private memory; threads share memory inside a process',
-      'Chrome isolates tabs as processes for crash safety',
-      'Pathing differs across OSes — code defensively',
+      'The Kernel is the ultimate gatekeeper of hardware.',
+      'Processes = apps; Threads = workers inside those apps.',
+      'Modern apps isolate tasks to prevent full-system crashes.',
+      'Use relative paths so your code doesn\'t "break" when moved.',
     ],
   },
 
-  {
+ {
     id: 'net-3',
     module: 'Module 1: Computer & Network Fundamentals',
     order: 3,
     title: 'The Command Line — The Developer\'s Power Tool',
     icon: '💻',
-    philosophy:
-      'The GUI was designed for simplicity, not power. The CLI is your direct line to the OS. Almost every professional dev tool — Git, npm, Docker, deployment — runs from the command line.',
+    philosophy: 'Think of the CLI as your "Developer Console." GUIs are for users, but the command line is for creators—it gives you direct access to the machine without the "filter" of menus.',
     concepts: [
       {
         title: '1. Absolute vs Relative Paths',
-        beginner: 'A path is the address of a file or folder.',
-        advanced:
-          'Absolute path: full address from root (`C:/Users/Nishan/Desktop/Project`). Relative path: from current location (`./images/logo.png`). Use relative paths in code so it works on any machine.',
+        beginner: 'A path is simply the address of a file or folder on your computer.',
+        advanced: 'Absolute paths are like a full GPS coordinate (`C:/Users/Nishan/Desktop`). Relative paths are like "go down the hall and turn left" (`./images/logo.png`). Pro-tip: Always use relative paths in your code so your project doesn\'t break when you move it to another computer!',
       },
       {
         title: '2. Common Commands',
-        beginner: 'Type a command, press Enter, the OS runs it.',
-        advanced:
-          '`pwd` (where am I), `ls` / `dir` (list files), `cd folder` (enter), `cd ..` (go up), `mkdir name` (make folder), `touch file` (create file), `rm file` (delete).',
+        beginner: 'Type a command, press Enter, and the machine executes your orders.',
+        advanced: 'Think of these as your "Action Menu": `pwd` (Where am I?), `ls` (What’s in this room?), `cd` (Move to a room), and `mkdir`/`touch` (Build items). These are the basic spells you’ll cast every single day.',
       },
       {
         title: '3. Permissions & Danger',
-        beginner: 'Some commands need admin rights.',
-        advanced:
-          'The CLI is powerful and dangerous — `rm -rf /` can delete your entire OS. Standard users can only edit their own files; `sudo` (Linux/Mac) or "Run as Administrator" (Windows) elevates privileges.',
+        beginner: 'Some commands are locked behind "Admin" mode for safety.',
+        advanced: 'The CLI is powerful—`rm -rf /` is the "game-ender" command that can wipe your entire system. Treat the terminal with respect; `sudo` (Mac/Linux) or "Run as Administrator" (Windows) gives you "God Mode" privileges, but use them sparingly!',
       },
     ],
     practical: {
       title: 'Your First Folder, From Scratch',
-      intro: 'Create a project folder using only the terminal.',
+      intro: 'Level up your skills by building a project folder without ever touching the mouse.',
       steps: [
-        'Open Terminal (Mac/Linux) or PowerShell (Windows).',
-        'Type `cd Desktop` to go to your desktop.',
-        'Type `mkdir code-sage-test` to create a folder.',
-        'Type `cd code-sage-test` to enter it.',
-        'Type `touch index.html` (Mac/Linux) or `ni index.html` (PowerShell) to create a file.',
-        'Type `ls` (or `dir`) to verify the file is there.',
+        'Open your Terminal (Mac/Linux) or PowerShell (Windows).',
+        'Type `cd Desktop` to move to your base camp.',
+        'Type `mkdir code-sage-test` to spawn a new folder.',
+        'Type `cd code-sage-test` to enter your new territory.',
+        'Type `touch index.html` (or `ni index.html` in PowerShell) to craft an empty file.',
+        'Type `ls` (or `dir`) to verify your loot is there.',
       ],
-      goal: 'You created a folder and file without ever touching the mouse.',
+      goal: 'Prove you can navigate the machine like a pro using only your keyboard.',
     },
     quiz: [
       {
-        question: 'How do you go up one folder in the terminal?',
+        question: 'How do you go up one folder level in the terminal?',
         options: ['`cd forward`', '`cd ..`', '`exit`', '`mkdir back`'],
         correctIndex: 1,
       },
@@ -266,7 +252,7 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
         correctIndex: 1,
       },
       {
-        question: 'Why is the CLI considered dangerous?',
+        question: 'Why is the CLI considered powerful and dangerous?',
         options: [
           'It can damage the screen',
           'A wrong command can delete files or the whole OS',
@@ -277,10 +263,10 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       },
     ],
     keyTakeaways: [
-      'Use relative paths in code so it works on any machine',
-      '`pwd`, `ls`, `cd`, `mkdir`, `touch`, `rm` are your daily commands',
-      '`cd ..` moves up one folder',
-      'Elevated commands (sudo / admin) can permanently destroy data',
+      'Use relative paths so your code stays portable on any machine.',
+      '`pwd`, `ls`, `cd`, `mkdir`, `touch`, `rm` are your daily commands.',
+      '`cd ..` is the standard "back" button for terminal users.',
+      'Admin commands (`sudo`) are "God Mode"—they are permanent and powerful.',
     ],
   },
 
@@ -290,52 +276,47 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 4,
     title: 'IP Addressing — The Internet\'s House Numbers',
     icon: '📍',
-    philosophy:
-      'Every device on a network needs a unique address so packets know where to go. That\'s an IP address — like a house number for your computer.',
+    philosophy: 'Think of an IP address as your device’s "Global Mailing Address." Without it, the internet wouldn’t know how to deliver data packets to your doorstep.',
     concepts: [
       {
         title: '1. IPv4 vs IPv6',
-        beginner: 'IPv4 looks like `192.168.1.1`. IPv6 is much longer with letters.',
-        advanced:
-          'IPv4 has only ~4.3 billion addresses — we ran out. IPv6 uses hexadecimal and provides 340 undecillion addresses — enough for every grain of sand.',
+        beginner: 'IPv4 looks like `192.168.1.1`. IPv6 is a much longer string of numbers and letters.',
+        advanced: 'IPv4 hit a "capacity crisis" because we ran out of the 4.3 billion available addresses. IPv6 uses hexadecimal to provide 340 undecillion addresses—enough to give every grain of sand on Earth its own IP!',
       },
       {
         title: '2. Public vs Private IP',
-        beginner: 'Private IPs are inside your home; public IPs face the internet.',
-        advanced:
-          'Your router has one Public IP given by your ISP. Inside your network, devices get Private IPs (10.x, 172.16-31.x, 192.168.x) assigned by the router via NAT.',
+        beginner: 'Private IPs stay inside your home network; Public IPs are visible to the outside world.',
+        advanced: 'Your router acts as the "Receptionist." It takes the one Public IP provided by your ISP and uses NAT (Network Address Translation) to route traffic to your local devices via Private IPs. It’s a massive security buff that hides your local home network from the open web.',
       },
       {
         title: '3. Static vs Dynamic',
-        beginner: 'Static IPs never change; dynamic IPs do.',
-        advanced:
-          'Servers usually have Static IPs so DNS can always find them. Home devices get Dynamic IPs from DHCP — they may change every reboot or every few days.',
+        beginner: 'Static IPs never change; Dynamic IPs can change whenever the router feels like it.',
+        advanced: 'Servers require Static IPs so they can be reliably "found" by DNS. Home devices use Dynamic IPs via DHCP—they essentially "lease" an address for a while and then give it back. It’s an efficient way to manage limited "inventory" in a household full of devices.',
       },
     ],
     practical: {
       title: 'Find Your IP Addresses',
-      intro: 'Discover your private and public IPs.',
+      intro: 'Time to see your machine’s "mailing address" and compare it to the world view.',
       steps: [
-        'Find your Private IP — Windows: `ipconfig`, Mac/Linux: `ifconfig` or `ip addr`. Look for "IPv4 Address."',
-        'Find your Public IP — open a browser and search "What is my IP?"',
-        'Notice they\'re different — that\'s NAT in action.',
-        'Restart your router and check if your public IP changed (most ISPs give dynamic IPs).',
+        'Find your Private IP: Type `ipconfig` (Windows) or `ifconfig`/`ip addr` (Mac/Linux). Look for "IPv4 Address."',
+        'Find your Public IP: Search "What is my IP?" in your browser.',
+        'Compare them: Notice they are different? That’s NAT in action—your router is shielding your local address!',
       ],
-      goal: 'Understand the difference between what your device thinks its address is, and what the internet sees.',
+      goal: 'Understand the difference between your local "internal" ID and your identity on the global internet.',
     },
     quiz: [
       {
-        question: 'Which gives the most unique addresses?',
+        question: 'Which addressing system provides the most unique addresses?',
         options: ['IPv4', 'IPv6', 'MAC', 'Subnet'],
         correctIndex: 1,
       },
       {
-        question: 'Who assigns private IPs inside your home?',
+        question: 'Who acts as the "Receptionist" to assign private IPs inside your home?',
         options: ['The web browser', 'The router', 'The CPU', 'Google'],
         correctIndex: 1,
       },
       {
-        question: 'What is a Static IP?',
+        question: 'What is a "Static IP"?',
         options: [
           'An IP that changes every minute',
           'An IP that never changes — usually for servers',
@@ -351,10 +332,10 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       },
     ],
     keyTakeaways: [
-      'IPv4 is running out; IPv6 fixes that with hexadecimal addresses',
-      'Public IP = your router\'s internet address; Private IPs = devices inside',
-      'Static IPs are for servers; dynamic IPs (DHCP) are for clients',
-      'NAT lets many private devices share one public IP',
+      'IPv6 was created to solve the IPv4 address shortage.',
+      'Public IP = your router\'s internet address; Private IPs = local device identities.',
+      'Static IPs are for permanent infrastructure; Dynamic IPs (DHCP) are for client efficiency.',
+      'NAT is the "Receptionist" that lets many internal devices share one global IP.',
     ],
   },
 
@@ -364,82 +345,78 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 5,
     title: 'DNS & DHCP — The Internet\'s Phonebook',
     icon: '📒',
-    philosophy:
-      'Humans remember names like google.com; computers route by numbers like 142.250.x.x. DNS translates names to numbers. DHCP hands out IPs so you don\'t have to configure them manually.',
+    philosophy: 'Think of DNS as the Internet’s Contact List. Humans love names, but machines speak in numbers. DNS translates names to IPs, while DHCP is the invisible assistant that assigns those IDs automatically.',
     concepts: [
       {
         title: '1. The DNS Lookup Chain',
-        beginner: 'You type a website name; somehow the browser finds the right server.',
-        advanced:
-          'Browser → OS cache → Recursive Resolver (your ISP) → Root servers → TLD servers (.com) → Authoritative server holding the master record. Each step caches the answer for faster lookups next time.',
+        beginner: 'You type a website name; the internet "magically" finds the right server.',
+        advanced: 'It’s a relay race: Browser → OS Cache → ISP Resolver → Root Servers → TLD Servers (.com) → Authoritative Server. Every stop caches the result, saving time for your next visit. Caching is the secret ingredient that makes the web feel "instant."',
       },
       {
         title: '2. Common DNS Records',
-        beginner: 'Different record types for different things.',
-        advanced:
-          '`A` — domain → IPv4. `AAAA` — domain → IPv6. `CNAME` — alias. `MX` — mail server. `TXT` — verification & SPF/DKIM. As a dev you\'ll edit these constantly.',
+        beginner: 'Different record types act as specialized entries in the phonebook.',
+        advanced: 'Master these keys: `A` (Maps to IPv4), `AAAA` (Maps to IPv6), `CNAME` (An alias/nickname), `MX` (Mail server destination), and `TXT` (Verification/Security). You will be editing these frequently when you deploy your own apps!',
       },
       {
         title: '3. DHCP — Auto IP Assignment',
-        beginner: 'When your device joins WiFi, it just gets an IP automatically.',
-        advanced:
-          'Device sends DHCPDISCOVER → server replies DHCPOFFER → device DHCPREQUEST → server DHCPACK with a "lease" (e.g., 24 hours). When the lease expires, it renews or asks for a new one.',
+        beginner: 'Your device automatically gets an IP when it joins a network.',
+        advanced: 'It’s a 4-step negotiation: Discover → Offer → Request → Acknowledge. Your router gives your device an IP "lease." If the lease expires, your device simply asks for a renewal—it’s like renewing a library book so you don’t lose your spot on the network.',
       },
     ],
     practical: {
       title: 'Trace a DNS Lookup',
-      intro: 'See DNS in action.',
+      intro: 'Time to see the "translation" happening in real-time.',
       steps: [
-        'Open terminal and run `nslookup google.com` (or `dig google.com` on Mac/Linux).',
-        'Notice the server that answered and the IP returned.',
-        'Try `nslookup youtube.com` — observe the multiple answers.',
-        'Flush your DNS cache — Windows: `ipconfig /flushdns`, Mac: `sudo killall -HUP mDNSResponder`.',
-        'Now reload a website and notice the slight first-load delay (cache was empty).',
+        'Open your terminal and run `nslookup google.com` (or `dig google.com` on Mac/Linux).',
+        'Observe the server that answered and the IP address it returned.',
+        'Try `nslookup youtube.com`—notice how it returns multiple IP addresses (for load balancing).',
+        'Flush your cache: `ipconfig /flushdns` (Windows) or `sudo killall -HUP mDNSResponder` (Mac).',
+        'Reload a site and notice the tiny delay—that’s the "phonebook" lookup happening fresh!',
       ],
-      goal: 'See that every URL is silently translated to an IP before any data flows.',
+      goal: 'See that every URL is silently translated to an IP before your data can even start moving.',
     },
     quiz: [
       {
-        question: 'What does DNS do?',
+        question: 'What is the primary role of DNS?',
         options: [
-          'Encrypts your traffic',
-          'Translates domain names to IP addresses',
-          'Speeds up your CPU',
-          'Stores cookies',
+          'Encrypts your private traffic',
+          'Translates human-readable domain names into IP addresses',
+          'Boosts your CPU performance',
+          'Stores your browser cookies',
         ],
         correctIndex: 1,
       },
       {
-        question: 'Which record maps a domain to an IPv4 address?',
+        question: 'Which DNS record is used to map a domain to an IPv4 address?',
         options: ['MX', 'CNAME', 'A', 'DHCP'],
         correctIndex: 2,
       },
       {
-        question: 'What happens when a DHCP lease expires?',
+        question: 'What happens when a device\'s DHCP lease expires?',
         options: [
-          'The device permanently loses internet',
+          'The device is permanently banned from the internet',
           'The device asks the DHCP server to renew the lease',
-          'The router restarts',
-          'The DNS cache clears',
+          'The router initiates a full factory reset',
+          'The local DNS cache is completely cleared',
         ],
         correctIndex: 1,
       },
       {
-        question: 'Why do DNS responses get cached?',
+        question: 'Why does the web rely heavily on DNS caching?',
         options: [
-          'To hide browsing from the ISP',
-          'So repeated lookups are instant instead of querying the chain again',
-          'To save battery',
-          'To reduce screen brightness',
+          'To hide your browsing history from the ISP',
+          'So repeated lookups are instant instead of querying the entire chain',
+          'To save battery life on mobile devices',
+          'To optimize screen brightness',
         ],
         correctIndex: 1,
       },
     ],
     keyTakeaways: [
-      'DNS = phonebook of the internet (name → IP)',
-      'A, AAAA, CNAME, MX, TXT are the records you\'ll edit as a dev',
-      'DHCP auto-assigns IPs with a time-limited lease',
-      'Caching makes the web feel fast',
+      'DNS acts as the phonebook of the internet (Name → IP).',
+      'Learn your records: A, AAAA, CNAME, MX, and TXT are developer essentials.',
+      'DHCP is your "automatic assistant" that manages IP leases for you.',
+      'Caching is the key to a fast, responsive web experience.',
     ],
   },
 
@@ -449,39 +426,35 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 6,
     title: 'The OSI Model — How Data Travels',
     icon: '🌐',
-    philosophy:
-      'Data doesn\'t magically jump from your laptop to a server in California — it travels through 7 conceptual layers. Each layer has one job. Knowing the model helps you debug whether a bug is in your code, your network, or the server.',
+    philosophy: 'Think of the OSI Model as the "Shipping Pipeline." Data doesn\'t just teleport; it passes through 7 distinct stations. If your app breaks, this model helps you pinpoint exactly which station is failing.',
     concepts: [
       {
-        title: '1. The 7 Layers (Top → Bottom)',
-        beginner: 'Layer 7 = your app, Layer 1 = the cable. Each layer wraps the one below.',
-        advanced:
-          '7. Application (HTTP), 6. Presentation (encryption/SSL), 5. Session, 4. Transport (TCP/UDP), 3. Network (IP routing), 2. Data Link (MAC, frames), 1. Physical (cables/wifi waves).',
+        title: '1. The 7 Layers (The Pipeline)',
+        beginner: 'Layer 7 is your App (the browser), Layer 1 is the physical cable or Wi-Fi wave.',
+        advanced: 'Data travels top-down (Application to Physical) to be sent, and bottom-up to be received. Each layer adds its own "shipping label" (header) to the package. Mastering these 7 steps turns you from a coder into a network detective.',
       },
       {
         title: '2. TCP vs UDP — The Transport Layer',
-        beginner: 'TCP is reliable; UDP is fast.',
-        advanced:
-          'TCP guarantees delivery and order — used by HTTP, email, file transfer. UDP is fire-and-forget — used by video calls, gaming, live streams where speed beats accuracy.',
+        beginner: 'TCP is reliable (makes sure it arrives); UDP is fast (doesn\'t care if it drops a few).',
+        advanced: 'TCP is like a registered letter—it guarantees order and delivery (HTTP, Email). UDP is like shouting across a room—it’s pure speed, perfect for gaming or live streams where a dropped packet is better than a laggy delay.',
       },
       {
-        title: '3. Encapsulation',
-        beginner: 'Each layer adds its own envelope around the data.',
-        advanced:
-          'Your HTTP request gets wrapped with a TCP header → wrapped with an IP header → wrapped with a MAC frame → finally sent as bits on the wire. The receiver unwraps in reverse.',
+        title: '3. Encapsulation (The Envelope Trick)',
+        beginner: 'Each layer wraps your data in its own envelope.',
+        advanced: 'Your HTTP request gets wrapped with a TCP header (port info) → wrapped with an IP header (destination address) → wrapped with a MAC frame (hardware ID). When the server receives it, it "unwraps" these layers in reverse to find your original data.',
       },
     ],
     practical: {
       title: 'Inspect a Real Request',
-      intro: 'See the layers in your browser DevTools.',
+      intro: 'Time to see the "Pipeline" in your own browser.',
       steps: [
         'Open any website and press F12 → Network tab.',
         'Reload the page and click on the first request (the HTML doc).',
-        'Headers tab → Layer 7 (HTTP method, status, headers).',
-        'Look at "Remote Address" — that\'s the Layer 3 (IP) address.',
-        'The connection used (HTTP/2, TLS) is Layers 4 and 6 doing their job.',
+        'Headers tab → That’s your Layer 7 (Application) info (HTTP methods, status codes).',
+        'Look at "Remote Address" — that’s your Layer 3 (Network) IP address in action.',
+        'The connection type (HTTP/2, TLS) shows Layers 4 and 6 doing the heavy lifting.',
       ],
-      goal: 'Realize that one click triggers all 7 layers in milliseconds.',
+      goal: 'Realize that a single mouse click triggers all 7 layers in just a few milliseconds.',
     },
     quiz: [
       {
@@ -500,95 +473,91 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
         correctIndex: 1,
       },
       {
-        question: 'Why use TCP for downloads?',
+        question: 'Why do we use TCP for file downloads instead of UDP?',
         options: [
-          'It is the only protocol allowed',
-          'It guarantees every byte arrives in order',
-          'It uses less RAM',
-          'It works without internet',
+          'It is the only protocol allowed by the internet',
+          'It guarantees every byte arrives and stays in order',
+          'It uses significantly less RAM than UDP',
+          'It works even without an internet connection',
         ],
         correctIndex: 1,
       },
     ],
     keyTakeaways: [
-      '7 layers, each with one specific job',
-      'TCP = reliable; UDP = fast',
-      'Every request is wrapped (encapsulated) by each layer',
-      'DevTools shows you the upper layers in action',
+      'The OSI Model has 7 layers, each with one unique job in the "Shipping Pipeline."',
+      'TCP = Reliability; UDP = Speed.',
+      'Encapsulation is the process of wrapping your data in headers for each layer.',
+      'Browser DevTools are your best tool for seeing these layers at work.',
     ],
   },
 
-  {
+ {
     id: 'net-7',
     module: 'Module 1: Computer & Network Fundamentals',
     order: 7,
     title: 'Protocols — The Rules of the Road',
     icon: '🛣️',
-    philosophy:
-      'A protocol is just an agreed-upon set of rules so two computers can understand each other. Picking the right protocol makes apps fast, secure, and reliable.',
+    philosophy: 'Think of protocols as the "Languages of the Internet." If two computers don\'t speak the same protocol, they’re just two strangers passing in the night. Mastering these rules is what makes your apps fast, secure, and reliable.',
     concepts: [
       {
         title: '1. HTTP & HTTPS — The Web',
-        beginner: 'HTTP loads websites. HTTPS is the secure version.',
-        advanced:
-          'HTTPS = HTTP wrapped in TLS encryption. Modern browsers warn on plain HTTP. Always build with HTTPS — most APIs and OAuth providers reject HTTP.',
+        beginner: 'HTTP fetches website pages; HTTPS is the secure, encrypted version.',
+        advanced: 'HTTPS is literally just HTTP wrapped in a TLS "encryption jacket." Pro-tip: Never build on plain HTTP today—modern browsers will flag your app as "Insecure," and most APIs will flat-out reject your connection. Always default to HTTPS.',
       },
       {
         title: '2. SSH & FTP — Server Tools',
-        beginner: 'SSH = secure remote login. FTP = old way of moving files.',
-        advanced:
-          'SSH gives you encrypted shell access to a server. SFTP / SCP transfer files over SSH. Plain FTP sends passwords in clear text — avoid it.',
+        beginner: 'SSH is for logging into remote computers securely; FTP is an older way to move files.',
+        advanced: 'SSH gives you a secure "encrypted shell" to run commands on a server. Use SFTP (or SCP) for file transfers—never use plain FTP, as it broadcasts your passwords in clear text for anyone on the network to steal!',
       },
       {
-        title: '3. SMTP / IMAP — Email',
-        beginner: 'SMTP sends mail; IMAP/POP3 reads mail.',
-        advanced:
-          'When your app sends a "forgot password" email, it talks SMTP to a mail server. SPF/DKIM/DMARC DNS records prove your mail isn\'t spam.',
+        title: '3. SMTP / IMAP — The Mailroom',
+        beginner: 'SMTP is for sending mail; IMAP/POP3 is for reading mail.',
+        advanced: 'When your app sends a "Forgot Password" email, it’s talking via SMTP. Pro-tip: If your emails are landing in the spam folder, look into your DNS records—specifically SPF, DKIM, and DMARC. These are the "security IDs" that prove your mail is legitimate.',
       },
     ],
     practical: {
       title: 'See Who You\'re Talking To',
-      intro: 'List active connections.',
+      intro: 'Time to see your machine’s active connections in real-time.',
       steps: [
-        'Open terminal and run `netstat -an` (Windows/Mac/Linux).',
-        'Look for the Local Address and Foreign Address columns.',
-        'Note the port numbers — `:443` is HTTPS, `:80` is HTTP, `:22` is SSH.',
-        'Open a new browser tab and load a site, then run netstat again — new connection appears.',
+        'Open your terminal and run `netstat -an` (Windows/Mac/Linux).',
+        'Scan the "Local Address" and "Foreign Address" columns.',
+        'Watch for port numbers: `:443` (HTTPS), `:80` (HTTP), and `:22` (SSH).',
+        'Open a browser, load a new site, and run the command again—you’ll see a brand new "live connection" appear instantly.',
       ],
-      goal: 'See your machine speaking multiple protocols simultaneously.',
+      goal: 'Realize that your machine is constantly chatting across dozens of different protocols at once.',
     },
     quiz: [
       {
-        question: 'Which is the secure version of HTTP?',
+        question: 'Which is the secure, encrypted version of HTTP?',
         options: ['HTTP2', 'HTTPS', 'FTP', 'SMTP'],
         correctIndex: 1,
       },
       {
-        question: 'Which protocol is for video calls / gaming where speed > accuracy?',
+        question: 'Which protocol is best for live video calls/gaming where speed is more important than perfect accuracy?',
         options: ['TCP', 'SMTP', 'UDP', 'SSH'],
         correctIndex: 2,
       },
       {
-        question: 'What is SSH used for?',
-        options: ['Sending email', 'Securely logging into a remote server\'s shell', 'Loading websites', 'Streaming video'],
+        question: 'What is the primary use of SSH?',
+        options: ['Sending mass emails', 'Securely logging into a remote server\'s shell', 'Loading website assets', 'Streaming high-def video'],
         correctIndex: 1,
       },
       {
-        question: 'What\'s the main reason to avoid plain FTP?',
+        question: 'Why must developers avoid plain FTP?',
         options: [
-          'It\'s too slow',
-          'It transmits credentials in plain text',
-          'It only works on Mac',
-          'It uses too much RAM',
+          'It is technically slower than other protocols',
+          'It transmits your login credentials in plain text',
+          'It only works on Apple Mac machines',
+          'It consumes excessive system RAM',
         ],
         correctIndex: 1,
       },
     ],
     keyTakeaways: [
-      'HTTPS encrypts HTTP — always default to it',
-      'SSH replaces insecure FTP for server work',
-      'SMTP sends email; SPF/DKIM/DMARC protect your sender reputation',
-      'Each protocol has a default port (80, 443, 22, 25)',
+      'HTTPS encrypts HTTP—it is the modern standard for all web traffic.',
+      'Always use SSH/SFTP over insecure FTP for server management.',
+      'SMTP sends mail, but DNS records (SPF/DKIM/DMARC) are what protect your sender reputation.',
+      'Every protocol has a default port (80 for HTTP, 443 for HTTPS, 22 for SSH, 25 for SMTP).',
     ],
   },
 
@@ -598,92 +567,87 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 8,
     title: 'Web Security Basics — The Shield',
     icon: '🛡️',
-    philosophy:
-      'If you build apps that handle user data, security isn\'t optional — it\'s the foundation. A single leak can end a startup. Learn the basics now so you don\'t learn them after a breach.',
+    philosophy: 'Think of security as your app’s "Armor." It isn\'t a luxury; it\'s the foundation. A single weak point can end a startup, so we learn the patterns of the "defenders" to stop the "intruders" before they get in.',
     concepts: [
       {
         title: '1. Encryption (TLS / SSL)',
-        beginner: 'A lock on your data so eavesdroppers see only gibberish.',
-        advanced:
-          'TLS performs a handshake using public/private keys, then switches to a fast symmetric cipher. The lock icon in the URL bar = TLS in action.',
+        beginner: 'The digital lock on your data that keeps eavesdroppers from reading your secrets.',
+        advanced: 'It starts with a "handshake" using public/private keys to agree on a secret, then switches to a high-speed symmetric cipher. That lock icon in your browser? That’s proof the handshake succeeded and your data is encrypted.',
       },
       {
         title: '2. Authentication vs Authorization',
-        beginner: 'Auth = "who are you?" Authorization = "what can you do?"',
-        advanced:
-          'Use bcrypt/argon2 for password hashing — never store plaintext. Use JWT or session cookies for auth. Apply role-based access (RBAC) for authorization.',
+        beginner: 'Auth is "Who are you?"; Authorization is "What are you allowed to do?"',
+        advanced: 'Master these two rules: Never store plaintext passwords—use `bcrypt` or `argon2` to scramble them into irreversible hashes. For Authorization, use Role-Based Access (RBAC) to ensure a standard "user" can never access an "admin" dashboard.',
       },
       {
         title: '3. Common Attacks',
-        beginner: 'Hackers try to trick your app or its users.',
-        advanced:
-          'XSS (inject scripts into pages), SQL Injection (inject queries), CSRF (forged actions). Mitigate with input validation, parameterized queries, CSP headers, and CSRF tokens.',
+        beginner: 'Hackers try to trick your app or its users using malicious inputs.',
+        advanced: 'Learn the "Big Three": XSS (injecting fake scripts), SQL Injection (tricking your database queries), and CSRF (tricking users into performing actions they didn\'t mean to). The cure? Always treat user input as "radioactive"—never trust it, always validate it!',
       },
       {
         title: '4. Firewalls',
-        beginner: 'A bouncer for your server.',
-        advanced:
-          'Filters traffic by IP, port, and protocol. Cloud providers expose this as Security Groups / WAF rules.',
+        beginner: 'The bouncer standing at the door of your server.',
+        advanced: 'Firewalls filter traffic based on rules (IP, port, protocol). Whether it’s a hardware device or a cloud-based Security Group (WAF), its job is to block unwanted traffic before it ever touches your application code.',
       },
     ],
     practical: {
       title: 'Check Your Security',
-      intro: 'Inspect any site\'s security posture.',
+      intro: 'Time to put on your detective hat and inspect a site\'s "Armor."',
       steps: [
-        'Click the lock icon next to any URL → "Connection is secure" → "Certificate is valid."',
-        'Note the issuer (Let\'s Encrypt, DigiCert, etc.) and expiry date.',
-        'Open DevTools → Security tab — see TLS version and cipher.',
-        'Try visiting `http://neverssl.com` — see how the browser warns.',
+        'Click the lock icon next to any URL in your browser → "Connection is secure" → "Certificate is valid."',
+        'Check the issuer (e.g., Let\'s Encrypt) and the expiration date.',
+        'Open DevTools → Security tab: Peek at the TLS version and the specific "cipher" being used.',
+        'Try visiting `http://neverssl.com`—observe how your browser warns you because the "Armor" is missing.',
       ],
-      goal: 'Trained eye — you should never trust a login form on plain HTTP.',
+      goal: 'Develop a "security instinct"—you should feel uneasy whenever you see a login form on plain, unencrypted HTTP.',
     },
     quiz: [
       {
-        question: 'What does a firewall do?',
+        question: 'What does a firewall do for your server?',
         options: [
-          'Stops physical fires',
-          'Monitors and filters network traffic by security rules',
-          'Backs up your files',
-          'Speeds up the CPU',
+          'Stops physical office fires',
+          'Monitors and filters network traffic based on security rules',
+          'Automatically backs up your database files',
+          'Speeds up the CPU processing power',
         ],
         correctIndex: 1,
       },
       {
-        question: 'Why hash passwords with bcrypt instead of storing them?',
+        question: 'Why must you hash passwords with bcrypt instead of storing them as-is?',
         options: [
-          'It saves disk space',
-          'If the database leaks, attackers can\'t read the passwords',
-          'It makes login faster',
-          'Browsers require it',
+          'It saves disk space on your server',
+          'If the database is leaked, attackers cannot read the actual passwords',
+          'It makes the login process faster for the user',
+          'Web browsers require hashed passwords to function',
         ],
         correctIndex: 1,
       },
       {
-        question: 'What is XSS?',
+        question: 'What is XSS (Cross-Site Scripting)?',
         options: [
-          'A type of cable',
-          'Injecting malicious scripts into a webpage seen by other users',
-          'A faster version of HTTPS',
-          'A backup format',
+          'A specific type of high-speed network cable',
+          'Injecting malicious scripts into a webpage viewed by other users',
+          'A faster, more efficient version of HTTPS',
+          'A standardized backup file format',
         ],
         correctIndex: 1,
       },
       {
-        question: 'Auth vs Authorization — which is which?',
+        question: 'What is the key difference between Authentication and Authorization?',
         options: [
-          'Both mean the same thing',
-          'Auth = who you are; Authorization = what you can do',
-          'Auth = passwords; Authorization = usernames',
-          'Auth is for admins only',
+          'They mean exactly the same thing',
+          'Authentication = "Who are you?"; Authorization = "What can you do?"',
+          'Authentication = Passwords; Authorization = Usernames',
+          'Authentication is only required for system administrators',
         ],
         correctIndex: 1,
       },
     ],
     keyTakeaways: [
-      'Always serve over HTTPS',
-      'Hash passwords with bcrypt/argon2 — never plaintext',
-      'Validate every input to prevent XSS / SQL injection',
-      'Authentication ≠ Authorization',
+      'Always serve your app over HTTPS—it is the baseline for trust.',
+      'Hash passwords with `bcrypt`/`argon2`—never store them in plain text.',
+      'Treat all user input as "radioactive": Validate and sanitize to prevent XSS and SQL Injection.',
+      'Understand that Authentication (identity) and Authorization (permissions) are two different "keys" in your app.',
     ],
   },
 
@@ -693,78 +657,73 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 9,
     title: 'The Browser — Where the Web Lives',
     icon: '🌍',
-    philosophy:
-      'Your code runs inside the browser — but the browser itself is one of the most complex pieces of software ever made. Understanding it makes you a better frontend developer.',
+    philosophy: 'Think of the browser as your app’s "Execution Arena." It’s one of the most complex machines ever built. Understanding how it paints pixels and executes code is the difference between a "laggy site" and a "professional experience."',
     concepts: [
       {
         title: '1. The Rendering Engine',
-        beginner: 'Turns HTML and CSS into the pixels you see.',
-        advanced:
-          'Pipeline: Parse HTML → DOM, parse CSS → CSSOM, combine → Render Tree, Layout, Paint, Composite. Heavy CSS or layout thrashing slows this down.',
+        beginner: 'The inner-team that turns your raw HTML and CSS into the colorful pixels you see on screen.',
+        advanced: 'It’s a strict pipeline: Parse HTML (DOM) + Parse CSS (CSSOM) → Render Tree → Layout (Geometry) → Paint (Pixels) → Composite (Layering). Pro-tip: "Layout Thrashing"—repeatedly forcing the browser to re-calculate positions—is the #1 cause of choppy scrolling.',
       },
       {
         title: '2. The JavaScript Engine (V8)',
-        beginner: 'Runs your JS code.',
-        advanced:
-          'V8 (Chrome, Node) compiles JS to machine code via JIT. Other engines: SpiderMonkey (Firefox), JavaScriptCore / WebKit (Safari).',
+        beginner: 'The translator that converts your human-readable JS into machine code the computer can run.',
+        advanced: 'Chrome uses V8, which employs JIT (Just-In-Time) compilation to optimize your code while it runs. Firefox uses SpiderMonkey, while Safari uses JavaScriptCore. Your code is the same, but the "engines" are competing to run it as fast as physically possible.',
       },
       {
         title: '3. Browser Storage',
-        beginner: 'The browser can remember things between visits.',
-        advanced:
-          'Cookies (~4KB, sent with every request — auth tokens), LocalStorage (~5MB, persistent, no expiry), SessionStorage (per-tab), IndexedDB (large structured data).',
+        beginner: 'The browser’s built-in memory bank for remembering data between visits.',
+        advanced: 'Choose your weapon: Cookies (tiny, sent with every request), LocalStorage (~5MB, persists forever), SessionStorage (erased when the tab closes), or IndexedDB (for massive, structured data). If you store sensitive auth tokens, stick to secure, HttpOnly cookies!',
       },
       {
         title: '4. The Event Loop',
-        beginner: 'How JS handles many things without blocking.',
-        advanced:
-          'Single-threaded JS uses a queue: synchronous code runs, then microtasks (Promises), then macrotasks (setTimeout, click events). Blocking the loop = frozen UI.',
+        beginner: 'The traffic controller that lets JS handle multiple tasks without freezing the page.',
+        advanced: 'JS is single-threaded, but the Event Loop keeps it fluid. It manages the queue: Sync code first → Microtasks (Promises) → Macrotasks (setTimeout, click events). Block this loop with a heavy loop, and your entire interface "janks" to a halt.',
       },
     ],
     practical: {
       title: 'Spy on LocalStorage',
-      intro: 'See what websites store about you.',
+      intro: 'Time to peek into your browser\'s memory banks.',
       steps: [
         'Open DevTools → Application tab → Storage → Local Storage.',
-        'Click on any domain — see the keys/values websites have saved on your machine.',
-        'Try `localStorage.setItem("test", "hello")` in the Console.',
-        'Refresh the page and run `localStorage.getItem("test")` — your data persists.',
-        'Check the Cookies section too — you\'ll find session/auth tokens.',
+        'Click on any domain to see the "keys" and "values" websites have saved on your machine.',
+        'Open the Console and type `localStorage.setItem("test", "hello")`.',
+        'Refresh the page and run `localStorage.getItem("test")`—the browser remembered your data!',
+        'Explore the Cookies section to see where your auth tokens are hidden.',
       ],
-      goal: 'Realize the browser is a database your apps can use directly.',
+      goal: 'Understand that your browser is more than just a viewer—it is a functional database your app can use to stay "stateful."',
     },
     quiz: [
       {
-        question: 'Which JS engine powers Chrome?',
+        question: 'Which JS engine powers the Google Chrome browser?',
         options: ['SpiderMonkey', 'V8', 'JavaScriptCore', 'WebKit'],
         correctIndex: 1,
       },
       {
-        question: 'Which storage persists across browser restarts and is ~5MB?',
+        question: 'Which storage method persists even after you close and restart the browser?',
         options: ['SessionStorage', 'LocalStorage', 'Cookies (typical)', 'RAM'],
         correctIndex: 1,
       },
       {
-        question: 'What does the Rendering Engine produce?',
-        options: ['Network packets', 'The pixels you see on screen', 'JS bytecode', 'Sound output'],
+        question: 'What is the primary output of the browser\'s Rendering Engine?',
+        options: ['Network packets', 'The pixels you see on screen', 'JavaScript bytecode', 'Sound output streams'],
         correctIndex: 1,
       },
       {
-        question: 'Why is a long-running synchronous loop bad in JS?',
+        question: 'Why is a long-running synchronous "while" loop bad in JavaScript?',
         options: [
-          'It uses too much disk',
-          'It blocks the event loop and freezes the UI',
-          'It sends too many requests',
-          'It deletes cookies',
+          'It consumes too much disk space',
+          'It blocks the Event Loop and freezes the entire UI',
+          'It floods the network with too many requests',
+          'It automatically deletes your browser cookies',
         ],
         correctIndex: 1,
       },
     ],
     keyTakeaways: [
-      'Render pipeline: DOM + CSSOM → Render Tree → Layout → Paint → Composite',
-      'V8 compiles JS to machine code via JIT',
-      'Cookies / LocalStorage / SessionStorage / IndexedDB each have a purpose',
-      'JS is single-threaded; never block the event loop',
+      'The Render Pipeline is a precise order: DOM/CSSOM → Layout → Paint → Composite.',
+      'V8 uses JIT (Just-In-Time) compilation to make your JS blazing fast.',
+      'Know your storage tools: Cookies, LocalStorage, SessionStorage, and IndexedDB each have a specific job.',
+      'JS is single-threaded; never perform heavy blocking work on the main Event Loop.',
     ],
   },
 
@@ -774,88 +733,83 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 10,
     title: 'Servers & The Cloud — Where the Web Lives',
     icon: '☁️',
-    philosophy:
-      '"The Cloud" isn\'t magic — it\'s someone else\'s computer in a giant air-conditioned warehouse. As a dev you\'ll deploy your code to these computers every day.',
+    philosophy: 'Think of "The Cloud" not as a magical vapor, but as "someone else’s computer"—a high-performance machine in a giant, air-conditioned warehouse. As a dev, your job is to package your code and ship it to these remote machines so they can serve your app to the world.',
     concepts: [
       {
         title: '1. What is a Server?',
-        beginner: 'A computer that\'s always on, waiting to answer requests.',
-        advanced:
-          'Same hardware as a regular PC, but optimized for uptime, networking, and concurrent connections. Runs server software (Nginx, Node, PostgreSQL).',
+        beginner: 'A computer that stays powered on 24/7, specifically designed to answer incoming requests.',
+        advanced: 'While the hardware is similar to your PC, servers are optimized for "uptime" and massive concurrency. They run server-grade software like Nginx, Node.js, or PostgreSQL, which are built to handle thousands of requests per second without breaking a sweat.',
       },
       {
         title: '2. The Cloud — Really',
-        beginner: 'Renting servers from companies like AWS, Google, Vercel.',
-        advanced:
-          'IaaS (raw VMs — AWS EC2), PaaS (managed runtimes — Heroku, Vercel), SaaS (full apps — Gmail). Lovable Cloud is PaaS — you don\'t manage servers.',
+        beginner: 'The practice of renting servers from tech giants like AWS, Google, or Vercel instead of owning them.',
+        advanced: 'Know your tier: IaaS (Raw Virtual Machines like AWS EC2—you control everything), PaaS (Managed Runtimes like Vercel—you just push code, they handle the rest), and SaaS (Ready-to-use software like Gmail). Platforms like Lovable are PaaS—they allow you to deploy instantly without touching a single server config.',
       },
       {
         title: '3. Static vs Dynamic Sites',
-        beginner: 'Static = same for everyone. Dynamic = personalized.',
-        advanced:
-          'Static = pre-built HTML files served from a CDN (super fast, cheap). Dynamic = server runs code per request (DB queries, personalization). Modern apps mix both via SSR / ISR.',
+        beginner: 'Static sites are the same for everyone; Dynamic sites change based on who is logged in.',
+        advanced: 'Static sites are pre-built HTML files pushed to a CDN (insanely fast and cheap). Dynamic sites run code at the moment of request (database queries, user profiles). Modern "Full Stack" developers master the mix—serving static content via CDNs and using server-side rendering for the dynamic "brain" of the app.',
       },
       {
         title: '4. CDN — Content Delivery Network',
-        beginner: 'Copies of your site stored close to users.',
-        advanced:
-          'Cloudflare, Fastly, etc. cache your assets in 200+ cities. A user in Tokyo loads from Tokyo, not your origin in New York. Cuts latency 5–10×.',
+        beginner: 'A network of "proxy" servers stored in cities all over the world to make your site load faster.',
+        advanced: 'Services like Cloudflare or Fastly store copies of your assets in 200+ cities globally. Instead of a user in Tokyo waiting for a file from your New York server, the CDN delivers it from the Tokyo branch. It cuts latency 5–10x, making your site feel local to every user on Earth.',
       },
     ],
     practical: {
       title: 'Inspect a Server Response',
-      intro: 'See server info live.',
+      intro: 'Time to see who is actually serving your web requests.',
       steps: [
         'Open DevTools → Network tab.',
-        'Reload any site and click the first request.',
-        'Headers tab → Response Headers — look for `server:`, `cf-ray:` (Cloudflare), `x-vercel-id:`, etc.',
-        'These tell you what software & CDN powers the site.',
-        'Try `ping google.com` in your terminal — note the response times in milliseconds.',
+        'Reload any site and click the very first request in the list.',
+        'Navigate to the "Headers" tab → "Response Headers."',
+        'Look for clues like `server:`, `cf-ray:` (Cloudflare), or `x-vercel-id:`.',
+        'Try `ping google.com` in your terminal—the time in milliseconds shows exactly how far that "remote computer" is from you.',
       ],
-      goal: 'Every site you visit is the result of one or more servers responding in milliseconds.',
+      goal: 'Understand that every click you make triggers a lightning-fast journey to a remote server and back.',
     },
     quiz: [
       {
-        question: 'What is a server, simply put?',
+        question: 'What is a server in simple terms?',
         options: [
-          'A waiter in a restaurant',
-          'A computer that stays on and responds to requests',
-          'A type of cable',
-          'A USB drive',
+          'A restaurant waiter',
+          'A computer that stays on 24/7 and responds to network requests',
+          'A specific type of high-speed network cable',
+          'A portable USB storage device',
         ],
         correctIndex: 1,
       },
       {
-        question: 'What is "the cloud" really?',
+        question: 'What is the "Cloud" actually made of?',
         options: [
-          'Floating data in the sky',
-          'Someone else\'s computers in a data center',
-          'A type of WiFi',
-          'A new browser',
+          'Data floating in the atmosphere',
+          'Someone else\'s computers hosted in large data centers',
+          'A special type of wireless WiFi signal',
+          'A new kind of web browser technology',
         ],
         correctIndex: 1,
       },
       {
-        question: 'What does a CDN do?',
+        question: 'What is the main advantage of using a CDN?',
         options: [
-          'Encrypts your traffic',
-          'Caches content close to users for faster loads',
-          'Replaces your server',
-          'Generates databases',
+          'It encrypts all your network traffic',
+          'It caches content in cities close to users to reduce load times',
+          'It completely replaces the need for a server',
+          'It automatically generates databases for your app',
         ],
         correctIndex: 1,
       },
       {
-        question: 'Static vs Dynamic — which is faster for the same content for all users?',
-        options: ['Dynamic — always personalized', 'Static — pre-built and served from CDN', 'They are identical', 'Neither'],
+        question: 'Between Static and Dynamic sites, which is usually faster for identical content across all users?',
+        options: ['Dynamic—it is personalized for everyone', 'Static—it is pre-built and delivered via CDN', 'They are always identical in speed', 'Neither is fast'],
         correctIndex: 1,
       },
     ],
     keyTakeaways: [
-      'Servers are always-on computers running server software',
-      '"The Cloud" = rented servers from AWS / Google / Vercel / etc.',
-      'Static sites are fast and cheap; dynamic sites are personalized',
-      'CDNs cut latency dramatically by serving from nearby locations',
+      'Servers are always-on computers running specialized software to handle requests.',
+      '"The Cloud" is simply a way to rent massive computing power from providers like Vercel or AWS.',
+      'Static sites are pre-built for speed; dynamic sites are built on-the-fly for personalization.',
+      'CDNs act as "local branches" of your server, cutting latency by serving content from nearby locations.',
     ],
   },
 ];
