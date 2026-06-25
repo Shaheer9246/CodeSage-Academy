@@ -812,6 +812,71 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       'CDNs act as "local branches" of your server, cutting latency by serving content from nearby locations.',
     ],
   },
+
+  {
+    id: 'net-11',
+    module: 'Module 1: Computer & Network Fundamentals',
+    order: 11,
+    title: 'Ports & Sockets',
+    icon: '🔌',
+    philosophy: 'If the IP address is the building, the Port is the specific office number. Sockets are the "doorways" that allow your software to send and receive data. Without them, your computer would be a locked vault.',
+    concepts: [
+      {
+        title: '1. What is a Port?',
+        beginner: 'A port is a virtual doorway (numbered 0–65535) used to direct traffic to the right app.',
+        advanced: 'Ports 0–1023 are "Well-Known Ports" (e.g., 80 for HTTP, 22 for SSH). Never use these for your own custom services. Use ports > 1024 for your local development to avoid conflicts with system services.',
+      },
+      {
+        title: '2. Sockets — The Data Pipe',
+        beginner: 'A socket is an endpoint that lets a program talk to the network.',
+        advanced: 'Think of a socket as the "plug" connected to the "wall socket" (Port). When a server "listens" on a port, it’s waiting for a client to connect a socket. WebSockets take this further, creating a persistent, two-way pipe for real-time chat or gaming.',
+      },
+      {
+        title: '3. Listening vs. Connecting',
+        beginner: 'The server "listens" for a call; the client "connects" to the server.',
+        advanced: 'Use `netstat` or `lsof -i` to see your local sockets. If you get "Port already in use," it means another process has already "plugged" into that specific virtual office door.',
+      },
+    ],
+    practical: {
+      title: 'Hunt for Open Ports',
+      intro: 'See what your computer is currently listening to.',
+      steps: [
+        'Open terminal/command prompt.',
+        'Type `netstat -an` (Windows) or `lsof -i -P -n | grep LISTEN` (Mac/Linux).',
+        'Look for local ports currently in a "LISTEN" state.',
+        'Try to visit `localhost:3000` (or your dev port) and run the command again.',
+      ],
+      goal: 'Identify the active doorways your computer is using to communicate with the world.',
+    },
+    quiz: [
+      {
+        question: 'Which port range is reserved for standard, well-known services?',
+        options: ['0–1023', '5000–6000', '10000–20000', 'Any range is fine'],
+        correctIndex: 0,
+      },
+      {
+        question: 'What happens when you try to run a server on a port that is already in use?',
+        options: ['The OS creates a second port automatically', 'You get an "EADDRINUSE" or "Port in use" error', 'The computer reboots', 'It works perfectly fine'],
+        correctIndex: 1,
+      },
+      {
+        question: 'What is a Socket?',
+        options: ['A physical cable', 'The software endpoint for network communication', 'A type of CPU error', 'A DNS record'],
+        correctIndex: 1,
+      },
+      {
+        question: 'Why use a port higher than 1024 for development?',
+        options: ['It makes the internet faster', 'To avoid conflicts with protected system-level services', 'It requires less RAM', 'It encrypts the data automatically'],
+        correctIndex: 1,
+      },
+    ],
+    keyTakeaways: [
+      'IP = Building Address; Port = Specific office/doorway.',
+      'Ports 0–1023 are strictly reserved; stay in the "High Port" range for your apps.',
+      'A Socket is the connection endpoint between your code and the network.',
+      'Use `netstat` to debug why your server won\'t start (port collisions).',
+    ],
+  },
 ];
 
 export const getNetworkingLessonById = (id: string): NetworkingLesson | undefined =>
