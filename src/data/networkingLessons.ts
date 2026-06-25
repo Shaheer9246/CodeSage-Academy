@@ -877,6 +877,93 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       'Use `netstat` to debug why your server won\'t start (port collisions).',
     ],
   },
+
+  {
+  id: 'net-12',
+  module: 'Module 1: Computer & Network Fundamentals',
+  order: 12,
+  title: 'The Complete Request Journey',
+  icon: '🚀',
+  philosophy: 'Every time you type a URL, a miniature "epic quest" begins. Data travels through the labyrinth of the internet to fetch your content. Understanding this journey is how you learn to debug why a site won\'t load.',
+  concepts: [
+    {
+      title: '1. The Setup (Browser → DNS)',
+      beginner: 'Browser checks cache, then asks ISP DNS: "Where does this domain live?"',
+      advanced: 'It’s a race. Browser Cache → OS Cache → Router Cache → ISP Resolver. Failure here means a "Server Not Found" error.',
+    },
+    {
+      title: '2. The Handshake (TCP/TLS)',
+      beginner: 'The computer establishes a "trusted connection" with the server.',
+      advanced: 'TCP (3-way handshake: SYN, SYN-ACK, ACK) ensures reliability, followed by the TLS handshake for encryption.',
+    },
+    {
+      title: '3. The Request & Response',
+      beginner: 'Your browser sends an HTTP request; the server sends back the content.',
+      advanced: 'The server returns a status code (200, 404, etc.), metadata headers, and the payload (HTML/JSON).',
+    },
+  ],
+  practical: {
+    title: 'Follow the Packet',
+    intro: 'Visualize the journey in your browser.',
+    steps: [
+      'Open DevTools → Network tab.',
+      'Filter by "Doc".',
+      'Reload the page.',
+      'Hover over the "Waterfall" bars to see DNS, Connection, and TTFB times.',
+    ],
+    goal: 'Identify which part of the journey is causing lag.',
+  },
+  quiz: [
+    { question: 'What is the "3-way handshake" for?', options: ['Establishing a secure TCP connection', 'Sending images', 'Finding DNS', 'Logging in'], correctIndex: 0 },
+    { question: 'What does "TTFB" stand for?', options: ['Time To First Byte', 'Total Transfer File Bytes', 'Time To Finish Building', 'The Total Flow Bandwidth'], correctIndex: 0 },
+    { question: 'Where does the browser look first for a domain IP?', options: ['The internet', 'The local DNS cache', 'The router', 'Google'], correctIndex: 1 },
+    { question: 'What is a "200 OK" status?', options: ['The server is down', 'Everything worked perfectly', 'The file was moved', 'Security error'], correctIndex: 1 },
+  ],
+  keyTakeaways: ['DNS finds the address; TCP/TLS creates the secure bridge.', 'TTFB is the key metric for server health.', 'Status codes tell you exactly what happened during the request.'],
+},
+
+  {
+  id: 'net-13',
+  module: 'Module 1: Computer & Network Fundamentals',
+  order: 13,
+  title: 'Network Troubleshooting Tools',
+  icon: '🛠️',
+  philosophy: 'When the internet acts like a black box, these tools are your flashlight. If you can\'t ping it, you can\'t reach it.',
+  concepts: [
+    {
+      title: '1. Ping — "Are you there?"',
+      beginner: 'Sends a tiny "pulse" to a server to see if it responds.',
+      advanced: 'Uses ICMP packets. High latency (ms) means the server is distant or the connection is congested.',
+    },
+    {
+      title: '2. Traceroute — "The Map"',
+      beginner: 'Shows every "hop" your data takes across the internet.',
+      advanced: 'Pinpoints exactly which router on the way is failing. Excellent for diagnosing ISP-level issues.',
+    },
+    {
+      title: '3. Curl — "The Direct Request"',
+      beginner: 'Fetches web data directly in the terminal.',
+      advanced: '`curl -I` fetches only headers. It’s the fastest way to check server status codes without a browser.',
+    },
+  ],
+  practical: {
+    title: 'Map Your Journey',
+    intro: 'Test your connection to the outside world.',
+    steps: [
+      'Run `ping google.com`.',
+      'Run `traceroute google.com` (Mac/Linux) or `tracert google.com` (Windows).',
+      'Run `curl -I https://google.com` to see headers.',
+    ],
+    goal: 'Identify exactly where a network connection dies.',
+  },
+  quiz: [
+    { question: 'Which command helps you see the path your data takes?', options: ['ping', 'curl', 'traceroute', 'nslookup'], correctIndex: 2 },
+    { question: 'What does "Request timed out" in a ping mean?', options: ['The server is fast', 'The server didn\'t respond in time', 'The password is wrong', 'The internet is too fast'], correctIndex: 1 },
+    { question: 'How can `curl -I` help a developer?', options: ['It plays video', 'It fetches only headers', 'It cleans the browser cache', 'It deletes files'], correctIndex: 1 },
+    { question: 'What protocol does `ping` use?', options: ['ICMP', 'TCP', 'UDP', 'SMTP'], correctIndex: 0 },
+  ],
+  keyTakeaways: ['Ping for availability.', 'Traceroute to find blockages.', 'Curl for quick header debugging.'],
+},
 ];
 
 export const getNetworkingLessonById = (id: string): NetworkingLesson | undefined =>
