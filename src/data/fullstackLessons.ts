@@ -1,4 +1,4 @@
-// Full Stack Frontend Development — 20 lessons
+// Full Stack Frontend Development — 28 lessons
 import type { NetworkingLesson, Concept, QuizQuestion } from './networkingLessons';
 
 export interface FullstackLesson extends Omit<NetworkingLesson, 'practical'> {
