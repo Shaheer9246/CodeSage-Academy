@@ -81,7 +81,7 @@ const Suggestions = () => {
   const cancelEdit = () => { setEditingId(null); setEditText(''); };
   const saveEdit = async (id: string) => {
     if (!editText.trim()) return;
-    const { error } = await supabase.from<Suggestion>('suggestions')
+    const { error } = await supabase.from('suggestions')
       .update({ text: editText.trim().slice(0, 500) }).eq('id', id);
     if (error) { toast.error(error.message); return; }
     cancelEdit(); toast.success('Updated');
