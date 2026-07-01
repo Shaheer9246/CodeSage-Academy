@@ -4,7 +4,7 @@ import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, type LucideIcon } from 'lucide-react';
 import PythonWorkspace from '@/components/PythonWorkspace';
 
 type Section = 'concept' | 'practical' | 'quiz';
