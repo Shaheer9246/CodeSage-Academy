@@ -43,11 +43,11 @@ const Suggestions = () => {
 
   const refresh = useCallback(async () => {
     const { data, error } = await supabase
-      .from<Suggestion>('suggestions')
+      .from('suggestions')
       .select('*')
       .order('created_at', { ascending: false });
     if (error) { console.error(error); return; }
-    setItems(data || []);
+    setItems((data || []) as Suggestion[]);
     if (user) {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const mine = (data || []).some(s =>
