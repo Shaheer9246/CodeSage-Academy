@@ -228,17 +228,17 @@ const Roadmap = () => {
                   <motion.div
                     initial={{ opacity: 0, x: isLeft ? -30 : 30 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: Math.min(i * 0.02, 0.3), type: 'spring', stiffness: 100 }}
-                    className={`flex items-center gap-2 ${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/30 rounded-2xl' : ''}`}
+                    className={`flex items-center gap-2 sm:${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/30 rounded-2xl mx-1' : ''}`}
                   >
-                    {!isLeft && <div className="flex-1" />}
+                    {!isLeft && <div className="hidden sm:block flex-1" />}
                     <button onClick={status !== 'locked' ? () => handleNodeClick(node) : undefined}
-                      className={`flex items-center gap-2 px-2.5 py-2 sm:px-4 sm:py-3 rounded-2xl border-2 transition-all w-[78%] sm:w-auto sm:max-w-[70%] ${
+                      className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl border-2 transition-all w-full sm:w-auto sm:max-w-[70%] ${
                         status === 'completed' ? 'bg-primary/8 border-primary/30 hover:border-primary/50' :
                         status === 'current' ? 'bg-primary/10 border-primary/40 neon-glow' :
                         status === 'upcoming' ? 'bg-secondary/20 border-border/30 hover:border-primary/20 opacity-70' :
                         'bg-secondary/10 border-border/20 opacity-30 cursor-not-allowed'
                       }`}>
-                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-base sm:text-lg flex-shrink-0 ${
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-base sm:text-lg flex-shrink-0 ${
                         status === 'completed' ? 'bg-primary/15' :
                         status === 'current' ? 'bg-primary/20' :
                         'bg-secondary/30'
@@ -246,12 +246,12 @@ const Roadmap = () => {
                         {status === 'locked' ? <Lock className="w-4 h-4 text-muted-foreground" /> : node.icon}
                       </div>
                       <div className="text-left min-w-0 flex-1">
-                        <p className={`text-xs sm:text-sm font-display font-semibold truncate ${
+                        <p className={`text-[13px] sm:text-sm font-display font-semibold truncate ${
                           status === 'completed' ? 'text-foreground' :
                           status === 'current' ? 'text-primary' :
                           'text-muted-foreground'
                         }`}>{node.label}</p>
-                        <p className="text-[9px] sm:text-[10px] text-muted-foreground font-mono">
+                        <p className="text-[10px] text-muted-foreground font-mono">
                           {status === 'completed' ? 'Complete ✓' :
                            status === 'current' ? 'In Progress →' :
                            status === 'upcoming' ? `Step ${node.step}` :
@@ -260,7 +260,7 @@ const Roadmap = () => {
                       </div>
                       {status === 'completed' && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary ml-auto flex-shrink-0" />}
                     </button>
-                    {isLeft && <div className="flex-1" />}
+                    {isLeft && <div className="hidden sm:block flex-1" />}
                   </motion.div>
 
 
