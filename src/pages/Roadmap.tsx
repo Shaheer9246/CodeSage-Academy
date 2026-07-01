@@ -228,7 +228,7 @@ const Roadmap = () => {
                   <motion.div
                     initial={{ opacity: 0, x: isLeft ? -30 : 30 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: Math.min(i * 0.02, 0.3), type: 'spring', stiffness: 100 }}
-                    className={`flex items-center gap-2 sm:${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/30 rounded-2xl mx-1' : ''}`}
+                    className={`flex items-center gap-2 ${isLeft ? 'sm:justify-start' : 'sm:justify-end'} ${isCurrent ? 'ring-2 ring-primary/30 rounded-2xl mx-1' : ''}`}
                   >
                     {!isLeft && <div className="hidden sm:block flex-1" />}
                     <button onClick={status !== 'locked' ? () => handleNodeClick(node) : undefined}
