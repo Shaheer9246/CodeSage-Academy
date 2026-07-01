@@ -122,7 +122,7 @@ const Suggestions = () => {
   };
 
   const deleteOwn = async (id: string) => {
-    const { error } = await supabase.from<Suggestion>('suggestions').delete().eq('id', id);
+    const { error } = await supabase.from('suggestions').delete().eq('id', id);
     if (error) { toast.error(error.message); return; }
     toast.success('Deleted');
     setItems(prev => prev.filter(s => s.id !== id));
