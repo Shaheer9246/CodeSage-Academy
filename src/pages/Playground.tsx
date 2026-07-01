@@ -156,7 +156,7 @@ const Playground = () => {
       const buf = await file.arrayBuffer();
       const zip = await JSZip.loadAsync(buf);
       const added: FileItem[] = [];
-          const entries = Object.values(zip.files).filter((z): z is { name: string; dir: boolean; async: (type: string) => Promise<string> } => !z.dir);
+          const entries = Object.values(zip.files).filter((z) => !z.dir);
       for (const z of entries) {
         const name = z.name.split('/').pop() || z.name;
         const ext = name.split('.').pop()?.toLowerCase() || '';
@@ -257,10 +257,14 @@ const Playground = () => {
               </span>
             )}
           </div>
-          <button onClick={handleExport} className="flex items-center gap-1 text-[10px] bg-primary/15 text-primary px-2 py-1 rounded">
-            <Download className="w-3 h-3" /> Export
-          </button>
+          <div className="flex items-center gap-1">
+            <button onClick={handleExport} className="flex items-center gap-1 text-[10px] bg-primary/15 text-primary px-2 py-1 rounded">
+              <Download className="w-3 h-3" /> Export
+            </button>
+          </div>
         </header>
+
+
 
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* FILES */}
@@ -270,7 +274,7 @@ const Playground = () => {
                 <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Files</span>
                 <div className="flex gap-1">
                   <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js" className="hidden" />
-                  <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip" className="hidden" />
+                  <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip,application/zip,application/x-zip-compressed,application/octet-stream" className="hidden" />
                   <button onClick={() => fileInputRef.current?.click()} className="text-[10px] flex items-center gap-1 text-muted-foreground bg-secondary/40 px-2 py-1 rounded">
                     <Upload className="w-3 h-3" /> Import
                   </button>
@@ -458,7 +462,7 @@ const Playground = () => {
             </select>
           )}
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".html,.css,.js,.jsx" className="hidden" />
-          <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip" className="hidden" />
+          <input type="file" ref={zipInputRef} onChange={handleZipChange} accept=".zip,application/zip,application/x-zip-compressed,application/octet-stream" className="hidden" />
           <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-1 rounded hover:bg-secondary/30">
             <Upload className="w-3 h-3" /> Import
           </button>
