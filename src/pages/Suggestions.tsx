@@ -69,7 +69,7 @@ const Suggestions = () => {
   const submit = async () => {
     if (!user || !text.trim()) return;
     if (postedToday) { toast.error('You can only post one suggestion per day.'); return; }
-    const { error } = await supabase.from<Suggestion>('suggestions').insert({
+    const { error } = await supabase.from('suggestions').insert({
       user_id: user.id, username: user.username || 'anonymous',
       text: text.trim().slice(0, 500),
     });
