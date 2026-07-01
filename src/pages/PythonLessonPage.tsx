@@ -4,7 +4,8 @@ import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, type LucideIcon } from 'lucide-react';
+import PythonWorkspace from '@/components/PythonWorkspace';
 
 type Section = 'concept' | 'practical' | 'quiz';
 
@@ -114,27 +115,11 @@ const PythonLessonPage = () => {
                 <FlaskConical className="w-3 h-3" /> III. Practical Lab
               </p>
               <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
-              <p className="text-xs text-muted-foreground">{lesson.practical.intro}</p>
+              <p className="text-xs text-muted-foreground">Write, run, and iterate Python entirely in your browser — no setup required.</p>
             </div>
-            <div className="glass-card rounded-2xl p-4">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">Steps</p>
-              <ol className="space-y-3">
-                {lesson.practical.steps.map((step, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-primary font-mono">{i + 1}</span>
-                    <p className="text-xs text-foreground leading-relaxed pt-0.5" dangerouslySetInnerHTML={{
-                      __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
-                    }} />
-                  </li>
-                ))}
-              </ol>
-            </div>
-            <div className="glass-card rounded-2xl p-4 border border-primary/20 bg-primary/5">
-              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Lightbulb className="w-3 h-3" /> The Goal
-              </p>
-              <p className="text-xs text-foreground">{lesson.practical.goal}</p>
-            </div>
+
+            <PythonWorkspace practical={lesson.practical} />
+
             <button onClick={() => setSection('quiz')}
               className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
               Take the Mastery Test <ChevronRight className="w-4 h-4" />

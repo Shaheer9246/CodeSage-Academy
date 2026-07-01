@@ -1,73 +1,80 @@
-# Implementation Plan — 9 Items
 
-## 1. Suggestions: wire admin edit/delete UI
-In `Suggestions.tsx`, every card gets two new admin buttons next to "Reply": **Edit (admin)** and **Delete (admin)**. Clicking opens an inline password + text field that calls `admin_edit_suggestion` / `admin_delete_suggestion` RPCs already deployed. Success toast + realtime refresh handles the rest.
+## 1. Python Interactive Workspace (Skulpt)
 
-## 2. Challenges: 4 tiers + ~24 new
-Rewrite `Challenges.tsx`:
-- Add tier `'Complex'` to the `difficulty` union.
-- Top tab bar: **Easy · Medium · Hard · Complex** (filter state).
-- Append ~24 new challenges (6 per tier). Complex tier = mini-projects (calculator, weather widget mock, kanban, mini-blog, quiz app, image-carousel).
-- Show difficulty count per tab and a tier color (green / yellow / orange / purple).
+**Scope:** Only affects the Python track (`PythonLessonPage.tsx`). HTML/CSS/JS tracks and the general Playground stay untouched.
 
-## 3. Playground upgrades
-In `Playground.tsx`:
-- **ZIP upload**: new "Upload ZIP" button → uses already-installed `jszip` to read `.html/.css/.js` files into the workspace.
-- **Single/Multi toggle** at top: Single mode hides Files panel and uses one combined `.html` doc; Multi keeps current 3-file workflow.
-- **4th-file preview**: if a 4th custom `.html` file exists, add a "Preview this file" eye icon on its file row that swaps the preview source.
-- **Mobile cut/copy/paste bar**: add three buttons in `EditorShortcuts` mobile bar that call `document.execCommand` on the active Monaco selection.
-- **Console dock-back**: when console is detached/floating, add a small ◰ "Dock" button to re-anchor it to the bottom panel.
+### 1a. New component: `src/components/PythonWorkspace.tsx`
 
-## 4. Auth → /tour for brand-new users
-In `UserContext.fetchProfile`, after fetching/creating a profile check `has_seen_tour === false`. If false and we just signed up (no `name` yet), navigate to `/tour` once. `Tour.tsx` already calls an RPC stub to flip `has_seen_tour` on Finish/Skip — wire it through a `profiles.update({ has_seen_tour: true })` (allowed by the new column-level GRANT).
+A self-contained 3-pane workbench used inside the "Practical" tab of the Python lesson page.
 
-## 5. Trip = real Dashboard in guest mode + Welcome glow + 2 new tiles
-- Replace `/trip` to redirect to `/dashboard?guest=1`.
-- New `GuestContext` provider wraps the app; `Dashboard.tsx` reads the query param, renders normally with a banner "Guest mode — sign up to save progress". Clicking any tile other than Lesson 1 of Frontend → toast + redirect to `/auth`.
-- `Welcome.tsx`: add two more feature rows (**Python**, **Local-only coding**) so all 6 tracks show.
-- **Glow on hover**: every Welcome button + every Dashboard tile gets `hover:neon-glow hover:border-primary/60 transition-all` so an arrow/hover triggers a glow halo.
+Layout (mobile-first, stacks vertically on small screens, splits on `md`):
 
-## 6. Smart-back for Freelance & Fullstack learn pages
-Mirror what Networking already does:
-- Read `?from` query param.
-- Back button → `/roadmap` when `from=roadmap`, else `/dashboard`.
-- Dashboard tiles for Freelance/Fullstack pass no `from` (default dashboard). Roadmap tiles pass `?from=roadmap`.
+```text
+┌─────────────────────────────────────────┐
+│  Tabs:  [ Assignment ] [ Terminal ]     │  <- mobile
+├─────────────────────────────────────────┤
+│  Monaco Python editor                   │
+│  [ ▶ Run Code ] [ Reset ] [ Clear ]     │
+├─────────────────────────────────────────┤
+│  Active tab pane                        │
+│   - Assignment: intro, steps, goal      │
+│   - Terminal:   dark stdout console     │
+└─────────────────────────────────────────┘
+```
 
-## 7. Post-lesson → Dashboard (no Urrhhh page)
-For **Python**, **Local**, **Freelance**, **Fullstack** lesson pages: on submit-success, skip the `/lesson-complete/:id` redirect — show a small inline "Lesson complete ✓ +XP" toast and `navigate('/dashboard')`.
+On desktop (`md+`): editor left, tabbed panel (Assignment / Terminal) right.
 
-For **Networking** and **Frontend Dev** lesson pages: keep `LessonComplete.tsx` but replace the current "Roadmap · Review" pair with **3 buttons**: `Lesson Path` (→ `/learn` or `/networking`), `Review` (→ same lesson), `Next Lesson` (existing, moved into the row). Removes the standalone giant Next button on top.
+Props: `starterCode`, `practical` (intro/steps/goal), `onSolved?`.
 
-## 8. Settings power tools
-Below the theme buttons in `SettingsPage.tsx`, add 3 grouped sections:
+### 1b. Skulpt integration
 
-**Execution Control** (glass-card)
-- Toggle: *Auto-Run Preview* (writes `codesage_autorun` to localStorage; Playground/Lesson previews read it).
-- Button: *Reset Runtime* (clears preview iframe + workspace caches, not XP).
+- Load Skulpt from CDN once on mount via a small `useSkulpt()` hook that injects two `<script>` tags:
+  - `https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js`
+  - `https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js`
+- Track load state so Run is disabled until ready.
+- `runPython(src)`:
+  - `Sk.configure({ output: writeToTerminal, read: builtinRead, inputfun: promptInput, inputfunTakesPrompt: true })`
+  - `Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, src, true))`
+  - On error, print `err.toString()` and the line number in red.
+- `stdout` handler appends chunks to a `lines` state array rendered in the terminal (monospace, `bg-zinc-950 text-emerald-300`).
+- `input()` support:
+  - `inputfun` returns a Promise. Terminal renders an inline `<input>` at the bottom while awaiting; pressing Enter resolves with the value and echoes it to the log.
+- Clear Console empties `lines`; Reset restores `starterCode` in the editor.
 
-**Data & Workspace**
-- Button: *Export All Workspaces (.zip)* — uses `jszip` to zip Playground recents + current files.
-- Button: *Clear Sandbox Cache* — wipes `codesage_playground_recent` + autosave only.
+### 1c. Editor
 
-**Onboarding**
-- Button: *Replay Tour* → flip `has_seen_tour` to false and `navigate('/tour')`.
+- Reuse existing `CodeEditor` (Monaco) with `language="python"`. If it doesn't accept a language prop, extend it minimally (frontend-only change).
 
-## 9. XP rebalance + Freeze Streak + Dashboard XP bar
-Server changes (migration):
-- `award_lesson`: change `_profile.xp + 50` → `+ 5`, `sage_coins + 10` → `+ 2`. Level formula stays.
-- New RPC `buy_freeze_streak()`: deducts 10 XP, sets a new profile column `streak_freeze_until date` to tomorrow. Validates `xp >= 10`.
-- New column `profiles.streak_freeze_until date`.
-- `update_streak` respects `streak_freeze_until` — if yesterday was a freeze day, treat as continuous.
+### 1d. Wire into `PythonLessonPage`
 
-UI:
-- `Dashboard.tsx` top header (right of welcome): two pills — `⚡ {xp} XP` and `🔥 {streakCount}d`. Tapping XP pill opens a tiny "Shop" sheet with one item: **Freeze Streak — 10 XP** button → calls `buy_freeze_streak` RPC.
-- `UserContext` exposes `buyFreezeStreak()` wrapper.
+- Import `PythonWorkspace` and render it inside the `section === 'practical'` block, above the existing "Take the Mastery Test" button.
+- Pull `starterCode` from the lesson data if present; otherwise fall back to a friendly `# Write your code here\nprint("Hello, Python!")`. Add an optional `starterCode?: string` field to the Python lesson type (data-shape change only, existing lessons default to placeholder).
 
----
+### 1e. Non-goals
+
+- No change to Playground.tsx or LivePreview (HTML iframe preview stays intact).
+- No backend calls — Skulpt runs 100% in-browser.
+
+## 2. Roadmap mobile fix
+
+Problem on ~360–540px widths: the zigzag layout uses `w-[78%]` per node with `justify-start`/`justify-end`, so long labels wrap awkwardly and the connector line looks off-center.
+
+Change in `src/pages/Roadmap.tsx`:
+
+- On mobile (`< sm`): switch to single-column, full-width nodes (drop the `isLeft` alternating flex and the empty `flex-1` spacers, use `w-full`). Keep the zigzag only from `sm:` and up.
+- Move the vertical dashed connector to a centered absolute rail on mobile so it lines up under each node's icon.
+- Reduce sticky header/track-selector horizontal padding on `< sm` to reclaim space; make the track pills `text-[11px] px-3 py-1.5`.
+- Ensure the current-node ring (`ring-2`) doesn't clip by adding `mx-1`.
+
+No changes to lesson data, routing, or the track selector logic.
 
 ## Technical notes
-- New migration: lower XP rewards, `streak_freeze_until` column, `buy_freeze_streak` RPC, GRANT EXECUTE to authenticated.
-- Files created: `src/contexts/GuestContext.tsx`, `src/components/FreezeStreakSheet.tsx`.
-- Files edited: `Suggestions.tsx`, `Challenges.tsx`, `Playground.tsx`, `EditorShortcuts.tsx`, `Auth.tsx`, `UserContext.tsx`, `Welcome.tsx`, `Trip.tsx`, `Dashboard.tsx`, `FreelanceLearn.tsx`, `FullstackLearn.tsx`, `FreelanceLessonPage.tsx`, `FullstackLessonPage.tsx`, `PythonLessonPage.tsx`, `LocalLessonPage.tsx`, `LessonComplete.tsx`, `SettingsPage.tsx`, `App.tsx`.
-- No new dependencies (jszip already installed).
-- No changes to existing lesson data files.
+
+- Skulpt types: add a minimal `declare global { interface Window { Sk: any } }` in the workspace file; no npm dep needed.
+- CSP: CDN scripts from jsdelivr are already used elsewhere for JSZip — safe.
+- Files touched:
+  - **new** `src/components/PythonWorkspace.tsx`
+  - **edit** `src/pages/PythonLessonPage.tsx` (render workspace in practical tab)
+  - **edit** `src/components/CodeEditor.tsx` (accept optional `language` prop, default `html`)
+  - **edit** `src/data/pythonLessons.ts` (optional `starterCode` field on type)
+  - **edit** `src/pages/Roadmap.tsx` (mobile layout tweaks only)
