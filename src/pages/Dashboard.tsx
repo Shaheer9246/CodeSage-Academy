@@ -1,11 +1,14 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2, Palette } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2, Palette, Users, Lock } from 'lucide-react';
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import DashboardTour, { TourStep } from '@/components/DashboardTour';
+import EnrollDialog from '@/components/EnrollDialog';
+import { TrackId, TRACK_META, isEnrolled, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
+
 
 const TOUR_STEPS: TourStep[] = [
   { target: 'frontend',   title: 'Frontend Development', body: 'Learn HTML, CSS, and JavaScript from absolute zero — your first real website by lesson 5.' },
@@ -90,10 +93,16 @@ const Dashboard = () => {
   // 👍 ADD THIS: Local state to give animations time to complete
   const [tourReady, setTourReady] = useState(false);
 
+  // Enrollment dialog + refresh tick when enrollments change (for student counts).
+  const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
+  const [, setEnrollTick] = useState(0);
+  useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
+
   useEffect(() => {
     if (!user || isGuest) return;
     updateStreak();
   }, [isGuest, user, updateStreak]);
+
 
   // Brand-new users → in-page dashboard tour overlay (replaces /tour redirect)
   const showTour = !!user && !isGuest && user.isOnboarded === true && user.hasSeenTour === false;
@@ -124,31 +133,91 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     else toast.error('Could not purchase freeze');
   };
 
-  // Guest mode: redirect track tiles to first lesson with ?guest=1 (one taste per track)
+  // Guest mode: only the Frontend Development track is clickable (goes to first lesson).
+  // Every other tile is locked behind a sign-up prompt.
+  const GUEST_ALLOWED = new Set<string>(['/learn']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
-    '/learn':       '/lesson/html-1?guest=1',
-    '/networking':  '/networking/net-1?guest=1',
-    '/fullstack':   '/fullstack/fs-1?guest=1',
-    '/freelance':   '/freelance/free-1?guest=1',
-    '/python':      '/python/py-1?guest=1',
-    '/local':       '/local/local-1?guest=1',
+    '/learn': '/lesson/html-1?guest=1',
   };
 
+  // Map dashboard routes → track IDs (for enrollment gating on logged-in users).
+  const ROUTE_TO_TRACK: Record<string, TrackId> = {
+    '/learn': 'frontend',
+    '/networking': 'networking',
+    '/fullstack': 'fullstack',
+    '/freelance': 'freelance',
+    '/python': 'python',
+    '/local': 'local',
+  };
+
+  const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
+
   const go = (path: string) => () => {
+    const bare = path.split('?')[0];
     if (isGuest) {
-      const guestPath = GUEST_FIRST_LESSON[path];
+      const guestPath = GUEST_FIRST_LESSON[bare];
       if (guestPath) { navigate(guestPath); return; }
-      toast.info('Sign up to unlock this — it takes 10 seconds ✨');
+      toast.info('Sign up to unlock — it takes 10 seconds ✨');
       navigate('/auth');
+      return;
+    }
+    // Enrollment gate for track routes.
+    const track = ROUTE_TO_TRACK[bare];
+    if (track && !isEnrolled(track)) {
+      setEnrollTarget(track);
       return;
     }
     navigate(path);
   };
 
+  // Per-tile helpers for guest lock / active-course glow / student count footer.
+  const tileCls = (path: string) => {
+    const bare = path.split('?')[0];
+    const track = ROUTE_TO_TRACK[bare];
+    const locked = isTrackLockedForGuest(path);
+    const glow = !isGuest && track && isEnrolled(track);
+    const guestHighlight = isGuest && GUEST_ALLOWED.has(bare);
+    return [
+      'w-full glass-card p-5 rounded-2xl text-left transition-all',
+      locked ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border',
+      glow ? 'neon-border ring-1 ring-primary/40' : '',
+      guestHighlight ? 'neon-glow ring-2 ring-primary/60 animate-pulse' : '',
+    ].join(' ');
+  };
+  const TileFooter = ({ path, desc }: { path: string; desc: string }) => {
+    const bare = path.split('?')[0];
+    const track = ROUTE_TO_TRACK[bare];
+    const locked = isTrackLockedForGuest(path);
+    return (
+      <div className="flex items-center justify-between mt-2 gap-2">
+        <p className="text-[10px] text-muted-foreground truncate">{desc}</p>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {track && (
+            <span className="flex items-center gap-1 text-[9px] text-muted-foreground font-mono">
+              <Users className="w-3 h-3" /> {getStudentCount(track).toLocaleString()}
+            </span>
+          )}
+          {locked && (
+            <span className="flex items-center gap-1 text-[9px] text-primary bg-primary/10 border border-primary/30 rounded-full px-1.5 py-0.5 font-mono">
+              <Lock className="w-2.5 h-2.5" /> Sign up
+            </span>
+          )}
+          {!isGuest && track && isEnrolled(track) && (
+            <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-1.5 py-0.5 font-mono">
+              Enrolled
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+
   // Display name/values: real for users, fake for guests
   const displayName = user?.name || 'Explorer';
   const xp = user?.xp || 0;
   const streak = user?.streakCount || 0;
+
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
@@ -233,7 +302,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
             onClick={go('/challenges')}
           data-tour="challenges"
-            className="glass-card p-3 rounded-2xl text-left hover:neon-border transition-all group"
+            className={`glass-card p-3 rounded-2xl text-left transition-all group ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
           >
             <div className="w-9 h-9 rounded-xl bg-accent-orange/15 flex items-center justify-center mb-2">
               <Zap className="w-4 h-4 text-accent-orange" />
@@ -246,7 +315,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             initial={{ x: 0, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.12 }}
             onClick={go('/playground')}
           data-tour="playground"
-            className="glass-card p-3 rounded-2xl text-left hover:neon-border transition-all group"
+            className={`glass-card p-3 rounded-2xl text-left transition-all group ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
           >
             <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center mb-2">
               <Code className="w-4 h-4 text-primary" />
@@ -258,7 +327,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           <motion.button
             initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}
             onClick={go('/exams')}
-            className="glass-card p-3 rounded-2xl text-left hover:neon-border transition-all group"
+            className={`glass-card p-3 rounded-2xl text-left transition-all group ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
           >
             <div className="w-9 h-9 rounded-xl bg-accent-blue/15 flex items-center justify-center mb-2">
               <HelpCircle className="w-4 h-4 text-accent-blue" />
@@ -272,7 +341,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.17 }}
           onClick={go('/games/crawler')}
-          className="w-full glass-card p-4 rounded-2xl text-left hover:neon-border transition-all relative overflow-hidden group"
+          className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden group ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10 pointer-events-none" />
           <div className="relative flex items-center justify-between">
@@ -296,7 +365,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
           onClick={go('/learn')}
           data-tour="frontend"
-          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+          className={tileCls('/learn')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -314,7 +383,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">Beginner → Intermediate → Expert</p>
+          <TileFooter path="/learn" desc="Beginner → Intermediate → Expert" />
         </motion.button>
 
         {/* Computer & Networking — UNLOCKED */}
@@ -322,7 +391,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
           onClick={go('/networking?from=dashboard')}
           data-tour="networking"
-          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+          className={tileCls('/networking')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -340,7 +409,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">Hardware → OS → Networking → Security · 10 lessons</p>
+          <TileFooter path="/networking" desc="Hardware → OS → Networking → Security · 13 lessons" />
         </motion.button>
 
         {/* Full Stack Frontend Development — UNLOCKED */}
@@ -348,7 +417,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
           onClick={go('/fullstack?from=dashboard')}
           data-tour="fullstack"
-          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+          className={tileCls('/fullstack')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -366,7 +435,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">HTML → CSS → JS → React → Deploy · {FULLSTACK_LESSONS.length} lessons</p>
+          <TileFooter path="/fullstack" desc={`HTML → CSS → JS → React → Deploy · ${FULLSTACK_LESSONS.length} lessons`} />
         </motion.button>
 
         {/* Freelance & Clients — UNLOCKED */}
@@ -374,7 +443,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
           onClick={go('/freelance?from=dashboard')}
           data-tour="freelance"
-          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+          className={tileCls('/freelance')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -392,7 +461,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">Niche → Pitch → Price → Deliver · 12 lessons</p>
+          <TileFooter path="/freelance" desc="Niche → Pitch → Price → Deliver · 12 lessons" />
         </motion.button>
 
         {/* Python Programming — NEW */}
@@ -400,7 +469,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
           onClick={go('/python?from=dashboard')}
           data-tour="python"
-          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+          className={tileCls('/python')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -418,7 +487,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">Beginner → Advanced → Capstone · 20 lessons</p>
+          <TileFooter path="/python" desc="Beginner → Advanced → Capstone · 30 lessons" />
         </motion.button>
 
         {/* Local-Only Coding — NEW */}
@@ -426,7 +495,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
           onClick={go('/local?from=dashboard')}
           data-tour="local"
-          className="w-full glass-card p-5 rounded-2xl text-left hover:neon-border transition-all"
+          className={tileCls('/local')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -444,14 +513,14 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">No backend, no server, no cost · 15 lessons</p>
+          <TileFooter path="/local" desc="No backend, no server, no cost · 15 lessons" />
         </motion.button>
 
         {/* Suggestions tile */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
           onClick={go('/suggestions')}
-          className="w-full glass-card p-4 rounded-2xl text-left hover:neon-border transition-all flex items-center gap-3"
+          className={`w-full glass-card p-4 rounded-2xl text-left transition-all flex items-center gap-3 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
         >
           <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 flex items-center justify-center flex-shrink-0">
             <MessageSquare className="w-5 h-5 text-accent-yellow" />
@@ -480,7 +549,14 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
       {showTour && tourReady && (
         <DashboardTour steps={TOUR_STEPS} onFinish={() => { markTourSeen(); }} />
       )}
+
+      <EnrollDialog
+        open={enrollTarget !== null}
+        track={enrollTarget}
+        onClose={() => setEnrollTarget(null)}
+      />
     </div>
+
   );
 };
 
