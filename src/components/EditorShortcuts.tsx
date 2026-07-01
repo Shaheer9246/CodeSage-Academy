@@ -6,7 +6,7 @@ type MonacoEditor = {
   onDidFocusEditorText: (callback: () => void) => { dispose: () => void };
   onDidBlurEditorText: (callback: () => void) => { dispose: () => void };
   getSelection: () => unknown;
-  getModel: () => unknown;
+  getModel: () => { getValueInRange: (range: unknown) => string } | null;
   executeEdits: (source: string, edits: Array<{ range: unknown; text: string; forceMoveMarkers: boolean }>) => void;
   getPosition: () => { lineNumber: number; column: number } | null;
   setPosition: (position: { lineNumber: number; column: number }) => void;

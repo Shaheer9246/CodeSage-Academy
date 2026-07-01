@@ -348,13 +348,7 @@ const QuestionsPage = () => {
             <RotateCcw className="w-4 h-4" /> Another Exam
           </button>
          <button 
-  onClick={async () => {
-    // 1. Mark onboarding complete in the database
-    await supabase.from('profiles').update({ isOnboarded: true }).eq('id', user.id);
-    
-    // 2. Navigate away
-    window.location.href = '/dashboard';
-  }} 
+  onClick={() => { window.location.href = '/dashboard'; }} 
   className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl text-sm font-semibold"
 >
   Done

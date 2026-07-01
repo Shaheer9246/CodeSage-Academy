@@ -74,7 +74,7 @@ const LessonComplete = () => {
     }
   }
 
-  const takeaways: string[] = lesson.keyTakeaways || [
+  const takeaways: string[] = (lesson as { keyTakeaways?: string[] }).keyTakeaways || [
     `You learned ${String(lesson.title).toLowerCase()}`,
     'You completed the practice challenge',
     'You earned XP and Sage Coins',

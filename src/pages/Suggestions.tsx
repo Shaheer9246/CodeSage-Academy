@@ -43,11 +43,11 @@ const Suggestions = () => {
 
   const refresh = useCallback(async () => {
     const { data, error } = await supabase
-      .from<Suggestion>('suggestions')
+      .from('suggestions')
       .select('*')
       .order('created_at', { ascending: false });
     if (error) { console.error(error); return; }
-    setItems(data || []);
+    setItems((data || []) as Suggestion[]);
     if (user) {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const mine = (data || []).some(s =>
@@ -69,7 +69,7 @@ const Suggestions = () => {
   const submit = async () => {
     if (!user || !text.trim()) return;
     if (postedToday) { toast.error('You can only post one suggestion per day.'); return; }
-    const { error } = await supabase.from<Suggestion>('suggestions').insert({
+    const { error } = await supabase.from('suggestions').insert({
       user_id: user.id, username: user.username || 'anonymous',
       text: text.trim().slice(0, 500),
     });
@@ -81,7 +81,7 @@ const Suggestions = () => {
   const cancelEdit = () => { setEditingId(null); setEditText(''); };
   const saveEdit = async (id: string) => {
     if (!editText.trim()) return;
-    const { error } = await supabase.from<Suggestion>('suggestions')
+    const { error } = await supabase.from('suggestions')
       .update({ text: editText.trim().slice(0, 500) }).eq('id', id);
     if (error) { toast.error(error.message); return; }
     cancelEdit(); toast.success('Updated');
@@ -122,7 +122,7 @@ const Suggestions = () => {
   };
 
   const deleteOwn = async (id: string) => {
-    const { error } = await supabase.from<Suggestion>('suggestions').delete().eq('id', id);
+    const { error } = await supabase.from('suggestions').delete().eq('id', id);
     if (error) { toast.error(error.message); return; }
     toast.success('Deleted');
     setItems(prev => prev.filter(s => s.id !== id));
