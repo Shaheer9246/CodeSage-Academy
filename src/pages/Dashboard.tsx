@@ -135,9 +135,14 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
 
   // Guest mode: only the Frontend Development track is clickable (goes to first lesson).
   // Every other tile is locked behind a sign-up prompt.
-  const GUEST_ALLOWED = new Set<string>(['/learn']);
+  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
+    '/networking': '/n-lesson/net-1?guest=1',
+    '/fullstack': '/fs-lesson/fs-1?guest=1',
+    '/freelance': '/f-lesson/free-1?guest=1',
+    '/python': '/py-lesson/py-01?guest=1',
+    '/local': '/local-lesson/local-1?guest=1',
   };
 
   // Map dashboard routes → track IDs (for enrollment gating on logged-in users).
