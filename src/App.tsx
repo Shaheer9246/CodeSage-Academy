@@ -35,6 +35,10 @@ import CommunityPage from "./pages/CommunityPage";
 import Suggestions from "./pages/Suggestions";
 import CodeCrawler from "./pages/CodeCrawler";
 import NotFound from "./pages/NotFound";
+import InboxPage from "./pages/Inbox";
+import PythonExpertLearn from "./pages/PythonExpertLearn";
+import PythonExpertLessonPage from "./pages/PythonExpertLessonPage";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2, Terminal } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -102,6 +106,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ErrorBoundary>
           <AppShell>
             <Routes>
               <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
@@ -131,6 +136,9 @@ const App = () => (
               <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
               <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/games/crawler" element={<ProtectedRoute><CodeCrawler /></ProtectedRoute>} />
+              <Route path="/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+              <Route path="/pythonexpert" element={<ProtectedRoute><PythonExpertLearn /></ProtectedRoute>} />
+              <Route path="/pyx-lesson/:id" element={<ProtectedRoute><PythonExpertLessonPage /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
               <Route path="/trip" element={<Trip />} />
               <Route path="*" element={<NotFound />} />

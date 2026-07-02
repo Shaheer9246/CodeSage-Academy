@@ -1,80 +1,92 @@
+# CodeSage Update Plan (8 items)
 
-## 1. Python Interactive Workspace (Skulpt)
+## 1. Python lesson completion + smart back-nav
 
-**Scope:** Only affects the Python track (`PythonLessonPage.tsx`). HTML/CSS/JS tracks and the general Playground stay untouched.
+- After submitting a Python lesson, skip the "Learn Path" detour: navigate straight to `/complete/:id` (already exists) with buttons for Review / Next Lesson / Back to Dashboard — same as Frontend/Networking.
+- Fix back-nav from Python **learning path** → currently returns to Roadmap after a lesson; make it always return to Dashboard.
+- Rule: entering a lesson via Dashboard tile → back button = Dashboard. Entering via Roadmap → back = Roadmap. This is controlled by the `?from=` query param that is already partially wired; audit `PythonLessonPage.tsx`, `PythonLearn.tsx`, and the `LessonComplete` "Next Lesson" handler for the Python track.
 
-### 1a. New component: `src/components/PythonWorkspace.tsx`
+## 1.1 Python lesson page mobile fixes
 
-A self-contained 3-pane workbench used inside the "Practical" tab of the Python lesson page.
+- Terminal/preview panel currently overflows on mobile (384px viewport). Constrain `PythonWorkspace` panes with `min-w-0`, responsive heights, and horizontal scroll only inside the terminal.
+- Remove the yellow/amber warning strip on the Python learning path page (leftover "practical lab" banner).
 
-Layout (mobile-first, stacks vertically on small screens, splits on `md`):
+## 2. Local-Only smart back-nav
 
-```text
-┌─────────────────────────────────────────┐
-│  Tabs:  [ Assignment ] [ Terminal ]     │  <- mobile
-├─────────────────────────────────────────┤
-│  Monaco Python editor                   │
-│  [ ▶ Run Code ] [ Reset ] [ Clear ]     │
-├─────────────────────────────────────────┤
-│  Active tab pane                        │
-│   - Assignment: intro, steps, goal      │
-│   - Terminal:   dark stdout console     │
-└─────────────────────────────────────────┘
-```
+- Same fix as #1 for `LocalLessonPage.tsx` + `LocalLearn.tsx`. After finishing a lesson, back should go to Dashboard, not Roadmap.
 
-On desktop (`md+`): editor left, tabbed panel (Assignment / Terminal) right.
+## 3. Crash hardening
 
-Props: `starterCode`, `practical` (intro/steps/goal), `onSolved?`.
+- Investigate the Python page crash — likely Skulpt re-init on route change or Monaco unmount race. Wrap `PythonWorkspace` in an ErrorBoundary, guard Skulpt `configure()` from double-calls, and dispose Monaco editors on unmount.
+- Add a global ErrorBoundary in `App.tsx` so a single component crash shows a recoverable screen instead of a white page.
 
-### 1b. Skulpt integration
+## 4. Enrollment persistence (backend)
 
-- Load Skulpt from CDN once on mount via a small `useSkulpt()` hook that injects two `<script>` tags:
-  - `https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js`
-  - `https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js`
-- Track load state so Run is disabled until ready.
-- `runPython(src)`:
-  - `Sk.configure({ output: writeToTerminal, read: builtinRead, inputfun: promptInput, inputfunTakesPrompt: true })`
-  - `Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, src, true))`
-  - On error, print `err.toString()` and the line number in red.
-- `stdout` handler appends chunks to a `lines` state array rendered in the terminal (monospace, `bg-zinc-950 text-emerald-300`).
-- `input()` support:
-  - `inputfun` returns a Promise. Terminal renders an inline `<input>` at the bottom while awaiting; pressing Enter resolves with the value and echoes it to the log.
-- Clear Console empties `lines`; Reset restores `starterCode` in the editor.
+- Currently mock counts + enrollments live in `localStorage` → reset on logout / new device.
+- Migration: create two tables:
+  - `track_stats(track text pk, enrolled_count int)` seeded with the current mock values (200, 140, 90, 75, 180, 60).
+  - `enrollments(user_id uuid, track text, status text, student_id text, enrolled_at timestamptz)` with RLS scoped to `auth.uid()`.
+- RPC `enroll_track(_track)` — inserts enrollment if new, atomically increments `track_stats.enrolled_count`, returns row. Idempotent (re-enrolling same track does not re-increment).
+- Rewrite `src/lib/enrollment.ts` to call Supabase, keep the same public API so existing UI keeps working.
+- Result: counts only grow, never reset; enrollment survives logout (4.2).
 
-### 1c. Editor
+## 5. Student ID
 
-- Reuse existing `CodeEditor` (Monaco) with `language="python"`. If it doesn't accept a language prop, extend it minimally (frontend-only change).
+- Generated server-side on first profile load. Add `student_id text unique` column on `profiles`, format `ID-CSA-0001` (zero-padded sequence via a Postgres sequence).
+- Backfill existing profiles. Show on Profile / Settings page as a copyable badge.
 
-### 1d. Wire into `PythonLessonPage`
+## 6. Suggestion unread notifications
 
-- Import `PythonWorkspace` and render it inside the `section === 'practical'` block, above the existing "Take the Mastery Test" button.
-- Pull `starterCode` from the lesson data if present; otherwise fall back to a friendly `# Write your code here\nprint("Hello, Python!")`. Add an optional `starterCode?: string` field to the Python lesson type (data-shape change only, existing lessons default to placeholder).
+- Add `suggestion_reads(user_id uuid, last_seen_at timestamptz)` table.
+- Compute unread = suggestions with `created_at > last_seen_at` (and, for a user's own suggestion, `reply_at > last_seen_at`).
+- Show red dot + count on the Suggestions nav button. Mark read when the page mounts.
+- Admin still replies via existing RPC — unchanged.
 
-### 1e. Non-goals
+## 7. Inbox / Announcements (with admin composer)
 
-- No change to Playground.tsx or LivePreview (HTML iframe preview stays intact).
-- No backend calls — Skulpt runs 100% in-browser.
+- New `announcements` table: `id, title, body, created_by, created_at`. Public read for authenticated users.
+- New `announcement_reads(user_id, announcement_id, read_at)` for per-user unread count.
+- New RPC `post_announcement(_title, _body, _password)` — validates admin password from `app_secrets` (same pattern as suggestion admin RPCs).
+- UI:
+  - New Inbox pill button in the top header (Dashboard) next to XP/Streak/Theme, with unread-count badge.
+  - `/inbox` page listing announcements newest-first, empty state when none.
+  - Shield icon (top-right of inbox) opens password-gated composer modal for admin posts.
 
-## 2. Roadmap mobile fix
+## 8. Python Expert track scaffold
 
-Problem on ~360–540px widths: the zigzag layout uses `w-[78%]` per node with `justify-start`/`justify-end`, so long labels wrap awkwardly and the connector line looks off-center.
+- Add `Full Stack Python Expert_LESSONS` a brand new track module set to include `Advance To Expert` 
+- Add exactly **one** template Expert lesson (e.g. `py-1` "Metaclasses & Descriptors") using the exact same lesson object shape (`philosophy`, `concepts[]`, `practical`, `quiz[]`, `module: 'Expert'`).
+- Create new tracks files pythonexpert and create structure for lesson 1 and user will add the rest of lesson. 
+- Add Python expert Learn page module grouping + Dashboard progress denominator dynamically (already reads array length).
+- Bro not like this (I want you to read this) make a separate track with the name of python expert on the dashboard there make the structure and add ly py- 1 and I will add the rest of 39 lesson. So we will have 2 courses of python 1 is beginner to advance and the 2nd is full stack python expert
 
-Change in `src/pages/Roadmap.tsx`:
-
-- On mobile (`< sm`): switch to single-column, full-width nodes (drop the `isLeft` alternating flex and the empty `flex-1` spacers, use `w-full`). Keep the zigzag only from `sm:` and up.
-- Move the vertical dashed connector to a centered absolute rail on mobile so it lines up under each node's icon.
-- Reduce sticky header/track-selector horizontal padding on `< sm` to reclaim space; make the track pills `text-[11px] px-3 py-1.5`.
-- Ensure the current-node ring (`ring-2`) doesn't clip by adding `mx-1`.
-
-No changes to lesson data, routing, or the track selector logic.
+---
 
 ## Technical notes
 
-- Skulpt types: add a minimal `declare global { interface Window { Sk: any } }` in the workspace file; no npm dep needed.
-- CSP: CDN scripts from jsdelivr are already used elsewhere for JSZip — safe.
-- Files touched:
-  - **new** `src/components/PythonWorkspace.tsx`
-  - **edit** `src/pages/PythonLessonPage.tsx` (render workspace in practical tab)
-  - **edit** `src/components/CodeEditor.tsx` (accept optional `language` prop, default `html`)
-  - **edit** `src/data/pythonLessons.ts` (optional `starterCode` field on type)
-  - **edit** `src/pages/Roadmap.tsx` (mobile layout tweaks only)
+**New migrations (single call):**
+
+- `track_stats`, `enrollments`, `suggestion_reads`, `announcements`, `announcement_reads`, `profiles.student_id` column + sequence.
+- GRANTs + RLS for each, per project convention (auth-only, no anon).
+- RPCs: `enroll_track`, `mark_suggestions_read`, `mark_announcement_read`, `post_announcement`, `assign_student_id` (trigger on profile insert).
+
+**Files touched (frontend):**
+
+- `src/lib/enrollment.ts` — swap to Supabase.
+- `src/pages/PythonLessonPage.tsx`, `PythonLearn.tsx`, `LocalLessonPage.tsx`, `LocalLearn.tsx` — routing + mobile CSS.
+- `src/components/PythonWorkspace.tsx` — cleanup, ErrorBoundary wrapper, responsive layout.
+- `src/App.tsx` — global ErrorBoundary + `/inbox` route.
+- `src/pages/Dashboard.tsx` — Inbox button + unread badges (suggestions + inbox).
+- `src/pages/Suggestions.tsx` — mark-read on mount.
+- `src/pages/SettingsPage.tsx` — show Student ID.
+- New `src/pages/Inbox.tsx` with admin composer modal.
+- New `src/data/pythonexpertLessons.ts` — Expert module + 1 template lesson.
+- New  src/pages/PythonexpertLessonPage.tsx, PythonExpertLearn.tsx, for the structure of new track
+
+**Order of execution once approved:**
+
+1. Migration (all schema at once, approved by user).
+2. Frontend rewrites for enrollment + routing + mobile fixes + ErrorBoundary.
+3. Inbox + notifications UI.
+4. Python Expert scaffold + documentation comment.
+5. Verify with build.

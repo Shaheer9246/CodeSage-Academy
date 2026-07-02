@@ -239,22 +239,33 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 useEffect(() => {
     let mounted = true;
 
+    // Lazy import to avoid a circular dep at module top-level.
+    import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
+      const uid = readCachedProfile()?.id ?? null;
+      void hydrateEnrollments(uid);
+    }).catch(() => { /* noop */ });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
-      
+
       if (session?.user) {
         await fetchProfile(session.user);
+        import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
+          void hydrateEnrollments(session.user.id);
+        });
       } else {
         localStorage.removeItem('codesage_cached_profile');
         setUser(null);
         setLoading(false);
+        import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
+          void hydrateEnrollments(null);
+        });
       }
     });
-    
-    return () => { 
-      mounted = false; 
-      subscription.unsubscribe(); 
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
     };
   }, [fetchProfile]);
 
