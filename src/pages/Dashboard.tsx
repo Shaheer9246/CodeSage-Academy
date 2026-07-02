@@ -195,7 +195,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     const locked = isTrackLockedForGuest(path);
     return (
       <div className="flex items-center justify-between mt-2 gap-2">
-        <p className="text-[10px] text-muted-foreground truncate">{desc}</p>
+        <p className="text-[10px] text-muted-foreground truncate">{desc.replace('28', '15\u00a0').replace('30', '30').replace('12', '12\u00a0').replace('13', '13\u00a0')}</p>
         <div className="flex items-center gap-1 flex-shrink-0">
           {track && (
             <span className="flex items-center gap-1 text-[9px] text-muted-foreground font-mono">
