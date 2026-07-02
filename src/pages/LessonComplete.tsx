@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, Navigate } from 'react-router-dom';
+import { useNavigate, useParams, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getLessonById, getAllLessons, type Lesson } from '@/data/lessons';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
@@ -26,22 +26,22 @@ const TRACK_HOME: Record<string, string> = {
   'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
 };
 
-// Preserve the ?from=dashboard hint so the Lesson-Path back-button returns
-// users to the dashboard (not the roadmap) when they came from the dashboard.
-const withFromDashboard = (path: string) =>
-  path.includes('?') ? path : `${path}?from=dashboard`;
-
 const LessonComplete = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useUser();
+  const [searchParams] = useSearchParams();
   const [showConfetti, setShowConfetti] = useState(true);
 
-  // Find lesson + track
+  // Preserve the query parameter across all navigation jumps
+  const from = searchParams.get('from');
+  const fromQs = from ? `?from=${from}` : '';
+
+  // Find lesson + track (with bulletproof fallback for missing hyphens like 'py1')
   let lesson: Lesson | { id: string; title: string; keyTakeaways?: string[] } | undefined = id ? getLessonById(id) : undefined;
   let track: Track | undefined;
   if (!lesson && id) {
-    track = TRACKS.find(t => id.startsWith(t.prefix));
+    track = TRACKS.find(t => id.startsWith(t.prefix) || id.startsWith(t.prefix.replace('-', '')));
     if (track) {
       const found = track.list.find(l => l.id === id);
       if (found) lesson = { id: found.id, title: found.title };
@@ -58,13 +58,12 @@ const LessonComplete = () => {
 
   // Determine path/nextLesson
   let lessonPath = '/learn';
-  let reviewPath = `/lesson/${lesson.id}`;
+  let reviewPath = `${track ? track.path : '/lesson'}/${lesson.id}`;
   let nextPath: string | null = null;
   let nextTitle: string | null = null;
 
   if (track) {
     lessonPath = TRACK_HOME[track.prefix];
-    reviewPath = `${track.path}/${lesson.id}`;
     const idx = track.list.findIndex(l => l.id === lesson.id);
     if (idx >= 0 && idx < track.list.length - 1) {
       const nxt = track.list[idx + 1];
@@ -159,20 +158,20 @@ const LessonComplete = () => {
 
         <div className="grid grid-cols-3 gap-2">
           <button
-            onClick={() => navigate(withFromDashboard(lessonPath))}
+            onClick={() => navigate(`${lessonPath}${fromQs}`)}
             className="glass-card border border-border/50 text-foreground text-[11px] py-2.5 rounded-xl hover:border-primary/40 hover:neon-glow transition-all flex flex-col items-center justify-center gap-1"
           >
             <BookOpen className="w-3.5 h-3.5 text-primary" /> Lesson Path
           </button>
           <button
-            onClick={() => navigate(reviewPath)}
+            onClick={() => navigate(`${reviewPath}${fromQs}`)}
             className="glass-card border border-border/50 text-foreground text-[11px] py-2.5 rounded-xl hover:border-primary/40 hover:neon-glow transition-all flex flex-col items-center justify-center gap-1"
           >
             <RotateCcw className="w-3.5 h-3.5 text-primary" /> Review
           </button>
           {nextPath ? (
             <button
-              onClick={() => navigate(nextPath)}
+              onClick={() => navigate(`${nextPath}${fromQs}`)}
               title={nextTitle || 'Next'}
               className="bg-primary text-primary-foreground text-[11px] font-semibold py-2.5 rounded-xl neon-glow hover:opacity-90 flex flex-col items-center justify-center gap-1"
             >
@@ -180,7 +179,7 @@ const LessonComplete = () => {
             </button>
           ) : (
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(`/dashboard${fromQs}`)}
               className="bg-primary text-primary-foreground text-[11px] font-semibold py-2.5 rounded-xl neon-glow"
             >
               Dashboard
