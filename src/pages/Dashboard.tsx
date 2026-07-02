@@ -195,7 +195,13 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     const locked = isTrackLockedForGuest(path);
     return (
       <div className="flex items-center justify-between mt-2 gap-2">
-        <p className="text-[10px] text-muted-foreground truncate">{desc.replace('12 lessons', '15\u00a0lessons').replace('10 lessons', '30 lessons').replace('8 lessons', '12\u00a0lessons').replace('10 lessons', '13\u00a0lessons')}</p>
+        <p className="text-[10px] text-muted-foreground truncate">{
+          path === '/learn' ? desc.replace('12', '15\u00a0') :
+          path === '/python' ? desc.replace('10', '30') :
+          path === '/freelance' ? desc.replace('8', '12\u00a0') :
+          path === '/networking' ? desc.replace('10', '13\u00a0') :
+          desc
+        }</p>
         <div className="flex items-center gap-1 flex-shrink-0">
           {track && (
             <span className="flex items-center gap-1 text-[9px] text-muted-foreground font-mono">
