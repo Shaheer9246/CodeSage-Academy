@@ -527,6 +527,32 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           <TileFooter path="/local" desc="No backend, no server, no cost · 15 lessons" />
         </motion.button>
 
+        {/* Full Stack Python Expert — NEW */}
+        <motion.button
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+          onClick={go('/pythonexpert?from=dashboard')}
+          data-tour="pythonexpert"
+          className={tileCls('/pythonexpert')}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/15 flex items-center justify-center text-2xl border border-purple-500/30">
+                🧙‍♂️
+              </div>
+              <div>
+                <p className="text-base font-bold font-display text-foreground">Full Stack Python Expert</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {['Metaclasses','Decorators','FastAPI','Architecture'].map(t => (
+                    <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </div>
+          <TileFooter path="/pythonexpert" desc="Advanced Python → Architecture → Expert · 40 lessons" />
+        </motion.button>
+
         {/* Suggestions tile */}
         <motion.button
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
