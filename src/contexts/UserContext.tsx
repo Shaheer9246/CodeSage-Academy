@@ -343,7 +343,7 @@ useEffect(() => {
     setUser(dbRowToProfile(singleRow, user.email));
   };
 
-  const completeLesson = async (lessonId: string) => {
+ const completeLesson = async (lessonId: string) => {
   if (!user) return;
 
   // 1. Optimistic update (safe + immutable)
@@ -353,18 +353,10 @@ useEffect(() => {
     const alreadyCompleted = prev.completedLessons.includes(lessonId);
     if (alreadyCompleted) return prev;
 
-    const updatedUser = {
+    return {
       ...prev,
       completedLessons: [...prev.completedLessons, lessonId],
     };
-
-    // update cache immediately
-    localStorage.setItem(
-      'codesage_cached_profile',
-      JSON.stringify(updatedUser)
-    );
-
-    return updatedUser;
   });
 
   // 2. Sync with database in background
@@ -377,34 +369,29 @@ useEffect(() => {
     return;
   }
 
-  // 3. Merge server response safely (DO NOT overwrite progress)
+  // 3. Merge server response safely using the dbRowToProfile mapper
   if (data) {
-    setUser(prev => {
-      if (!prev) return prev;
+    const singleRow = Array.isArray(data) ? data[0] : data;
+    if (singleRow) {
+      // Map raw snake_case DB fields safely to camelCase UserProfile properties
+      const serverProfile = dbRowToProfile(singleRow, user.email);
 
-      return {
-        ...prev,
-        ...data,
-        completedLessons: Array.from(
-          new Set([
-            ...(prev.completedLessons || []),
-            ...(data.completedLessons || []),
-          ])
-        ),
-      };
-    });
+      setUser(prev => {
+        if (!prev) return prev;
 
-    // keep cache in sync
-    setTimeout(() => {
-      setUser(current => {
-        if (!current) return current;
-        localStorage.setItem(
-          'codesage_cached_profile',
-          JSON.stringify(current)
-        );
-        return current;
+        return {
+          ...prev,
+          ...serverProfile,
+          // Merge both arrays cleanly with a Set to guarantee zero duplicates or lost progress
+          completedLessons: Array.from(
+            new Set([
+              ...(prev.completedLessons || []),
+              ...(serverProfile.completedLessons || []),
+            ])
+          ),
+        };
       });
-    }, 0);
+    }
   }
 };
 
