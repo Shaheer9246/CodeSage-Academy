@@ -66,6 +66,15 @@ const Suggestions = () => {
     return () => { supabase.removeChannel(ch); };
   }, [refresh]);
 
+  // Mark suggestions as read when the user opens the page
+  useEffect(() => {
+    if (user) {
+      supabase.rpc('mark_suggestions_read').catch(err => 
+        console.error('Failed to mark suggestions as read:', err)
+      );
+    }
+  }, [user]);
+
   const submit = async () => {
     if (!user || !text.trim()) return;
     if (postedToday) { toast.error('You can only post one suggestion per day.'); return; }
