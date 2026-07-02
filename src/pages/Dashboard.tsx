@@ -414,7 +414,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/networking" desc="Hardware → OS → Networking → Security · 13 lessons" />
+          <TileFooter path="/networking" desc="Hardware → OS → Networking → Security · 10 lessons" />
         </motion.button>
 
         {/* Full Stack Frontend Development — UNLOCKED */}
