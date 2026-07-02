@@ -440,7 +440,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/fullstack" desc={`HTML → CSS → JS → React → Deploy · ${FULLSTACK_LESSONS.length} lessons`} />
+          <TileFooter path="/fullstack" desc={`HTML → CSS → JS → React → Deploy · 30 lessons`} />
         </motion.button>
 
         {/* Freelance & Clients — UNLOCKED */}
