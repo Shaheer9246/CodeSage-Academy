@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcement_reads: {
+        Row: {
+          announcement_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_reads_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       app_secrets: {
         Row: {
           key: string
@@ -29,6 +76,30 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string
+        }
+        Relationships: []
+      }
+      enrollments: {
+        Row: {
+          enrolled_at: string
+          id: string
+          status: string
+          track: string
+          user_id: string
+        }
+        Insert: {
+          enrolled_at?: string
+          id?: string
+          status?: string
+          track: string
+          user_id: string
+        }
+        Update: {
+          enrolled_at?: string
+          id?: string
+          status?: string
+          track?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -64,6 +135,7 @@ export type Database = {
           sage_coins: number | null
           streak_count: number | null
           streak_freeze_until: string | null
+          student_id: string | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
@@ -89,6 +161,7 @@ export type Database = {
           sage_coins?: number | null
           streak_count?: number | null
           streak_freeze_until?: string | null
+          student_id?: string | null
           studying?: string | null
           unlocked_sections?: string[] | null
           updated_at?: string
@@ -114,6 +187,7 @@ export type Database = {
           sage_coins?: number | null
           streak_count?: number | null
           streak_freeze_until?: string | null
+          student_id?: string | null
           studying?: string | null
           unlocked_sections?: string[] | null
           updated_at?: string
@@ -137,6 +211,21 @@ export type Database = {
           code?: string
           created_at?: string
           sections?: string[]
+        }
+        Relationships: []
+      }
+      suggestion_reads: {
+        Row: {
+          last_seen_at: string
+          user_id: string
+        }
+        Insert: {
+          last_seen_at?: string
+          user_id: string
+        }
+        Update: {
+          last_seen_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -182,6 +271,24 @@ export type Database = {
         }
         Update: {
           id?: string
+        }
+        Relationships: []
+      }
+      track_stats: {
+        Row: {
+          enrolled_count: number
+          track: string
+          updated_at: string
+        }
+        Insert: {
+          enrolled_count?: number
+          track: string
+          updated_at?: string
+        }
+        Update: {
+          enrolled_count?: number
+          track?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -234,6 +341,7 @@ export type Database = {
           sage_coins: number | null
           streak_count: number | null
           streak_freeze_until: string | null
+          student_id: string | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
@@ -268,6 +376,7 @@ export type Database = {
           sage_coins: number | null
           streak_count: number | null
           streak_freeze_until: string | null
+          student_id: string | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
@@ -302,6 +411,7 @@ export type Database = {
           sage_coins: number | null
           streak_count: number | null
           streak_freeze_until: string | null
+          student_id: string | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
@@ -311,6 +421,39 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      enroll_track: {
+        Args: { _track: string }
+        Returns: {
+          enrolled_at: string
+          id: string
+          status: string
+          track: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "enrollments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      mark_announcement_read: { Args: { _id: string }; Returns: undefined }
+      mark_suggestions_read: { Args: never; Returns: undefined }
+      post_announcement: {
+        Args: { _body: string; _password: string; _title: string }
+        Returns: {
+          body: string
+          created_at: string
+          id: string
+          title: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "announcements"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -336,6 +479,7 @@ export type Database = {
           sage_coins: number | null
           streak_count: number | null
           streak_freeze_until: string | null
+          student_id: string | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
@@ -368,6 +512,22 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      update_enrollment_status: {
+        Args: { _status: string; _track: string }
+        Returns: {
+          enrolled_at: string
+          id: string
+          status: string
+          track: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "enrollments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_streak: {
         Args: never
         Returns: {
@@ -389,6 +549,7 @@ export type Database = {
           sage_coins: number | null
           streak_count: number | null
           streak_freeze_until: string | null
+          student_id: string | null
           studying: string | null
           unlocked_sections: string[] | null
           updated_at: string
