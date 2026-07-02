@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2, Palette, Users, Lock } from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus, Map, HelpCircle, Gamepad2, Palette, Users, Lock, Info, CheckCircle2 } from 'lucide-react';
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -135,9 +135,14 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
 
   // Guest mode: only the Frontend Development track is clickable (goes to first lesson).
   // Every other tile is locked behind a sign-up prompt.
-  const GUEST_ALLOWED = new Set<string>(['/learn']);
+  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
+    '/networking': '/n-lesson/net-1?guest=1',
+    '/fullstack': '/fs-lesson/fs-1?guest=1',
+    '/freelance': '/f-lesson/free-1?guest=1',
+    '/python': '/py-lesson/py-01?guest=1',
+    '/local': '/local-lesson/local-1?guest=1',
   };
 
   // Map dashboard routes → track IDs (for enrollment gating on logged-in users).
@@ -190,7 +195,13 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     const locked = isTrackLockedForGuest(path);
     return (
       <div className="flex items-center justify-between mt-2 gap-2">
-        <p className="text-[10px] text-muted-foreground truncate">{desc}</p>
+        <p className="text-[10px] text-muted-foreground truncate">{
+          path === '/learn' ? desc.replace('12', '15\u00a0') :
+          path === '/python' ? desc.replace('10', '30') :
+          path === '/freelance' ? desc.replace('8', '12\u00a0') :
+          path === '/networking' ? desc.replace('10', '13\u00a0') :
+          desc
+        }</p>
         <div className="flex items-center gap-1 flex-shrink-0">
           {track && (
             <span className="flex items-center gap-1 text-[9px] text-muted-foreground font-mono">
@@ -383,7 +394,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/learn" desc="Beginner → Intermediate → Expert" />
+          <TileFooter path="/learn" desc="HTML → CSS → JS → React → Deploy · 12 lessons" />
         </motion.button>
 
         {/* Computer & Networking — UNLOCKED */}
@@ -409,7 +420,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/networking" desc="Hardware → OS → Networking → Security · 13 lessons" />
+          <TileFooter path="/networking" desc="Hardware → OS → Networking → Security · 10 lessons" />
         </motion.button>
 
         {/* Full Stack Frontend Development — UNLOCKED */}
@@ -435,7 +446,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/fullstack" desc={`HTML → CSS → JS → React → Deploy · ${FULLSTACK_LESSONS.length} lessons`} />
+          <TileFooter path="/fullstack" desc={`HTML → CSS → JS → React → Deploy · 30 lessons`} />
         </motion.button>
 
         {/* Freelance & Clients — UNLOCKED */}
@@ -461,7 +472,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/freelance" desc="Niche → Pitch → Price → Deliver · 12 lessons" />
+          <TileFooter path="/freelance" desc="Niche → Pitch → Price → Deliver · 8 lessons" />
         </motion.button>
 
         {/* Python Programming — NEW */}
@@ -487,7 +498,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/python" desc="Beginner → Advanced → Capstone · 30 lessons" />
+          <TileFooter path="/python" desc="Beginner → Advanced → Capstone · 10 lessons" />
         </motion.button>
 
         {/* Local-Only Coding — NEW */}
