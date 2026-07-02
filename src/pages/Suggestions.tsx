@@ -66,12 +66,17 @@ const Suggestions = () => {
     return () => { supabase.removeChannel(ch); };
   }, [refresh]);
 
-  // Mark suggestions as read when the user opens the page
+ // Mark suggestions as read when the user opens the page
   useEffect(() => {
     if (user) {
-      supabase.rpc('mark_suggestions_read').catch(err => 
-        console.error('Failed to mark suggestions as read:', err)
-      );
+      const markAsRead = async () => {
+        const { error } = await supabase.rpc('mark_suggestions_read');
+        if (error) {
+          console.error('Failed to mark suggestions as read:', error);
+        }
+      };
+      
+      markAsRead();
     }
   }, [user]);
 
