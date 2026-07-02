@@ -466,7 +466,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/freelance" desc="Niche → Pitch → Price → Deliver · 12 lessons" />
+          <TileFooter path="/freelance" desc="Niche → Pitch → Price → Deliver · 8 lessons" />
         </motion.button>
 
         {/* Python Programming — NEW */}
