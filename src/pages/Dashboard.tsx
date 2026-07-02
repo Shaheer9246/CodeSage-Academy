@@ -492,7 +492,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/python" desc="Beginner → Advanced → Capstone · 30 lessons" />
+          <TileFooter path="/python" desc="Beginner → Advanced → Capstone · 10 lessons" />
         </motion.button>
 
         {/* Local-Only Coding — NEW */}
