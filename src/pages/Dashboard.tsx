@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import DashboardTour, { TourStep } from '@/components/DashboardTour';
 import EnrollDialog from '@/components/EnrollDialog';
 import { TrackId, TRACK_META, isEnrolled, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
+import InboxBadge from '@/components/InboxBadge';
+import SuggestionsBadge from '@/components/SuggestionsBadge';
 
 
 const TOUR_STEPS: TourStep[] = [
@@ -261,7 +263,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </h1>
             <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">{isGuest ? 'Tap any tile for a preview' : 'Continue your coding journey'}</p>
           </div>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2 flex-shrink-0">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 flex-shrink-0 items-center">
             <button onClick={() => isGuest ? navigate('/auth') : setShowShop(true)}
               className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full hover:neon-glow transition-all">
               <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
@@ -272,10 +274,18 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
               <span className="text-[11px] sm:text-xs font-bold text-orange-400">{streak}d</span>
             </div>
             {!isGuest && (
-              <button onClick={cycleTheme} title={`Theme: ${THEMES.find(t => t.id === theme)?.label}`}
-                className="flex items-center gap-1 bg-secondary/40 border border-border/40 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full hover:neon-glow transition-all">
-                <Palette className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
-              </button>
+              <>
+                <div onClick={() => navigate('/inbox')} className="cursor-pointer flex items-center justify-center transition-transform active:scale-95">
+                  <InboxBadge />
+                </div>
+                <div onClick={() => navigate('/suggestions')} className="cursor-pointer flex items-center justify-center transition-transform active:scale-95">
+                  <SuggestionsBadge />
+                </div>
+                <button onClick={cycleTheme} title={`Theme: ${THEMES.find(t => t.id === theme)?.label}`}
+                  className="flex items-center gap-1 bg-secondary/40 border border-border/40 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full hover:neon-glow transition-all">
+                  <Palette className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
+                </button>
+              </>
             )}
           </div>
         </motion.div>
