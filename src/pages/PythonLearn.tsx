@@ -7,6 +7,7 @@ import { useScrollTop } from '@/hooks/useScrollTop';
 
 const PythonLearn = () => {
   useScrollTop();
+
   const { user } = useUser();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -28,17 +29,6 @@ const PythonLearn = () => {
   const total = lessonList.length;
   const progress = Math.round((completed / total) * 100);
 
-  const handleBack = () => {
-    // Prefer browser history so the user returns to the actual previous page.
-    if (window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-
-    // Fallback if there is no browser history.
-    navigate(fromDashboard ? '/dashboard' : '/roadmap');
-  };
-
   return (
     <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
       <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-yellow-400/5 blur-[120px] pointer-events-none" />
@@ -46,7 +36,7 @@ const PythonLearn = () => {
       <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(fromDashboard ? '/dashboard' : '/roadmap')}
             className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-5 h-5" />
