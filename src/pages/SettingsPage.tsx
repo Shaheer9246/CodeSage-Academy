@@ -180,6 +180,7 @@ const SettingsPage = () => {
             </div>
           </div>
           <div className="space-y-2">
+            <InfoRow label="Student ID" value={user.id} />
             <InfoRow label="Email" value={user.email} />
             <InfoRow label="Studying" value={user.studying} />
             <InfoRow label="Goal" value={user.goal} />
