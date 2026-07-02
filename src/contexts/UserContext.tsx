@@ -344,30 +344,69 @@ useEffect(() => {
   };
 
   const completeLesson = async (lessonId: string) => {
-    if (!user) return;
+  if (!user) return;
 
-    // 1. OPTIMISTIC UPDATE: Update UI instantly so progress bar hits 100%
-    if (!user.completedLessons.includes(lessonId)) {
-      const newCompleted = [...user.completedLessons, lessonId];
-      const updatedUser = { ...user, completedLessons: newCompleted };
-      setUser(updatedUser);
-      
-      // Instantly update cache so a quick refresh doesn't lose it
-      localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
-    }
+  // 1. Optimistic update (safe + immutable)
+  setUser(prev => {
+    if (!prev) return prev;
 
-    // 2. Sync with Database in background
-    const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
-    if (error) { 
-      console.error('award_lesson failed', error.message); 
-      return; 
-    }
-    
-    // 3. If DB returns fresh data, apply it (for XP/Coins updates)
-    if (data) {
-      applyServerProfile(data);
-    }
-  };
+    const alreadyCompleted = prev.completedLessons.includes(lessonId);
+    if (alreadyCompleted) return prev;
+
+    const updatedUser = {
+      ...prev,
+      completedLessons: [...prev.completedLessons, lessonId],
+    };
+
+    // update cache immediately
+    localStorage.setItem(
+      'codesage_cached_profile',
+      JSON.stringify(updatedUser)
+    );
+
+    return updatedUser;
+  });
+
+  // 2. Sync with database in background
+  const { data, error } = await supabase.rpc('award_lesson', {
+    _lesson_id: lessonId,
+  });
+
+  if (error) {
+    console.error('award_lesson failed', error.message);
+    return;
+  }
+
+  // 3. Merge server response safely (DO NOT overwrite progress)
+  if (data) {
+    setUser(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        ...data,
+        completedLessons: Array.from(
+          new Set([
+            ...(prev.completedLessons || []),
+            ...(data.completedLessons || []),
+          ])
+        ),
+      };
+    });
+
+    // keep cache in sync
+    setTimeout(() => {
+      setUser(current => {
+        if (!current) return current;
+        localStorage.setItem(
+          'codesage_cached_profile',
+          JSON.stringify(current)
+        );
+        return current;
+      });
+    }, 0);
+  }
+};
 
   const completeTest = async (testId: string) => {
     if (!user) return;
