@@ -56,11 +56,10 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   if (!track) return null;
   const meta = TRACK_META[track];
 
-  const doEnroll = () => {
-    const rec = enroll(track);
+  const doEnroll = async () => {
+    const rec = await enroll(track);
     onEnrolled?.(track);
     onClose();
-    // Navigate to the track's learn page after enrollment.
     setTimeout(() => navigate(meta.route), 50);
     return rec;
   };

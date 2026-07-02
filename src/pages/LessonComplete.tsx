@@ -7,6 +7,7 @@ import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
+import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
 
 type Track = { prefix: string; path: string; list: Array<{ id: string; title: string }> };
@@ -15,6 +16,7 @@ const TRACKS: Track[] = [
   { prefix: 'net-',   path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'free-',  path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'fs-',    path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'pyx-',   path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'py-',    path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'local-', path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title })) },
 ];
