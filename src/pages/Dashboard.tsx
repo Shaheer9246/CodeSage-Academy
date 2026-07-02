@@ -383,7 +383,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/learn" desc="Beginner → Intermediate → Expert" />
+          <TileFooter path="/learn" desc="Beginner → Intermediate → Expert · 80 lessons" />
         </motion.button>
 
         {/* Computer & Networking — UNLOCKED */}
