@@ -345,9 +345,28 @@ useEffect(() => {
 
   const completeLesson = async (lessonId: string) => {
     if (!user) return;
+
+    // 1. OPTIMISTIC UPDATE: Update UI instantly so progress bar hits 100%
+    if (!user.completedLessons.includes(lessonId)) {
+      const newCompleted = [...user.completedLessons, lessonId];
+      const updatedUser = { ...user, completedLessons: newCompleted };
+      setUser(updatedUser);
+      
+      // Instantly update cache so a quick refresh doesn't lose it
+      localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
+    }
+
+    // 2. Sync with Database in background
     const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
-    if (error) { console.error('award_lesson failed', error.message); return; }
-    applyServerProfile(data);
+    if (error) { 
+      console.error('award_lesson failed', error.message); 
+      return; 
+    }
+    
+    // 3. If DB returns fresh data, apply it (for XP/Coins updates)
+    if (data) {
+      applyServerProfile(data);
+    }
   };
 
   const completeTest = async (testId: string) => {
