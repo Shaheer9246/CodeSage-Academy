@@ -343,57 +343,43 @@ useEffect(() => {
     setUser(dbRowToProfile(singleRow, user.email));
   };
 
- const completeLesson = async (lessonId: string) => {
-  if (!user) return;
+const completeLesson = async (lessonId: string) => {
+    if (!user) return;
 
-  // 1. Optimistic update (safe + immutable)
-  setUser(prev => {
-    if (!prev) return prev;
+    // 1. Calculate the fully merged list safely on the frontend
+    const alreadyCompleted = user.completedLessons.includes(lessonId);
+    if (alreadyCompleted) return;
 
-    const alreadyCompleted = prev.completedLessons.includes(lessonId);
-    if (alreadyCompleted) return prev;
+    const newCompletedList = [...user.completedLessons, lessonId];
+    const newXp = user.xp + 5;
+    const newCoins = user.sageCoins + 2;
 
-    return {
-      ...prev,
-      completedLessons: [...prev.completedLessons, lessonId],
+    // 2. Instantly update the UI so progress bars don't lag
+    const updatedUser = { 
+      ...user, 
+      completedLessons: newCompletedList, 
+      xp: newXp, 
+      sageCoins: newCoins 
     };
-  });
+    setUser(updatedUser);
+    
+    // Save to local cache immediately
+    localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
 
-  // 2. Sync with database in background
-  const { data, error } = await supabase.rpc('award_lesson', {
-    _lesson_id: lessonId,
-  });
+    // 3. THE BYPASS: Update the table directly instead of using the broken RPC!
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        completed_lessons: newCompletedList,
+        xp: newXp,
+        sage_coins: newCoins
+      })
+      .eq('id', user.id);
 
-  if (error) {
-    console.error('award_lesson failed', error.message);
-    return;
-  }
-
-  // 3. Merge server response safely using the dbRowToProfile mapper
-  if (data) {
-    const singleRow = Array.isArray(data) ? data[0] : data;
-    if (singleRow) {
-      // Map raw snake_case DB fields safely to camelCase UserProfile properties
-      const serverProfile = dbRowToProfile(singleRow, user.email);
-
-      setUser(prev => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          ...serverProfile,
-          // Merge both arrays cleanly with a Set to guarantee zero duplicates or lost progress
-          completedLessons: Array.from(
-            new Set([
-              ...(prev.completedLessons || []),
-              ...(serverProfile.completedLessons || []),
-            ])
-          ),
-        };
-      });
+    if (error) {
+      console.error('Direct table update failed:', error.message);
     }
-  }
-};
+  };
 
   const completeTest = async (testId: string) => {
     if (!user) return;
