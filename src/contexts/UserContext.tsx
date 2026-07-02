@@ -346,38 +346,46 @@ useEffect(() => {
 const completeLesson = async (lessonId: string) => {
     if (!user) return;
 
-    // 1. Calculate the fully merged list safely on the frontend
-    const alreadyCompleted = user.completedLessons.includes(lessonId);
-    if (alreadyCompleted) return;
+    // 1. SAFE OPTIMISTIC UPDATE: Use 'prev' to guarantee we never use stale UI state
+    setUser(prev => {
+      if (!prev || prev.completedLessons.includes(lessonId)) return prev;
+      const updatedUser = { 
+        ...prev, 
+        completedLessons: [...prev.completedLessons, lessonId], 
+        xp: prev.xp + 5, 
+        sageCoins: prev.sageCoins + 2 
+      };
+      localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
+      return updatedUser;
+    });
 
-    const newCompletedList = [...user.completedLessons, lessonId];
-    const newXp = user.xp + 5;
-    const newCoins = user.sageCoins + 2;
-
-    // 2. Instantly update the UI so progress bars don't lag
-    const updatedUser = { 
-      ...user, 
-      completedLessons: newCompletedList, 
-      xp: newXp, 
-      sageCoins: newCoins 
-    };
-    setUser(updatedUser);
-    
-    // Save to local cache immediately
-    localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
-
-    // 3. THE BYPASS: Update the table directly instead of using the broken RPC!
-    const { error } = await supabase
+    // 2. FETCH LATEST SERVER DATA: Prevent overwriting history with stale local state
+    const { data: currentProfile, error: fetchError } = await supabase
       .from('profiles')
-      .update({
-        completed_lessons: newCompletedList,
-        xp: newXp,
-        sage_coins: newCoins
-      })
-      .eq('id', user.id);
+      .select('completed_lessons, xp, sage_coins')
+      .eq('id', user.id)
+      .single();
 
-    if (error) {
-      console.error('Direct table update failed:', error.message);
+    if (fetchError) {
+      console.error('Could not fetch latest profile state:', fetchError.message);
+      return;
+    }
+
+    // 3. MERGE & SAVE: Add the new lesson ONLY to the most up-to-date server array
+    const serverCompleted = currentProfile?.completed_lessons || [];
+    if (!serverCompleted.includes(lessonId)) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          completed_lessons: [...serverCompleted, lessonId],
+          xp: (currentProfile?.xp || 0) + 5,
+          sage_coins: (currentProfile?.sage_coins || 0) + 2
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Direct table update failed:', updateError.message);
+      }
     }
   };
 
