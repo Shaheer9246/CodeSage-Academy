@@ -1,7 +1,12 @@
-// Client-side enrollment system (localStorage-backed).
-// Single source of truth for track enrollment + mock "students learning" counters.
+// Enrollment system — Supabase-backed with in-memory cache for sync reads.
+// Hydration happens on login (UserContext calls hydrateEnrollments(userId)).
+// Writes (enroll/pause/end) go through RPCs so they persist across devices/logouts.
 
-export type TrackId = 'frontend' | 'networking' | 'fullstack' | 'freelance' | 'python' | 'local';
+import { supabase } from '@/integrations/supabase/client';
+
+export type TrackId =
+  | 'frontend' | 'networking' | 'fullstack' | 'freelance'
+  | 'python' | 'local' | 'pythonexpert';
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
 export interface Enrollment {
@@ -11,147 +16,138 @@ export interface Enrollment {
   studentId?: string;
 }
 
-const ENROLL_KEY_PREFIX = 'codesage:enrollments:v1:';
-const COUNTS_KEY = 'codesage:studentCounts:v1';
 const EVENT = 'enrollment:changed';
+const LOCAL_CACHE = 'codesage:enroll_cache:v2';
+const LOCAL_COUNT_CACHE = 'codesage:count_cache:v2';
 
 export const TRACK_META: Record<TrackId, {
-  label: string;
-  short: string;
-  route: string;
-  idPrefix: string;
-  seed: number;
-  prereq?: TrackId[];
+  label: string; short: string; route: string; idPrefix: string;
+  seed: number; prereq?: TrackId[];
 }> = {
-  frontend:   { label: 'Frontend Development',            short: 'Frontend',   route: '/learn',      idPrefix: 'CS-FE',  seed: 200 },
-  networking: { label: 'Computer & Networking',           short: 'Networking', route: '/networking', idPrefix: 'CS-NET', seed: 140 },
-  fullstack:  { label: 'Full Stack Frontend Development', short: 'Full Stack', route: '/fullstack',  idPrefix: 'CS-FS',  seed: 90,  prereq: ['frontend'] },
-  freelance:  { label: 'Freelance & Clients',             short: 'Freelance',  route: '/freelance',  idPrefix: 'CS-FR',  seed: 75,  prereq: ['frontend', 'fullstack'] },
-  python:     { label: 'Python Programming',              short: 'Python',     route: '/python',     idPrefix: 'CS-PY',  seed: 180, prereq: ['networking'] },
-  local:      { label: 'Local-Only Coding',               short: 'Local',      route: '/local',      idPrefix: 'CS-LO',  seed: 60 },
+  frontend:     { label: 'Frontend Development',            short: 'Frontend',   route: '/learn',        idPrefix: 'CS-FE',  seed: 200 },
+  networking:   { label: 'Computer & Networking',           short: 'Networking', route: '/networking',   idPrefix: 'CS-NET', seed: 140 },
+  fullstack:    { label: 'Full Stack Frontend Development', short: 'Full Stack', route: '/fullstack',    idPrefix: 'CS-FS',  seed: 90,  prereq: ['frontend'] },
+  freelance:    { label: 'Freelance & Clients',             short: 'Freelance',  route: '/freelance',    idPrefix: 'CS-FR',  seed: 75,  prereq: ['frontend', 'fullstack'] },
+  python:       { label: 'Python Programming',              short: 'Python',     route: '/python',       idPrefix: 'CS-PY',  seed: 180, prereq: ['networking'] },
+  local:        { label: 'Local-Only Coding',               short: 'Local',      route: '/local',        idPrefix: 'CS-LO',  seed: 60 },
+  pythonexpert: { label: 'Python Expert',                   short: 'Py Expert',  route: '/pythonexpert', idPrefix: 'CS-PYX', seed: 40,  prereq: ['python'] },
 };
 
-function activeUserId(): string {
+// ---------- in-memory cache ----------
+let mem: Enrollment[] = [];
+let counts: Partial<Record<TrackId, number>> = {};
+let currentUserId: string | null = null;
+
+// Hydrate synchronously from localStorage cache (survives reloads within same session).
+try {
+  const raw = localStorage.getItem(LOCAL_CACHE);
+  if (raw) mem = JSON.parse(raw) as Enrollment[];
+  const c = localStorage.getItem(LOCAL_COUNT_CACHE);
+  if (c) counts = JSON.parse(c);
+} catch { /* ignore */ }
+
+function emit() {
   try {
-    const raw = localStorage.getItem('codesage_cached_profile');
-    if (raw) {
-      const p = JSON.parse(raw);
-      if (p?.id) return String(p.id);
-    }
-  } catch {}
-  return 'anon';
+    localStorage.setItem(LOCAL_CACHE, JSON.stringify(mem));
+    localStorage.setItem(LOCAL_COUNT_CACHE, JSON.stringify(counts));
+  } catch { /* ignore quota */ }
+  window.dispatchEvent(new Event(EVENT));
 }
 
-function storageKey(): string {
-  return ENROLL_KEY_PREFIX + activeUserId();
-}
-
-function readList(): Enrollment[] {
+// ---------- hydration ----------
+export async function hydrateEnrollments(userId: string | null): Promise<void> {
+  currentUserId = userId;
+  if (!userId) {
+    mem = [];
+    // keep counts (seeds fallback) — clear cache
+    try { localStorage.removeItem(LOCAL_CACHE); } catch { /* noop */ }
+    emit();
+    return;
+  }
   try {
-    const raw = localStorage.getItem(storageKey());
-    if (!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  } catch { return []; }
+    const [{ data: enr }, { data: stats }] = await Promise.all([
+      supabase.from('enrollments').select('*').eq('user_id', userId),
+      supabase.from('track_stats').select('*'),
+    ]);
+    mem = ((enr || []) as { track: string; status: string; enrolled_at: string }[]).map(r => ({
+      track: r.track as TrackId,
+      status: (r.status as EnrollmentStatus) || 'active',
+      enrolledAt: new Date(r.enrolled_at).getTime() || Date.now(),
+    }));
+    counts = {};
+    ((stats || []) as { track: string; enrolled_count: number }[]).forEach(s => {
+      counts[s.track as TrackId] = s.enrolled_count;
+    });
+    emit();
+  } catch (err) {
+    console.warn('[enrollment] hydrate failed', err);
+  }
 }
 
-function writeList(list: Enrollment[]) {
-  try {
-    localStorage.setItem(storageKey(), JSON.stringify(list));
-    window.dispatchEvent(new Event(EVENT));
-  } catch {}
-}
-
-function readCounts(): Record<string, number> {
-  try {
-    const raw = localStorage.getItem(COUNTS_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) || {};
-  } catch { return {}; }
-}
-
-function writeCounts(c: Record<string, number>) {
-  try { localStorage.setItem(COUNTS_KEY, JSON.stringify(c)); } catch {}
-}
-
-function bumpCount(track: TrackId) {
-  const c = readCounts();
-  c[track] = (c[track] || 0) + 1;
-  writeCounts(c);
-}
-
-function generateStudentId(track: TrackId): string {
-  const n = Math.floor(100000 + Math.random() * 900000);
-  return `${TRACK_META[track].idPrefix}-${n}`;
-}
-
-// ---------- public API ----------
-
-export function getEnrollments(): Enrollment[] {
-  return readList();
-}
-
-export function getEnrollment(track: TrackId): Enrollment | undefined {
-  return readList().find(e => e.track === track);
-}
-
+// ---------- sync reads ----------
+export function getEnrollments(): Enrollment[] { return [...mem]; }
+export function getEnrollment(track: TrackId): Enrollment | undefined { return mem.find(e => e.track === track); }
 export function isEnrolled(track: TrackId): boolean {
   const e = getEnrollment(track);
   return !!e && e.status !== 'ended';
 }
-
 export function isActive(track: TrackId): boolean {
   const e = getEnrollment(track);
   return !!e && e.status === 'active';
 }
-
 export function activeCount(): number {
-  return readList().filter(e => e.status === 'active').length;
+  return mem.filter(e => e.status === 'active').length;
 }
-
-export function enroll(track: TrackId): Enrollment {
-  const list = readList();
-  const existing = list.find(e => e.track === track);
-  if (existing) {
-    existing.status = 'active';
-    if (!existing.studentId) existing.studentId = generateStudentId(track);
-    writeList(list);
-    return existing;
-  }
-  const rec: Enrollment = {
-    track,
-    status: 'active',
-    enrolledAt: Date.now(),
-    studentId: generateStudentId(track),
-  };
-  list.push(rec);
-  writeList(list);
-  bumpCount(track);
-  return rec;
-}
-
-export function pause(track: TrackId) {
-  const list = readList();
-  const e = list.find(x => x.track === track);
-  if (e) { e.status = 'paused'; writeList(list); }
-}
-
-export function resume(track: TrackId) {
-  const list = readList();
-  const e = list.find(x => x.track === track);
-  if (e) { e.status = 'active'; writeList(list); }
-}
-
-export function end(track: TrackId) {
-  const list = readList();
-  const e = list.find(x => x.track === track);
-  if (e) { e.status = 'ended'; writeList(list); }
-}
-
 export function getStudentCount(track: TrackId): number {
-  return TRACK_META[track].seed + (readCounts()[track] || 0);
+  const seed = TRACK_META[track]?.seed ?? 0;
+  const server = counts[track];
+  return typeof server === 'number' && server > 0 ? server : seed;
 }
 
+// ---------- writes (async, persisted to Supabase) ----------
+export async function enroll(track: TrackId): Promise<Enrollment> {
+  const optimistic: Enrollment = {
+    track, status: 'active', enrolledAt: Date.now(),
+  };
+  const existing = mem.find(e => e.track === track);
+  if (existing) existing.status = 'active';
+  else mem.push(optimistic);
+  counts[track] = (counts[track] ?? TRACK_META[track].seed) + (existing ? 0 : 1);
+  emit();
+
+  if (currentUserId) {
+    try {
+      const { data, error } = await supabase.rpc('enroll_track', { _track: track });
+      if (error) throw error;
+      // Refresh count from server for accuracy.
+      const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
+      if (stats) counts[track] = stats.enrolled_count;
+      if (data) {
+        const rec = mem.find(e => e.track === track);
+        if (rec) rec.enrolledAt = new Date((data as { enrolled_at: string }).enrolled_at).getTime();
+      }
+      emit();
+    } catch (err) {
+      console.warn('[enrollment] enroll failed', err);
+    }
+  }
+  return mem.find(e => e.track === track)!;
+}
+
+async function updateStatus(track: TrackId, status: EnrollmentStatus) {
+  const e = mem.find(x => x.track === track);
+  if (e) { e.status = status; emit(); }
+  if (currentUserId) {
+    try {
+      await supabase.rpc('update_enrollment_status', { _track: track, _status: status });
+    } catch (err) { console.warn('[enrollment] status update failed', err); }
+  }
+}
+export function pause(track: TrackId) { void updateStatus(track, 'paused'); }
+export function resume(track: TrackId) { void updateStatus(track, 'active'); }
+export function end(track: TrackId) { void updateStatus(track, 'ended'); }
+
+// ---------- subscription ----------
 export function onEnrollmentChange(cb: () => void): () => void {
   const handler = () => cb();
   window.addEventListener(EVENT, handler);
