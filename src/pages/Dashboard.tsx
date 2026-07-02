@@ -388,7 +388,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-          <TileFooter path="/learn" desc="HTML → CSS → JS → React → Deploy · 28 lessons" />
+          <TileFooter path="/learn" desc="HTML → CSS → JS → React → Deploy · 12 lessons" />
         </motion.button>
 
         {/* Computer & Networking — UNLOCKED */}
