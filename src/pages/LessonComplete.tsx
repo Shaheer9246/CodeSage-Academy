@@ -21,8 +21,13 @@ const TRACKS: Track[] = [
 
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
-  'py-': '/python', 'local-': '/local',
+  'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
 };
+
+// Preserve the ?from=dashboard hint so the Lesson-Path back-button returns
+// users to the dashboard (not the roadmap) when they came from the dashboard.
+const withFromDashboard = (path: string) =>
+  path.includes('?') ? path : `${path}?from=dashboard`;
 
 const LessonComplete = () => {
   const { id } = useParams<{ id: string }>();
@@ -152,7 +157,7 @@ const LessonComplete = () => {
 
         <div className="grid grid-cols-3 gap-2">
           <button
-            onClick={() => navigate(lessonPath)}
+            onClick={() => navigate(withFromDashboard(lessonPath))}
             className="glass-card border border-border/50 text-foreground text-[11px] py-2.5 rounded-xl hover:border-primary/40 hover:neon-glow transition-all flex flex-col items-center justify-center gap-1"
           >
             <BookOpen className="w-3.5 h-3.5 text-primary" /> Lesson Path

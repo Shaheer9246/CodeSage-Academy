@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { PYTHON_LESSONS, PYTHON_TRACK_NOTICE, isPythonLessonUnlocked } from '@/data/pythonLessons';
+import { PYTHON_LESSONS, isPythonLessonUnlocked } from '@/data/pythonLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
@@ -53,14 +53,7 @@ const total = lessonList.length;
         </div>
 
        <div className="space-y-2">
-  {/* Inject the notice at the top of the list */}
-{PYTHON_TRACK_NOTICE && (
-  <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded shadow-sm text-amber-900 mb-4">
-    <p className="font-medium text-sm leading-relaxed">
-      {PYTHON_TRACK_NOTICE.notice}
-    </p>
-  </div>
-)}
+
 
   {/* Render your filtered lesson list as before */}
   {lessonList.map((lesson, i) => {
