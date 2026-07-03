@@ -1647,8 +1647,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       {
         title: '3. Mapping Python Classes to C Structs',
         beginner: 'You can design a special class in Python that maps its fields directly to exact byte-by-byte memory locations matching standard C structures.',
-        advanced: 'By inheriting from `ctypes.Structure` and declaring the fields array schema `_fields_ = [("field_name", ctypes.c_int)]`, you define an explicit C-compatible memory block that can be read and written directly by compiled C extensions.',
-        latex: true
+        advanced: 'By inheriting from `ctypes.Structure` and declaring the fields array schema `_fields_ = [("field_name", ctypes.c_int)]`, you define an explicit C-compatible memory block that can be read and written directly by compiled C extensions.'
       },
       {
         title: '4. Direct Pointer & Memory Control',
