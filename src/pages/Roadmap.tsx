@@ -116,15 +116,20 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
     LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })),
     'local-lesson', 'Module 1: Local-Only Coding', 'LOCAL MASTER'
   ),
+  pythonexpert: buildTrack(
+    PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })),
+    'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'
+  ),
 };
 
 const TRACKS = [
-  { key: 'frontend',   label: 'Frontend Dev' },
-  { key: 'networking', label: 'Networking' },
-  { key: 'fullstack',  label: 'Full Stack' },
-  { key: 'freelance',  label: 'Freelance' },
-  { key: 'python',     label: 'Python' },
-  { key: 'local',      label: 'Local-Only' },
+  { key: 'frontend',     label: 'Frontend Dev' },
+  { key: 'networking',   label: 'Networking' },
+  { key: 'fullstack',    label: 'Full Stack' },
+  { key: 'freelance',    label: 'Freelance' },
+  { key: 'python',       label: 'Python' },
+  { key: 'local',        label: 'Local-Only' },
+  { key: 'pythonexpert', label: 'Python Expert' },
 ];
 
 function getNodeStatus(node: TrackNode, completedLessons: string[]): 'locked' | 'completed' | 'current' | 'upcoming' {
