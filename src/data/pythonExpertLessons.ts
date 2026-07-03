@@ -622,7 +622,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       '`line_profiler` introduces overhead but provides surgical, line-by-line execution analytics.',
       'When algorithmic scaling limits are reached, compiling bottlenecks via Cython or Rust (PyO3) yields native-level speeds.'
     ]
-  )
+  ),
 
   L(
     'pyx-11', 11, 'The Descriptor Protocol Engine', '🔑',
@@ -769,7 +769,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
     },
     [
       q('What happens if the `__exit__` method of a context manager returns `True`?', ['The program reboots completely.', 'Any exception raised inside the `with` block is completely suppressed and swallowed.', 'An intermediate thread is spawned.', 'Python raises a RuntimeError.'], 1, 'Returning `True` inside `__exit__` indicates to the interpreter that the error was fully handled and suppressed, halting propagation.'),
-      q('What are the three mandatory positional arguments that Python passes directly to `__exit__`?', ['`self`, `instance`, `owner`', `exc_type`, `exc_value`, `traceback``, '`args`, `kwargs`, `context`', '`time`, `date`, `runtime`'], 1, '`__exit__` requires `exc_type` (the exception class), `exc_value` (the exception instance), and `traceback` (the execution stack trace frame object).'),
+      q('What are the three mandatory positional arguments that Python passes directly to `__exit__`?', ['`self`, `instance`, `owner`', '`exc_type`, `exc_value`, `traceback`', '`args`, `kwargs`, `context`', '`time`, `date`, `runtime`'], 1, '`__exit__` requires `exc_type` (the exception class), `exc_value` (the exception instance), and `traceback` (the execution stack trace frame object).'),
       q('When writing a generator-based context manager via `@contextmanager`, where should resource cleanup logic be safely declared?', ['Before the `yield` statement.', 'Inside a `try...finally` block immediately following or surrounding the `yield`.', 'In a separate function entirely.', 'Inside a lambda function.'], 1, 'Because an error can happen inside the calling context, wrapping the `yield` in a `try...finally` ensures the cleanup code executes flawlessly.'),
       q('Which utility class should you use to manage an unpredictable, dynamic list of context managers simultaneously?', ['`contextlib.ExitStack`', '`contextlib.supress`', '`asyncio.gather`', '`multiprocessing.Pool`'], 0, '`ExitStack` allows flexible, programmatic expansion of nested active context states at runtime without hardcoded visual indentation trees.')
     ],
@@ -1149,7 +1149,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       'ABCs fuse strict interface enforcement rules with reusable shared concrete helper methods.',
       'Use `.register()` workflows to virtually map foreign library modules into systemic type validation trees.'
     ]
-  )
+  ),
 
    L(
     'pyx-21', 21, 'Weak References & Memory Lifecycles', '🔗',
@@ -1513,7 +1513,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       q('Which core function translates raw code text strings into highly optimized CPython bytecode objects?', ['`eval()`', '`exec()`', '`compile()`', '`ast.transpile()`'], 2, '`compile()` transforms character strings into optimized bytecode blocks, ready for efficient execution loops.'),
       q('What dangerous loophole allows malicious strings to escape sandboxes that only clear out standard built-in libraries?', ['Dynamic list comprehension loops.', 'Objects can crawl inheritance attributes using fields like `__class__.__base__.__subclasses__()` to find and reactivate core system tools.', 'Garbage collection cycle dumps.', 'Unslotted class parameters.'], 1, 'Every object links back to its parent type definition. Malicious actors can traverse subclass arrays to recover references to powerful system modules if left unchecked.'),
       q('Why should you use pre-compiled code objects instead of executing raw strings directly inside high-frequency evaluation loops?', ['Because strings leak memory arrays.', 'Because strings bypass the Global Interpreter Lock.', 'Because parsing a raw text string requires intensive compilation overhead every time, whereas code objects skip straight to runtime execution blocks.', 'Because code objects encrypt strings.'], 2, 'Pre-compiling code text once outside loops eliminates repetitive lexical parsing and tokenizing overhead, keeping performance high.'),
-      q('What positional arguments must be explicitly passed to isolate dynamic execution environments from local application variables?', ['`self`, `instance`, `owner`', 'Global and Local runtime namespace dictionaries.', `*args, **kwargs``, 'Bytearray reference buffers.'], 1, 'Passing custom global and local dictionaries encapsulates dynamic execution states, keeping them fully separated from your main application scope.')
+      q('What positional arguments must be explicitly passed to isolate dynamic execution environments from local application variables?', ['`self`, `instance`, `owner`', 'Global and Local runtime namespace dictionaries.', '`*args, **kwargs`', 'Bytearray reference buffers.'], 1, 'Passing custom global and local dictionaries encapsulates dynamic execution states, keeping them fully separated from your main application scope.')
     ],
     [
       'The `compile()` engine transforms raw string commands into executable bytecode blocks.',
@@ -1647,8 +1647,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       {
         title: '3. Mapping Python Classes to C Structs',
         beginner: 'You can design a special class in Python that maps its fields directly to exact byte-by-byte memory locations matching standard C structures.',
-        advanced: 'By inheriting from `ctypes.Structure` and declaring the fields array schema `_fields_ = [("field_name", ctypes.c_int)]`, you define an explicit C-compatible memory block that can be read and written directly by compiled C extensions.',
-        latex: true
+        advanced: 'By inheriting from `ctypes.Structure` and declaring the fields array schema `_fields_ = [("field_name", ctypes.c_int)]`, you define an explicit C-compatible memory block that can be read and written directly by compiled C extensions.'
       },
       {
         title: '4. Direct Pointer & Memory Control',

@@ -40,10 +40,10 @@ function loadScript(src: string): Promise<void> {
   });
 }
 
-function useSkulpt() {
+function useSkulpt(enabled: boolean) {
   const [ready, setReady] = useState<boolean>(typeof window !== 'undefined' && !!window.Sk);
   useEffect(() => {
-    if (ready) return;
+    if (ready || !enabled) return;
     let cancelled = false;
     (async () => {
       try {
@@ -55,7 +55,7 @@ function useSkulpt() {
       }
     })();
     return () => { cancelled = true; };
-  }, [ready]);
+  }, [ready, enabled]);
   return ready;
 }
 
@@ -72,7 +72,8 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   const [pendingInput, setPendingInput] = useState<{ prompt: string; resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
-  const ready = useSkulpt();
+  const [wantLoad, setWantLoad] = useState<boolean>(typeof window !== 'undefined' && !!window.Sk);
+  const ready = useSkulpt(wantLoad);
 
   useEffect(() => {
     if (termRef.current) termRef.current.scrollTop = termRef.current.scrollHeight;
@@ -109,6 +110,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   };
 
   const runCode = async () => {
+    if (!wantLoad) { setWantLoad(true); write('sys', '$ loading Python runtime… click Run again in a moment'); return; }
     if (!ready || running) return;
     setTab('term');
     setRunning(true);

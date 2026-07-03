@@ -155,6 +155,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     '/freelance': 'freelance',
     '/python': 'python',
     '/local': 'local',
+    '/pythonexpert': 'pythonexpert',
   };
 
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
