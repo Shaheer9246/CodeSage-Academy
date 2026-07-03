@@ -47,7 +47,8 @@ const LocalLessonPage = () => {
     if (correctCount >= 3) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
-      navigate('/complete/' + lesson.id);
+      const fromQs = from ? `?from=${from}` : '';
+      navigate(`/complete/${lesson.id}${fromQs}`);
     }
   };
 
