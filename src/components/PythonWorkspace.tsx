@@ -110,6 +110,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   };
 
   const runCode = async () => {
+    if (!wantLoad) { setWantLoad(true); write('sys', '$ loading Python runtime… click Run again in a moment'); return; }
     if (!ready || running) return;
     setTab('term');
     setRunning(true);
