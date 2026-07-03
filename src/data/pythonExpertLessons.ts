@@ -87,7 +87,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
     ],
     {
       title: 'Inspect CPython Internals from the REPL',
-      intro: 'You are going to poke at Python from Python — read reference counts, identity, MRO, and disassembled bytecode. Every step is safe to copy/paste into a REPL.',
+      intro: 'You are going to poke at Python from Python — read reference counts, identity, MRO, and disassembled bytecode. 🖥️ NOTE: If you prefer a larger workspace or want a bigger interface, feel free to open your own computer terminal, run the python interactive shell, and carry on with this practical assignment!',
       steps: [
         'Open a Python REPL by running `python` (or `python3`) in your terminal.',
         'Type `import sys` then `x = "codesage"` and inspect the reference count with `sys.getrefcount(x)`. Note that the return value is one higher than you expect because `getrefcount` itself holds a temporary reference.',
@@ -147,6 +147,8 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       'The GIL makes threads great for I/O and poor for CPU-bound pure-Python code.',
     ],
   ),
+
+  
 
   // -------------------------------------------------------------------------
   // ADD NEXT LESSONS BELOW (pyx-02 through pyx-40) using the exact same L(...)
