@@ -36,6 +36,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: 'Python runs on real machines. If you understand how computers, memory, and networks work, Python concepts click much faster. We recommend finishing Computer & Networking first.',
     ctas: [{ label: 'Networking course', route: '/networking' }],
   },
+  pythonexpert: {
+    title: 'Finish Python Programming first',
+    body: 'Python Expert is an advanced-level track that builds directly on Python Programming (beginner → intermediate → advanced). Please complete Python Programming first — otherwise the expert lessons will be hard to follow.',
+    ctas: [{ label: 'Python Programming course', route: '/python' }],
+  },
 };
 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
