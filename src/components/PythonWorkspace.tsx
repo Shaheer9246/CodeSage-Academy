@@ -72,7 +72,8 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   const [pendingInput, setPendingInput] = useState<{ prompt: string; resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
-  const ready = useSkulpt();
+  const [wantLoad, setWantLoad] = useState<boolean>(typeof window !== 'undefined' && !!window.Sk);
+  const ready = useSkulpt(wantLoad);
 
   useEffect(() => {
     if (termRef.current) termRef.current.scrollTop = termRef.current.scrollHeight;
