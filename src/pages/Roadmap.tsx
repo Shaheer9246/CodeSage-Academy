@@ -8,6 +8,7 @@ import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
+import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 
 interface TrackNode {
   id: string;
