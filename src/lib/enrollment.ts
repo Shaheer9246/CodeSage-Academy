@@ -99,9 +99,11 @@ export function activeCount(): number {
   return mem.filter(e => e.status === 'active').length;
 }
 export function getStudentCount(track: TrackId): number {
+  // Displayed count = mock baseline (seed) + real active enrollments from track_stats.
+  // The seed makes new tracks feel populated; the server delta reflects real signups/unenrollments.
   const seed = TRACK_META[track]?.seed ?? 0;
-  const server = counts[track];
-  return typeof server === 'number' && server > 0 ? server : seed;
+  const server = counts[track] ?? 0;
+  return seed + (server > 0 ? server : 0);
 }
 
 // ---------- writes (async, persisted to Supabase) ----------
@@ -110,16 +112,16 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
     track, status: 'active', enrolledAt: Date.now(),
   };
   const existing = mem.find(e => e.track === track);
+  const wasCounted = !!existing && existing.status !== 'ended';
   if (existing) existing.status = 'active';
   else mem.push(optimistic);
-  counts[track] = (counts[track] ?? TRACK_META[track].seed) + (existing ? 0 : 1);
+  if (!wasCounted) counts[track] = (counts[track] ?? 0) + 1;
   emit();
 
   if (currentUserId) {
     try {
       const { data, error } = await supabase.rpc('enroll_track', { _track: track });
       if (error) throw error;
-      // Refresh count from server for accuracy.
       const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
       if (stats) counts[track] = stats.enrolled_count;
       if (data) {
@@ -136,10 +138,21 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
 
 async function updateStatus(track: TrackId, status: EnrollmentStatus) {
   const e = mem.find(x => x.track === track);
-  if (e) { e.status = status; emit(); }
+  const prevStatus = e?.status;
+  if (e) { e.status = status; }
+  // Adjust local count when transitioning in/out of 'ended' so the displayed number reacts instantly.
+  if (prevStatus && prevStatus !== 'ended' && status === 'ended') {
+    counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
+  } else if (prevStatus === 'ended' && status !== 'ended') {
+    counts[track] = (counts[track] ?? 0) + 1;
+  }
+  emit();
   if (currentUserId) {
     try {
       await supabase.rpc('update_enrollment_status', { _track: track, _status: status });
+      // Re-sync from server for accuracy.
+      const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
+      if (stats) { counts[track] = stats.enrolled_count; emit(); }
     } catch (err) { console.warn('[enrollment] status update failed', err); }
   }
 }

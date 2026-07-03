@@ -33,9 +33,11 @@ const LessonComplete = () => {
   const [searchParams] = useSearchParams();
   const [showConfetti, setShowConfetti] = useState(true);
 
-  // Preserve the query parameter across all navigation jumps
-  const from = searchParams.get('from');
-  const fromQs = from ? `?from=${from}` : '';
+  // Preserve the query parameter across all navigation jumps.
+  // Default to 'dashboard' so back-nav from track lesson-lists always returns to /dashboard,
+  // never accidentally to /roadmap when the param was dropped upstream.
+  const from = searchParams.get('from') ?? 'dashboard';
+  const fromQs = `?from=${from}`;
 
   // Find lesson + track (with bulletproof fallback for missing hyphens like 'py1')
   let lesson: Lesson | { id: string; title: string; keyTakeaways?: string[] } | undefined = id ? getLessonById(id) : undefined;

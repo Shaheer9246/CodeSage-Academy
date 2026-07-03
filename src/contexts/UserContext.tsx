@@ -343,50 +343,31 @@ useEffect(() => {
     setUser(dbRowToProfile(singleRow, user.email));
   };
 
-const completeLesson = async (lessonId: string) => {
+  const completeLesson = async (lessonId: string) => {
     if (!user) return;
 
-    // 1. SAFE OPTIMISTIC UPDATE: Use 'prev' to guarantee we never use stale UI state
+    // Optimistic UI so the checkmark appears instantly.
     setUser(prev => {
       if (!prev || prev.completedLessons.includes(lessonId)) return prev;
-      const updatedUser = { 
-        ...prev, 
-        completedLessons: [...prev.completedLessons, lessonId], 
-        xp: prev.xp + 5, 
-        sageCoins: prev.sageCoins + 2 
+      const updatedUser = {
+        ...prev,
+        completedLessons: [...prev.completedLessons, lessonId],
+        xp: prev.xp + 5,
+        sageCoins: prev.sageCoins + 2,
       };
       localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
       return updatedUser;
     });
 
-    // 2. FETCH LATEST SERVER DATA: Prevent overwriting history with stale local state
-    const { data: currentProfile, error: fetchError } = await supabase
-      .from('profiles')
-      .select('completed_lessons, xp, sage_coins')
-      .eq('id', user.id)
-      .single();
-
-    if (fetchError) {
-      console.error('Could not fetch latest profile state:', fetchError.message);
+    // Server-authoritative write via the idempotent award_lesson RPC.
+    // Using array_append server-side eliminates the read-modify-write race
+    // that previously wiped earlier completions (e.g. py-01) on rapid sequential completes.
+    const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
+    if (error) {
+      console.error('award_lesson failed:', error.message);
       return;
     }
-
-    // 3. MERGE & SAVE: Add the new lesson ONLY to the most up-to-date server array
-    const serverCompleted = currentProfile?.completed_lessons || [];
-    if (!serverCompleted.includes(lessonId)) {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          completed_lessons: [...serverCompleted, lessonId],
-          xp: (currentProfile?.xp || 0) + 5,
-          sage_coins: (currentProfile?.sage_coins || 0) + 2
-        })
-        .eq('id', user.id);
-
-      if (updateError) {
-        console.error('Direct table update failed:', updateError.message);
-      }
-    }
+    if (data) applyServerProfile(data);
   };
 
   const completeTest = async (testId: string) => {
