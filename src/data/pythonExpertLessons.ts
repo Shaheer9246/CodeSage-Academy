@@ -622,7 +622,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       '`line_profiler` introduces overhead but provides surgical, line-by-line execution analytics.',
       'When algorithmic scaling limits are reached, compiling bottlenecks via Cython or Rust (PyO3) yields native-level speeds.'
     ]
-  )
+  ),
 
   L(
     'pyx-11', 11, 'The Descriptor Protocol Engine', '🔑',
