@@ -1149,7 +1149,7 @@ export const PYTHON_EXPERT_LESSONS: PythonExpertLesson[] = [
       'ABCs fuse strict interface enforcement rules with reusable shared concrete helper methods.',
       'Use `.register()` workflows to virtually map foreign library modules into systemic type validation trees.'
     ]
-  )
+  ),
 
    L(
     'pyx-21', 21, 'Weak References & Memory Lifecycles', '🔗',
