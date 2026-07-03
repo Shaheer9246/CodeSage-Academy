@@ -18,7 +18,7 @@ interface TrackNode {
   chapter?: string;
   milestone?: string;
   lessonIds: string[];
-  routePrefix: 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson' | 'py-lesson' | 'local-lesson';
+  routePrefix: 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson' | 'py-lesson' | 'local-lesson' | 'pyx-lesson';
   locked?: boolean;
 }
 
