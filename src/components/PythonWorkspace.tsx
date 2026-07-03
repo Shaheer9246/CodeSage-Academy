@@ -40,10 +40,10 @@ function loadScript(src: string): Promise<void> {
   });
 }
 
-function useSkulpt() {
+function useSkulpt(enabled: boolean) {
   const [ready, setReady] = useState<boolean>(typeof window !== 'undefined' && !!window.Sk);
   useEffect(() => {
-    if (ready) return;
+    if (ready || !enabled) return;
     let cancelled = false;
     (async () => {
       try {
@@ -55,7 +55,7 @@ function useSkulpt() {
       }
     })();
     return () => { cancelled = true; };
-  }, [ready]);
+  }, [ready, enabled]);
   return ready;
 }
 
