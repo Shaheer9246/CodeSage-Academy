@@ -398,13 +398,13 @@ const SettingsPage = () => {
               <div className="space-y-2">
                 {lessonGroups.filter(g => !['challenges', 'crawler'].includes(g.key)).map(g => {
                   // approx denominators per track (matches data files)
-                  const totals: Record<string, number> = { frontend: 50, networking: 8, fullstack: 28, freelance: 8, python: 10, local: 12 };
+                  const totals: Record<string, number> = { frontend: 50, networking: 13, fullstack: 30, freelance: 12, python: 30, local: 15 };
                   const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
                   return (
                     <div key={g.key}>
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-foreground">{g.label}</span>
-                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
+                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
                       </div>
                       <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
                         <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
