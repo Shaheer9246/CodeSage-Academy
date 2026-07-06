@@ -12,7 +12,8 @@ const PythonExpertLearn = () => {
   const [params] = useSearchParams();
   const from = params.get('from');
   const fromQs = from ? `?from=${from}` : '';
-  const fromDashboard = from === 'dashboard';
+  const backTo = from === 'roadmap' ? '/roadmap' : '/dashboard';
+
   if (!user) { navigate('/auth'); return null; }
 
   const completed = PYTHON_EXPERT_LESSONS.filter(l => user.completedLessons.includes(l.id)).length;
@@ -25,7 +26,7 @@ const PythonExpertLearn = () => {
 
       <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(fromDashboard ? '/dashboard' : '/roadmap')} className="text-muted-foreground hover:text-foreground">
+          <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
