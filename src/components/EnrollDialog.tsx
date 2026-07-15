@@ -31,10 +31,20 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
       { label: 'Full-Stack course', route: '/fullstack' },
     ],
   },
+  local: {
+    title: 'Start with Frontend Development',
+    body: 'Before starting this track, you should know how a website works and be familiar with frontend development. We recommend completing the Frontend track first.',
+    ctas: [{ label: 'Frontend course', route: '/learn' }],
+  },
   python: {
     title: 'Start with Computer & Networking',
     body: 'Python runs on real machines. If you understand how computers, memory, and networks work, Python concepts click much faster. We recommend finishing Computer & Networking first.',
     ctas: [{ label: 'Networking course', route: '/networking' }],
+  },
+  sql: {
+    title: 'Start with Frontend Development',
+    body: 'Before diving into SQL and databases, a person should know about frontend or python programming. We recommend completing Frontend Development first so you understand how applications interact with data.',
+    ctas: [{ label: 'Frontend course', route: '/learn' }],
   },
   pythonexpert: {
     title: 'Finish Python Programming first',
