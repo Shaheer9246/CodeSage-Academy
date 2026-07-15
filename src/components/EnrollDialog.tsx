@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { GraduationCap, AlertTriangle, ArrowRight, PauseCircle, StopCircle, PlayCircle } from 'lucide-react';
+import { GraduationCap, AlertTriangle, ArrowRight, PauseCircle, StopCircle } from 'lucide-react';
 import {
-  TrackId, TRACK_META, enroll, activeCount, getEnrollments, isEnrolled,
-  pause as pauseTrack, end as endTrack,
+  TrackId, TRACK_META, enroll, activeCount, getEnrollments, isEnrolled, isActive,
+  pause as pauseTrack, end as endTrack, onEnrollmentChange
 } from '@/lib/enrollment';
 import { useUser } from '@/contexts/UserContext';
 
@@ -59,12 +59,23 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   const [tick, setTick] = useState(0); // force re-read after pause/end
   const refresh = () => setTick(t => t + 1);
 
+  // Sync state with global enrollment cache changes instantly
+  useEffect(() => {
+    return onEnrollmentChange(() => {
+      setTick(t => t + 1);
+    });
+  }, []);
+
   const step: Step = useMemo(() => {
     if (!track) return 'idcard';
-    if (!isEnrolled(track) && activeCount() >= 2) return 'limit';
+    
+    // Strict active track cap interceptor
+    if (!isActive(track) && activeCount() >= 2) return 'limit';
+    
     const meta = TRACK_META[track];
-    const needsPrereq = (meta.prereq || []).some(p => !isEnrolled(p));
+    const needsPrereq = (meta?.prereq || []).some(p => !isEnrolled(p));
     if (needsPrereq && PREREQ_COPY[track]) return 'prereq';
+    
     return 'idcard';
   }, [track, tick, open]);
 
@@ -75,7 +86,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
     const rec = await enroll(track);
     onEnrolled?.(track);
     onClose();
-    setTimeout(() => navigate(meta.route), 50);
+    setTimeout(() => navigate(meta?.route || '/dashboard'), 50);
     return rec;
   };
 
@@ -123,7 +134,9 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
         {list.map(e => (
           <div key={e.track} className="flex items-center justify-between gap-2 bg-secondary/30 rounded-xl px-3 py-2 border border-border/30">
             <div className="min-w-0">
-              <p className="text-xs font-display font-semibold text-foreground truncate">{TRACK_META[e.track].label}</p>
+              <p className="text-xs font-display font-semibold text-foreground truncate">
+                {TRACK_META[e.track]?.label || e.track}
+              </p>
               <p className="text-[10px] text-muted-foreground font-mono">{e.studentId || '—'}</p>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
@@ -161,13 +174,13 @@ function PrereqStep({
     <>
       <DialogHeader>
         <DialogTitle className="font-display flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-primary" /> {copy.title}
+          <AlertTriangle className="w-5 h-5 text-amber-500" /> {copy.title}
         </DialogTitle>
-        <DialogDescription className="text-xs leading-relaxed whitespace-pre-line">
+        <DialogDescription className="text-xs leading-relaxed bg-muted/40 p-3 rounded-xl border border-border/20 font-sans mt-2">
           {copy.body}
         </DialogDescription>
       </DialogHeader>
-      <div className="space-y-2 mt-2">
+      <div className="space-y-2 mt-4">
         {copy.ctas.map(cta => (
           <button key={cta.route} onClick={() => onGoTo(cta.route)}
             className="w-full flex items-center justify-between gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl px-3 py-2 text-primary text-xs font-display font-bold transition-all">
@@ -196,7 +209,7 @@ function IdCardStep({
   onBack: () => void;
 }) {
   const meta = TRACK_META[track];
-  const previewId = useMemo(() => `${meta.idPrefix}-${Math.floor(100000 + Math.random() * 900000)}`, [track]);
+  const previewId = useMemo(() => `${meta?.idPrefix || 'CS'}-${Math.floor(100000 + Math.random() * 900000)}`, [track]);
   return (
     <>
       <DialogHeader>
@@ -204,7 +217,7 @@ function IdCardStep({
           <GraduationCap className="w-5 h-5 text-primary" /> Welcome aboard!
         </DialogTitle>
         <DialogDescription className="text-xs leading-relaxed">
-          You're about to enroll in <span className="text-primary font-semibold">{meta.label}</span>. Here's your student card — keep it in your pocket 🎓
+          You're about to enroll in <span className="text-primary font-semibold">{meta?.label || 'Track'}</span>. Here's your student card — keep it in your pocket 🎓
         </DialogDescription>
       </DialogHeader>
       <div className="mt-2 rounded-2xl p-4 border border-primary/40 bg-gradient-to-br from-primary/10 via-background to-accent-blue/10 neon-glow">
@@ -218,7 +231,7 @@ function IdCardStep({
         </div>
         <div className="border-t border-border/30 mt-3 pt-2">
           <p className="text-[10px] text-muted-foreground font-display">Track</p>
-          <p className="text-xs font-display font-semibold text-foreground">{meta.label}</p>
+          <p className="text-xs font-display font-semibold text-foreground">{meta?.label || 'Track'}</p>
         </div>
       </div>
       <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
