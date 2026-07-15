@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Check, AlertTriangle, Database, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Play, Check, AlertTriangle, Database, RefreshCw, CheckCircle2, ChevronLeft, ArrowRight, BookOpen } from 'lucide-react';
+import { sqlLessons } from '../data/sqlLessons'; // Double check this path matches your file structure
 
 interface PracticalProps {
   practical: {
@@ -29,7 +31,7 @@ const loadSqlJs = (): Promise<any> => {
   });
 };
 
-export default function SqlWorkspace({ practical }: PracticalProps) {
+function SqlWorkspace({ practical }: PracticalProps) {
   const [userQuery, setUserQuery] = useState<string>('');
   const [dbLoading, setDbLoading] = useState<boolean>(true);
   const [queryResult, setQueryResult] = useState<{ columns: string[]; values: any[][] } | null>(null);
@@ -118,7 +120,6 @@ export default function SqlWorkspace({ practical }: PracticalProps) {
     try {
       let userPassed = false;
 
-      // Schema Mutation validation hook (e.g. creating/altering tables)
       if (practical.starterQuery.toLowerCase().includes('create table')) {
         try {
           dbUser.run(userQuery);
@@ -133,7 +134,6 @@ export default function SqlWorkspace({ practical }: PracticalProps) {
           userPassed = false;
         }
       } else {
-        // Standard Row dataset output matching
         const userRes = dbUser.exec(userQuery);
         const solRes = dbSol.exec(practical.solutionQuery);
 
@@ -165,7 +165,6 @@ export default function SqlWorkspace({ practical }: PracticalProps) {
 
   return (
     <div className="space-y-4">
-      {/* Steps List */}
       <div className="glass-card rounded-2xl p-4 space-y-3">
         <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Exercise Tasks</p>
         <ul className="space-y-2">
@@ -184,7 +183,6 @@ export default function SqlWorkspace({ practical }: PracticalProps) {
         </div>
       </div>
 
-      {/* Editor & Control Actions */}
       <div className="glass-card rounded-2xl border border-border/30 overflow-hidden flex flex-col min-h-[320px] relative">
         {dbLoading && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center gap-3">
@@ -229,7 +227,6 @@ export default function SqlWorkspace({ practical }: PracticalProps) {
         />
       </div>
 
-      {/* Console Results Output Grid */}
       <div className="glass-card rounded-2xl border border-border/30 overflow-hidden">
         <div className="px-4 py-2 bg-muted/30 border-b border-border/30">
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Engine Outputs</p>
@@ -296,6 +293,86 @@ export default function SqlWorkspace({ practical }: PracticalProps) {
               </div>
             )
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SqlLessonPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // Find current lesson index from data configuration
+  const currentIdx = sqlLessons.findIndex((l) => l.id === id);
+  const lesson = sqlLessons[currentIdx];
+
+  if (!lesson) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12 text-center space-y-4">
+        <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
+        <h2 className="text-lg font-bold">Lesson Not Found</h2>
+        <p className="text-sm text-muted-foreground">The requested SQL lesson module could not be traced.</p>
+        <button onClick={() => navigate('/sql')} className="text-xs text-primary underline">
+          Return to SQL Directory
+        </button>
+      </div>
+    );
+  }
+
+  const handleNext = () => {
+    if (currentIdx < sqlLessons.length - 1) {
+      navigate(`/sql/${sqlLessons[currentIdx + 1].id}`);
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/sql');
+  };
+
+  return (
+    <div className="min-h-screen bg-background text-foreground pb-12">
+      {/* Navigation Header bar */}
+      <div className="border-b border-border/40 bg-background/50 backdrop-blur-md sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+          <button onClick={handleBack} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-all">
+            <ChevronLeft className="w-4 h-4" /> Back to Dashboard
+          </button>
+          <div className="flex items-center gap-2 text-xs font-medium">
+            <BookOpen className="w-4 h-4 text-primary" />
+            <span className="text-muted-foreground">SQL Track:</span>
+            <span>{lesson.title}</span>
+          </div>
+          <button 
+            onClick={handleNext}
+            disabled={currentIdx === sqlLessons.length - 1}
+            className="flex items-center gap-1 px-3 py-1.5 bg-secondary hover:bg-secondary/80 disabled:opacity-40 rounded-xl text-xs font-semibold transition-all"
+          >
+            Next <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Primary Layout Grid split view */}
+      <div className="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Left Side: Lesson Documentation details */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="glass-card rounded-2xl p-6 space-y-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-bold">
+                Module {currentIdx + 1} of {sqlLessons.length}
+              </span>
+              <h1 className="text-xl font-extrabold tracking-tight">{lesson.title}</h1>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              {lesson.practical.intro || "Learn how to structure database queries via this step-by-step technical workbook."}
+            </p>
+          </div>
+        </div>
+
+        {/* Right Side: Execution sandbox playground environment */}
+        <div className="lg:col-span-3">
+          <SqlWorkspace practical={lesson.practical} />
         </div>
       </div>
     </div>
