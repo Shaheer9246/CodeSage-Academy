@@ -1,12 +1,13 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { GraduationCap, AlertTriangle, ArrowRight, PauseCircle, StopCircle } from 'lucide-react';
+import { GraduationCap, AlertTriangle, ArrowRight, PauseCircle, StopCircle, Loader2 } from 'lucide-react';
 import {
   TrackId, TRACK_META, enroll, activeCount, getEnrollments, isEnrolled, isActive,
   pause as pauseTrack, end as endTrack, onEnrollmentChange
 } from '@/lib/enrollment';
 import { useUser } from '@/contexts/UserContext';
+import { toast } from 'sonner';
 
 interface Props {
   open: boolean;
@@ -56,10 +57,10 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
   const navigate = useNavigate();
   const { user } = useUser();
-  const [tick, setTick] = useState(0); // force re-read after pause/end
+  const [tick, setTick] = useState(0); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const refresh = () => setTick(t => t + 1);
 
-  // Sync state with global enrollment cache changes instantly
   useEffect(() => {
     return onEnrollmentChange(() => {
       setTick(t => t + 1);
@@ -69,12 +70,13 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   const step: Step = useMemo(() => {
     if (!track) return 'idcard';
     
-    // Strict active track cap interceptor
-    if (!isActive(track) && activeCount() >= 2) return 'limit';
-    
+    // 1. Check prerequisites first so students see guidance regardless of limits
     const meta = TRACK_META[track];
     const needsPrereq = (meta?.prereq || []).some(p => !isEnrolled(p));
     if (needsPrereq && PREREQ_COPY[track]) return 'prereq';
+
+    // 2. Check active cap limitation
+    if (!isActive(track) && activeCount() >= 2) return 'limit';
     
     return 'idcard';
   }, [track, tick, open]);
@@ -83,15 +85,26 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   const meta = TRACK_META[track];
 
   const doEnroll = async () => {
-    const rec = await enroll(track);
-    onEnrolled?.(track);
-    onClose();
-    setTimeout(() => navigate(meta?.route || '/dashboard'), 50);
-    return rec;
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const rec = await enroll(track);
+      onEnrolled?.(track);
+      toast.success(`Successfully enrolled in ${meta?.label || 'track'}!`);
+      onClose();
+      // Use meta defined route path safely ('/sql-learn')
+      setTimeout(() => navigate(meta?.route || '/dashboard'), 50);
+      return rec;
+    } catch (err: any) {
+      console.error('[EnrollDialog] Enrollment failed:', err);
+      toast.error(err?.message || 'Database rejected enrollment. Check if server schema supports this track.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v && !isSubmitting) onClose(); }}>
       <DialogContent className="glass-card border-primary/30 max-w-md">
         {step === 'limit' && <LimitStep onBack={onClose} onChanged={refresh} />}
         {step === 'prereq' && (
@@ -100,6 +113,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
             onBack={onClose}
             onGoTo={(r) => { onClose(); setTimeout(() => navigate(r), 50); }}
             onEnrollAnyway={doEnroll}
+            isSubmitting={isSubmitting}
           />
         )}
         {step === 'idcard' && (
@@ -108,6 +122,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
             name={user?.name || 'New Student'}
             onCarryOn={doEnroll}
             onBack={onClose}
+            isSubmitting={isSubmitting}
           />
         )}
       </DialogContent>
@@ -162,12 +177,13 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
 }
 
 function PrereqStep({
-  track, onBack, onGoTo, onEnrollAnyway,
+  track, onBack, onGoTo, onEnrollAnyway, isSubmitting
 }: {
   track: TrackId;
   onBack: () => void;
   onGoTo: (route: string) => void;
   onEnrollAnyway: () => void;
+  isSubmitting: boolean;
 }) {
   const copy = PREREQ_COPY[track]!;
   return (
@@ -182,17 +198,17 @@ function PrereqStep({
       </DialogHeader>
       <div className="space-y-2 mt-4">
         {copy.ctas.map(cta => (
-          <button key={cta.route} onClick={() => onGoTo(cta.route)}
-            className="w-full flex items-center justify-between gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl px-3 py-2 text-primary text-xs font-display font-bold transition-all">
+          <button key={cta.route} onClick={() => !isSubmitting && onGoTo(cta.route)} disabled={isSubmitting}
+            className="w-full flex items-center justify-between gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl px-3 py-2 text-primary text-xs font-display font-bold transition-all disabled:opacity-50">
             {cta.label} <ArrowRight className="w-4 h-4" />
           </button>
         ))}
-        <button onClick={onEnrollAnyway}
-          className="w-full bg-secondary/40 hover:bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-foreground text-xs font-display font-bold">
-          Enroll anyway
+        <button onClick={onEnrollAnyway} disabled={isSubmitting}
+          className="w-full bg-secondary/40 hover:bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-foreground text-xs font-display font-bold flex items-center justify-center gap-2 disabled:opacity-50">
+          {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Enroll anyway'}
         </button>
-        <button onClick={onBack}
-          className="w-full text-muted-foreground hover:text-foreground text-[11px] py-1 font-display">
+        <button onClick={onBack} disabled={isSubmitting}
+          className="w-full text-muted-foreground hover:text-foreground text-[11px] py-1 font-display disabled:opacity-50">
           Back
         </button>
       </div>
@@ -201,12 +217,13 @@ function PrereqStep({
 }
 
 function IdCardStep({
-  track, name, onCarryOn, onBack,
+  track, name, onCarryOn, onBack, isSubmitting
 }: {
   track: TrackId;
   name: string;
   onCarryOn: () => void;
   onBack: () => void;
+  isSubmitting: boolean;
 }) {
   const meta = TRACK_META[track];
   const previewId = useMemo(() => `${meta?.idPrefix || 'CS'}-${Math.floor(100000 + Math.random() * 900000)}`, [track]);
@@ -238,12 +255,16 @@ function IdCardStep({
         Small win, big journey. Show up daily — that's the whole trick. Ready?
       </p>
       <div className="flex justify-end gap-2 pt-2">
-        <button onClick={onBack} className="text-xs px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-foreground font-display">
+        <button onClick={onBack} disabled={isSubmitting} className="text-xs px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-foreground font-display">
           Not now
         </button>
-        <button onClick={onCarryOn}
-          className="text-xs px-4 py-2 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:neon-glow flex items-center gap-1">
-          Carry on <ArrowRight className="w-4 h-4" />
+        <button onClick={onCarryOn} disabled={isSubmitting}
+          className="text-xs px-4 py-2 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:neon-glow flex items-center gap-1 disabled:opacity-50">
+          {isSubmitting ? (
+            <>Validating... <Loader2 className="w-3.5 h-3.5 animate-spin" /></>
+          ) : (
+            <>Carry on <ArrowRight className="w-4 h-4" /></>
+          )}
         </button>
       </div>
     </>
