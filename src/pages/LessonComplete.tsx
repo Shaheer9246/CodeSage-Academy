@@ -8,6 +8,7 @@ import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
+import { SQL_LESSONS } from '@/data/sqlLessons';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
 
 type Track = { prefix: string; path: string; list: Array<{ id: string; title: string }> };
@@ -19,11 +20,13 @@ const TRACKS: Track[] = [
   { prefix: 'pyx-',   path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'py-',    path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'local-', path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'sql-',   path: '/sql-lesson',   list: (SQL_LESSONS || []).map(l => ({ id: l.id, title: l.title })) },
 ];
 
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
   'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
+  'sql-': '/sql-learn',
 };
 
 const LessonComplete = () => {
@@ -34,8 +37,6 @@ const LessonComplete = () => {
   const [showConfetti, setShowConfetti] = useState(true);
 
   // Preserve the query parameter across all navigation jumps.
-  // Default to 'dashboard' so back-nav from track lesson-lists always returns to /dashboard,
-  // never accidentally to /roadmap when the param was dropped upstream.
   const from = searchParams.get('from') ?? 'dashboard';
   const fromQs = `?from=${from}`;
 
