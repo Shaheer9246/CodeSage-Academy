@@ -128,7 +128,7 @@ const App = () => (
               <Route path="/py-lesson/:id" element={<ProtectedRoute><PythonLessonPage /></ProtectedRoute>} />
               <Route path="/local" element={<ProtectedRoute><LocalLearn /></ProtectedRoute>} />
               <Route path="/local-lesson/:id" element={<ProtectedRoute><LocalLessonPage /></ProtectedRoute>} />
-              <Route path="/sql" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
+              <Route path="/sql-learn" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
               <Route path="/sql-lesson/:id" element={<ProtectedRoute><SqlLessonPage /></ProtectedRoute>} />
               <Route path="/tour" element={<ProtectedRoute><Tour /></ProtectedRoute>} />
               <Route path="/playground" element={<Playground />} />
