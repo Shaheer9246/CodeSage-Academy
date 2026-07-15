@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { SQL_LESSONS, isSqlLessonUnlocked } from '@/data/sqlLessons';
@@ -16,18 +17,26 @@ const SqlLearn = () => {
   const fromQs = from ? `?from=${from}` : '';
   const fromDashboard = from === 'dashboard';
 
+  // Prevent side effects during the render cycle
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
+
   if (!user) {
-    navigate('/auth');
     return null;
   }
 
-  const lessonList = SQL_LESSONS;
+  const lessonList = SQL_LESSONS || [];
+  const userCompletedLessons = user?.completedLessons || [];
+  
   const completed = lessonList.filter(l =>
-    user.completedLessons.includes(l.id)
+    userCompletedLessons.includes(l.id)
   ).length;
 
   const total = lessonList.length;
-  const progress = Math.round((completed / total) * 100);
+  const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
@@ -53,7 +62,7 @@ const SqlLearn = () => {
         <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
           <Flame className="w-3.5 h-3.5 text-primary" />
           <span className="text-xs font-bold text-primary">
-            {user.streakCount}
+            {user?.streakCount ?? 0}
           </span>
         </div>
       </header>
@@ -81,10 +90,10 @@ const SqlLearn = () => {
 
         <div className="space-y-2">
           {lessonList.map((lesson, i) => {
-            const isCompleted = user.completedLessons.includes(lesson.id);
+            const isCompleted = userCompletedLessons.includes(lesson.id);
             const isUnlocked = isSqlLessonUnlocked(
               lesson.id,
-              user.completedLessons
+              userCompletedLessons
             );
 
             return (
@@ -111,16 +120,16 @@ const SqlLearn = () => {
                       : 'bg-primary/10 border-primary/20'
                   }`}
                 >
-                  {lesson.icon}
+                  {lesson?.icon}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-mono text-muted-foreground uppercase">
-                    Lesson {lesson.order}
+                    Lesson {lesson?.order}
                   </p>
 
                   <p className="text-sm font-display font-semibold text-foreground truncate">
-                    {lesson.title}
+                    {lesson?.title}
                   </p>
                 </div>
 
