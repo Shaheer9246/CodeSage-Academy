@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, Check, AlertTriangle, BookOpen, Award, ChevronRight, 
   ChevronLeft, Database, Code, Shield, CheckCircle2, 
-  Terminal, HelpCircle, Sparkles, RefreshCw, Eye
+  Terminal, HelpCircle, Sparkles, RefreshCw
 } from 'lucide-react';
 import { SQL_LESSONS, SQLLesson, isSqlLessonUnlocked } from '../data/sqlLessons';
 
@@ -29,7 +29,7 @@ export default function SqlWorkspace() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const lesson: SQLLesson = SQL_LESSONS[currentLessonIndex];
+  const lesson: SQLLesson | undefined = SQL_LESSONS[currentLessonIndex];
 
   // SQL Runner State
   const [userQuery, setUserQuery] = useState<string>('');
@@ -54,11 +54,15 @@ export default function SqlWorkspace() {
 
   // Sync starter query when active lesson updates
   useEffect(() => {
-    setUserQuery(lesson.practical.starterQuery);
+    if (lesson?.practical?.starterQuery) {
+      setUserQuery(lesson.practical.starterQuery);
+    } else {
+      setUserQuery('');
+    }
     setQueryResult(null);
     setError(null);
     setExecutionMessage(null);
-    setLessonCompleted(completedLessons.includes(lesson.id));
+    setLessonCompleted(lesson ? completedLessons.includes(lesson.id) : false);
     setSelectedAnswers({});
     setQuizSubmitted(false);
     setQuizPassed(false);
@@ -75,7 +79,7 @@ export default function SqlWorkspace() {
         SQLRef.current = SQL;
         setDbLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Database sandbox environment could not be initialized. Please check connection.");
         setDbLoading(false);
       });
@@ -83,7 +87,7 @@ export default function SqlWorkspace() {
 
   // Helper: Setup isolated SQLite instance and seed it
   const createSeededDatabase = () => {
-    if (!SQLRef.current) return null;
+    if (!SQLRef.current || !lesson?.practical) return null;
     const db = new SQLRef.current.Database();
     if (lesson.practical.seedSql && lesson.practical.seedSql.trim() !== '') {
       db.run(lesson.practical.seedSql);
@@ -99,12 +103,11 @@ export default function SqlWorkspace() {
 
     const db = createSeededDatabase();
     if (!db) {
-      setError("SQL driver is not initialized.");
+      setError("SQL driver is not initialized or lesson template is missing.");
       return;
     }
 
     try {
-      // Execute input
       const res = db.exec(userQuery);
       
       if (res.length > 0) {
@@ -114,7 +117,6 @@ export default function SqlWorkspace() {
         });
         setExecutionMessage(`Execution successful: Query returned ${res[0].values.length} records.`);
       } else {
-        // Query ran successfully but returned no tabular output (e.g., updates/creations/deletes)
         setQueryResult(null);
         setExecutionMessage("Command processed successfully. No rows returned.");
       }
@@ -127,6 +129,10 @@ export default function SqlWorkspace() {
 
   // Intelligent verification algorithm
   const handleVerifySolution = () => {
+    if (!lesson?.practical) {
+      setError("Practical layout data is missing.");
+      return;
+    }
     setError(null);
     setExecutionMessage(null);
 
@@ -212,6 +218,7 @@ export default function SqlWorkspace() {
 
   // Evaluate the local multiple-choice quiz
   const handleQuizSubmit = () => {
+    if (!lesson?.quiz) return;
     let allCorrect = true;
     lesson.quiz.forEach((q, idx) => {
       if (selectedAnswers[idx] !== q.correctIndex) {
@@ -225,6 +232,19 @@ export default function SqlWorkspace() {
       markLessonComplete(lesson.id);
     }
   };
+
+  // Global early guard against undefined lesson contexts
+  if (!lesson) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center font-sans p-6">
+        <AlertTriangle className="w-12 h-12 text-rose-400 mb-4 animate-bounce" />
+        <h2 className="text-xl font-bold mb-2">Lesson Data Unavailable</h2>
+        <p className="text-sm text-slate-400 text-center max-w-md">
+          The selected lesson configuration could not be loaded or identified. Please check your course configuration or track enrollment status.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -352,7 +372,7 @@ export default function SqlWorkspace() {
                 </div>
 
                 <div className="space-y-6">
-                  {lesson.concepts.map((concept, index) => (
+                  {lesson.concepts?.map((concept, index) => (
                     <div 
                       key={index} 
                       className={`p-5 rounded-xl border transition-all duration-300 ${
@@ -391,28 +411,28 @@ export default function SqlWorkspace() {
                 <div className="bg-slate-900/40 border border-slate-800 p-5 rounded-xl">
                   <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
-                    Objective: {lesson.practical.title}
+                    Objective: {lesson.practical?.title || 'No Title'}
                   </h3>
-                  <p className="text-sm text-slate-300 leading-relaxed font-light">{lesson.practical.intro}</p>
+                  <p className="text-sm text-slate-300 leading-relaxed font-light">{lesson.practical?.intro || 'No intro text available.'}</p>
                 </div>
 
                 <div className="space-y-3">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Structured Workout Tasks</h4>
                   <ul className="space-y-2.5">
-                    {lesson.practical.steps.map((step, idx) => (
+                    {lesson.practical?.steps?.map((step, idx) => (
                       <li key={idx} className="flex gap-3 text-sm text-slate-300 font-light leading-relaxed">
                         <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400">
                           {idx + 1}
                         </span>
                         <span>{step}</span>
                       </li>
-                    ))}
+                    )) || <li className="text-sm text-slate-500 italic">No steps defined for this lesson.</li>}
                   </ul>
                 </div>
 
                 <div className="p-4 bg-emerald-950/20 border border-emerald-500/20 rounded-lg">
                   <h4 className="text-xs font-bold uppercase text-emerald-400 tracking-widest mb-1.5">Database Target Output Goal</h4>
-                  <p className="text-sm text-emerald-200 font-light">{lesson.practical.goal}</p>
+                  <p className="text-sm text-emerald-200 font-light">{lesson.practical?.goal || 'No objective goal defined.'}</p>
                 </div>
               </div>
             )}
@@ -425,11 +445,11 @@ export default function SqlWorkspace() {
                 </div>
 
                 <div className="space-y-6">
-                  {lesson.quiz.map((item, qIdx) => (
+                  {lesson.quiz?.map((item, qIdx) => (
                     <div key={qIdx} className="space-y-3 p-4 bg-slate-900/30 border border-slate-800/80 rounded-xl">
                       <h4 className="text-sm font-semibold text-slate-200">{qIdx + 1}. {item.question}</h4>
                       <div className="grid grid-cols-1 gap-2">
-                        {item.options.map((opt, oIdx) => {
+                        {item.options?.map((opt, oIdx) => {
                           const isSelected = selectedAnswers[qIdx] === oIdx;
                           const isCorrect = oIdx === item.correctIndex;
                           
@@ -479,7 +499,7 @@ export default function SqlWorkspace() {
                 {!quizSubmitted ? (
                   <button
                     onClick={handleQuizSubmit}
-                    disabled={Object.keys(selectedAnswers).length !== lesson.quiz.length}
+                    disabled={Object.keys(selectedAnswers).length !== (lesson.quiz?.length || 0)}
                     className="w-full py-3 bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2"
                   >
                     Validate Quiz Submissions
@@ -521,7 +541,7 @@ export default function SqlWorkspace() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => setUserQuery(lesson.practical.starterQuery)}
+                onClick={() => setUserQuery(lesson.practical?.starterQuery || '')}
                 className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded text-slate-300 flex items-center gap-1.5 transition-all"
                 title="Reset code template"
               >
