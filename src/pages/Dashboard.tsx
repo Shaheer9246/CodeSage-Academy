@@ -19,6 +19,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn your skills into income — pick a niche, pitch, price, contract, and deliver.' },
   { target: 'python',     title: 'Python Programming', body: 'From syntax to OOP, async, and a capstone project. Great as a second language.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'Build real apps with zero backend — DOM, localStorage, PWAs, offline-first.' },
+  { target: 'sql',        title: 'SQL Databases', body: 'Master queries, relational constraints, joins, CTEs, and schema indexing.' },
   { target: 'challenges', title: 'Challenges', body: 'Bite-sized coding puzzles across 4 difficulty tiers. Earn XP and badges.' },
   { target: 'playground', title: 'Code Editor', body: 'A real in-browser editor with live preview, ZIP import, console, and snapshots.' },
 ];
@@ -137,7 +138,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
 
   // Guest mode: only the Frontend Development track is clickable (goes to first lesson).
   // Every other tile is locked behind a sign-up prompt.
-  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local']);
+  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local', '/sql']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
     '/networking': '/n-lesson/net-1?guest=1',
@@ -145,6 +146,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     '/freelance': '/f-lesson/free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
     '/local': '/local-lesson/local-1?guest=1',
+    '/sql': '/sql-lesson/sql-1?guest=1',
   };
 
   // Map dashboard routes → track IDs (for enrollment gating on logged-in users).
@@ -155,6 +157,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
     '/freelance': 'freelance',
     '/python': 'python',
     '/local': 'local',
+    '/sql': 'sql' as TrackId,
     '/pythonexpert': 'pythonexpert',
   };
 
@@ -538,9 +541,35 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
           <TileFooter path="/local" desc="No backend, no server, no cost · 15 lessons" />
         </motion.button>
 
+        {/* SQL Databases — NEW */}
+        <motion.button
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.48 }}
+          onClick={go('/sql?from=dashboard')}
+          data-tour="sql"
+          className={tileCls('/sql')}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center text-2xl border border-emerald-500/30">
+                🛢️
+              </div>
+              <div>
+                <p className="text-base font-bold font-display text-foreground">SQL Databases</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {['Queries', 'Joins', 'Schemas', 'Indexing'].map(t => (
+                    <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </div>
+          <TileFooter path="/sql" desc="Queries → Joins → DB Design → Optimization · 15 lessons" />
+        </motion.button>
+
         {/* Full Stack Python Expert — NEW */}
         <motion.button
-          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.52 }}
           onClick={go('/pythonexpert?from=dashboard')}
           data-tour="pythonexpert"
           className={tileCls('/pythonexpert')}
@@ -566,7 +595,7 @@ if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" rep
 
         {/* Suggestions tile */}
         <motion.button
-          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55 }}
           onClick={go('/suggestions')}
           className={`w-full glass-card p-4 rounded-2xl text-left transition-all flex items-center gap-3 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
         >
