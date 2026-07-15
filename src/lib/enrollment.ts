@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type TrackId =
   | 'frontend' | 'networking' | 'fullstack' | 'freelance'
-  | 'python' | 'local' | 'pythonexpert';
+  | 'python' | 'local' | 'sql' | 'pythonexpert';
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
 export interface Enrollment {
@@ -30,6 +30,7 @@ export const TRACK_META: Record<TrackId, {
   freelance:    { label: 'Freelance & Clients',             short: 'Freelance',  route: '/freelance',    idPrefix: 'CS-FR',  seed: 75,  prereq: ['frontend', 'fullstack'] },
   python:       { label: 'Python Programming',              short: 'Python',     route: '/python',       idPrefix: 'CS-PY',  seed: 180, prereq: ['networking'] },
   local:        { label: 'Local-Only Coding',               short: 'Local',      route: '/local',        idPrefix: 'CS-LO',  seed: 60 },
+  sql:          { label: 'SQL Databases',                    short: 'SQL',        route: '/sql',          idPrefix: 'CS-SQL', seed: 110 },
   pythonexpert: { label: 'Python Expert',                   short: 'Py Expert',  route: '/pythonexpert', idPrefix: 'CS-PYX', seed: 40,  prereq: ['python'] },
 };
 
