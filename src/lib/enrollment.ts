@@ -1,7 +1,4 @@
 // Enrollment system — Supabase-backed with in-memory cache for sync reads.
-// Hydration happens on login (UserContext calls hydrateEnrollments(userId)).
-// Writes (enroll/pause/end) go through RPCs so they persist across devices/logouts.
-
 import { supabase } from '@/integrations/supabase/client';
 
 export type TrackId =
@@ -35,16 +32,14 @@ export const TRACK_META: Record<TrackId, {
   freelance:    { label: 'Freelance & Clients',             short: 'Freelance',  route: '/freelance',    idPrefix: 'CS-FR',  seed: 75,  prereq: ['frontend'] },
   python:       { label: 'Python Programming',              short: 'Python',     route: '/python',       idPrefix: 'CS-PY',  seed: 180, prereq: ['networking'] },
   local:        { label: 'Local-Only Coding',               short: 'Local',      route: '/local',        idPrefix: 'CS-LO',  seed: 60,  prereq: ['frontend'] },
-  sql:          { label: 'SQL Databases',                    short: 'SQL',        route: '/sql-learn',    idPrefix: 'CS-SQL', seed: 110, prereq: ['frontend'] },
+  sql:          { label: 'SQL Databases',                    short: 'SQL',        route: '/sql',          idPrefix: 'CS-SQL', seed: 110, prereq: ['frontend'] },
   pythonexpert: { label: 'Python Expert',                   short: 'Py Expert',  route: '/pythonexpert', idPrefix: 'CS-PYX', seed: 40,  prereq: ['python'] },
 };
 
-// ---------- in-memory cache ----------
 let mem: Enrollment[] = [];
 let counts: Partial<Record<TrackId, number>> = {};
 let currentUserId: string | null = null;
 
-// Hydrate synchronously from localStorage cache (survives reloads within same session).
 try {
   const raw = localStorage.getItem(LOCAL_CACHE);
   if (raw) mem = (JSON.parse(raw) as Enrollment[]).filter(e => VALID_TRACK_IDS.has(e.track));
@@ -56,16 +51,14 @@ function emit() {
   try {
     localStorage.setItem(LOCAL_CACHE, JSON.stringify(mem));
     localStorage.setItem(LOCAL_COUNT_CACHE, JSON.stringify(counts));
-  } catch { /* ignore quota */ }
+  } catch { /* ignore */ }
   window.dispatchEvent(new Event(EVENT));
 }
 
-// ---------- hydration ----------
 export async function hydrateEnrollments(userId: string | null): Promise<void> {
   currentUserId = userId;
   if (!userId) {
     mem = [];
-    // keep counts (seeds fallback) — clear cache
     try { localStorage.removeItem(LOCAL_CACHE); } catch { /* noop */ }
     emit();
     return;
@@ -96,7 +89,6 @@ export async function hydrateEnrollments(userId: string | null): Promise<void> {
   }
 }
 
-// ---------- sync reads ----------
 export function getEnrollments(): Enrollment[] { return [...mem]; }
 export function getEnrollment(track: TrackId): Enrollment | undefined { return mem.find(e => e.track === track); }
 export function isEnrolled(track: TrackId): boolean {
@@ -111,15 +103,12 @@ export function activeCount(): number {
   return mem.filter(e => e.status === 'active').length;
 }
 export function getStudentCount(track: TrackId): number {
-  // Displayed count = mock baseline (seed) + real active enrollments from track_stats.
   const seed = TRACK_META[track]?.seed ?? 0;
   const server = counts[track] ?? 0;
   return seed + (server > 0 ? server : 0);
 }
 
-// ---------- writes (async, persisted to Supabase) ----------
 export async function enroll(track: TrackId): Promise<Enrollment> {
-  // Strict execution block if already running 2 active courses
   if (!isActive(track) && activeCount() >= 2) {
     throw new Error('Action restricted: Maximum limit of 2 active courses reached.');
   }
@@ -128,7 +117,6 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   const oldStatus = existing?.status;
   const wasCounted = !!existing && existing.status !== 'ended';
   
-  // Optimistic update
   if (existing) existing.status = 'active';
   else mem.push({ track, status: 'active', enrolledAt: Date.now() });
   
@@ -142,14 +130,8 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
 
       const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
       if (stats) counts[track] = stats.enrolled_count;
-      if (data) {
-        const rec = mem.find(e => e.track === track);
-        if (rec) rec.enrolledAt = new Date((data as { enrolled_at: string }).enrolled_at).getTime();
-      }
       emit();
     } catch (err) {
-      console.warn('[enrollment] enroll action rejected by server, rolling back...', err);
-      // Revert cache to original state
       if (existing) {
         if (oldStatus) existing.status = oldStatus;
       } else {
@@ -164,17 +146,12 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
 }
 
 async function updateStatus(track: TrackId, status: EnrollmentStatus) {
-  // Strict execution block if trying to activate/resume a track when already running 2 active courses
-  if (status === 'active' && !isActive(track) && activeCount() >= 2) {
-    console.warn('[enrollment] Action restricted: Cannot activate track. Limit is 2 active courses.');
-    return;
-  }
+  if (status === 'active' && !isActive(track) && activeCount() >= 2) return;
 
   const e = mem.find(x => x.track === track);
   const prevStatus = e?.status;
   if (!e) return;
 
-  // Optimistic update
   e.status = status;
   if (prevStatus && prevStatus !== 'ended' && status === 'ended') {
     counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
@@ -187,18 +164,8 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
     try {
       const { error } = await supabase.rpc('update_enrollment_status', { _track: track, _status: status });
       if (error) throw error;
-
-      const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
-      if (stats) { counts[track] = stats.enrolled_count; emit(); }
     } catch (err) { 
-      console.warn('[enrollment] status update rejected by server, rolling back...', err);
-      // Revert cache adjustments
       e.status = prevStatus;
-      if (prevStatus && prevStatus !== 'ended' && status === 'ended') {
-        counts[track] = (counts[track] ?? 0) + 1;
-      } else if (prevStatus === 'ended' && status !== 'ended') {
-        counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
-      }
       emit();
     }
   }
@@ -207,13 +174,8 @@ export function pause(track: TrackId) { void updateStatus(track, 'paused'); }
 export function resume(track: TrackId) { void updateStatus(track, 'active'); }
 export function end(track: TrackId) { void updateStatus(track, 'ended'); }
 
-// ---------- subscription ----------
 export function onEnrollmentChange(cb: () => void): () => void {
   const handler = () => cb();
   window.addEventListener(EVENT, handler);
-  window.addEventListener('storage', handler);
-  return () => {
-    window.removeEventListener(EVENT, handler);
-    window.removeEventListener('storage', handler);
-  };
+  return () => window.removeEventListener(EVENT, handler);
 }
