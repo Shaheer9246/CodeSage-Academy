@@ -20,6 +20,11 @@ const EVENT = 'enrollment:changed';
 const LOCAL_CACHE = 'codesage:enroll_cache:v2';
 const LOCAL_COUNT_CACHE = 'codesage:count_cache:v2';
 
+const VALID_TRACK_IDS: Set<string> = new Set([
+  'frontend', 'networking', 'fullstack', 'freelance',
+  'python', 'local', 'sql', 'pythonexpert'
+]);
+
 export const TRACK_META: Record<TrackId, {
   label: string; short: string; route: string; idPrefix: string;
   seed: number; prereq?: TrackId[];
@@ -30,7 +35,7 @@ export const TRACK_META: Record<TrackId, {
   freelance:    { label: 'Freelance & Clients',             short: 'Freelance',  route: '/freelance',    idPrefix: 'CS-FR',  seed: 75,  prereq: ['frontend', 'fullstack'] },
   python:       { label: 'Python Programming',              short: 'Python',     route: '/python',       idPrefix: 'CS-PY',  seed: 180, prereq: ['networking'] },
   local:        { label: 'Local-Only Coding',               short: 'Local',      route: '/local',        idPrefix: 'CS-LO',  seed: 60 },
-  sql:          { label: 'SQL Databases',                    short: 'SQL',        route: '/sql',          idPrefix: 'CS-SQL', seed: 110 },
+  sql:          { label: 'SQL Databases',                    short: 'SQL',        route: '/sql-learn',    idPrefix: 'CS-SQL', seed: 110 },
   pythonexpert: { label: 'Python Expert',                   short: 'Py Expert',  route: '/pythonexpert', idPrefix: 'CS-PYX', seed: 40,  prereq: ['python'] },
 };
 
@@ -42,7 +47,7 @@ let currentUserId: string | null = null;
 // Hydrate synchronously from localStorage cache (survives reloads within same session).
 try {
   const raw = localStorage.getItem(LOCAL_CACHE);
-  if (raw) mem = JSON.parse(raw) as Enrollment[];
+  if (raw) mem = (JSON.parse(raw) as Enrollment[]).filter(e => VALID_TRACK_IDS.has(e.track));
   const c = localStorage.getItem(LOCAL_COUNT_CACHE);
   if (c) counts = JSON.parse(c);
 } catch { /* ignore */ }
@@ -70,14 +75,20 @@ export async function hydrateEnrollments(userId: string | null): Promise<void> {
       supabase.from('enrollments').select('*').eq('user_id', userId),
       supabase.from('track_stats').select('*'),
     ]);
-    mem = ((enr || []) as { track: string; status: string; enrolled_at: string }[]).map(r => ({
-      track: r.track as TrackId,
-      status: (r.status as EnrollmentStatus) || 'active',
-      enrolledAt: new Date(r.enrolled_at).getTime() || Date.now(),
-    }));
+    
+    mem = ((enr || []) as { track: string; status: string; enrolled_at: string }[])
+      .filter(r => VALID_TRACK_IDS.has(r.track))
+      .map(r => ({
+        track: r.track as TrackId,
+        status: (r.status as EnrollmentStatus) || 'active',
+        enrolledAt: new Date(r.enrolled_at).getTime() || Date.now(),
+      }));
+
     counts = {};
     ((stats || []) as { track: string; enrolled_count: number }[]).forEach(s => {
-      counts[s.track as TrackId] = s.enrolled_count;
+      if (VALID_TRACK_IDS.has(s.track)) {
+        counts[s.track as TrackId] = s.enrolled_count;
+      }
     });
     emit();
   } catch (err) {
@@ -101,7 +112,6 @@ export function activeCount(): number {
 }
 export function getStudentCount(track: TrackId): number {
   // Displayed count = mock baseline (seed) + real active enrollments from track_stats.
-  // The seed makes new tracks feel populated; the server delta reflects real signups/unenrollments.
   const seed = TRACK_META[track]?.seed ?? 0;
   const server = counts[track] ?? 0;
   return seed + (server > 0 ? server : 0);
@@ -134,7 +144,7 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
       console.warn('[enrollment] enroll failed', err);
     }
   }
-  return mem.find(e => e.track === track)!;
+  return mem.find(e => e.track === track) || optimistic;
 }
 
 async function updateStatus(track: TrackId, status: EnrollmentStatus) {
