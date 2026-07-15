@@ -72,7 +72,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   const [pendingInput, setPendingInput] = useState<{ prompt: string; resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
-  const [wantLoad, setWantLoad] = useState<boolean>(typeof window !== 'undefined' && !!window.Sk);
+  const [wantLoad, setWantLoad] = useState<boolean>(true);
   const ready = useSkulpt(wantLoad);
 
   useEffect(() => {
@@ -110,7 +110,6 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   };
 
   const runCode = async () => {
-    if (!wantLoad) { setWantLoad(true); write('sys', '$ loading Python runtime… click Run again in a moment'); return; }
     if (!ready || running) return;
     setTab('term');
     setRunning(true);
