@@ -8,6 +8,7 @@ import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
+import { SQL_LESSONS } from '@/data/sqlLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 
 interface TrackNode {
@@ -18,7 +19,7 @@ interface TrackNode {
   chapter?: string;
   milestone?: string;
   lessonIds: string[];
-  routePrefix: 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson' | 'py-lesson' | 'local-lesson' | 'pyx-lesson';
+  routePrefix: 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson' | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson';
   locked?: boolean;
 }
 
@@ -116,6 +117,10 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
     LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })),
     'local-lesson', 'Module 1: Local-Only Coding', 'LOCAL MASTER'
   ),
+  sql: buildTrack(
+    SQL_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })),
+    'sql-lesson', 'Module 1: SQL Databases', 'SQL MASTER'
+  ),
   pythonexpert: buildTrack(
     PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })),
     'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'
@@ -129,6 +134,7 @@ const TRACKS = [
   { key: 'freelance',    label: 'Freelance' },
   { key: 'python',       label: 'Python' },
   { key: 'local',        label: 'Local-Only' },
+  { key: 'sql',          label: 'SQL Databases' },
   { key: 'pythonexpert', label: 'Python Expert' },
 ];
 
