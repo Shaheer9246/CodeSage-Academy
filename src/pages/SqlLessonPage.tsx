@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Check, AlertTriangle, Database, RefreshCw, CheckCircle2, ChevronLeft, ArrowRight, BookOpen } from 'lucide-react';
-import { sqlLessons } from '../data/sqlLessons'; // Double check this path matches your file structure
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useUser } from '@/contexts/UserContext';
+import { 
+  Play, Check, AlertTriangle, Database, RefreshCw, 
+  CheckCircle2, ChevronLeft, ArrowRight, BookOpen, Sparkles 
+} from 'lucide-react';
+import { SQL_LESSONS, isSqlLessonUnlocked } from '../data/sqlLessons';
+
+// Fallback lookup if token configurations vary across file directories
+const LESSON_DATA_SET = SQL_LESSONS || (window as any).sqlLessons || [];
 
 interface PracticalProps {
+  lessonId: string;
   practical: {
     title: string;
     intro: string;
@@ -13,9 +21,10 @@ interface PracticalProps {
     solutionQuery: string;
     seedSql: string;
   };
+  onSuccessCompletion: () => void;
 }
 
-// Dynamic script loader for running SQLite in the sandbox
+// Dynamic script loader for running SQLite inside the browser WASM sandbox
 const loadSqlJs = (): Promise<any> => {
   return new Promise((resolve, reject) => {
     if ((window as any).initSqlJs) {
@@ -31,7 +40,7 @@ const loadSqlJs = (): Promise<any> => {
   });
 };
 
-function SqlWorkspace({ practical }: PracticalProps) {
+function SqlWorkspace({ lessonId, practical, onSuccessCompletion }: PracticalProps) {
   const [userQuery, setUserQuery] = useState<string>('');
   const [dbLoading, setDbLoading] = useState<boolean>(true);
   const [queryResult, setQueryResult] = useState<{ columns: string[]; values: any[][] } | null>(null);
@@ -40,34 +49,46 @@ function SqlWorkspace({ practical }: PracticalProps) {
   const [isValidated, setIsValidated] = useState<boolean>(false);
 
   const SQLRef = useRef<any>(null);
+  const isMounted = useRef<boolean>(true);
 
-  // Sync state whenever the lesson/practical changes
   useEffect(() => {
-    setUserQuery(practical.starterQuery);
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  // Sync editor environment when practical workout steps shift
+  useEffect(() => {
+    setUserQuery(practical?.starterQuery || '');
     setQueryResult(null);
     setError(null);
     setExecutionMessage(null);
     setIsValidated(false);
   }, [practical]);
 
-  // Load the WASM SQL engine once
+  // Lazy-load WASM engine assets
   useEffect(() => {
     loadSqlJs()
       .then(async (initSqlJs) => {
         const SQL = await initSqlJs({
           locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
-        SQLRef.current = SQL;
-        setDbLoading(false);
+        if (isMounted.current) {
+          SQLRef.current = SQL;
+          setDbLoading(false);
+        }
       })
-      .catch((err) => {
-        setError("Database sandbox environment could not be initialized. Check network connection.");
-        setDbLoading(false);
+      .catch(() => {
+        if (isMounted.current) {
+          setError("Database sandbox environment could not be initialized. Check network connection.");
+          setDbLoading(false);
+        }
       });
   }, []);
 
   const createSeededDatabase = () => {
-    if (!SQLRef.current) return null;
+    if (!SQLRef.current || !practical) return null;
     const db = new SQLRef.current.Database();
     if (practical.seedSql && practical.seedSql.trim() !== '') {
       db.run(practical.seedSql);
@@ -106,6 +127,7 @@ function SqlWorkspace({ practical }: PracticalProps) {
   };
 
   const handleVerifySolution = () => {
+    if (!practical) return;
     setError(null);
     setExecutionMessage(null);
 
@@ -120,7 +142,8 @@ function SqlWorkspace({ practical }: PracticalProps) {
     try {
       let userPassed = false;
 
-      if (practical.starterQuery.toLowerCase().includes('create table')) {
+      // Detect schema declaration queries
+      if (practical.starterQuery?.toLowerCase().includes('create table') || lessonId === 'sql-05') {
         try {
           dbUser.run(userQuery);
           dbSol.run(practical.solutionQuery);
@@ -150,6 +173,7 @@ function SqlWorkspace({ practical }: PracticalProps) {
       if (userPassed) {
         setExecutionMessage("Excellent! Your query matches the reference solution specifications.");
         setIsValidated(true);
+        onSuccessCompletion();
       } else {
         setError("Result mismatch. Your output did not match the expected dataset schema or records.");
         setIsValidated(false);
@@ -168,18 +192,18 @@ function SqlWorkspace({ practical }: PracticalProps) {
       <div className="glass-card rounded-2xl p-4 space-y-3">
         <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Exercise Tasks</p>
         <ul className="space-y-2">
-          {practical.steps.map((step, idx) => (
+          {practical?.steps?.map((step, idx) => (
             <li key={idx} className="flex gap-2.5 text-xs text-muted-foreground leading-relaxed">
               <span className="flex-shrink-0 w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-[10px] font-bold text-foreground">
                 {idx + 1}
               </span>
               <span>{step}</span>
             </li>
-          ))}
+          )) || <li className="text-xs text-muted-foreground italic">No verification items mapped.</li>}
         </ul>
         <div className="pt-2 border-t border-border/30">
           <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-1">Target Goal</p>
-          <p className="text-xs text-foreground font-medium">{practical.goal}</p>
+          <p className="text-xs text-foreground font-medium">{practical?.goal}</p>
         </div>
       </div>
 
@@ -195,7 +219,7 @@ function SqlWorkspace({ practical }: PracticalProps) {
           <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">SQL QUERY CONSOLE</span>
           <div className="flex gap-1.5">
             <button
-              onClick={() => setUserQuery(practical.starterQuery)}
+              onClick={() => setUserQuery(practical?.starterQuery || '')}
               className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-all"
               title="Reset query"
             >
@@ -224,6 +248,7 @@ function SqlWorkspace({ practical }: PracticalProps) {
           className="w-full flex-1 p-4 bg-transparent text-foreground font-mono text-xs leading-relaxed focus:outline-none resize-none"
           placeholder="-- Write your database queries here..."
           spellCheck={false}
+          disabled={dbLoading}
         />
       </div>
 
@@ -302,10 +327,22 @@ function SqlWorkspace({ practical }: PracticalProps) {
 export default function SqlLessonPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const { user, updateUser } = useUser();
 
-  // Find current lesson index from data configuration
-  const currentIdx = sqlLessons.findIndex((l) => l.id === id);
-  const lesson = sqlLessons[currentIdx];
+  const from = params.get('from');
+  const fromQs = from ? `?from=${from}` : '';
+
+  // Calculate position parameters within lessons list safely
+  const currentIdx = LESSON_DATA_SET.findIndex((l: any) => l.id === id);
+  const lesson = LESSON_DATA_SET[currentIdx];
+
+  // Early route authorization safeguard if user payload goes missing
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
 
   if (!lesson) {
     return (
@@ -313,22 +350,43 @@ export default function SqlLessonPage() {
         <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
         <h2 className="text-lg font-bold">Lesson Not Found</h2>
         <p className="text-sm text-muted-foreground">The requested SQL lesson module could not be traced.</p>
-        <button onClick={() => navigate('/sql')} className="text-xs text-primary underline">
+        <button onClick={() => navigate('/sql-learn')} className="text-xs text-primary underline">
           Return to SQL Directory
         </button>
       </div>
     );
   }
 
+  // Persistence handler to update user profiles on course progression matches
+  const handlePersistProgress = () => {
+    const localCompleted = JSON.parse(localStorage.getItem('sql_completed_lessons') || '[]');
+    if (!localCompleted.includes(lesson.id)) {
+      const advancedList = [...localCompleted, lesson.id];
+      localStorage.setItem('sql_completed_lessons', JSON.stringify(advancedList));
+    }
+
+    if (user && updateUser && !user.completedLessons.includes(lesson.id)) {
+      updateUser({
+        completedLessons: [...user.completedLessons, lesson.id]
+      });
+    }
+  };
+
   const handleNext = () => {
-    if (currentIdx < sqlLessons.length - 1) {
-      navigate(`/sql/${sqlLessons[currentIdx + 1].id}`);
+    if (currentIdx >= 0 && currentIdx < LESSON_DATA_SET.length - 1) {
+      const nextLesson = LESSON_DATA_SET[currentIdx + 1];
+      navigate(`/sql-lesson/${nextLesson.id}${fromQs}`);
     }
   };
 
   const handleBack = () => {
-    navigate('/sql');
+    navigate(from === 'dashboard' ? '/dashboard' : '/sql-learn');
   };
+
+  const userCompletedList = user?.completedLessons || [];
+  const hasCompletedCurrent = userCompletedList.includes(lesson.id);
+  const nextLessonObj = LESSON_DATA_SET[currentIdx + 1];
+  const isNextUnlocked = nextLessonObj ? isSqlLessonUnlocked(nextLessonObj.id, userCompletedList) : false;
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-12">
@@ -336,16 +394,18 @@ export default function SqlLessonPage() {
       <div className="border-b border-border/40 bg-background/50 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <button onClick={handleBack} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-all">
-            <ChevronLeft className="w-4 h-4" /> Back to Dashboard
+            <ChevronLeft className="w-4 h-4" /> Exit to Menu
           </button>
+          
           <div className="flex items-center gap-2 text-xs font-medium">
             <BookOpen className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">SQL Track:</span>
+            <span className="text-muted-foreground font-mono">Module {currentIdx + 1}/{LESSON_DATA_SET.length}:</span>
             <span>{lesson.title}</span>
           </div>
+
           <button 
             onClick={handleNext}
-            disabled={currentIdx === sqlLessons.length - 1}
+            disabled={currentIdx === LESSON_DATA_SET.length - 1 || (!hasCompletedCurrent && !isNextUnlocked)}
             className="flex items-center gap-1 px-3 py-1.5 bg-secondary hover:bg-secondary/80 disabled:opacity-40 rounded-xl text-xs font-semibold transition-all"
           >
             Next <ArrowRight className="w-3.5 h-3.5" />
@@ -359,20 +419,25 @@ export default function SqlLessonPage() {
         <div className="lg:col-span-2 space-y-4">
           <div className="glass-card rounded-2xl p-6 space-y-4">
             <div className="space-y-1">
-              <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-bold">
-                Module {currentIdx + 1} of {sqlLessons.length}
+              <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-bold flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                SQL Databases Track
               </span>
               <h1 className="text-xl font-extrabold tracking-tight">{lesson.title}</h1>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
-              {lesson.practical.intro || "Learn how to structure database queries via this step-by-step technical workbook."}
+              {lesson.practical?.intro || "Learn how to structure database queries via this step-by-step technical workbook."}
             </p>
           </div>
         </div>
 
         {/* Right Side: Execution sandbox playground environment */}
         <div className="lg:col-span-3">
-          <SqlWorkspace practical={lesson.practical} />
+          <SqlWorkspace 
+            lessonId={lesson.id} 
+            practical={lesson.practical} 
+            onSuccessCompletion={handlePersistProgress} 
+          />
         </div>
       </div>
     </div>
