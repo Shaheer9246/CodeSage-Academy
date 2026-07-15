@@ -119,34 +119,26 @@ export function getStudentCount(track: TrackId): number {
 
 // ---------- writes (async, persisted to Supabase) ----------
 export async function enroll(track: TrackId): Promise<Enrollment> {
-  const optimistic: Enrollment = {
-    track, status: 'active', enrolledAt: Date.now(),
-  };
+  // Strict execution block if already running 2 active courses
+  if (!isActive(track) && activeCount() >= 2) {
+    throw new Error('Action restricted: Maximum limit of 2 active courses reached.');
+  }
+
   const existing = mem.find(e => e.track === track);
+  const oldStatus = existing?.status;
   const wasCounted = !!existing && existing.status !== 'ended';
+  
+  // Optimistic update
   if (existing) existing.status = 'active';
-  else mem.push(optimistic);
+  else mem.push({ track, status: 'active', enrolledAt: Date.now() });
+  
   if (!wasCounted) counts[track] = (counts[track] ?? 0) + 1;
   emit();
 
   if (currentUserId) {
     try {
       const { data, error } = await supabase.rpc('enroll_track', { _track: track });
-      
-      // FALLBACK: If RPC fails or triggers a constraint limit rule, write directly to table
-      if (error) {
-        console.warn('[enrollment] RPC restricted enrollment, running direct table override...', error);
-        const { error: upsertError } = await supabase
-          .from('enrollments')
-          .upsert({
-            user_id: currentUserId,
-            track: track,
-            status: 'active',
-            enrolled_at: new Date().toISOString()
-          }, { onConflict: 'user_id,track' });
-          
-        if (upsertError) throw upsertError;
-      }
+      if (error) throw error;
 
       const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
       if (stats) counts[track] = stats.enrolled_count;
@@ -156,45 +148,59 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
       }
       emit();
     } catch (err) {
-      console.warn('[enrollment] enroll write operation failed', err);
+      console.warn('[enrollment] enroll action rejected by server, rolling back...', err);
+      // Revert cache to original state
+      if (existing) {
+        if (oldStatus) existing.status = oldStatus;
+      } else {
+        mem = mem.filter(e => e.track !== track);
+      }
+      if (!wasCounted) counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
+      emit();
+      throw err;
     }
   }
-  return mem.find(e => e.track === track) || optimistic;
+  return mem.find(e => e.track === track) || { track, status: 'active', enrolledAt: Date.now() };
 }
 
 async function updateStatus(track: TrackId, status: EnrollmentStatus) {
+  // Strict execution block if trying to activate/resume a track when already running 2 active courses
+  if (status === 'active' && !isActive(track) && activeCount() >= 2) {
+    console.warn('[enrollment] Action restricted: Cannot activate track. Limit is 2 active courses.');
+    return;
+  }
+
   const e = mem.find(x => x.track === track);
   const prevStatus = e?.status;
-  if (e) { e.status = status; }
-  // Adjust local count when transitioning in/out of 'ended' so the displayed number reacts instantly.
+  if (!e) return;
+
+  // Optimistic update
+  e.status = status;
   if (prevStatus && prevStatus !== 'ended' && status === 'ended') {
     counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
   } else if (prevStatus === 'ended' && status !== 'ended') {
     counts[track] = (counts[track] ?? 0) + 1;
   }
   emit();
+
   if (currentUserId) {
     try {
       const { error } = await supabase.rpc('update_enrollment_status', { _track: track, _status: status });
-      
-      // FALLBACK: If status adjustment fails via RPC (like resuming a 3rd track), force update table directly
-      if (error) {
-        console.warn('[enrollment] RPC status change restricted, executing table override...');
-        const { error: upsertError } = await supabase
-          .from('enrollments')
-          .upsert({
-            user_id: currentUserId,
-            track: track,
-            status: status
-          }, { onConflict: 'user_id,track' });
-          
-        if (upsertError) throw upsertError;
-      }
+      if (error) throw error;
 
-      // Re-sync from server for accuracy.
       const { data: stats } = await supabase.from('track_stats').select('*').eq('track', track).maybeSingle();
       if (stats) { counts[track] = stats.enrolled_count; emit(); }
-    } catch (err) { console.warn('[enrollment] status update failed', err); }
+    } catch (err) { 
+      console.warn('[enrollment] status update rejected by server, rolling back...', err);
+      // Revert cache adjustments
+      e.status = prevStatus;
+      if (prevStatus && prevStatus !== 'ended' && status === 'ended') {
+        counts[track] = (counts[track] ?? 0) + 1;
+      } else if (prevStatus === 'ended' && status !== 'ended') {
+        counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
+      }
+      emit();
+    }
   }
 }
 export function pause(track: TrackId) { void updateStatus(track, 'paused'); }
