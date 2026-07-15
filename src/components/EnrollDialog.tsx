@@ -70,12 +70,10 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   const step: Step = useMemo(() => {
     if (!track) return 'idcard';
     
-    // 1. Check prerequisites first so students see guidance regardless of limits
     const meta = TRACK_META[track];
     const needsPrereq = (meta?.prereq || []).some(p => !isEnrolled(p));
     if (needsPrereq && PREREQ_COPY[track]) return 'prereq';
 
-    // 2. Check active cap limitation
     if (!isActive(track) && activeCount() >= 2) return 'limit';
     
     return 'idcard';
@@ -92,12 +90,11 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
       onEnrolled?.(track);
       toast.success(`Successfully enrolled in ${meta?.label || 'track'}!`);
       onClose();
-      // Use meta defined route path safely ('/sql-learn')
       setTimeout(() => navigate(meta?.route || '/dashboard'), 50);
       return rec;
     } catch (err: any) {
       console.error('[EnrollDialog] Enrollment failed:', err);
-      toast.error(err?.message || 'Database rejected enrollment. Check if server schema supports this track.');
+      toast.error(err?.message || 'Database rejected enrollment.');
     } finally {
       setIsSubmitting(false);
     }
@@ -130,8 +127,6 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   );
 }
 
-// ---------- steps ----------
-
 function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () => void }) {
   const list = getEnrollments().filter(e => e.status === 'active');
   return (
@@ -141,8 +136,7 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
           <AlertTriangle className="w-5 h-5 text-accent-orange" /> You're already in 2 courses
         </DialogTitle>
         <DialogDescription className="text-xs leading-relaxed">
-          We recommend keeping your focus on just 2 tracks — quality beats quantity, and finishing what you start builds real skill.
-          Pause or end one below to make room for this new course.
+          We recommend keeping your focus on just 2 tracks. Pause or end one below to make room for this new course.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-2 mt-2">
@@ -152,7 +146,6 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
               <p className="text-xs font-display font-semibold text-foreground truncate">
                 {TRACK_META[e.track]?.label || e.track}
               </p>
-              <p className="text-[10px] text-muted-foreground font-mono">{e.studentId || '—'}</p>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button onClick={() => { pauseTrack(e.track); onChanged(); }}
