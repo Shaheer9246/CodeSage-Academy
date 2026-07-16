@@ -112,13 +112,15 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
     // 1. Strict Limit Check Priority
     if (!isActive(track) && activeCount() >= 2) return 'limit';
 
-    // 2. Fallback to Prerequisite Check
+    // 2. Fallback to Prerequisite Check — show the pre-req card unless the
+    //    prereq track is actually COMPLETED (not just enrolled).
     const meta = TRACK_META[track];
-    const needsPrereq = (meta?.prereq || []).some(p => !isEnrolled(p));
+    const completed = user?.completedLessons || [];
+    const needsPrereq = (meta?.prereq || []).some(p => !isTrackCompleted(p, completed));
     if (needsPrereq && PREREQ_COPY[track]) return 'prereq';
 
     return 'idcard';
-  }, [track, open, tick]); 
+  }, [track, open, tick, user?.completedLessons]);
 
   if (!track) return null;
   const meta = TRACK_META[track];
