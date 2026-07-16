@@ -204,6 +204,32 @@ export async function hydrateEnrollments(
       }
     });
 
+    // Enforce the 2-active-track limit on hydration. If the DB carries over
+    // more than 2 active tracks from earlier sessions, auto-pause the older
+    // ones so the client state matches the rule.
+    const actives = mem
+      .filter(e => e.status === 'active')
+      .sort((a, b) => b.enrolledAt - a.enrolledAt);
+    if (actives.length > 2) {
+      const toPause = actives.slice(2);
+      toPause.forEach(e => {
+        e.status = 'paused';
+      });
+      // Best-effort DB sync (fire-and-forget)
+      toPause.forEach(e => {
+        if (!DB_UNSUPPORTED.has(e.track)) {
+          try {
+            void supabase.rpc('update_enrollment_status', {
+              _track: e.track,
+              _status: 'paused',
+            });
+          } catch {
+            /* noop */
+          }
+        }
+      });
+    }
+
     emit();
   } catch (err) {
     console.warn('[enrollment] hydrate failed', err);

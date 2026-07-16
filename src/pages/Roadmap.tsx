@@ -227,7 +227,7 @@ const Roadmap = () => {
                       <motion.div
                         initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: Math.min(i * 0.02, 0.3) }}
-                        className="text-[10px] sm:text-xs text-primary/60 font-display font-semibold uppercase tracking-wider mb-1.5 pl-2"
+                        className="text-[10px] sm:text-xs text-primary/60 font-display font-semibold uppercase tracking-wider mb-1.5 pl-2 overflow-x-auto whitespace-nowrap scrollbar-none"
                       >
                         {node.chapter}
                       </motion.div>
@@ -239,7 +239,7 @@ const Roadmap = () => {
                       className={`flex items-center w-full ${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/20 rounded-xl sm:rounded-2xl' : ''}`}
                     >
                       <button onClick={status !== 'locked' ? () => handleNodeClick(node) : undefined}
-                        className={`flex items-center gap-1.5 sm:gap-3 px-1.5 py-1.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all w-[48%] sm:w-auto sm:max-w-[45%] ${
+                        className={`flex items-center gap-1.5 sm:gap-3 px-1.5 py-1.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all w-1/2 max-w-[50%] sm:w-auto sm:max-w-[45%] overflow-hidden ${
                           status === 'completed' ? 'bg-primary/8 border-primary/30 hover:border-primary/50' :
                           status === 'current' ? 'bg-primary/10 border-primary/40 neon-glow' :
                           status === 'upcoming' ? 'bg-secondary/20 border-border/30 hover:border-primary/20 opacity-70' :
@@ -252,13 +252,13 @@ const Roadmap = () => {
                         }`}>
                           {status === 'locked' ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" /> : node.icon}
                         </div>
-                        <div className="text-left min-w-0 flex-1">
+                        <div className="text-left min-w-0 flex-1 overflow-hidden">
                           <p className={`text-[9px] sm:text-sm font-display font-semibold truncate leading-tight ${
                             status === 'completed' ? 'text-foreground' :
                             status === 'current' ? 'text-primary' :
                             'text-muted-foreground'
                           }`}>{node.label}</p>
-                          <p className="text-[7.5px] sm:text-[10px] text-muted-foreground font-mono mt-0.5">
+                          <p className="text-[7.5px] sm:text-[10px] text-muted-foreground font-mono mt-0.5 truncate">
                             {status === 'completed' ? 'Complete ✓' :
                              status === 'current' ? 'In Progress →' :
                              status === 'upcoming' ? `Step ${node.step}` :
