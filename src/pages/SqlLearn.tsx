@@ -16,8 +16,8 @@ const SqlLearn = () => {
   const from = params.get('from');
   const fromQs = from ? `?from=${from}` : '';
   
-  // Routes back to dashboard by default, unless arriving from the roadmap
-  const backTo = from === 'roadmap' ? '/roadmap' : '/dashboard';
+  // Always route back to dashboard
+const backTo = '/dashboard';
 
   // Prevent side effects during the render cycle
   useEffect(() => {
