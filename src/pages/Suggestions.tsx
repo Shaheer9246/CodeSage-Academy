@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Send, Lock, MessageSquare, ShieldCheck, Edit2, Save, X, Reply, ShieldAlert, Trash2 } from 'lucide-react';
+import { ArrowLeft, Send, Lock, MessageSquare, ShieldCheck, Edit2, Save, X, Reply, ShieldAlert, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -15,6 +15,9 @@ interface Suggestion {
   reply_at: string | null;
   created_at: string;
   updated_at: string;
+  upvotes: number;
+  downvotes: number;
+  user_vote?: 'up' | 'down' | null;
 }
 
 const PROMPTS = [
@@ -42,15 +45,41 @@ const Suggestions = () => {
   const [postedToday, setPostedToday] = useState(false);
 
   const refresh = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data: suggestionsData, error: suggestionsError } = await supabase
       .from('suggestions')
       .select('*')
       .order('created_at', { ascending: false });
-    if (error) { console.error(error); return; }
-    setItems((data || []) as Suggestion[]);
+      
+    if (suggestionsError) { console.error(suggestionsError); return; }
+
+    let userVotes: Record<string, 'up' | 'down'> = {};
+
+    if (user) {
+      const { data: votesData } = await supabase
+        .from('suggestion_votes')
+        .select('suggestion_id, vote_type')
+        .eq('user_id', user.id);
+
+      if (votesData) {
+        userVotes = votesData.reduce((acc, curr) => {
+          acc[curr.suggestion_id] = curr.vote_type as 'up' | 'down';
+          return acc;
+        }, {} as Record<string, 'up' | 'down'>);
+      }
+    }
+
+    const itemsWithVotes = (suggestionsData || []).map((s: any) => ({
+      ...s,
+      upvotes: s.upvotes || 0,
+      downvotes: s.downvotes || 0,
+      user_vote: userVotes[s.id] || null,
+    })) as Suggestion[];
+
+    setItems(itemsWithVotes);
+
     if (user) {
       const today = new Date(); today.setHours(0, 0, 0, 0);
-      const mine = (data || []).some(s =>
+      const mine = itemsWithVotes.some(s =>
         s.user_id === user.id && new Date(s.created_at) >= today
       );
       setPostedToday(mine);
@@ -66,7 +95,7 @@ const Suggestions = () => {
     return () => { supabase.removeChannel(ch); };
   }, [refresh]);
 
- // Mark suggestions as read when the user opens the page
+  // Mark suggestions as read when the user opens the page
   useEffect(() => {
     if (user) {
       const markAsRead = async () => {
@@ -144,6 +173,72 @@ const Suggestions = () => {
     refresh();
   };
 
+  const handleVote = async (suggestionId: string, type: 'up' | 'down') => {
+    if (!user) {
+      toast.error('You must be logged in to vote.');
+      return;
+    }
+
+    const currentSuggestion = items.find(s => s.id === suggestionId);
+    if (!currentSuggestion) return;
+
+    const existingVote = currentSuggestion.user_vote;
+
+    // Optimistic UI updates
+    let newUpvotes = currentSuggestion.upvotes;
+    let newDownvotes = currentSuggestion.downvotes;
+    let newVoteState: 'up' | 'down' | null = type;
+
+    if (existingVote === type) {
+      // Undo existing vote
+      if (type === 'up') newUpvotes = Math.max(0, newUpvotes - 1);
+      else newDownvotes = Math.max(0, newDownvotes - 1);
+      newVoteState = null;
+    } else {
+      // Add new vote or switch vote
+      if (type === 'up') {
+        newUpvotes += 1;
+        if (existingVote === 'down') newDownvotes = Math.max(0, newDownvotes - 1);
+      } else {
+        newDownvotes += 1;
+        if (existingVote === 'up') newUpvotes = Math.max(0, newUpvotes - 1);
+      }
+    }
+
+    // Instantly update UI locally
+    setItems(prev => prev.map(s => s.id === suggestionId ? {
+      ...s,
+      upvotes: newUpvotes,
+      downvotes: newDownvotes,
+      user_vote: newVoteState
+    } : s));
+
+    try {
+      if (newVoteState === null) {
+        // Delete vote from DB
+        await supabase.from('suggestion_votes').delete().eq('suggestion_id', suggestionId).eq('user_id', user.id);
+      } else {
+        // Upsert vote in DB
+        await supabase.from('suggestion_votes').upsert({
+          suggestion_id: suggestionId,
+          user_id: user.id,
+          vote_type: type
+        }, { onConflict: 'suggestion_id,user_id' });
+      }
+
+      // Sync actual database counters for the suggestion
+      await supabase.from('suggestions').update({
+        upvotes: newUpvotes,
+        downvotes: newDownvotes
+      }).eq('id', suggestionId);
+
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to register vote.');
+      refresh(); // Rollback UI to actual DB state on failure
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
       <div className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-primary/3 blur-[120px] pointer-events-none" />
@@ -215,7 +310,37 @@ const Suggestions = () => {
                     ) : (
                       <p className="text-sm text-foreground whitespace-pre-wrap break-words">{s.text}</p>
                     )}
-                    <p className="text-[9px] text-muted-foreground mt-1">
+                    
+                    {/* Upvote & Downvote buttons */}
+                    {!isEditing && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          onClick={() => handleVote(s.id, 'up')}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-mono transition-all ${
+                            s.user_vote === 'up'
+                              ? 'bg-primary/20 border-primary text-primary neon-glow'
+                              : 'bg-secondary/20 border-border/40 text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                          <span>{s.upvotes}</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleVote(s.id, 'down')}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-mono transition-all ${
+                            s.user_vote === 'down'
+                              ? 'bg-destructive/20 border-destructive text-destructive'
+                              : 'bg-secondary/20 border-border/40 text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                          <span>{s.downvotes}</span>
+                        </button>
+                      </div>
+                    )}
+
+                    <p className="text-[9px] text-muted-foreground mt-2">
                       {new Date(s.created_at).toLocaleString()}
                       {s.updated_at && s.updated_at !== s.created_at && ' · edited'}
                     </p>
@@ -245,7 +370,7 @@ const Suggestions = () => {
                 )}
 
                 {s.reply && (
-                  <div className="pl-3 border-l-2 border-primary/40 bg-primary/5 rounded-r-lg p-2.5">
+                  <div className="pl-3 border-l-2 border-primary/40 bg-primary/5 rounded-r-lg p-2.5 mt-2">
                     <p className="text-[10px] text-primary font-semibold flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3" /> Admin reply
                     </p>
