@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
-import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAllLessons } from '@/data/lessons';
 import { motion } from 'framer-motion';
@@ -10,6 +10,15 @@ import { resetGuestLessons } from '@/lib/guestGate';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
 import AvatarPicker, { getStoredAvatar } from '@/components/AvatarPicker';
+import {
+  TRACK_META,
+  TrackId,
+  getEnrollments,
+  pause as pauseTrack,
+  resume as resumeTrack,
+  end as endTrack,
+  onEnrollmentChange,
+} from '@/lib/enrollment';
 
 type Achievement = {
   id: string;
@@ -55,6 +64,8 @@ const SettingsPage = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
+  // Force re-render when enrollment state changes (pause/resume/end)
+  const [, setEnrollTick] = useState(0);
 
   useEffect(() => { setTheme(getTheme()); }, []);
   useEffect(() => { if (user?.id) setAvatarUrl(getStoredAvatar(user.id)); }, [user?.id]);
@@ -65,6 +76,7 @@ const SettingsPage = () => {
       console.warn('Failed to persist autoRun setting', error);
     }
   }, [autoRun]);
+  useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
 
   const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
 
@@ -123,13 +135,15 @@ const SettingsPage = () => {
   const completedCount = user.completedLessons.length;
   const progress = totalLessons ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-  // Track breakdown for detail dialogs
+  // Track breakdown for detail dialogs — now includes SQL and Python Expert
   const lessonGroups = [
     { key: 'frontend', label: 'Frontend', match: (id: string) => /^(html|css|js|react|multi|form|a11y|pro|proj)-/.test(id) },
     { key: 'networking', label: 'Networking', match: (id: string) => id.startsWith('net-') },
     { key: 'fullstack', label: 'Full Stack', match: (id: string) => id.startsWith('fs-') },
     { key: 'freelance', label: 'Freelance', match: (id: string) => id.startsWith('free-') },
-    { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') },
+    { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') && !id.startsWith('pyx-') },
+    { key: 'pythonexpert', label: 'Python Expert', match: (id: string) => id.startsWith('pyx-') || id.startsWith('pyexpert-') },
+    { key: 'sql', label: 'SQL', match: (id: string) => id.startsWith('sql-') },
     { key: 'local', label: 'Local-Only', match: (id: string) => id.startsWith('local-') },
     { key: 'challenges', label: 'Challenges', match: (id: string) => id.startsWith('challenge-') },
     { key: 'crawler', label: 'Code Crawler', match: (id: string) => id.startsWith('crawler-') },
@@ -153,6 +167,29 @@ const SettingsPage = () => {
   };
 
   const initials = (user.name || user.username || 'U').slice(0, 2).toUpperCase();
+
+  // Enrollment lists (excluding "ended" from active/paused view)
+  const enrollments = getEnrollments();
+  const activeEnroll = enrollments.filter(e => e.status === 'active');
+  const pausedEnroll = enrollments.filter(e => e.status === 'paused');
+
+  const doPause = (t: TrackId) => {
+    pauseTrack(t);
+    toast.success(`Paused ${TRACK_META[t]?.short || t}`);
+  };
+  const doResume = (t: TrackId) => {
+    if (activeEnroll.length >= 2) {
+      toast.error('You already have 2 active tracks. Pause one first.');
+      return;
+    }
+    resumeTrack(t);
+    toast.success(`Resumed ${TRACK_META[t]?.short || t}`);
+  };
+  const doEnd = (t: TrackId) => {
+    if (!confirm(`End enrollment in ${TRACK_META[t]?.label || t}? Your progress stays, but the track goes back to un-enrolled.`)) return;
+    endTrack(t);
+    toast.success(`Ended ${TRACK_META[t]?.short || t}`);
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
@@ -226,6 +263,83 @@ const SettingsPage = () => {
             <p className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</p>
             <p className="text-[10px] text-muted-foreground">XP</p>
           </button>
+        </div>
+
+        {/* Enrollment Management */}
+        <div className="glass-card rounded-2xl p-5">
+          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-1">
+            <GraduationCap className="w-4 h-4 text-primary" /> My Enrollments
+          </h3>
+          <p className="text-[10px] text-muted-foreground mb-3">
+            You can be active in up to <strong>2 tracks</strong> at a time. Pause a track to free a slot, or end it to un-enroll (progress stays).
+          </p>
+
+          {/* Active tracks */}
+          <div className="mb-3">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-display mb-2">
+              Active · {activeEnroll.length}/2
+            </p>
+            {activeEnroll.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground bg-secondary/15 rounded-lg px-3 py-2 border border-border/20">
+                No active tracks. Pick one from the Roadmap to start.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {activeEnroll.map(e => (
+                  <div key={e.track} className="flex items-center justify-between gap-2 bg-primary/5 rounded-xl px-3 py-2 border border-primary/20">
+                    <div className="min-w-0">
+                      <p className="text-xs font-display font-semibold text-foreground truncate">
+                        {TRACK_META[e.track]?.label || e.track}
+                      </p>
+                      <p className="text-[10px] text-primary font-mono">Active</p>
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button onClick={() => doPause(e.track)}
+                        className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25">
+                        <PauseCircle className="w-3 h-3" /> Pause
+                      </button>
+                      <button onClick={() => doEnd(e.track)}
+                        className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25">
+                        <StopCircle className="w-3 h-3" /> End
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Paused tracks */}
+          {pausedEnroll.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-display mb-2">
+                Paused · {pausedEnroll.length}
+              </p>
+              <div className="space-y-2">
+                {pausedEnroll.map(e => (
+                  <div key={e.track} className="flex items-center justify-between gap-2 bg-secondary/20 rounded-xl px-3 py-2 border border-border/30">
+                    <div className="min-w-0">
+                      <p className="text-xs font-display font-semibold text-foreground truncate">
+                        {TRACK_META[e.track]?.label || e.track}
+                      </p>
+                      <p className="text-[10px] text-amber-400 font-mono">Paused</p>
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button onClick={() => doResume(e.track)}
+                        disabled={activeEnroll.length >= 2}
+                        className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-primary/15 text-primary border border-primary/30 hover:bg-primary/25 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <ResumeIcon className="w-3 h-3" /> Resume
+                      </button>
+                      <button onClick={() => doEnd(e.track)}
+                        className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25">
+                        <StopCircle className="w-3 h-3" /> End
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Badges */}
@@ -398,13 +512,22 @@ const SettingsPage = () => {
               <div className="space-y-2">
                 {lessonGroups.filter(g => !['challenges', 'crawler'].includes(g.key)).map(g => {
                   // approx denominators per track (matches data files)
-                  const totals: Record<string, number> = { frontend: 50, networking: 13, fullstack: 30, freelance: 12, python: 30, local: 15 };
+                  const totals: Record<string, number> = {
+                    frontend: 50,
+                    networking: 13,
+                    fullstack: 30,
+                    freelance: 12,
+                    python: 30,
+                    pythonexpert: 30,
+                    sql: 10,
+                    local: 15,
+                  };
                   const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
                   return (
                     <div key={g.key}>
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-foreground">{g.label}</span>
-                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
+                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
                       </div>
                       <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
                         <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
@@ -438,6 +561,8 @@ const SettingsPage = () => {
                 <p className="text-[11px] text-muted-foreground">XP sources:</p>
                 <ul className="space-y-1 text-[11px]">
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Lessons completed</span><span className="font-mono text-primary">{completedCount} × 5 XP</span></li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Python Expert lessons</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'pythonexpert')?.count || 0} / 30</span></li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>SQL lessons</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'sql')?.count || 0} / 10</span></li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Exams passed</span><span className="font-mono text-primary">{user.completedTests?.length || 0} entries</span></li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Challenges solved</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</span></li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Crawler runs</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'crawler')?.count || 0} × 10 XP</span></li>
