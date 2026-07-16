@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { GraduationCap, AlertTriangle, ArrowRight, PauseCircle, StopCircle, Loader2 } from 'lucide-react';
 import {
-  TrackId, TRACK_META, enroll, activeCount, getEnrollments, isEnrolled, isActive,
-  pause as pauseTrack, end as endTrack, onEnrollmentChange
+  TrackId, TRACK_META, enroll,
+  activeCount, getEnrollments,
+  isEnrolled, isActive,
+  pause as pauseTrack, end as endTrack,
+  onEnrollmentChange
 } from '@/lib/enrollment';
 import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
@@ -21,12 +24,12 @@ type Step = 'limit' | 'prereq' | 'idcard';
 const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: { label: string; route: string }[] }>> = {
   fullstack: {
     title: 'Did you complete Frontend Development?',
-    body: 'Full-Stack builds directly on HTML, CSS, and JavaScript. Finish the Frontend track first so this course feels like leveling up — not learning from scratch.',
+    body: 'Full-Stack builds directly on HTML, CSS, and JavaScript. Finish the Frontend track first so this course feels like leveling up – not learning from scratch.',
     ctas: [{ label: 'Go to Frontend course', route: '/learn' }],
   },
   freelance: {
     title: 'Are you ready to sell your work?',
-    body: 'Freelancing is easier when you already have a skill to sell. Please complete Frontend Development and Full-Stack Frontend Development first — then this course will show you how to turn those skills into income.',
+    body: 'Freelancing is easier when you already have a skill to sell. Please complete Frontend Development and Full-Stack Frontend Development first – then this course will show you how to turn those skills into income.',
     ctas: [
       { label: 'Frontend course', route: '/learn' },
       { label: 'Full-Stack course', route: '/fullstack' },
@@ -49,7 +52,7 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
   },
   pythonexpert: {
     title: 'Finish Python Programming first',
-    body: 'Python Expert is an advanced-level track that builds directly on Python Programming (beginner → intermediate → advanced). Please complete Python Programming first — otherwise the expert lessons will be hard to follow.',
+    body: 'Python Expert is an advanced-level track that builds directly on Python Programming (beginner → intermediate → advanced). Please complete Python Programming first – otherwise the expert lessons will be hard to follow.',
     ctas: [{ label: 'Python Programming course', route: '/python' }],
   },
 };
@@ -57,7 +60,7 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
   const navigate = useNavigate();
   const { user } = useUser();
-  const [tick, setTick] = useState(0); 
+  const [tick, setTick] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const refresh = () => setTick(t => t + 1);
 
@@ -69,15 +72,17 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
 
   const step: Step = useMemo(() => {
     if (!track) return 'idcard';
-    
+
+    // 1. Prioritize Limit Check: Ensure 2-course max is enforced before checking prerequisites
+    if (!isActive(track) && activeCount() >= 2) return 'limit';
+
+    // 2. Fallback to Prerequisite Check
     const meta = TRACK_META[track];
     const needsPrereq = (meta?.prereq || []).some(p => !isEnrolled(p));
     if (needsPrereq && PREREQ_COPY[track]) return 'prereq';
 
-    if (!isActive(track) && activeCount() >= 2) return 'limit';
-    
     return 'idcard';
-  }, [track, tick, open]);
+  }, [track, open, tick]); // Crucial fix: Added 'tick' to dependencies
 
   if (!track) return null;
   const meta = TRACK_META[track];
@@ -148,12 +153,10 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
               </p>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
-              <button onClick={() => { pauseTrack(e.track); onChanged(); }}
-                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 hover:bg-accent-yellow/25">
+              <button onClick={() => { pauseTrack(e.track); onChanged(); }} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 hover:bg-accent-yellow/25">
                 <PauseCircle className="w-3 h-3" /> Pause
               </button>
-              <button onClick={() => { endTrack(e.track); onChanged(); }}
-                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25">
+              <button onClick={() => { endTrack(e.track); onChanged(); }} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25">
                 <StopCircle className="w-3 h-3" /> End
               </button>
             </div>
@@ -191,17 +194,14 @@ function PrereqStep({
       </DialogHeader>
       <div className="space-y-2 mt-4">
         {copy.ctas.map(cta => (
-          <button key={cta.route} onClick={() => !isSubmitting && onGoTo(cta.route)} disabled={isSubmitting}
-            className="w-full flex items-center justify-between gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl px-3 py-2 text-primary text-xs font-display font-bold transition-all disabled:opacity-50">
+          <button key={cta.route} onClick={() => !isSubmitting && onGoTo(cta.route)} disabled={isSubmitting} className="w-full flex items-center justify-between gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl px-3 py-2 text-primary text-xs font-display font-bold transition-all disabled:opacity-50">
             {cta.label} <ArrowRight className="w-4 h-4" />
           </button>
         ))}
-        <button onClick={onEnrollAnyway} disabled={isSubmitting}
-          className="w-full bg-secondary/40 hover:bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-foreground text-xs font-display font-bold flex items-center justify-center gap-2 disabled:opacity-50">
+        <button onClick={onEnrollAnyway} disabled={isSubmitting} className="w-full bg-secondary/40 hover:bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-foreground text-xs font-display font-bold flex items-center justify-center gap-2 disabled:opacity-50">
           {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Enroll anyway'}
         </button>
-        <button onClick={onBack} disabled={isSubmitting}
-          className="w-full text-muted-foreground hover:text-foreground text-[11px] py-1 font-display disabled:opacity-50">
+        <button onClick={onBack} disabled={isSubmitting} className="w-full text-muted-foreground hover:text-foreground text-[11px] py-1 font-display disabled:opacity-50">
           Back
         </button>
       </div>
@@ -227,7 +227,7 @@ function IdCardStep({
           <GraduationCap className="w-5 h-5 text-primary" /> Welcome aboard!
         </DialogTitle>
         <DialogDescription className="text-xs leading-relaxed">
-          You're about to enroll in <span className="text-primary font-semibold">{meta?.label || 'Track'}</span>. Here's your student card — keep it in your pocket 🎓
+          You're about to enroll in <span className="text-primary font-semibold">{meta?.label || 'Track'}</span>. Here's your student card – keep it in your pocket 🎓
         </DialogDescription>
       </DialogHeader>
       <div className="mt-2 rounded-2xl p-4 border border-primary/40 bg-gradient-to-br from-primary/10 via-background to-accent-blue/10 neon-glow">
@@ -245,14 +245,13 @@ function IdCardStep({
         </div>
       </div>
       <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
-        Small win, big journey. Show up daily — that's the whole trick. Ready?
+        Small win, big journey. Show up daily – that's the whole trick. Ready?
       </p>
       <div className="flex justify-end gap-2 pt-2">
         <button onClick={onBack} disabled={isSubmitting} className="text-xs px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-foreground font-display">
           Not now
         </button>
-        <button onClick={onCarryOn} disabled={isSubmitting}
-          className="text-xs px-4 py-2 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:neon-glow flex items-center gap-1 disabled:opacity-50">
+        <button onClick={onCarryOn} disabled={isSubmitting} className="text-xs px-4 py-2 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:neon-glow flex items-center gap-1 disabled:opacity-50">
           {isSubmitting ? (
             <>Validating... <Loader2 className="w-3.5 h-3.5 animate-spin" /></>
           ) : (
