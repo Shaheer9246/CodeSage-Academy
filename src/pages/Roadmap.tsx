@@ -236,11 +236,10 @@ const Roadmap = () => {
                     <motion.div
                       initial={{ opacity: 0, x: isLeft ? -20 : 20 }} animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: Math.min(i * 0.02, 0.3), type: 'spring', stiffness: 120 }}
-                      className={`flex items-center gap-1.5 ${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/20 rounded-xl sm:rounded-2xl' : ''}`}
+                      className={`flex items-center w-full ${isLeft ? 'justify-start' : 'justify-end'} ${isCurrent ? 'ring-2 ring-primary/20 rounded-xl sm:rounded-2xl' : ''}`}
                     >
-                      {!isLeft && <div className="flex-1 min-w-[15%]" />}
                       <button onClick={status !== 'locked' ? () => handleNodeClick(node) : undefined}
-                        className={`flex items-center gap-2 px-2.5 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all w-[82%] sm:w-auto sm:max-w-[70%] ${
+                        className={`flex items-center gap-2 px-2.5 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all w-[60%] sm:w-auto sm:max-w-[70%] ${
                           status === 'completed' ? 'bg-primary/8 border-primary/30 hover:border-primary/50' :
                           status === 'current' ? 'bg-primary/10 border-primary/40 neon-glow' :
                           status === 'upcoming' ? 'bg-secondary/20 border-border/30 hover:border-primary/20 opacity-70' :
@@ -268,7 +267,6 @@ const Roadmap = () => {
                         </div>
                         {status === 'completed' && <Check className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-primary ml-auto flex-shrink-0" />}
                       </button>
-                      {isLeft && <div className="flex-1 min-w-[15%]" />}
                     </motion.div>
 
                     {i < activeNodes.length - 1 && (
