@@ -73,7 +73,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
   const step: Step = useMemo(() => {
     if (!track) return 'idcard';
 
-    // 1. Prioritize Limit Check: Ensure 2-course max is enforced before checking prerequisites
+    // 1. Strict Limit Check Priority
     if (!isActive(track) && activeCount() >= 2) return 'limit';
 
     // 2. Fallback to Prerequisite Check
@@ -82,13 +82,21 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
     if (needsPrereq && PREREQ_COPY[track]) return 'prereq';
 
     return 'idcard';
-  }, [track, open, tick]); // Crucial fix: Added 'tick' to dependencies
+  }, [track, open, tick]); 
 
   if (!track) return null;
   const meta = TRACK_META[track];
 
   const doEnroll = async () => {
     if (isSubmitting) return;
+
+    // Bulletproof frontend check to physically block submission if over limit
+    if (!isActive(track) && activeCount() >= 2) {
+      toast.error('Course limit reached. Please pause existing courses first.');
+      refresh();
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const rec = await enroll(track);
@@ -133,15 +141,20 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
 }
 
 function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () => void }) {
-  const list = getEnrollments().filter(e => e.status === 'active');
+  // Use robust string checking to ensure no UI ghosting
+  const list = getEnrollments().filter(e => e.status?.toLowerCase()?.trim() === 'active');
+  const currentCount = list.length;
+  // Dynamically calculate how many they need to pause to get back down to 1 active track
+  const numberToPause = Math.max(1, currentCount - 1);
+
   return (
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2 font-display">
-          <AlertTriangle className="w-5 h-5 text-accent-orange" /> You're already in 2 courses
+          <AlertTriangle className="w-5 h-5 text-accent-orange" /> Course Limit Reached
         </DialogTitle>
         <DialogDescription className="text-xs leading-relaxed">
-          We recommend keeping your focus on just 2 tracks. Pause or end one below to make room for this new course.
+          You are currently in <strong>{currentCount}</strong> active tracks, but the maximum limit is 2. To make room for this new course, you need to pause or end <strong>{numberToPause}</strong> of your current tracks below.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-2 mt-2">
