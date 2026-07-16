@@ -218,13 +218,14 @@ export async function hydrateEnrollments(
       // Best-effort DB sync (fire-and-forget)
       toPause.forEach(e => {
         if (!DB_UNSUPPORTED.has(e.track)) {
-          supabase
-            .rpc('update_enrollment_status', {
+          try {
+            void supabase.rpc('update_enrollment_status', {
               _track: e.track,
               _status: 'paused',
-            })
-            .then(() => {})
-            .catch(() => {});
+            });
+          } catch {
+            /* noop */
+          }
         }
       });
     }
