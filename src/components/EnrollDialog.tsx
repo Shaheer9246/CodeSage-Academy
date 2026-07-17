@@ -17,6 +17,7 @@ import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
+import { AI_LESSONS } from '@/data/aiLessons';
 
 // Frontend lesson ids used for completion checks (matches Roadmap listing).
 const FRONTEND_LESSON_IDS = [
