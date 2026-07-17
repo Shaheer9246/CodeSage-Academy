@@ -69,7 +69,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isGuestMode =
     urlParams.get("guest") === "1" ||
     location.pathname === "/trip" ||
-    location.pathname.includes("/lesson/");
+    location.pathname.includes("lesson");
 
   if (loading) return <LoadingScreen />;
 
