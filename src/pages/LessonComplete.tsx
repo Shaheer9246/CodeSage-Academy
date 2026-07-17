@@ -3,6 +3,7 @@ import { useNavigate, useParams, Navigate, useSearchParams } from 'react-router-
 import { useUser } from '@/contexts/UserContext';
 import { getLessonById, getAllLessons, type Lesson } from '@/data/lessons';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
+import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
@@ -15,6 +16,7 @@ type Track = { prefix: string; path: string; list: Array<{ id: string; title: st
 
 const TRACKS: Track[] = [
   { prefix: 'net-',   path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'ai-', path: '/ai-lesson',       list: AI_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'free-',  path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'fs-',    path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'pyx-',   path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title })) },
@@ -26,7 +28,7 @@ const TRACKS: Track[] = [
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
   'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
-  'sql-': '/sql-learn',
+  'sql-': '/sql-learn', 'ai-': '/ai-fundamentals',
 };
 
 const LessonComplete = () => {
