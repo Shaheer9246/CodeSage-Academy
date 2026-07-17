@@ -144,6 +144,7 @@ const SettingsPage = () => {
     { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') && !id.startsWith('pyx-') },
     { key: 'pythonexpert', label: 'Python Expert', match: (id: string) => id.startsWith('pyx-') || id.startsWith('pyexpert-') },
     { key: 'sql', label: 'SQL', match: (id: string) => id.startsWith('sql-') },
+    { key: 'ai', label: 'AI Fundamentals', match: (id: string) => id.startsWith('ai-') },
     { key: 'local', label: 'Local-Only', match: (id: string) => id.startsWith('local-') },
     { key: 'challenges', label: 'Challenges', match: (id: string) => id.startsWith('challenge-') },
     { key: 'crawler', label: 'Code Crawler', match: (id: string) => id.startsWith('crawler-') },
@@ -520,6 +521,7 @@ const SettingsPage = () => {
                     python: 30,
                     pythonexpert: 30,
                     sql: 10,
+                    ai: 12,
                     local: 15,
                   };
                   const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
@@ -561,8 +563,7 @@ const SettingsPage = () => {
                 <p className="text-[11px] text-muted-foreground">XP sources:</p>
                 <ul className="space-y-1 text-[11px]">
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Lessons completed</span><span className="font-mono text-primary">{completedCount} × 5 XP</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Python Expert lessons</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'pythonexpert')?.count || 0} / 30</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>SQL lessons</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'sql')?.count || 0} / 10</span></li>
+        
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Exams passed</span><span className="font-mono text-primary">{user.completedTests?.length || 0} entries</span></li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Challenges solved</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</span></li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Crawler runs</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'crawler')?.count || 0} × 10 XP</span></li>
