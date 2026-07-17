@@ -9,7 +9,8 @@ export type TrackId =
   | 'python'
   | 'local'
   | 'sql'
-  | 'pythonexpert';
+  | 'pythonexpert'
+  | 'ai-fundamentals';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -32,12 +33,13 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'python',
   'local',
   'sql',
-  'pythonexpert'
+  'pythonexpert',
+  'ai-fundamentals'
 ]);
 
 // Tracks that do not exist or are not yet configured in your Supabase DB.
 // These will run strictly in localStorage so the user never gets an error.
-const DB_UNSUPPORTED = new Set<string>(['sql', 'pythonexpert']);
+const DB_UNSUPPORTED = new Set<string>(['sql', 'pythonexpert', 'ai-fundamentals']);
 
 export const TRACK_META: Record<
   TrackId,
@@ -111,6 +113,13 @@ export const TRACK_META: Record<
     idPrefix: 'CS-PYX',
     seed: 40,
     prereq: ['python'],
+  },
+  'ai-fundamentals': {
+    label: 'AI Fundamentals',
+    short: 'AI',
+    route: '/ai-fundamentals',
+    idPrefix: 'CS-AI',
+    seed: 130,
   },
 };
 
