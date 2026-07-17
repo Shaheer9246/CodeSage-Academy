@@ -19,6 +19,7 @@ import SuggestionsBadge from '@/components/SuggestionsBadge';
 const TOUR_STEPS: TourStep[] = [
   { target: 'frontend',   title: 'Frontend Development', body: 'HTML, CSS, JS from zero.' },
   { target: 'networking', title: 'Computer & Networking', body: 'How machines & the internet work.' },
+  { target: 'ai-fundamentals', title: 'AI Fundamentals', body: 'Concepts, LLMs & Agents.' },
   { target: 'fullstack',  title: 'Full Stack Frontend', body: 'React, hooks, deployment.' },
   { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn skills into income.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone.' },
@@ -64,9 +65,17 @@ const SECTIONS: SectionDef[] = [
         tags: ['Hardware', 'OS', 'DNS', 'HTTP'], desc: 'Hardware → OS → Networking → Security',
         trackId: 'networking' },
       // Placeholder for future AI Fundamentals
-      { id: 'ai-fundamentals', path: '/ai-fundamentals?from=dashboard', title: 'AI Fundamentals', emoji: '🧠',
-        tour: 'ai-fundamentals', lessons: 0, accent: 'accent-blue',
-        tags: ['Coming soon'], desc: 'Coming soon · intelligence primitives' },
+      { 
+  id: 'ai-fundamentals', 
+  path: '/ai-fundamentals?from=dashboard', 
+  title: 'AI Fundamentals', 
+  emoji: '🧠',
+  tour: 'ai-fundamentals', 
+  lessons: 12, // Ensure this matches the number of lessons in your AI_LESSONS array
+  accent: 'accent-blue',
+  tags: ['Foundations', 'LLMs'], 
+  desc: 'Foundations of AI, neural networks, and modern agents' 
+},
     ],
   },
   {
@@ -199,10 +208,11 @@ const Dashboard = () => {
     else toast.error('Could not purchase freeze');
   };
 
-  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local', '/sql']);
+  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local', '/sql', '/ai-fundamentals']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
     '/networking': '/n-lesson/net-1?guest=1',
+    '/ai-fundamentals': '/ai-lesson/ai-1?guest=1',
     '/fullstack': '/fs-lesson/fs-1?guest=1',
     '/freelance': '/f-lesson/free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
@@ -213,6 +223,7 @@ const Dashboard = () => {
     '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
     '/freelance': 'freelance', '/python': 'python', '/local': 'local',
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
+    '/ai-fundamentals': 'ai-fundamentals',
   };
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
   const go = (path: string) => () => {
