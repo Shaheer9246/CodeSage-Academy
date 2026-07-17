@@ -10,6 +10,7 @@ import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
+import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 
 /* ------------------------------------------------------------------ */
 /*  TYPES + DATA (identical shape to your original — just re-authored) */
@@ -25,7 +26,7 @@ interface TrackNode {
   lessonIds: string[];
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
-    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson';
+    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson';
   locked?: boolean;
 }
 
@@ -106,6 +107,7 @@ const buildTrack = (
 const TRACKS_DATA: Record<string, TrackNode[]> = {
   frontend:     buildTrack(FRONTEND_LESSONS, 'lesson', 'HTML — Beginner', 'FRONTEND MASTER'),
   networking:   buildTrack(NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'n-lesson', 'Module 1: Networking Fundamentals', 'NETWORKING COMPLETE'),
+ 'ai-fundamentals': buildTrack(AI_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧠' })), 'ai-lesson', 'Module 1: Foundations of AI', 'AI BASICS COMPLETE'),
   fullstack:    buildTrack(FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'fs-lesson', 'Module 1: Full Stack Frontend Dev', 'FULL STACK COMPLETE'),
   freelance:    buildTrack(FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'f-lesson', 'Module 1: Freelance & Clients', 'FREELANCE MASTER'),
   python:       buildTrack(PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'py-lesson', 'Module 1: Python Programming', 'PYTHON COMPLETE'),
@@ -117,6 +119,7 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
 const TRACKS = [
   { key: 'frontend',     label: 'Frontend Dev' },
   { key: 'networking',   label: 'Networking' },
+  { key: 'ai-fundamentals', label: 'AI Fundamentals' },
   { key: 'fullstack',    label: 'Full Stack' },
   { key: 'freelance',    label: 'Freelance' },
   { key: 'python',       label: 'Python' },
