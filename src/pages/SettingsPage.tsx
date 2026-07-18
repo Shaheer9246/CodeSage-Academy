@@ -472,7 +472,7 @@ const SettingsPage = () => {
         </div>
 
         <div className="text-center pt-4 pb-2">
-          <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v1.0.0</p>
+          <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v1.1.10</p>
         </div>
       </motion.div>
 
