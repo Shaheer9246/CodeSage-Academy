@@ -2,11 +2,12 @@ import { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Map, HelpCircle, Users, User, LogOut, Flame } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import InboxBadge from '@/components/InboxBadge';
 
 const NAV_ITEMS = [
   { path: '/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/roadmap', icon: Map, label: 'Roadmap' },
-  { path: '/exams', icon: HelpCircle, label: 'Exams' },
+  { path: '/inbox', icon: InboxBadge, label: 'Inbox' },
   { path: '/community', icon: Users, label: 'Community' },
   { path: '/settings', icon: User, label: 'Profile' },
 ];
