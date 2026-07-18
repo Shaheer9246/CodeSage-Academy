@@ -45,12 +45,6 @@ const basicLessons: LevelData = {
       icon: '🤖',
       lessons: [
        
-    
-    {
-      id: 'html-basics',
-      name: 'HTML Fundamentals',
-      icon: '📄',
-      lessons: [
         {
           id: 'html-1',
           title: 'What is HTML?',
