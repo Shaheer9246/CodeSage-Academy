@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Inbox } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/contexts/UserContext';
 
-// Small header pill that shows unread admin-announcement count and navigates to /inbox.
-export default function InboxBadge() {
-  const navigate = useNavigate();
+interface InboxBadgeProps {
+  className?: string;
+}
+
+export default function InboxBadge({ className }: { className?: string }) {
   const { user } = useUser();
   const [unread, setUnread] = useState(0);
 
@@ -26,7 +27,6 @@ export default function InboxBadge() {
     const onRead = () => refresh();
     window.addEventListener('inbox:read', onRead);
     
-    // Change 'announcements-badge' to use a random string suffix:
     const ch = supabase
       .channel(`announcements-badge-${Math.random()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, refresh)
@@ -39,15 +39,13 @@ export default function InboxBadge() {
   }, [refresh]);
 
   return (
-    <button
-      onClick={() => navigate('/inbox')}
-      title="Inbox"
-      className="relative flex items-center gap-1 bg-secondary/40 border border-border/40 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full hover:neon-glow transition-all"
-    >
-      <Inbox className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
+    <div className={`relative flex items-center justify-center ${className}`}>
+      <Inbox className="w-full h-full" />
       {unread > 0 && (
-        <span className="text-[10px] font-bold text-primary min-w-[14px] text-center">{unread > 9 ? '9+' : unread}</span>
+        <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[8px] font-black min-w-[14px] h-3.5 rounded-full flex items-center justify-center px-0.5 shadow-[0_0_6px_rgba(0,0,0,0.5)] border border-background animate-pulse">
+          {unread > 9 ? '9+' : unread}
+        </span>
       )}
-    </button>
+    </div>
   );
 }
