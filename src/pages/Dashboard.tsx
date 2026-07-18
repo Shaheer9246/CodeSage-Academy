@@ -86,7 +86,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-fuchsia-400/70 via-pink-500/60 to-rose-500/70',
     tracks: [
       { id: 'frontend', path: '/learn', title: 'Frontend Development', emoji: '📱',
-        tour: 'frontend', lessons: 15, accent: 'primary',
+        tour: 'frontend', lessons: 50, accent: 'primary',
         tags: ['HTML', 'CSS', 'JS'], desc: 'HTML → CSS → JS → React → Deploy',
         trackId: 'frontend' },
       { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full Stack Frontend Dev', emoji: '🚀',
