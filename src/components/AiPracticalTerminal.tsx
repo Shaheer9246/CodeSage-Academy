@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import CodeEditor from './CodeEditor';
 import { Play, RotateCcw, Eye, EyeOff, Terminal, Trash2 } from 'lucide-react';
+import { SAGE_MATH_INJECTION } from '@/lib/aiMath';
 
 interface LogLine {
   type: 'log' | 'error' | 'info' | 'result';
@@ -58,6 +59,8 @@ const AiPracticalTerminal = ({ starterCode, solutionCode, lessonId }: Props) => 
     };
 
     try {
+      // Inject the AI Math library before the user's code
+      const fullCode = `${SAGE_MATH_INJECTION}\n\n${code}`;
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const fn = new Function('console', `"use strict";\n${code}\n;return (typeof __result !== 'undefined' ? __result : undefined);`);
       const start = performance.now();
