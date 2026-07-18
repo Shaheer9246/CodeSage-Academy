@@ -12,7 +12,6 @@ import { toast } from 'sonner';
 import DashboardTour, { TourStep } from '@/components/DashboardTour';
 import EnrollDialog from '@/components/EnrollDialog';
 import { TrackId, isEnrolled, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
-import InboxBadge from '@/components/InboxBadge';
 import SuggestionsBadge from '@/components/SuggestionsBadge';
 
 /* ---------- Tour ---------- */
@@ -306,9 +305,7 @@ const Dashboard = () => {
               </div>
               {!isGuest && (
                 <>
-                  <div onClick={() => navigate('/inbox')} className="cursor-pointer active:scale-95 transition-transform">
-                    <InboxBadge />
-                  </div>
+                
                   <div onClick={() => navigate('/suggestions')} className="cursor-pointer active:scale-95 transition-transform">
                     <SuggestionsBadge />
                   </div>
