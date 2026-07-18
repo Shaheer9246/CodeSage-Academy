@@ -25,10 +25,13 @@ export default function InboxBadge() {
     refresh();
     const onRead = () => refresh();
     window.addEventListener('inbox:read', onRead);
+    
+    // Change 'announcements-badge' to use a random string suffix:
     const ch = supabase
-      .channel('announcements-badge')
+      .channel(`announcements-badge-${Math.random()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, refresh)
       .subscribe();
+      
     return () => {
       window.removeEventListener('inbox:read', onRead);
       supabase.removeChannel(ch);
