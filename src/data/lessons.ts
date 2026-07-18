@@ -39,11 +39,6 @@ const basicLessons: LevelData = {
   level: 'basic',
   label: 'Basic',
   topics: [
-{
-      id: 'ai-basics',
-      name: 'AI Fundamentals',
-      icon: '🤖',
-      lessons: [
        
         {
           id: 'html-1',
