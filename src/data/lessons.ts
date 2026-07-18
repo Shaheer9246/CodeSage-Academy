@@ -44,24 +44,7 @@ const basicLessons: LevelData = {
       name: 'AI Fundamentals',
       icon: '🤖',
       lessons: [
-        {
-          id: 'ai-1',
-          title: 'Your First Neuron Calculation',
-          topic: 'AI Fundamentals',
-          level: 'basic',
-          content: `# Your First Neuron Calculation 🧠\n\nWelcome to AI! Let's build a mathematical model of a single brain cell (a neuron).\n\nNeurons take inputs, multiply them by weights, add a bias, and pass them to an activation function.\n\n### Formula:\n\`output = (input * weight) + bias\`\n\nComplete the code on the right to find the output.`,
-          initialCode: `// 1. Inputs\nconst inputVal = 2.5;\nconst weight = 0.4;\nconst bias = 0.2;\n\n// 2. Compute the value\nconst output = (inputVal * weight) + bias;\n\n// 3. Log it out!\nconsole.log("Neuron Output:", output);`,
-          initialCss: '',
-          initialJs: `// 1. Inputs\nconst inputVal = 2.5;\nconst weight = 0.4;\nconst bias = 0.2;\n\n// 2. Compute the value\nconst output = (inputVal * weight) + bias;\n\n// 3. Log it out!\nconsole.log("Neuron Output:", output);`,
-          language: 'javascript', 
-          challenge: {
-            instruction: 'Verify that your equation evaluates to 1.2 in the console terminal.',
-            initialCode: `const inputVal = 2.5;\nconst weight = 0.4;\nconst bias = 0.2;\nconst output = (inputVal * weight) + bias;\nconsole.log("Neuron Output:", output);`,
-            validationKeywords: ['1.2'],
-          },
-        }
-      ]
-    },
+       
     
     {
       id: 'html-basics',
