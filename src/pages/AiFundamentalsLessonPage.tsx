@@ -4,6 +4,7 @@ import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-
 import { useUser } from '@/contexts/UserContext';
 import { getAiLessonById, isAiLessonUnlocked } from '@/data/aiFundamentalsLesson';
 import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
+import AiPracticalTerminal from '@/components/AiPracticalTerminal';
 
 type Section = 'concept' | 'practical' | 'quiz';
 
@@ -22,15 +23,13 @@ const AiFundamentalsLessonPage = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  // Using 'ai' as the identifier for the guest gate
-  const { isGuest: __pgGuest } = useGuestLessonGate('ai', id); 
+  const { isGuest: __pgGuest } = useGuestLessonGate('ai', id);
   if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/roadmap" replace />;
   if (!isAiLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/roadmap" replace />;
 
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
-  // AI Lessons currently have 2 questions each, so we require a perfect score (or dynamically all of them)
-  const passThreshold = lesson.quiz.length; 
+  const passThreshold = lesson.quiz.length;
   const passed = correctCount >= passThreshold;
   const allAnswered = lesson.quiz.every((_, i) => answers[i] !== undefined);
 
@@ -92,7 +91,6 @@ const AiFundamentalsLessonPage = () => {
             <div>
               <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 px-1">II. Detailed Breakdown</p>
 
-              {/* View toggle */}
               <div className="flex gap-1 mb-3 p-1 glass-card rounded-xl w-full">
                 {(['beginner', 'advanced'] as const).map(v => (
                   <button
@@ -161,6 +159,13 @@ const AiFundamentalsLessonPage = () => {
               </p>
               <p className="text-xs text-foreground">{lesson.practical.goal}</p>
             </div>
+
+            {/* JS Terminal / editor */}
+            <AiPracticalTerminal
+              lessonId={lesson.id}
+              starterCode={lesson.practical.starterCode}
+              solutionCode={lesson.practical.solutionCode}
+            />
 
             <button
               onClick={() => setSection('quiz')}
