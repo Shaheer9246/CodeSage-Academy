@@ -22,10 +22,9 @@ export const PYTHON_TRACK_NOTICE = {
 
 export const PYTHON_LESSONS: PythonLesson[] = [
 
-  
- 
   L(
-  'py-01', 1, 'Environment Setup & Language Core', '🚀', 'Every incredible software engineering journey starts at the exact same place: the terminal. Before writing complex automation scripts, machine learning pipelines, or web applications, you must transform your machine into a development workstation. This means correctly installing the Python runtime environment, configuring your operating system path arrays, mastering terminal console inputs, and learning how to cleanly execute both live command sandboxes and standalone script files.',
+  'py-01', 1, 'Environment Setup & Language Core', '🚀', 
+  '🖥️ **Terminal Notice:** We now have a built-in terminal right here! However, if you want a bigger screen, you can use your computer\'s native terminal. The practical assignment below contains the full setup instructions to install Python on your machine.\n\nEvery incredible software engineering journey starts at the exact same place: the terminal. Before writing complex automation scripts, machine learning pipelines, or web applications, you must transform your machine into a development workstation. This means correctly installing the Python runtime environment, configuring your operating system path arrays, mastering terminal console inputs, and learning how to cleanly execute both live command sandboxes and standalone script files.',
   [
     { title: '1. The Python Interpreter Engine', beginner: 'Think of the Python Interpreter as an elite automatic translator. Your computer processor cannot read human English words or clean code text; it only understands raw binary pulses (ones and zeros). When you write a line of code, the interpreter acts as the middleman, reading your syntax, evaluating your intent, and converting it into instructions the machine can instantly execute.', advanced: 'At a lower system level, standard Python (CPython) acts as both a compiler and a virtual machine. When you run a script, it first parses your source code text into an optimized, intermediate binary layer called Bytecode (stored inside hidden `.pyc` files), which is then safely evaluated sequentially by the virtual machine runtime environment.' },
     { title: '2. Terminal Shell Navigation', beginner: 'Most everyday computer users click on colorful graphical desktop icons to open apps and move files. As a developer, you will drop behind the curtains and use the Terminal (Command Prompt or PowerShell on Windows, Terminal app on Mac/Linux). It is a text-only command station where you talk directly to your operating system using specific typed code paths.', advanced: 'The terminal communicates directly with your system shell. When you type a word like `python`, the shell searches through a specific environmental configuration list called the `PATH` variable. If the absolute folder address of your compiler isn\'t recorded inside that PATH array, your terminal will throw an annoying "command not found" error.' },
@@ -58,7 +57,7 @@ export const PYTHON_LESSONS: PythonLesson[] = [
 ),
 
  L('py-2', 2, 'Variables & Data Types', '📦',
-    'Think of your computer\'s memory like a massive warehouse. A variable is just a friendly sticky note label you slap onto a specific item in that warehouse so you can find it instantly later!',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nThink of your computer\'s memory like a massive warehouse. A variable is just a friendly sticky note label you slap onto a specific item in that warehouse so you can find it instantly later!',
     [
       { 
         title: '1. Naming & Assignment', 
@@ -103,7 +102,7 @@ export const PYTHON_LESSONS: PythonLesson[] = [
   ),
   
  L('py-3', 3, 'Control Flow', '🔀',
-    'Programs aren\'t just straight lines—they need to make smart choices and repeat tasks. Think of control flow as adding crossroads, traffic lights, and circular roundabouts to your code.',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nPrograms aren\'t just straight lines—they need to make smart choices and repeat tasks. Think of control flow as adding crossroads, traffic lights, and circular roundabouts to your code.',
     [
       { 
         title: '1. if / elif / else', 
@@ -149,7 +148,7 @@ export const PYTHON_LESSONS: PythonLesson[] = [
   ),
 
   L('py-4', 4, 'Functions', '🛠️',
-    'Think of a function as a magical kitchen recipe or a factory machine. You feed it raw ingredients (inputs), it runs a specific set of instructions inside, and it hands you back a finished product (output)!',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nThink of a function as a magical kitchen recipe or a factory machine. You feed it raw ingredients (inputs), it runs a specific set of instructions inside, and it hands you back a finished product (output)!',
     [
       { 
         title: '1. Defining a Function (def)', 
@@ -195,7 +194,7 @@ export const PYTHON_LESSONS: PythonLesson[] = [
   ),
 
  L('py-5', 5, 'Data Structures: List, Tuple, Dict, Set', '📚',
-    'Data structures are simply different kinds of storage containers. Choosing the right container for your data is half the battle in coding—each tool offers unique structural traits, speeds, and behavioral rules.',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nData structures are simply different kinds of storage containers. Choosing the right container for your data is half the battle in coding—each tool offers unique structural traits, speeds, and behavioral rules.',
     [
       { 
         title: '1. Lists (The Expandable Grocery List)', 
@@ -241,7 +240,7 @@ export const PYTHON_LESSONS: PythonLesson[] = [
   ),
 
  L('py-6', 6, 'Object-Oriented Programming', '🧱',
-    'Object-Oriented Programming (OOP) is just a way to group your data and behaviors together under one roof. Think of a class as an architectural blueprint, and an object as the actual physical house built from that blueprint.',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nObject-Oriented Programming (OOP) is just a way to group your data and behaviors together under one roof. Think of a class as an architectural blueprint, and an object as the actual physical house built from that blueprint.',
     [
       { 
         title: '1. Class & Instance (The Blueprint vs The House)', 
@@ -286,775 +285,861 @@ export const PYTHON_LESSONS: PythonLesson[] = [
     ['Classes serve as master blueprints while objects are live instances','The __init__ method initializes data values at object birth','Attributes define what an object knows; methods define what it does','Use self to ensure an object reads and modifies its own local properties']
   ),
 
- L('py-7', 7, 'Modules & Imports', '📦',
-    'Real-world coding projects aren\'t written in one gigantic, messy file. Think of modules and packages as specialized toolboxes and storage drawers that let you organize and divide your code neatly across separate files.',
+  // ... (You can leave py-7 through py-20 exactly as they currently are in your file!)
+
+L('py-7', 7, 'Error Handling & Exceptions', '🚨',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nCode breaks. It is a fundamental law of software engineering. Learning to predict, catch, and handle those breaks gracefully is what separates amateur scripts from professional, crash-resistant applications.',
     [
       { 
-        title: '1. Borrowing Tools (import)', 
-        beginner: 'To use tools from another file, use the `import` keyword. Writing `import math` brings in a whole toolkit, allowing you to use its functions like `math.sqrt(16)`. If you only need one specific tool, write `from math import sqrt` to pull it out directly!', 
-        advanced: 'Using wildcard imports like `from module import *` is a dangerous anti-pattern. It pollutes your active local namespace, causes unpredictable variable name collisions, and completely blinds your IDE\'s reference tracing.' 
+        title: '1. The Traceback', 
+        beginner: 'When Python crashes, it prints a massive wall of red text called a Traceback. Don\'t panic! Read it from the bottom up. The very last line tells you exactly what went wrong (like a `NameError` or `TypeError`), and the lines above it tell you exactly which file and line number caused it.', 
+        advanced: 'Tracebacks traverse the execution call stack. Unhandled exceptions propagate upwards dynamically until they are caught or hit the global interpreter boundary. You can manipulate or suppress stack traces at runtime using the `sys.exc_info()` module and custom exception hooks.' 
       },
       { 
-        title: '2. Modules Are Just Files', 
-        beginner: 'Every single `.py` file you create is automatically a module! If you have a file named `calculator.py` containing custom code, you can easily load those tools into a separate file by typing `import calculator` (leave off the `.py`).', 
-        advanced: 'Python executes a module\'s top-level code exactly once upon its very first import, caching the resulting object in `sys.modules`. Subsequent imports pull instantly from this cache; keep top-level logic free of runtime side effects.' 
+        title: '2. try / except Blocks', 
+        beginner: 'Think of `try/except` as a safety net. You put risky code (like downloading a file or doing math) inside the `try` block. If it crashes, Python stops the `try` block instantly and jumps into the `except` block to run backup code, preventing the whole program from dying!', 
+        advanced: 'Always catch specific exceptions (e.g., `except ValueError:`) rather than bare `except:` clauses. Bare exceptions catch system-level events like `KeyboardInterrupt` (Ctrl+C) and `SystemExit`, which can accidentally trap users inside infinite zombie loops.' 
       },
       { 
-        title: '3. Packages Are Folders', 
-        beginner: 'A package is simply a folder on your computer packed with multiple code modules inside it. Placing a special, empty file named `__init__.py` inside that folder tells Python: "Treat this entire directory as an official, organized package bundle!"', 
-        advanced: 'Python 3.3+ introduced implicit namespace packages, meaning `__init__.py` is no longer strictly mandatory for basic directory indexing. However, explicit packages remain essential for structuring complex architectures and modular plugin distributions.' 
+        title: '3. Raising Custom Errors', 
+        beginner: 'You don\'t have to wait for Python to crash—you can crash it yourself! Using the `raise` keyword, you can throw a custom error if a user does something wrong, like `raise ValueError("Age cannot be negative!")`.', 
+        advanced: 'Raising exceptions allows you to enforce strict API contracts. You can subclass the base `Exception` class to create highly specific, domain-level error structures (e.g., `class DatabaseTimeoutError(Exception): pass`) to cleanly segment your failure logic.' 
       },
       { 
-        title: '4. The Standard Library (Batteries Included)', 
-        beginner: 'Python comes with an absolute warehouse of free, built-in toolboxes called the Standard Library. Without installing anything extra, you can instantly import tools to talk to your operating system (`os`), parse web data (`json`), track time (`datetime`), or pick options (`random`)!', 
-        advanced: 'Audit Python\'s standard library documentation regularly. You will discover incredibly fast, highly optimized built-in utilities like `itertools` for advanced stream combinations or `collections` for specialized high-performance data structures.' 
+        title: '4. finally & else', 
+        beginner: 'A `finally` block runs at the very end of your try/except, no matter what happens (crash or no crash). It is perfect for closing files or turning off connections. An `else` block only runs if the `try` block succeeds without any errors at all.', 
+        advanced: 'The `finally` block is guaranteed to execute even if the `try` block returns a value, breaks a loop, or raises a new unhandled exception. It is the backbone of resource management and context cleanup operations.' 
       },
     ],
     { 
-      title: 'Splitting Your First Script', 
-      intro: 'Let\'s break a single code file apart into a multi-module system that shares tools across your workspace.', 
+      title: 'The Crash-Proof Calculator', 
+      intro: 'Let\'s build a division tool that uses error handling to survive bad inputs, like trying to divide by zero or passing text instead of numbers.', 
       steps: [
-        'Imagine creating a separate file named `math_utils.py` on your computer.',
-        'Inside that file, you write a standalone recipe: `def square(x): return x * x`.',
-        'Now imagine switching over to your core workspace file, named `main.py`.',
-        'At the absolute top of `main.py`, tell Python to look at your utility file by typing: `from math_utils import square`.',
-        'Now execute that imported tool directly inside your main code by running: `print(square(5))`.',
-        'When you tell the terminal to run `python3 main.py`, Python pieces the files together and outputs 25 perfectly!'
+        'Open your terminal and launch the Python REPL (>>>).',
+        'Create a function: `def safe_divide(a, b):`.',
+        'Inside the function, start a `try:` block and attempt to calculate `result = a / b`.',
+        'Add a specific safety net for zero: `except ZeroDivisionError:` and print a friendly warning instead of crashing.',
+        'Add another net for bad data types: `except TypeError:` and tell the user to only use numbers.',
+        'Add an `else:` block to print and return the final `result` if everything went perfectly.',
+        'Call `safe_divide(10, 0)` and `safe_divide(10, "two")` to watch your safety nets catch the crashes in real-time!'
       ], 
-      goal: 'You understand how to link multiple script files together by importing individual functions across modules.' 
+      goal: 'You successfully trapped specific runtime crashes and diverted them into graceful backup logic without stopping the application.' 
     },
     [
-      q('Why is writing `from math import *` generally considered a bad coding habit?', ['It makes your final code execution run 10 times slower','It completely pollutes your file workspace with hidden names, hiding where tools came from','It deletes the original math file off your hard drive','It prevents your script from running on Windows computers'], 1, 'Wildcard imports blend hundreds of hidden names into your current file space, making it impossible to track where functions were originally created.'),
-      q('What is a Python module in its simplest physical form?', ['A special system app downloaded from the internet','Any standard text file ending with a `.py` extension','A hidden command embedded inside your keyboard hardware','A specific type of mathematical equation loop'], 1, 'Every individual Python file you create is natively considered a separate module that can be shared and imported elsewhere.'),
-      q('How many times does Python execute the top-level script code inside a module if it is imported multiple times across your program?', ['It executes the code completely every single time it is imported','Exactly once on the first import, then it safely reads from a fast memory cache','Only when the application crashes and shuts down','Never, unless you add a specific loop wrapper'], 1, 'Python processes imported modules exactly once and stores them in a memory cache. Consecutive imports simply read from that existing cache to save processing power.'),
-      q('What does it mean when developers say Python comes with "batteries included"?', ['The programming language requires actual physical batteries to process variables','Python natively ships with a massive library of pre-installed toolkits ready to use immediately','The code automatically saves electricity on laptop computers','It runs perfectly fine without electricity'], 1, '"Batteries included" is a classic phrase celebrating the fact that Python\'s standard library gives you a massive set of built-in software tools out of the box.')
+      q('Which block of code is guaranteed to run regardless of whether an exception was triggered or not?', ['The `try` block','The `else` block','The `finally` block','The `except` block'], 2, 'The `finally` block is designed strictly for resource cleanup and executes unconditionally at the end of the error handling chain.'),
+      q('Why is writing a bare `except:` clause (catching all errors blindly) considered a bad practice?', ['It makes the code run too slowly','It catches system-level interrupts like Ctrl+C, making it nearly impossible to shut the program down manually','It deletes the original file','It triggers a syntax error immediately'], 1, 'Bare except clauses trap everything, including crucial `SystemExit` and `KeyboardInterrupt` signals, masking critical system failures.'),
+      q('How do you manually trigger a custom error inside your own program?', ['Use the `stop` keyword','Use the `raise` keyword followed by an Error class','Use the `break` keyword','Type `crash()`'], 1, 'The `raise` keyword explicitly initializes an exception event and throws it up the active execution call stack.'),
+      q('When debugging a crashed program, which part of the printed red Traceback should you read first?', ['The very top line','The middle lines showing the memory addresses','The very last line at the bottom','None of it, it is machine code'], 2, 'The bottom line of a Traceback always contains the specific exception name and the specific error message text.')
     ],
-    ['Use specific imports to keep your file workspace clean and transparent','Every individual .py script file functions as an independent module','Folders act as packages to group related modules together','Always check Python\'s huge built-in standard library before writing tools from scratch']
+    ['Use try/except blocks as safety nets around risky operations','Never use bare except blocks; always specify the exact error you expect','The raise keyword lets you enforce your own rules and errors','The finally block is perfect for closing files or connections cleanly']
+  ),
+
+  L('py-8', 8, 'File Systems & I/O', '📂',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nYour programs need to interact with the outside world. Reading text from files, parsing CSV data, and saving logs directly to your hard drive are essential skills for building persistent applications.',
+    [
+      { 
+        title: '1. open() and File Modes', 
+        beginner: 'To interact with a file, you must open it. The `open()` command requires a file name and a mode: `"r"` to read text, `"w"` to write (which overwrites the whole file!), or `"a"` to append (add text to the very bottom).', 
+        advanced: 'Standard file handling operations lock system resources. Modes like `"rb"` and `"wb"` allow raw byte-stream manipulation for images or non-text binaries. Always explicitly declare string encoding (e.g., `encoding="utf-8"`) to prevent cross-platform character corruption.' 
+      },
+      { 
+        title: '2. The `with` Context Manager', 
+        beginner: 'If you open a file, you MUST close it using `.close()`, otherwise your file might get corrupted. To avoid forgetting, Python has a `with open(...) as file:` block. It acts as an automatic door that safely closes the file the moment your code block finishes!', 
+        advanced: 'Context managers implement the `__enter__` and `__exit__` dunder methods. The `with` statement guarantees that the `__exit__` cleanup logic fires deterministically, instantly releasing the OS-level file descriptor lock even if a fatal exception is raised inside the block.' 
+      },
+      { 
+        title: '3. Reading Data', 
+        beginner: 'Once a file is open in read mode, you can use `.read()` to grab the entire file as one giant text block, or use a `for` loop to cleanly read the file line-by-line (perfect for massive files!).', 
+        advanced: 'Using `.read()` loads the entire file payload into active RAM, which will crash your system on gigabyte-scale datasets. Iterating over the file object directly (`for line in file:`) utilizes a lazy generator pattern, consuming memory for only one line at a time.' 
+      },
+      { 
+        title: '4. Parsing JSON', 
+        beginner: 'JSON is the standard format for sending data across the internet. Python has a built-in `json` tool. Use `json.loads()` to convert JSON text into a usable Python dictionary, and `json.dumps()` to convert your dictionary back into text to save it!', 
+        advanced: 'The built-in `json` module natively handles serialization (dumping) and deserialization (loading). For direct file interactions, utilize `json.dump(obj, file)` and `json.load(file)` to pipe data directly into open system streams without buffering intermediate strings.' 
+      },
+    ],
+    { 
+      title: 'The Permanent Log Book', 
+      intro: 'Let\'s create a script that writes a permanent text file to your hard drive, reads it back, and displays the content.', 
+      steps: [
+        'Open your terminal and start Python.',
+        'Use the automatic door manager to create a file: `with open("diary.txt", "w") as f:`',
+        'Inside the block, write a string: `f.write("System initialized.\\n")` (the \\n forces a new line).',
+        'Press Enter to exit the block. Python automatically closes and saves the file to your disk!',
+        'Now append to it! `with open("diary.txt", "a") as f:` and `f.write("Task complete.")`',
+        'Finally, read it back: `with open("diary.txt", "r") as f:` and then print `f.read()` to see your combined file output.'
+      ], 
+      goal: 'You successfully wrote, appended, and extracted permanent data from your operating system\'s hard drive using Python streams.' 
+    },
+    [
+      q('What is the safest, standard way to open a file in Python to guarantee it closes properly?', ['Calling `open()` and manually typing `.close()` at the end','Using the `with open() as file:` context manager block','Leaving the file open in the background','Restarting your terminal'], 1, 'The `with` statement guarantees the file descriptor lock is safely released when the block ends, even if the program crashes.'),
+      q('Which file mode should you use if you want to add a new sentence to the bottom of a text file without deleting the old text?', ['"r" (Read)','"w" (Write)','"a" (Append)','"x" (Execute)'], 2, 'The `"a"` (append) mode places the stream cursor at the very end of the file to preserve existing data.'),
+      q('What happens if you use `.read()` on a massive 10-Gigabyte text file?', ['Python will read it 10 times faster','The entire file is loaded into RAM all at once, potentially crashing your computer','Python automatically zips the file','Python skips the first half of the file'], 1, '`.read()` dumps the entire file payload into active memory, which is highly inefficient for massive datasets compared to line-by-line iteration.'),
+      q('Which standard library module handles converting Python dictionaries into formatted internet text structures?', ['The `math` module','The `csv` module','The `json` module','The `os` module'], 2, 'The built-in `json` module handles serialization mapping between Python objects and standard JSON strings.')
+    ],
+    ['Always use the with open() context manager to prevent file corruption','Mode w overwrites files completely, while mode a adds to the bottom','Loop through files line-by-line to save computer memory','JSON is the universal standard for saving and sending data structures']
+  ),
+
+  L('py-9', 9, 'Modules & the Standard Library', '🧩',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nYou don\'t have to build everything from scratch! Python comes with a massive "batteries included" standard library, and a rich ecosystem of external packages you can snap into your project like Lego bricks.',
+    [
+      { 
+        title: '1. The import Keyword', 
+        beginner: 'To use tools that aren\'t loaded by default, you must `import` them at the very top of your file. Typing `import math` gives you access to a huge toolbox of advanced calculators, which you can use by typing `math.sqrt(16)`.', 
+        advanced: 'Importing a module executes that module\'s global namespace entirely from top to bottom. The interpreter caches imported modules inside the `sys.modules` dictionary, ensuring that subsequent imports reference the same cached memory object rather than reloading the file.' 
+      },
+      { 
+        title: '2. Specific Imports (from / as)', 
+        beginner: 'If you only need one specific tool from a massive toolbox, you can extract it directly: `from random import randint`. Now you can just type `randint(1, 10)` instead of `random.randint`. You can also rename long tools using `as`, like `import datetime as dt`.', 
+        advanced: 'Use explicit `from x import y` statements rather than wildcard `from x import *` patterns. Wildcard imports pollute the local namespace, silently overwriting existing variables and making static analysis tools fail to track data origin.' 
+      },
+      { 
+        title: '3. Custom Modules', 
+        beginner: 'Any `.py` file you write can be imported! If you write a cool function inside `helper.py`, you can open a totally different file named `main.py` and type `import helper` to use your code. It keeps your projects clean and organized.', 
+        advanced: 'Python locates custom modules by scanning the directory paths mapped inside the `sys.path` list. The current working directory (where you executed the script) is always placed at index 0, prioritizing local files over system-installed packages.' 
+      },
+      { 
+        title: '4. __name__ == "__main__"', 
+        beginner: 'When you import your custom `helper.py` file, Python runs all the code inside it instantly. To stop it from running tests or printing things during an import, hide that code under `if __name__ == "__main__":`. It acts as a shield!', 
+        advanced: 'The global `__name__` variable is automatically assigned the string `"__main__"` if the script is executed directly by the terminal. If the script is loaded via an import statement, `__name__` is assigned the module\'s actual filename, bypassing the execution block.' 
+      },
+    ],
+    { 
+      title: 'The Password Generator', 
+      intro: 'Let\'s leverage Python\'s built-in standard library to build a highly secure, randomized password creator without writing complex math ourselves.', 
+      steps: [
+        'Open your terminal REPL.',
+        'Import the tools you need: `import random` and `import string`.',
+        'Explore the string module! Type `string.ascii_letters` and `string.digits` to see the built-in alphabet arrays.',
+        'Combine them into a pool: `pool = string.ascii_letters + string.digits`.',
+        'Use the random module to pick 12 characters: `chars = random.choices(pool, k=12)`.',
+        'Join the resulting list back into a clean string: `password = "".join(chars)`.',
+        'Print your new random password!'
+      ], 
+      goal: 'You successfully imported standard library modules, accessed built-in constants, and utilized imported functions to generate secure outputs.' 
+    },
+    [
+      q('Why is it dangerous to use a wildcard import like `from math import *` in a large project?', ['It forces the computer to restart','It silently dumps every variable from that module into your file, potentially overwriting your own custom variables with the same names','It triggers a firewall alert','It prevents the code from running on Mac computers'], 1, 'Wildcard imports heavily pollute the global namespace, causing naming collisions and making the origin of functions completely untraceable.'),
+      q('Where does Python look first when you type an `import` statement for a custom file?', ['The official Python website server','The exact local folder where your main script is currently running','The computer\'s trash bin','The C: drive root'], 1, 'Python always prioritizes the current working directory (index 0 of `sys.path`) before scanning system-wide installation libraries.'),
+      q('What does `if __name__ == "__main__":` actually do?', ['It converts all text to uppercase','It acts as a shield, ensuring the code underneath it only runs if the file is executed directly, NOT if it is imported by another file','It connects the code to the main internet router','It deletes the main file'], 1, 'This structural block protects executable script logic from firing automatically when the file is imported as a library component.'),
+      q('If you type `import datetime as dt`, how must you call the module\'s functions later in the code?', ['datetime.function()','dt.function()','function()','datetime.dt.function()'], 1, 'The `as` keyword assigns an alias; you must strictly use that new aliased namespace (`dt`) to access the module\'s internal contents.')
+    ],
+    ['Use import statements at the top of your file to pull in tools','Aliasing with the `as` keyword keeps long module names clean and brief','Avoid wildcard (*) imports to protect your variable names','Always use the __main__ shield when building custom reusable files']
+  ),
+
+  L('py-10', 10, 'Virtual Environments & pip', '🛡️',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nWhen you build multiple projects, their dependencies will eventually clash. Virtual environments allow you to create isolated bubbles for each project, ensuring their external libraries never interfere with each other.',
+    [
+      { 
+        title: '1. What is pip?', 
+        beginner: '`pip` (Pip Installs Packages) is Python\'s official app store downloader. It allows you to download code written by other people from the internet straight into your project. Need to build a web scraper? Just type `pip install requests` in your terminal!', 
+        advanced: 'Pip connects directly to PyPI (The Python Package Index). It handles dependency resolution, ensuring that if package A requires package B to run, both are downloaded and mapped correctly without manual intervention.' 
+      },
+      { 
+        title: '2. The Dependency Nightmare', 
+        beginner: 'Imagine Project 1 needs version 1.0 of a library, but Project 2 needs version 2.0. If you install them globally on your computer, one project will break! This is why you should never install packages directly onto your main system.', 
+        advanced: 'Global environment pollution causes unrecoverable application rot. Managing dependencies strictly through isolated project-level boundaries is a mandatory requirement for stable deployment and CI/CD pipeline integration.' 
+      },
+      { 
+        title: '3. Virtual Environments (venv)', 
+        beginner: 'A virtual environment (`venv`) is an isolated bubble folder. When you create one and "activate" it, your terminal pretends it\'s a brand new, empty Python installation. Anything you `pip install` while the bubble is active stays securely trapped inside that folder!', 
+        advanced: 'Executing `python -m venv .venv` generates an isolated binary tree. Activating the environment manipulates your system\'s `$PATH` variable, forcefully prioritizing the localized `python` and `pip` binaries over the global OS binaries.' 
+      },
+      { 
+        title: '4. requirements.txt', 
+        beginner: 'When you share your code with a friend, you don\'t send them your massive downloaded package folder. Instead, you create a text list of the tools you used (`pip freeze > requirements.txt`). Your friend can then install the exact same tools instantly using that list!', 
+        advanced: 'The requirements file ensures deterministic builds. A proper deployment architecture requires strict version pinning (e.g., `requests==2.31.0`) to guarantee that future updates to third-party libraries do not introduce breaking API changes.' 
+      },
+    ],
+    { 
+      title: 'Creating the Bubble', 
+      intro: 'Let\'s create a protected sandbox folder, activate the bubble, and install a powerful external library.', 
+      steps: [
+        'Open your normal system terminal (do not start the python >>> REPL yet).',
+        'Create a new project folder and navigate inside it (`mkdir my_project` then `cd my_project`).',
+        'Build the bubble folder: Type `python -m venv .venv` and hit Enter. Wait a few seconds for it to build.',
+        'Activate the bubble! On Windows: `.venv\\Scripts\\activate`. On Mac/Linux: `source .venv/bin/activate`.',
+        'Look at your terminal prompt—you should now see `(.venv)` at the beginning of the line! You are inside the bubble.',
+        'Install a package safely: Type `pip install requests` and watch it download.',
+        'To exit the bubble and return to normal, simply type the command `deactivate`.'
+      ], 
+      goal: 'You successfully scaffolded an isolated environment, rerouted your terminal paths, and installed external packages safely.' 
+    },
+    [
+      q('What is the primary danger of installing all Python packages globally on your main operating system?', ['It costs a lot of money','Different projects requiring different versions of the same library will overwrite each other, causing projects to break permanently','The computer will run out of electricity','The internet connection will sever'], 1, 'Global pollution leads to dependency conflicts. Project A and Project B cannot easily share the same global namespace if they rely on conflicting library versions.'),
+      q('What visual cue in your terminal indicates that a virtual environment has been successfully activated?', ['The terminal turns green','A prefix, typically `(.venv)`, appears at the very beginning of your terminal input line','A python logo pops up on screen','The terminal deletes all previous text'], 1, 'Activation scripts modify the terminal prompt variable (PS1) to display the name of the active environment bubble as a visual confirmation.'),
+      q('How do you generate a text file listing every package currently installed inside your virtual environment?', ['pip list-all > text.txt','python download.txt','pip freeze > requirements.txt','export packages'], 2, 'The `pip freeze` command outputs a cleanly formatted list of all installed packages and their exact version numbers, perfect for a requirements file.'),
+      q('What does `pip` stand for and what is its primary function?', ['Python Internet Protocol, for networking','Pip Installs Packages, the official tool for securely downloading and installing external libraries from PyPI','Personal Integer Parser, for math','Program Interface Panel, for UI'], 1, 'Pip is the official, built-in package manager used to query, download, and resolve external module dependencies from the Python Package Index.')
+    ],
+    ['Never pip install tools globally; always use an isolated project bubble','Use python -m venv to create a clean virtual environment folder','Look for the (.venv) prompt to confirm your bubble is active','Use requirements.txt to share your package list easily with other developers']
+  ),
+
+  L('py-11', 11, 'Comprehensions & Generators', '⚡',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nWriting "Pythonic" code means leaning into the language\'s unique, highly optimized features. Comprehensions allow you to map and filter lists in a single readable line, while generators let you handle massive datasets without running out of memory.',
+    [
+      { 
+        title: '1. List Comprehensions', 
+        beginner: 'Instead of writing a bulky 4-line `for` loop just to edit a list of items, you can write it all inside one pair of brackets! `[x * 2 for x in numbers]` instantly creates a brand new list where every number is doubled. It is clean, fast, and very popular.', 
+        advanced: 'List comprehensions execute using optimized internal C-code routines, making them measurably faster than standard `for` loops utilizing `.append()`. They cleanly map to standard map/filter functional paradigms without the lambda overhead.' 
+      },
+      { 
+        title: '2. Conditional Filtering', 
+        beginner: 'You can add an `if` statement to the very end of a comprehension to filter out bad data instantly. Writing `[name for name in users if name != "admin"]` creates a new list with all the regular users, cleanly ignoring the admin in a single line!', 
+        advanced: 'The standard conditional syntax `[expression for item in iterable if condition]` evaluates the filter first. If you need ternary assignment (changing the value based on a condition), it moves to the front: `[x if x > 0 else 0 for x in sequence]`.' 
+      },
+      { 
+        title: '3. The `yield` Keyword (Generators)', 
+        beginner: 'A normal function uses `return` to hand back a complete list. But what if the list has a billion items? Your computer would crash! Instead, use `yield`. It hands back one item, pauses the function, and waits. It generates items on-the-fly, saving massive amounts of memory.', 
+        advanced: 'Generators implement the Iterator protocol (`__iter__` and `__next__`). Because they lazily evaluate and maintain their internal local state between `yield` calls, they represent $O(1)$ memory consumption regardless of how infinitely large the dataset sequence is.' 
+      },
+      { 
+        title: '4. Generator Expressions', 
+        beginner: 'If you swap the square brackets of a List Comprehension `[...]` for round parentheses `(...)`, you create a Generator Expression! It looks identical, but instead of building the whole list at once, it becomes a lazy machine that only calculates the next item when you ask for it.', 
+        advanced: 'Always prefer generator expressions `(x**2 for x in data)` when piping sequences directly into aggregate functions like `sum()`, `max()`, or `any()`. It avoids materializing redundant intermediate lists in memory.' 
+      },
+    ],
+    { 
+      title: 'The One-Line Data Filter', 
+      intro: 'Let\'s use Pythonic comprehensions to clean up a messy data array in a single, lightning-fast line of code.', 
+      steps: [
+        'Open your terminal REPL.',
+        'Create a messy list of text: `data = ["apple", "BANANA", "cherry", "DATE"]`.',
+        'We want a new list with only the lowercase words, and we want to capitalize their first letters.',
+        'Write the comprehension: `clean = [fruit.capitalize() for fruit in data if fruit.islower()]`.',
+        'Print `clean`. You should see `["Apple", "Cherry"]`.',
+        'Now try a generator: Type `gen = (x * 10 for x in range(3))` and hit Enter.',
+        'Type `next(gen)` to get 0. Type `next(gen)` again to get 10. You control the flow!'
+      ], 
+      goal: 'You successfully condensed multi-line loop/filter logic into a single comprehension and manually stepped through a lazy generator object.' 
+    },
+    [
+      q('Why is a List Comprehension generally preferred over a standard `for` loop that uses `.append()`?', ['It connects to databases faster','It is more readable and executes faster because it utilizes optimized underlying C-level routines','It allows you to skip writing variables','It creates tuples instead of lists'], 1, 'Comprehensions are syntactically concise and execute faster because they bypass the continuous function-call overhead of `.append()`.'),
+      q('What is the core functional difference between `yield` and `return`?', ['`return` pauses the function, `yield` ends it entirely','`return` only works with numbers, `yield` works with text','`return` terminates the function and passes data, `yield` passes data but suspends the function state so it can resume later','They are identical in every way'], 2, '`yield` turns a function into a lazy generator, preserving local state variables so execution can resume exactly where it left off on the next call.'),
+      q('How do you quickly turn a List Comprehension into a memory-saving Generator Expression?', ['Change the square brackets `[...]` to round parentheses `(...)`','Add the word `lazy` to the front','Change the `for` to a `while`','Wrap it in quotation marks'], 0, 'Swapping brackets for parentheses changes the immediate list construction into a lazy generator expression.'),
+      q('If you run `sum( x for x in range(1000000) )`, how much memory does the generator expression consume?', ['1 million bytes of RAM','Barely any, because it only calculates and holds one number in memory at a time','1 Gigabyte','It crashes immediately'], 1, 'Generators evaluate lazily; they yield a single value to the `sum()` function and discard it before calculating the next, keeping memory footprint flat at $O(1)$.')
+    ],
+    ['Use list comprehensions to write clean, fast, single-line loops','Filter data instantly by adding an if statement to the end of a comprehension','Use yield instead of return to build massive sequences without crashing your RAM','Use round parentheses to make comprehensions lazy and memory-efficient']
+  ),
+
+  L('py-12', 12, 'Decorators & Advanced Functions', '🎁',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nDecorators are Python\'s way of wrapping a gift. They allow you to dynamically alter or enhance the behavior of a function without actually modifying the function\'s internal code. It is a superpower for logging, timing, and security checks.',
+    [
+      { 
+        title: '1. Functions are Objects', 
+        beginner: 'In Python, functions are just data objects. You can save a function to a variable (`my_var = print`), pass a function as an argument into another function, or even return a function from inside another function!', 
+        advanced: 'Python treats functions as first-class citizens. This means they are instances of the generic `function` object, capable of carrying custom attributes and being injected dynamically into complex higher-order routing pipelines.' 
+      },
+      { 
+        title: '2. Inner Functions (Closures)', 
+        beginner: 'You can define a new function completely hidden inside another function. This inner function has a special memory trick called a "closure"—it can remember and access the variables from the outer function even after the outer function has finished running!', 
+        advanced: 'Closures bind local variables from the enclosing lexical scope into the inner function\'s namespace (`__closure__` attribute). This allows persistent state retention without requiring class instantiation or global variables.' 
+      },
+      { 
+        title: '3. The Decorator Concept', 
+        beginner: 'A decorator is simply a function that takes another function, adds some extra behavior (like printing a timestamp), and gives you back the newly improved function. It is like putting a plain phone inside a protective, waterproof case.', 
+        advanced: 'Decorators implement the structural Wrapper pattern. They intercept the original function reference, replace it with a newly synthesized closure wrapper, and map the original execution block securely inside the wrapper scope.' 
+      },
+      { 
+        title: '4. The @ Syntax', 
+        beginner: 'Instead of writing ugly nested code to wrap functions, Python gives us the beautiful `@` symbol. Placing `@timer` directly above `def my_function():` instantly wraps your function inside the timer code automatically!', 
+        advanced: 'The `@decorator` syntactic sugar explicitly executes `my_func = decorator(my_func)` at module load time. Always utilize `functools.wraps` inside your decorators to explicitly preserve the original function\'s identity, docstrings, and name signatures.' 
+      },
+    ],
+    { 
+      title: 'Building a Speed Tracker', 
+      intro: 'Let\'s write a custom decorator from scratch that automatically times how long it takes for any function to execute.', 
+      steps: [
+        'Open your terminal REPL.',
+        'Import the time tool: `import time`.',
+        'Create the master decorator: `def speed_test(func):`.',
+        'Inside it, create the wrapper: `def wrapper():`.',
+        'Inside the wrapper, record start time: `start = time.time()`.',
+        'Execute the target function: `func()`.',
+        'Record end time and print: `print(f"Time: {time.time() - start}")`.',
+        'End the decorator block by returning the wrapper: `return wrapper`.',
+        'Now use it! Type `@speed_test`, and on the next line type `def slow_loop(): time.sleep(1)`.',
+        'Call `slow_loop()` and watch your decorator automatically track the 1-second delay!'
+      ], 
+      goal: 'You successfully authored a higher-order wrapper function and applied it using syntactic sugar to augment existing behaviors without altering source code.' 
+    },
+    [
+      q('What does it mean when we say functions are "first-class objects" in Python?', ['Functions must be written at the absolute top of the file','Functions can be assigned to variables, passed as arguments, and returned from other functions just like standard data','Functions are always processed faster than classes','Functions require an internet connection'], 1, 'Treating functions as first-class citizens allows for high-level functional programming, meaning they can be passed and modified dynamically like integers or strings.'),
+      q('What is a "closure" in Python?', ['A secure way to close an open text file','An inner function that remembers the specific local variables of its parent function, even after the parent function has finished executing','A syntax error caused by missing parentheses','A tool used to shut down the computer'], 1, 'Closures capture and lock external lexical state inside their own localized namespace, allowing inner functions to retain persistent memory.'),
+      q('What does placing the `@decorator_name` symbol directly above a function definition actually do?', ['It tells Python to ignore the function','It automatically wraps the target function inside the decorator logic right as the file is loaded into memory','It converts the function into an email address string','It triggers an immediate error'], 1, 'The `@` symbol is syntactic sugar that automatically intercepts the function creation, wraps it, and replaces the original variable name with the enhanced wrapper.'),
+      q('Why is using `functools.wraps` highly recommended when building custom decorators?', ['It makes the code run 10x faster','It encrypts the source code automatically','It preserves the original function\'s metadata (like its specific name and documentation strings) which would otherwise be erased by the wrapper','It zips the file to save disk space'], 2, 'By default, decorators overwrite the target function\'s identity with the generic wrapper\'s identity. `wraps` cleanly restores the original name and docstrings.')
+    ],
+    ['Python functions are data objects that can be wrapped and moved around','Closures allow hidden inner functions to remember variables from their parents','Decorators modify behavior dynamically without altering the original code','Use the @ symbol directly above a function to instantly wrap it']
   ),
   
- L('py-8', 8, 'File I/O', '📂',
-    'Working with files is how your program remembers things after it closes. Think of reading and writing files like pulling an physical notebook off a shelf, flipping open to a clean page, writing down or reading notes, and slamming it shut.',
+L('py-13', 13, 'Object-Oriented Programming I', '🏗️',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nAs programs grow, throwing hundreds of random functions and lists together becomes a chaotic mess. Object-Oriented Programming (OOP) fixes this by bundling related data and functions together into organized, reusable blueprints called Classes.',
     [
       { 
-        title: '1. Safe File Openings (with open)', 
-        beginner: 'To read a file on your computer, use the `with open("notes.txt") as f:` block. The `with` keyword acts like a smart personal assistant—the exact moment your indented code finishes running, it automatically slams the file shut for you so your computer memory doesn\'t leak data!', 
-        advanced: 'The `with` statement implements Python\'s context manager protocol by executing the file object\'s structural `__enter__()` and `__exit__()` methods. This guarantees underlying operating system file descriptors are released cleanly even if an unhandled runtime exception crashes the block execution.' 
+        title: '1. Classes vs. Objects', 
+        beginner: 'A Class is just a blueprint. If you design a `Car` blueprint, you can\'t drive it. But you can use that blueprint to build an Object: an actual red Ferrari that you can drive. You build one Class to create thousands of unique Objects!', 
+        advanced: 'Classes define memory structures and method resolution orders (MRO). Instantiating a class invokes its constructor, allocating contiguous memory for the object\'s specific state while maintaining references to the shared class-level namespace.' 
       },
       { 
-        title: '2. Operating Modes', 
-        beginner: 'When opening a file, you must tell Python what you plan to do. Use `"r"` for reading text. Use `"w"` for writing new text—but be careful, `"w"` completely wipes out and overwrites anything that was inside the file before! Use `"a"` to cleanly append text onto the very bottom of the existing page.', 
-        advanced: 'Pass the exclusive creation mode flag `"x"` to force a failure if the target filename already exists on disk. Always explicitly pass `encoding="utf-8"` within text streams to prevent your host operating system\'s default locale settings from corrupting or breaking localized Unicode text formatting.' 
+        title: '2. The __init__ Method', 
+        beginner: 'When you build a new object from your blueprint, Python instantly runs a special setup function called `__init__`. This is where you assign the object\'s initial properties, like giving a new user a `name` and starting their `score` at 0.', 
+        advanced: '`__init__` is the initializer, not the true constructor (which is `__new__`). It mutates the newly allocated object state before returning it to the caller. Failing to initialize variables here leads to shared class-attribute pollution.' 
       },
       { 
-        title: '3. Streaming Huge Files (Iterating Lines)', 
-        beginner: 'If you need to read a massive file line by line, don\'t swallow the whole book at once! Using a simple loop like `for line in f:` tells Python to read only one individual line into memory at a time, protecting your computer from freezing or crashing.', 
-        advanced: 'Calling `.read()` on multi-gigabyte structures triggers instant out-of-memory errors by pulling raw bytes directly into standard RAM. Leverage line-by-line file descriptor iteration combined with custom lazy generators to construct memory-bounded streaming data pipelines.' 
+        title: '3. The "self" Keyword', 
+        beginner: 'Every function inside a class must have the word `self` as its first argument. `self` is how the object talks to itself! If the object wants to change its own score, it must explicitly type `self.score = 100`.', 
+        advanced: '`self` is just a strong naming convention for the active instance reference dynamically passed by the interpreter during bound method calls. `obj.method()` is implicitly translated into `Class.method(obj)` at runtime.' 
       },
       { 
-        title: '4. Structured Layouts (JSON & CSV)', 
-        beginner: 'Python comes with pre-made tools to parse official formats. Importing the `json` module lets you read API data blocks, while the `csv` module lets you read spreadsheets easily without writing any complex text separation logic yourself.', 
-        advanced: 'While the `pandas` library is highly superior for scalable data analysis, utilize Python\'s native `json` and `csv` standard library components inside structural utility tools to minimize application dependencies and keep installation footprints lightweight.' 
+        title: '4. Methods vs. Attributes', 
+        beginner: 'Attributes are things an object HAS (like `self.color = "Red"`). Methods are things an object can DO (like `def honk(self):`). Think of attributes as nouns, and methods as verbs.', 
+        advanced: 'Attributes map to instance dictionaries (`__dict__`), while methods are bound functions stored in the class dictionary. Python descriptor protocols handle the seamless translation between the underlying function and the bound instance method.' 
       },
     ],
     { 
-      title: 'The JSON Storage Round Trip', 
-      intro: 'Let\'s write an advanced script that saves a Python variable permanently to a structured file on disk, and then reads it back into memory.', 
+      title: 'Building a Robot Factory', 
+      intro: 'Let\'s write our very first Class, use it to spawn a customized Robot object, and command it to speak.', 
       steps: [
-        'Open your interactive terminal screen and ensure the Python environment is ready (look for the >>> prompt).',
-        'Import the native system tool format by typing: `import json` and hit Enter.',
-        'Create a dictionary variable of data: Type `data = {"name": "Sage", "level": 99}` and hit Enter.',
-        'Open a brand new file pointer in write mode with clean text handling: Type `with open("out.json", "w", encoding="utf-8") as f:`.',
-        'On the next indented line, save your data using indent formatting: Type `json.dump(data, f, indent=2)` and hit Enter twice.',
-        'Now read it back! Open the file in read mode: Type `with open("out.json", "r", encoding="utf-8") as f:`.',
-        'Extract the data stream safely on the next indented line by running: `loaded = json.load(f)`. Print `loaded["name"]` to see it read from the file!'
+        'Open your terminal REPL.',
+        'Define the blueprint: `class Robot:`',
+        'Add the setup function (indent 4 spaces!): `def __init__(self, name):`',
+        'Assign the attribute (indent 8 spaces!): `self.name = name` and `self.battery = 100`.',
+        'Add a behavior at the 4-space indent level: `def speak(self): print(f"I am {self.name}.")`',
+        'Press Enter until you are out of the class block.',
+        'Spawn an object! `r1 = Robot("Wall-E")`',
+        'Check its battery: `print(r1.battery)`. Now make it talk: `r1.speak()`!'
       ], 
-      goal: 'You successfully serialized a live memory variable straight down to a physical JSON file and read it back.' 
+      goal: 'You successfully transitioned from procedural scripts into stateful Object-Oriented design by defining a class blueprint and instantiating a functional object.' 
     },
     [
-      q('Why should you always use the `with open(...)` pattern instead of manually opening files?', ['It makes the text inside the file completely unreadable to hackers','It automatically closes the file for you when your code block finishes, preventing data leaks','It forces your computer to execute the script twice as fast','It deletes temporary variables to save local space'], 1, 'The `with` keyword acts as a native context wrapper that guarantees your open file streams are automatically and safely shut down under all circumstances.'),
-      q('What happens to your data if you open an existing file using the `"w"` mode flag?', ['Python adds new lines directly onto the bottom of the file','It completely deletes the file\'s existing contents and overwrites it from scratch','It throws an immediate error screen to warn you','It duplicates the file and makes a separate copy'], 1, 'The `"w"` flag represents destructive writing; it opens a clear file stream, wiping out any historical data previously written on that file path.'),
-      q('What is the safest, most memory-efficient way to process an enormous 10-Gigabyte text file?', ['Load the entire file into a giant variable string using .read()','Iterate through the open file line by line using a standard loop','Convert the text file into a zip bundle before reading','Copy and paste the text lines manually into the terminal'], 1, 'Iterating through a file stream line by line loops through structural data incrementally without overloading your local RAM allocations.'),
-      q('Why is it highly recommended to pass `encoding="utf-8"` when opening text files in Python?', ['It encrypts the text inside your local files','It ensures text characters from different world languages are read correctly across all operating systems','It is a mandatory requirement to make file loops work','It compresses your file sizes down to half'], 1, 'Explicitly declaring your character encoder prevents layout reading glitches caused by shifting between cross-platform default locale standards.')
+      q('What is the core difference between a Class and an Object?', ['A Class is written in C, an Object is written in Python','A Class is a blueprint, an Object is the actual usable item built from that blueprint','A Class holds numbers, an Object holds text','They are the exact same thing'], 1, 'Classes act as abstract templates defining structure and behavior, while objects are concrete, instantiated manifestations of those templates existing in active memory.'),
+      q('What is the primary purpose of the `__init__` method?', ['To delete the object from memory','To securely initialize the object\'s specific starting data right when it is created','To connect the object to the internet','To print error messages'], 1, 'The `__init__` (initializer) method is automatically triggered upon instantiation to establish the object\'s foundational instance variables and starting state.'),
+      q('Why is the `self` keyword strictly required inside class methods?', ['To pass password checks','It explicitly tells Python to apply the changes to this specific object instance, rather than a generic global variable','It makes the code run infinitely','It prevents other files from reading the class'], 1, '`self` binds the method to the specific calling instance, allowing the method to read and write to that exact object\'s distinct memory address.'),
+      q('If an object has a variable `self.speed = 50`, what is that conceptually known as?', ['An Attribute (a noun/property)','A Method (a verb/action)','A Class','An Exception'], 0, 'Instance variables tracking state (like color, speed, or health) are known as Attributes, while the functions dictating actions are Methods.')
     ],
-    ['Always employ the with statement to handle file closure hooks safely','Beware that the write mode flag completely resets historical data contents','Iterate line by line to stream massive files without exhausting memory','Explicitly define your character encoding rules to preserve text integrity']
+    ['A Class is a blueprint; an Object is the actual item you build from it','The __init__ method sets up your object the moment it is born','Always use the self keyword so the object can interact with its own data','Attributes are nouns (properties); Methods are verbs (actions)']
   ),
 
-  L('py-9', 9, 'Error Handling', '⚠️',
-    'Code that ignores errors lies to its users. Think of error handling like setting up a safety net or buckling a seatbelt—unexpected bumps will happen, but a great program catches those bumps gracefully instead of crashing to the floor.',
+  L('py-14', 14, 'Object-Oriented Programming II', '🧬',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nOnce you have basic classes, you can use Inheritance to share logic between them without copy-pasting code. A "Dog" class and a "Cat" class can both inherit the ability to eat from a master "Animal" class!',
     [
       { 
-        title: '1. The Safety Net (try / except)', 
-        beginner: 'Wrap unpredictable code inside a `try:` block. If something goes wrong, Python stops and slides down safely into your matching `except:` recovery cushion. Never write a plain, empty `except:`—always name the exact problem you want to fix!', 
-        advanced: 'Writing a bare `except:` clause intercepts all exceptions indiscriminately, including crucial internal runtime interrupts like `KeyboardInterrupt` (Ctrl+C) and `SystemExit`. This acts as a dangerous anti-pattern that masks structural core logic failures.' 
+        title: '1. Inheritance', 
+        beginner: 'If you want to build a `Drone` class, and you already have a `Robot` class, you don\'t have to start from scratch. `class Drone(Robot):` tells Python that the Drone should instantly inherit all the weapons and batteries the Robot already has!', 
+        advanced: 'Inheritance represents an "is-a" structural relationship. Python supports multiple inheritance, resolving parent attribute lookups dynamically via the C3 Linearization algorithm (viewable via `Class.mro()`).' 
       },
       { 
-        title: '2. Naming the Problem (Exception Types)', 
-        beginner: 'Python uses different names for different mistakes. Shoving letters into math formulas causes a `TypeError`. Looking for a missing key inside a dictionary triggers a `KeyError`. Spotting these names lets you build targeted fixes for each unique situation!', 
-        advanced: 'Always target the narrowest, most explicit exception subclass possible. Catching a broad generic base `Exception` intercepts expected failures but simultaneously blinds your logging and debug stack traces from unpredictable runtime errors.' 
+        title: '2. The super() Function', 
+        beginner: 'When a child class overrides its parent\'s setup, it still needs the parent\'s basic tools. `super().__init__()` acts as a direct phone line to the parent class, ensuring the parent\'s setup code runs alongside the child\'s new code.', 
+        advanced: 'The `super()` proxy object cleanly routes method calls to the next class in the Method Resolution Order (MRO), preventing redundant executions and structural breaks in complex multi-inheritance architectures.' 
       },
       { 
-        title: '3. Guaranteeing Cleanup (finally / else)', 
-        beginner: 'The `else:` block runs only if your code succeeds perfectly without hitting any errors. The `finally:` block is your unstoppable cleanup crew—it executes no matter what happens, even if your code hits an error or immediately hits a return statement!', 
-        advanced: 'The `finally` block is natively reserved for resource disposal routines like forcing network connection drops or releasing database locks. For local file data streams, prioritizing standard context managers (`with`) provides a cleaner structural footprint.' 
+        title: '3. Overriding Methods', 
+        beginner: 'If a parent `Bird` class has a `def speak(): print("Chirp")`, a child `Duck` class can simply rewrite its own `def speak(): print("Quack")`. The child\'s unique code completely overrides the parent\'s default behavior!', 
+        advanced: 'Method overriding leverages Polymorphism. Because Python uses Duck Typing, the caller does not care if the object is a Bird or a Duck, only that the resulting object implements the requested interface successfully at runtime.' 
       },
       { 
-        title: '4. Sounding the Alarm (Raising Custom Errors)', 
-        beginner: 'You can sound a deliberate alarm inside your own code by typing `raise ValueError("Invalid Input Sent!")`. You can even design your own custom alarm names by creating an empty class that inherits from the core Exception blueprint!', 
-        advanced: 'Custom exceptions act as the public structural interface of high-level modules and frameworks. Construct logical domain exception hierarchies (e.g., creating a base `DatabaseError` from which specialized `ConnectionTimeout` errors branch) to support modular exception mapping.' 
+        title: '4. Dunder (Magic) Methods', 
+        beginner: 'Methods with double-underscores (`__`) are Python\'s secret system hooks. By defining `__str__(self):`, you can control exactly what prints to the screen when someone types `print(my_object)`, making it readable instead of ugly computer gibberish.', 
+        advanced: 'Dunder methods overload fundamental operator behavior. `__add__` controls the `+` operator, `__len__` controls `len()`, and `__eq__` controls `==`. Mastering them allows custom objects to interact natively with Python\'s built-in syntax.' 
       },
     ],
     { 
-      title: 'The Crash-Proof Divider', 
-      intro: 'Let\'s build a robust mathematical function that intercepts bad numbers and text parameters without letting the application crash.', 
+      title: 'The Flying Robot', 
+      intro: 'Let\'s inherit from the Robot blueprint we made earlier, give the new subclass the unique ability to fly, and customize how it prints to the screen.', 
       steps: [
-        'Open your interactive playground panel and confirm the Python prompt line (>>>) is ready.',
-        'Define a dividing template tool by typing: `def divide(a, b):` and hit Enter.',
-        'On the next indented line, set up your targeted safety net tracking block by typing: `try:`.',
-        'Directly under that tracking line, try to deliver the division math answer: Type `return a / b`.',
-        'Catch division by zero attempts safely below it: Type `except ZeroDivisionError: return None`.',
-        'Catch bad string data inputs next: Type `except TypeError: raise ValueError("Numbers only!") from None`.',
-        'Exit the indents and test both paths by running `divide(10, 0)` and `divide("text", 2)` to verify the clean failures.'
+        'Open your terminal REPL.',
+        'Define a parent: `class Robot:` and give it `def move(self): print("Rolling...")`.',
+        'Create a child class that inherits it: `class Drone(Robot):`',
+        'Inside the child, add a new ability: `def fly(self): print("Taking off!")`.',
+        'Override the parent\'s movement: `def move(self): print("Flying...")`.',
+        'Add a magic string method: `def __str__(self): return "I am a high-tech Drone."`',
+        'Exit the block and spawn it: `d = Drone()`.',
+        'Call `d.fly()`, check the overridden `d.move()`, and just type `print(d)` to see your magic string!'
       ], 
-      goal: 'You successfully mapped targeted safety blocks to handle math violations and data type mismatches smoothly.' 
+      goal: 'You successfully implemented inheritance, extended functionality with new child methods, overridden default behaviors, and customized internal dunder outputs.' 
     },
     [
-      q('Why is writing a bare, nameless `except:` block considered a dangerous coding habit?', ['It forces the computer to restart completely','It swallows every error blindly, including user exit commands, hiding underlying software bugs','It makes function definitions completely uncallable','It deletes your variable attributes'], 1, 'Bare exceptions hide critical logic bugs and block system override commands like Ctrl+C from functioning correctly.'),
-      q('Which block is guaranteed to run its code contents no matter what happens inside your error handling safety net?', ['The try block','The except block','The finally block','The else block'], 2, 'The `finally` clause executes unconditionally at the end of the error block, making it the perfect location for data cleanup routines.'),
-      q('What is the best practice regarding how specific your exception targets should be?', ['Always catch the generic global Exception to be completely safe','Be as narrow and specific as possible to catch only the exact problem you know how to handle','Never use error blocks and let the application crash naturally','Let your loop handle it randomly'], 1, 'Targeting tight, explicit exception classes prevents your recovery logic from accidentally capturing unrelated system failures.'),
-      q('How do custom exceptions assist when you are designing scalable software applications and libraries?', ['They automatically speed up runtime code loops','They provide a clean, highly descriptive public interface for mapping error handling across architectures','They shrink the footprint size of file packages','They eliminate the need to use decorators'], 1, 'Custom exceptions allow systems to differentiate internal application errors from standard structural language environment violations.')
+      q('What is the primary benefit of Class Inheritance?', ['It makes code run asynchronously','It eliminates repetitive copy-pasting by allowing a child class to share and reuse the logic established in a parent class','It forces all variables to be strings','It prevents errors globally'], 1, 'Inheritance enforces the DRY (Don\'t Repeat Yourself) principle, centralizing shared logic in the parent class while allowing targeted specialization in the subclasses.'),
+      q('If a subclass has its own `__init__` setup, how does it properly trigger the parent class\'s setup as well?', ['By typing `run_parent()`','By deleting its own `__init__`','By utilizing the `super().__init__()` proxy function inside its own setup block','Parents cannot be triggered'], 2, 'The `super()` function delegates method resolution up the inheritance chain, safely executing parent initializations without hardcoding the parent\'s direct class name.'),
+      q('If both the parent class and the child class have a method named `def attack(self):`, what happens when the child object calls it?', ['Python crashes with a duplicate name error','Both attack methods fire simultaneously','The child\'s custom attack method completely overrides and replaces the parent\'s version','The parent\'s version runs, ignoring the child'], 2, 'Subclasses structurally override parent definitions. When the runtime executes a method lookup, it checks the child\'s dictionary first, firing the localized logic.'),
+      q('What does defining the special `__str__(self):` magic method allow you to do?', ['Turn all text into strings automatically','Control the exact, readable text output that appears when someone uses `print()` on your object','Connect to the string module','Prevent the object from being deleted'], 1, 'The `__str__` dunder method overloads the default system representation, replacing the raw memory address output with a clean, human-readable string representation.')
     ],
-    ['Wrap risky statements inside targeted try blocks','Use explicit exception types instead of generic catchalls','The finally block triggers resource cleanup routines unconditionally','Raise explicit descriptive errors to prevent predictable silent software failures']
+    ['Inheritance creates a Parent-Child relationship, letting you reuse code instantly','Use super() to safely call a parent\'s methods from inside the child','Subclasses can Override parent methods by simply reusing the exact same function name','Dunder methods (like __str__) let you secretly hook into standard Python actions']
   ),
 
- L('py-10', 10, 'List Comprehensions & Generators', '⚡',
-    'Python lets you process entire collections of data using short, elegant, single-line shortcuts. You can choose to calculate everything instantly all at once, or stream items lazily one by one to save computer memory!',
+  L('py-15', 15, 'Type Hinting & Pydantic', '🏷️',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nPython lets you put text into a variable that was meant for numbers, causing explosive crashes later. Type Hinting fixes this by letting you label your variables. It is the secret to building massive, unbreakable enterprise applications.',
     [
       { 
-        title: '1. List Comprehensions (Instant Transformations)', 
-        beginner: 'Instead of writing a long, multi-line `for` loop just to modify items in a list, you can compress it into a clean one-liner inside square brackets, like `[x * 2 for x in nums]`. It loops, transforms, and outputs a brand new list instantly!', 
-        advanced: 'List comprehensions generate an entire populated array in memory eagerly. Writing complex, triple-nested comprehensions is a structural code smell that destroys readability—refactor those structures back into explicit standard loops, and use trailing `if` conditions exclusively for shallow filtering.' 
+        title: '1. Basic Type Annotations', 
+        beginner: 'You can hint what a variable should be by adding a colon. `age: int = 25` tells other developers (and your code editor) that `age` must be an integer. For functions, `def greet(name: str) -> str:` says it takes text and returns text!', 
+        advanced: 'Python is fundamentally dynamically typed; standard type hints are strictly ignored by the runtime interpreter. They exist solely for static analysis tools (like MyPy) and IDE language servers to enforce structural integrity pre-execution.' 
       },
       { 
-        title: '2. Dictionary & Set Comprehensions', 
-        beginner: 'You can use this exact same one-line loop trick to quickly build custom dictionaries and sets! For example, writing `{x for x in items}` loops through your data and instantly filters out all duplicate items automatically.', 
-        advanced: 'Set comprehensions use syntax like `{x for x in items}` to inline deduplicate streams efficiently. Prefer native set comprehensions over wrapping unoptimized casting operations like `list(set(sequence))` when structural clarity is preferred.' 
+        title: '2. The typing Module', 
+        beginner: 'What if you have a list, but you want to guarantee it only holds numbers? You can import tools to get specific! Using `List[int]` means a list of integers. `Dict[str, int]` means a dictionary with text keys and number values.', 
+        advanced: 'As of Python 3.9+, standard collections natively support generics (e.g., `list[int]` instead of importing `typing.List`). However, understanding the `typing` module is mandatory for backwards compatibility and advanced structural patterns like `Callable` and `Any`.' 
       },
       { 
-        title: '3. Generator Expressions (The Lazy Conveyor Belt)', 
-        beginner: 'If you swap out a list\'s square brackets `[]` for round parentheses `()`, you create a Generator expression! Instead of filling your computer memory with millions of items instantly, it waits lazily and calculates the next item only when you explicitly ask for it.', 
-        advanced: 'Generator expressions stream data iteratively without allocating intermediate block arrays. Pass them directly as arguments into reduction functions like `sum(x * x for x in data)` or `max()` to perform math over infinite streams at zero memory overhead cost.' 
+        title: '3. Union and Optional', 
+        beginner: 'Sometimes a variable can be more than one thing. `Union[int, float]` means it can be a whole number OR a decimal. `Optional[str]` is a lifesaver—it means the variable should be text, but it is also allowed to be totally empty (`None`).', 
+        advanced: 'In modern Python (3.10+), `Union[int, str]` is cleanly syntactically simplified to the bitwise OR operator `int | str`. `Optional[str]` is exactly equivalent to `str | None`.' 
       },
       { 
-        title: '4. Streaming Streams with `yield`', 
-        beginner: 'When building a function, swapping out the traditional `return` keyword for `yield` turns your tool into an iterator. Instead of shutting down after outputting one answer, it pauses its state, hands over a value, and waits to pick up right where it left off!', 
-        advanced: 'The presence of `yield` transforms a regular call frame into a reusable generator object. Generators act as synchronous coroutines under the hood; utilize `yield from sub_generator` to cleanly delegate iteration duties down into nested streaming pipelines.' 
+        title: '4. Intro to Pydantic', 
+        beginner: 'Standard type hints don\'t actually stop bad code from running. That is where external libraries like `Pydantic` come in. It turns your hints into strict bouncers. If you hint `age: int` and someone tries to pass the word "Twenty", Pydantic actively blocks it and throws an error!', 
+        advanced: 'Pydantic bridges the gap between static typing and runtime validation. By extending `BaseModel`, it automatically coerces types during parsing (e.g., casting string "5" to int 5) and guarantees API payload integrity for frameworks like FastAPI.' 
       },
     ],
     { 
-      title: 'The Lazy Infinite Generator', 
-      intro: 'Let\'s build a lazy math engine that can calculate squared numbers out to infinity without ever running out of computer memory or freezing your system.', 
+      title: 'The Typed Calculator', 
+      intro: 'Let\'s write a fully annotated function to see how Type Hints make our code self-documenting and easier for other developers to read.', 
       steps: [
-        'Open your interactive screen workspace and make sure the active Python prompt (>>>) is listening.',
-        'Define a custom lazy generator tool by typing: `def squares():` and hit Enter.',
-        'Initialize a baseline tracking number on the next indented line: Type `n = 1`.',
-        'Set up an infinite loop container below it: Type `while True:`.',
-        'Inside that loop, pause and output the math computation using yield: Type `yield n * n`. Then increment the counter with `n += 1`.',
-        'Exit the indents, instantiate your engine by running `g = squares()`, and type `next(g)` multiple times to see numbers stream out on demand!',
-        'Now try a rapid, single-line list shortcut for comparison: Type `[x * x for x in range(10)]` and observe the instant calculation array.'
+        'Open your terminal REPL.',
+        'Define a heavily typed function: `def calculate_tax(price: float, tax_rate: float) -> float:`',
+        'Inside, return the math: `return price + (price * tax_rate)`.',
+        'Notice how the `-> float` clearly tells anyone reading the code exactly what to expect back.',
+        'Run it: `calculate_tax(100.0, 0.05)`.',
+        'Now type `calculate_tax("One Hundred", "Five")`.',
+        'Notice that it crashes! Type Hints do not stop execution on their own, but if you used an editor like VSCode, it would have shown a giant red underline warning you BEFORE you ran it!'
       ], 
-      goal: 'You understand the core difference between building an eager data list all at once versus streaming data values lazily.' 
+      goal: 'You successfully applied static type constraints and return annotations to a function signature, improving developer readability and enabling static analysis.' 
     },
     [
-      q('Which tool allows you to transform and filter a massive collection of items lazily without overloading your computer RAM memory?', ['A standard eager list comprehension','A memory-efficient generator expression wrapped in parentheses ()','An implicit structural class declaration','A string slice sequence'], 1, 'Generator expressions use round parentheses to stream transformations step by step on demand, using virtually zero memory overhead.'),
-      q('What happens to a Python function when you use the `yield` keyword instead of a standard `return` keyword?', ['The function deletes itself immediately after running once','It transforms the function into a stateful iterator that can pause and resume execution','It converts all outputs into string values','It triggers a fatal compilation type failure'], 1, 'The `yield` keyword creates a generator, suspending execution context dynamically so it can stream multiple distinct data values over time.'),
-      q('What is the best structural choice if you find yourself writing a triple-nested list comprehension statement?', ['Keep it on a single line to show off your math skills','Stop and refactor the code back into standard, highly readable multi-line loops','Delete the function and use an external plugin package','Convert the square brackets into strings'], 1, 'Deeply nested comprehensions are a major readability violation; refactoring them back into standard code blocks keeps your system accessible and maintainable.'),
-      q('How does a set comprehension assist you when processing incoming raw sequence data collections?', ['It sorts all elements alphabetically','It instantly loops through and filters out all duplicate items from the collection automatically','It encrypts the individual items inside a key-value dictionary','It blocks empty values from entering'], 1, 'Set comprehensions utilize curly brackets `{x for x in data}` to automatically drop duplicates and guarantee structural uniqueness.')
+      q('What actually happens at runtime if you violate a standard Python type hint (like passing a string to an `int` hint)?', ['Python crashes instantly with a TypeError','Python ignores the hint completely; standard hints do not stop the code from running','Python secretly converts the string','The computer restarts'], 1, 'Standard type annotations are purely organizational metadata. The Python interpreter ignores them during execution; they rely entirely on external linters (like MyPy) to catch errors.'),
+      q('In the function signature `def fetch_user() -> dict:`, what does the `-> dict` represent?', ['It forces the function to take a dictionary as input','It restricts the function to one line of code','It explicitly documents that the function will return a dictionary data structure to the caller','It imports the dictionary module'], 2, 'The arrow syntax `->` designates the expected return type of the function, providing crucial structural guarantees to whoever relies on the function output.'),
+      q('What does the type hint `Optional[str]` indicate?', ['The user can skip writing this code','The variable must be a string, or it is allowed to be exactly `None` (empty)','It chooses a random string','It creates an optional checkbox UI'], 1, '`Optional[X]` is standard shorthand for `Union[X, None]`. It signals that missing or null values are an explicitly expected and permitted state.'),
+      q('Why do professional developers use the external library `Pydantic`?', ['Because it makes Python run faster in the browser','Because it enforces type hints AT RUNTIME, aggressively blocking bad data and converting inputs to protect the application','Because it replaces the standard library','It designs web graphics'], 1, 'Unlike standard hints which are passive, Pydantic actively validates data payloads during execution, casting valid inputs and crashing immediately on structural violations.')
     ],
-    ['List comprehensions express data transformations cleanly in a single line of code','Using parentheses creates a lazy generator expression that saves memory','The yield keyword allows functions to pause state and stream values sequentially','Avoid writing deeply nested comprehensions to preserve code readability']
+    ['Use colons to hint variables, and arrows (->) to hint what functions give back','Hints act as highly visible documentation that smart code editors use to warn you of bugs','Optional[X] is perfect for data that might be missing or empty','Standard hints don\'t stop the program; use libraries like Pydantic for strict runtime defense']
   ),
-  
-  L('py-11', 11, 'Decorators', '🎨',
-    'Think of a decorator like a security guard or a gift-wrapping machine. It wraps itself around an existing function to add extra superpowers—like timing, security clearance, or automatic logging—without touching or messing up the original code inside!',
+
+  L('py-16', 16, 'APIs & Web Requests', '🌐',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nYour code doesn\'t have to live in isolation. APIs (Application Programming Interfaces) allow your Python scripts to talk to the rest of the internet—fetching live weather data, sending automated emails, or pulling stock prices in real-time.',
     [
       { 
-        title: '1. Functions as First-Class Values', 
-        beginner: 'In Python, functions are just regular items! You can assign a function to a variable, pass it as a gift into another function, or return a function as an output. This flexibility lets us pass whole code recipes around seamlessly.', 
-        advanced: 'Decorators fundamentally rely on closures. A closure occurs when a nested inner function retains direct read access to variables defined within its enclosing parent scope, even after that parent function has completely finished executing.' 
+        title: '1. What is an API?', 
+        beginner: 'Think of an API as a digital restaurant waiter. You (the client) give the waiter an order (a Request). The waiter takes it to the kitchen (the Server). The kitchen prepares the food, and the waiter brings it back to you (the Response).', 
+        advanced: 'RESTful APIs operate over HTTP, mapping standard stateless CRUD operations (Create, Read, Update, Delete) to highly structured URI endpoints. Payloads are heavily serialized, typically transmitted as JSON.' 
       },
       { 
-        title: '2. The @ Syntax (Syntactic Sugar)', 
-        beginner: 'Placing the `@` symbol above a function definition (like `@my_decorator`) is just a clean shortcut! It tells Python: "Take this function, feed it through the decorator machine, and replace it with the upgraded wrapper version automatically."', 
-        advanced: 'The `@decorator` syntax is pure syntactic sugar for an explicit assignment: `f = decorator(f)`. When stacking multiple decorators above a single definition, Python evaluates them from the bottom up (closest to the function definition first).' 
+        title: '2. The Requests Library', 
+        beginner: 'Python\'s built-in internet tools are clunky. The external `requests` library is the industry standard for web scraping and API calls. You can fetch a webpage instantly just by typing `requests.get("https://google.com")`!', 
+        advanced: 'The `requests` library abstracts underlying `urllib3` connection pooling, SSL/TLS verification, and session state persistence, making low-level socket management completely invisible to the developer.' 
       },
       { 
-        title: '3. Identity Protection (functools.wraps)', 
-        beginner: 'When you wrap a function inside a decorator, it can accidentally lose its identity and forget its original name! Using a special helper line called `@functools.wraps` ensures your function holds onto its native name and description.', 
-        advanced: 'Failing to apply `@functools.wraps(fn)` to your internal wrapper function causes the target function\'s reflection metadata (`__name__` and `__doc__`) to be overwritten. This turns debugging into a nightmare as every function begins to report its name as "wrapper".' 
+        title: '3. Status Codes', 
+        beginner: 'When a server replies, it includes a 3-digit number. `200` means "Perfect, here is your data!" `404` means "File Not Found." `401` means "You are not authorized (bad password)." Always check your status code before trusting the data!', 
+        advanced: 'HTTP Status Codes categorize response behaviors structurally. 2xx dictates success, 3xx dictates redirection, 4xx dictates client-side failure (bad payload/auth), and 5xx dictates catastrophic upstream server failures.' 
       },
       { 
-        title: '4. Powerful Built-in Decorators', 
-        beginner: 'Python has incredible decorators pre-installed! For example, adding `@functools.lru_cache` above a slow function tells Python to remember previous answers so if you ask the exact same question again, it spits out the answer instantly without recalculating!', 
-        advanced: 'The `@lru_cache` decorator provides free, high-performance in-memory memoization. Other structural built-ins like `@dataclass` automatically write repetitive boilerplates for you, generating complete `__init__`, `__repr__`, and `__eq__` methods under the hood.' 
+        title: '4. GET vs. POST & JSON', 
+        beginner: 'A `GET` request just asks to read data (like loading a webpage). A `POST` request securely sends new data up to the server (like submitting a login form). Most APIs reply in JSON text, which `requests` can instantly convert to a dictionary using `.json()`.', 
+        advanced: 'GET requests encode parameters strictly in the query string of the URL, exposing them to router logs. POST requests encapsulate payloads securely within the HTTP message body, allowing complex, massive data transmission.' 
       },
     ],
     { 
-      title: 'The Code Execution Timer', 
-      intro: 'Let\'s build a reusable benchmarking tool that wraps around any function and measures exactly how many milliseconds it takes to run.', 
+      title: 'The PokeAPI Fetcher', 
+      intro: 'Let\'s write a script that connects to the public Pokemon API over the internet, fetches live JSON data, and parses it cleanly.', 
       steps: [
-        'Open your interactive workspace and check that the active Python prompt (>>>) is listening.',
-        'Import the core timing utilities: Type `import time` and `import functools` and hit Enter.',
-        'Define your custom wrapper machine by typing: `def timer(fn):` and hit Enter.',
-        'Protect metadata identity on the next indented line by applying the helper: `@functools.wraps(fn)`.',
-        'Directly below that, define the active wrapper function: `def wrapper(*args, **kwargs):`.',
-        'Inside the wrapper, record the start time (`start = time.time()`), run the actual code (`result = fn(*args, **kwargs)`), calculate the elapsed time, print it out, and return the result.',
-        'Exit all indents, return the internal `wrapper` function from your main tool, and test applying `@timer` to a test script!'
+        'Open your terminal and ensure you are in an environment with the library installed (`pip install requests`).',
+        'Launch the REPL and type `import requests`.',
+        'Make the GET request: `response = requests.get("https://pokeapi.co/api/v2/pokemon/pikachu")`.',
+        'Check the status to ensure the server liked your request: `print(response.status_code)`. (Look for 200!).',
+        'Extract the JSON data into a dictionary: `data = response.json()`.',
+        'Now parse it! Find Pikachu\'s weight: `print(data["weight"])`.',
+        'Find his ID number: `print(data["id"])`.'
       ], 
-      goal: 'You successfully wrote a structural wrapper decorator that captures runtime metrics dynamically.' 
+      goal: 'You successfully executed a stateless HTTP GET request, verified the network handshake, deserialized the JSON response body, and extracted targeted dictionary data.' 
     },
     [
-      q('What is the `@` symbol above a function definition actually doing under the hood?', ['It deletes the function from system memory to save space','It is a clean shortcut for feeding the function into a decorator modifier line, like `f = decorator(f)`','It encrypts the lines of code to make them secure','It turns the function into an infinite tracking loop'], 1, 'The `@` decorator operator is native syntactic sugar that automatically passes your target function as an argument directly into the wrapper utility.'),
-      q('What debugging issue occurs if you create a decorator but forget to include the `@functools.wraps` modifier helper?', ['The entire python program crashes immediately on compilation','The function loses its original metadata identity and mistakenly reports its name as "wrapper"','The function runs exactly 5 times slower than normal','The return keyword stops working entirely'], 1, 'Without `@functools.wraps`, the interior wrapper function\'s metadata completely overrides the original target function\'s true name and description attributes.'),
-      q('Which built-in Python decorator can you use to store previously calculated answers in a fast memory cache?', ['@property','@functools.lru_cache','@staticmethod','@dataclass'], 1, 'The `@lru_cache` decorator acts as a native memoization layer, saving input-output states to completely bypass repetitive execution cycles.'),
-      q('What foundational concept allows a nested wrapper function to remember and interact with variables from its outer function?', ['Global environment variables','Closures','Thread loops','System pipeline streams'], 1, 'Decorators operate on closures, which allow inner function definitions to lock down and remember the scope environment variables surrounding them.')
+      q('What is the primary difference between an HTTP GET request and a POST request?', ['GET is fast, POST is slow','GET asks to read data from the server, POST safely submits new payload data up to the server','GET deletes databases, POST creates them','There is no difference'], 1, 'GET requests are idempotent and used strictly for data retrieval, while POST requests package body data to mutate or create new state on the destination server.'),
+      q('If your API request returns a Status Code of `404`, what does it mean?', ['The server crashed completely','You forgot to pay for the API','The specific URL or data you requested could not be found','The request was a perfect success'], 2, 'The 404 status code universally dictates a Client Error where the server is alive and responding, but the specific endpoint resource does not exist.'),
+      q('What does the standard `.json()` method do when attached to a successful `requests` response object?', ['It deletes the file','It zips the response to save hard drive space','It translates the raw internet text perfectly into a usable Python dictionary','It launches a web browser'], 2, 'The `.json()` function automatically deserializes the raw string payload body into native Python lists and dictionaries.'),
+      q('Why is the `requests` library overwhelmingly preferred over Python\'s built-in internet tools?', ['It is built by Google','Its syntax is highly abstracted, readable, and handles complex SSL and session management invisibly','It is the only library allowed on Mac computers','It requires no memory'], 1, '`requests` revolutionized Python networking by aggressively abstracting the horrific boilerplate code required by standard built-in modules like `urllib`.')
     ],
-    ['Decorators wrap functions to add dynamic features without altering original code','The @ syntax acts as clean syntactic sugar for function reassignment','Always use functools.wraps to protect your original function metadata names','Apply lru_cache to inject fast performance memoization caching into functions']
+    ['Use the external requests library to communicate with the internet easily','Always verify your response.status_code == 200 before trusting the data','GET requests ask for information; POST requests submit new information','Use .json() to magically turn API text responses into workable Python dictionaries']
   ),
 
- L('py-12', 12, 'Iterators & Generators (Deep Dive)', '🔁',
-    'Ever wonder how `for` loops actually pull items out of a list? Python uses a universal sequence-grabbing rule called the Iterator Protocol. Master this one mechanic, and you will understand how loops, text parsing, and streaming data engines operate under the hood!',
+  L('py-17', 17, 'Asynchronous Python', '⏱️',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nNormal Python code is "synchronous"—it does one thing at a time. If it asks an API for data, the entire script freezes and waits. Asynchronous Python (`async/await`) fixes this by letting your code multitask in the background while waiting for slow things like networking or file downloads!',
     [
       { 
-        title: '1. The Iteration Rules (The Protocol)', 
-        beginner: 'An collection is "iterable" if it allows you to explore its contents. When a `for` loop runs, it drops a matching "iterator claw" into that collection. The claw executes a command called `__next__()` over and over to drag out one item at a time until the container runs completely dry!', 
-        advanced: 'Executing `for x in y:` implicitly calls `iter(y)` to retrieve an independent iterator object. It then repeatedly invokes `next()` on that object inside an optimized evaluation loop until a native `StopIteration` exception is raised, which Python catches internally to break the loop.' 
+        title: '1. The Event Loop', 
+        beginner: 'Think of the Event Loop as a super-fast chef. If the chef puts a turkey in the oven (a slow API request), they don\'t stand there staring at it for 4 hours. They move on to chop veggies! The Event Loop manages tasks, pausing the slow ones and running the fast ones.', 
+        advanced: 'The `asyncio` event loop is a single-threaded cooperative multitasking architecture. It continuously cycles through an internal queue of tasks, yielding execution thread-time during I/O blocking operations.' 
       },
       { 
-        title: '2. Building Custom Iterators', 
-        beginner: 'You can build your own custom looping tracks by writing a class that includes two internal setup methods: `__iter__()` (which sets up the claw) and `__next__()` (which defines exactly how to calculate or fetch the very next item in line).', 
-        advanced: 'While you can engineer explicit iterators by tracking index overrides manually within standard class instances, writing stateful generators with `yield` statements handles frame suspension automatically and cleanly covers 95% of custom data-streaming requirements.' 
+        title: '2. async def', 
+        beginner: 'To tell Python that a function is capable of multitasking, you simply add the word `async` to the front of it: `async def fetch_data():`. This turns your normal function into a special pausing object called a Coroutine.', 
+        advanced: 'Declaring a function with `async def` changes its return behavior entirely. Instead of executing code when called, it strictly returns an unexecuted Coroutine object that must be explicitly scheduled onto the event loop.' 
       },
       { 
-        title: '3. The Advanced Loop Arsenal (itertools)', 
-        beginner: 'Instead of writing messy nested loops to join sequences or search for combinations, Python includes a built-in module called `itertools`. It gives you pre-made, high-speed shortcuts to chain collections together or find pairs in a single line!', 
-        advanced: 'The `itertools` module offers ultra-fast memory-efficient routines written in optimized C logic. Common patterns like merging streams with `chain()`, chunking with `islice()`, tracking cyclic patterns with `cycle()`, or generating combinations eliminate custom structural iteration boilerplate.' 
+        title: '3. The await Keyword', 
+        beginner: 'Inside your async function, when you hit a slow task, you type `await`. `await slow_download()` tells Python: "This will take a while. Pause this function, go do other things, and come back here exactly when the download finishes!"', 
+        advanced: 'The `await` expression yields control back to the central event loop. It can only be applied to "Awaitable" objects (Coroutines, Tasks, or Futures). It fundamentally acts as an execution suspension point.' 
       },
       { 
-        title: '4. Infinite Data Streams', 
-        beginner: 'Because iterators calculate items one by one on demand, you can create loops that run forever without using up your computer\'s memory! For example, `itertools.count()` counts up to infinity safely, and you can slice out just the first few items whenever you want.', 
-        advanced: 'Lazy execution semantics allow you to assemble data filtering and transformation pipelines that act over infinitely long structural data streams. This technique process vast external telemetry sets or live socket events without risking an out-of-memory error.' 
+        title: '4. asyncio.gather()', 
+        beginner: 'If you need to download 10 different files, synchronous Python does them one-by-one, taking 10 minutes. By putting them into `asyncio.gather()`, Python launches all 10 downloads instantly at the exact same time, finishing in just 1 minute!', 
+        advanced: '`asyncio.gather()` takes multiple coroutines, schedules them concurrently as tasks on the active loop, and aggregates their returned results into a localized list while maintaining the original execution order.' 
       },
     ],
     { 
-      title: 'The itertools Hands-on Studio', 
-      intro: 'Let\'s run advanced sequence-combinatorics and lazy streaming operations using Python\'s high-performance loop toolkit.', 
+      title: 'The Multitasking Chef', 
+      intro: 'Let\'s write an asynchronous script that cooks two different meals at the same time, proving that Python can run background tasks without freezing.', 
       steps: [
-        'Open your interactive coding panel and make sure the active Python prompt line (>>>) is listening.',
-        'Load the native high-speed looping module by typing: `import itertools` and hit Enter.',
-        'Pull 5 elements out of an infinite stream by running: `list(itertools.islice(itertools.count(), 5))`. Observe the resulting list.',
-        'Glue two separate data lists together effortlessly into a single pipeline track: Type `list(itertools.chain([1, 2], [3, 4]))`.',
-        'Generate every single mathematical pair permutation out of a sequence: Type `list(itertools.combinations([1, 2, 3], 2))`.'
+        'Open your terminal and launch Python.',
+        'Import the core async tool: `import asyncio`.',
+        'Create a slow coroutine: `async def cook(food, delay):`',
+        'Inside it, add a print: `print(f"Started {food}...")`.',
+        'Add the magic pause: `await asyncio.sleep(delay)`. (This simulates slow cooking).',
+        'Finish it: `print(f"Finished {food}!")`.',
+        'Create the master runner: `async def main():`',
+        'Inside `main`, launch both concurrently: `await asyncio.gather(cook("Steak", 3), cook("Eggs", 1))`',
+        'Exit the blocks, and trigger the event loop: `asyncio.run(main())`. Notice how Eggs finish BEFORE Steak, even though Steak started first!'
       ], 
-      goal: 'You successfully controlled infinite data pipelines and paired sequences utilizing fast built-in iterative primitives.' 
+      goal: 'You successfully implemented a cooperative multitasking coroutine, yielding control back to the event loop, and executing concurrent blocking operations simultaneously.' 
     },
     [
-      q('What internal system protocol does a standard `for` loop rely on to grab items out of a collection?', ['The Global Interpreter Lock (GIL)','The implicit structural Iterator Protocol (`__iter__` and `__next__`)','The absolute terminal path directory configuration','A background system memory thread'], 1, 'All collection loops in Python rely directly on the iterator protocol to access sequence data points uniformly.'),
-      q('What is the absolute cleanest, most pythonic way to write a custom iterator without manually building class states?', ['Declare a local global variable counter','Write a functional generator that utilizes the `yield` keyword','Import an external third-party matrix pack','Nest five separate if statements together'], 1, 'Generators automatically implement the complete iterator protocol for you, tracking states implicitly behind a clean `yield` statement.'),
-      q('Which specific `itertools` helper allows you to safely slice off a small finite chunk from an infinite data stream?', ['itertools.chain','itertools.islice','itertools.product','itertools.cycle'], 1, 'The `itertools.islice()` function slices sequences lazily on demand, making it safe to extract a finite window out of a boundless data generator stream.'),
-      q('Which high-speed helper generates a full Cartesian coordinate matrix combination map between elements?', ['zip','itertools.product','enumerate','filter'], 1, 'The `itertools.product()` generator calculates structural Cartesian matrix paths natively inside highly optimized C system logic.')
+      q('What is the core difference between synchronous and asynchronous code?', ['Sync is for math, Async is for text','Sync freezes and waits for each task to finish before moving on; Async pauses slow tasks to work on other things simultaneously','Sync is built into Python, Async requires a monthly subscription','There is no difference'], 1, 'Synchronous code blocks execution entirely during I/O delays. Asynchronous architecture yields the execution thread to other tasks during I/O waits, maximizing throughput.'),
+      q('What happens if you call an `async def` function directly without using the `await` keyword?', ['It crashes the computer entirely','It runs normally but very fast','It does NOT run the code inside; it just returns a suspended Coroutine memory object','It formats your hard drive'], 2, 'Calling an async function implicitly generates an unexecuted coroutine object. The logic inside strictly requires an event loop scheduler (via `await` or `run()`) to actually execute.'),
+      q('What is the purpose of the `await` keyword inside an async function?', ['It acts as a breakpoint, yielding control back to the Event Loop to do other things until the slow task completes','It stops the program forever','It makes the internet connection faster','It downloads a specific file'], 0, '`await` tells the runtime: "Suspend this exact function state and process other loop queue tasks until this specific I/O operation returns a result."'),
+      q('Why is `asyncio.gather()` considered an incredibly powerful tool for networking?', ['It encrypts all network data natively','It completely bypasses all firewall security','It allows you to fire off dozens of API requests simultaneously instead of waiting for them one by one','It acts as a physical router'], 2, '`gather()` schedules multiple awaitable coroutines onto the loop simultaneously, turning sequential network blocking bottlenecks into highly concurrent, massive parallel requests.')
     ],
-    ['The iteration protocol relies on __iter__ and __next__ hooks','Using a yield statement automatically creates a functional iterator structure','The itertools library provides optimized loops for heavy data tasks','Lazy sequence evaluation processes infinite streams with zero memory danger']
+    ['Use the async keyword to create functions that are capable of pausing','Use the await keyword right before slow tasks to let Python multitask in the background','The Event Loop is the traffic controller managing all the pausing and resuming','Use asyncio.gather() to launch massive amounts of tasks at the exact same time']
   ),
-  
- L('py-13', 13, 'Virtual Environments & pip', '🧪',
-    'Installing software packages globally on your computer is a dangerous habit. Think of a virtual environment like an isolated, sterile laboratory room built specifically for one single project—keeping its tools completely separated so they never leak out and corrupt your main operating system!',
+
+  L('py-18', 18, 'Unit Testing & Pytest', '🧪',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nWriting code is easy; writing code that doesn\'t randomly break 6 months later is hard. Unit testing involves writing separate "robot scripts" that constantly check your main code to ensure it still works exactly as intended.',
     [
       { 
-        title: '1. Isolation is Mandatory (Why venv)', 
-        beginner: 'Different software projects require different versions of tools. If Project A needs an old tool version and Project B needs a brand-new version, installing them globally causes a massive collision that breaks your code! Isolation solves this completely.', 
-        advanced: 'Your host operating system relies on its built-in Python installation for core system tasks. Modifying global system-level site-packages can fundamentally destabilize OS utilities. Always combine dependency management tools like `pyenv` and `venv` to enforce workspace sandboxing.' 
+        title: '1. Why Test?', 
+        beginner: 'Imagine you update a calculator function, but accidentally break division without noticing. If you release the code, users will crash. Tests are tiny automated alarms. Before you release code, you run your tests. If division breaks, the test flashes red, saving you from disaster!', 
+        advanced: 'Test-Driven Development (TDD) ensures CI/CD pipeline integrity. Unit tests strictly isolate domain logic, guaranteeing that refactoring or dependency updates do not cause systemic logic regressions in production environments.' 
       },
       { 
-        title: '2. Spawning a Cleanroom (Creating a venv)', 
-        beginner: 'You can create a hidden safety environment folder inside your project directory by running `python3 -m venv .venv`. To step inside this cleanroom and start using it, you run an activation command called `source .venv/bin/activate`!', 
-        advanced: 'Always add your generated local environment folder path (`.venv/`) directly to your project\'s `.gitignore` file to avoid tracking megabytes of compiled binary dependencies. Maintain identical environment naming conventions across workspaces to standardize automation scripts.' 
+        title: '2. The assert Keyword', 
+        beginner: 'The foundation of all testing is `assert`. It simply means "I claim this is true!" If you write `assert 1 + 1 == 2`, Python does nothing because it is true. If you write `assert 1 + 1 == 3`, Python violently crashes with an AssertionError. We use these crashes as alarms!', 
+        advanced: 'The `assert` keyword evaluates the subsequent boolean expression. It is optimized away entirely if Python is run in optimized mode (`-O` flag), which is why assertions should strictly be used for testing, never for runtime data validation.' 
       },
       { 
-        title: '3. Fetching Gear (pip)', 
-        beginner: 'The program named `pip` is your personal delivery drone that downloads open-source libraries from the web! Running `pip install requests` fetches a package instantly, while running `pip freeze > requirements.txt` writes down a clean shopping list of your tools.', 
-        advanced: 'Utilize editable installations via `pip install -e .` when engineering local development libraries. Enforce explicit application build reproducibility by pinning exact deterministic package versions using strict double-equals bindings (`==`) inside tracking files.' 
+        title: '3. Intro to Pytest', 
+        beginner: 'While Python has built-in testing tools, the entire industry uses an external library called `pytest`. It is incredibly easy. You just name a file `test_math.py`, write a function named `test_addition()`, and run the `pytest` command. It automatically finds your asserts and prints a beautiful report!', 
+        advanced: 'Pytest heavily utilizes introspection. It rewrites standard assertion ASTs (Abstract Syntax Trees) at runtime to provide deep, highly detailed variable comparisons in its traceback outputs without requiring verbose boilerplate classes.' 
       },
       { 
-        title: '4. Modern Next-Gen Workspaces', 
-        beginner: 'While standard Python handles basic cleanrooms perfectly, modern developer teams use faster upgraded management tools like Poetry or `uv` to automate their dependency configurations and package setups in seconds.', 
-        advanced: 'The rapid adoption of `uv` has revolutionized dependency compilation speed by resolving ecosystem trees 10x to 100x faster than traditional pip architectures. Standardize on unified workspace managers like Poetry or `uv` across development groups to guarantee locked build environments.' 
+        title: '4. Test Isolation', 
+        beginner: 'A good test only checks ONE specific thing, and never relies on other tests. If `test_login` fails, it shouldn\'t cause `test_logout` to fail too. Keep your tests completely separated so you know exactly what broke!', 
+        advanced: 'Tests must be completely deterministic and stateless. Pytest implements "Fixtures" via decorators to cleanly inject setup/teardown state (like mock database connections) into specific test functions, maintaining strict isolation.' 
       },
     ],
     { 
-      title: 'The Isolated Workspace Setup', 
-      intro: 'Let\'s construct a real sandboxed development sandbox directory from scratch, boot up its environment engine, and save its tool configurations.', 
+      title: 'Building the Alarms', 
+      intro: 'Let\'s write a simple math function, and then use the `assert` keyword to build an automated safety test around it.', 
       steps: [
-        'Open your command line terminal app (make sure you are at your computer\'s system shell prompt, not inside the Python >>> loop).',
-        'Create and step inside a new directory: Type `mkdir myproject && cd myproject` and hit Enter.',
-        'Spawn a fresh, sandboxed workspace folder by running: `python3 -m venv .venv`.',
-        'Step inside your new cleanroom: Run `source .venv/bin/activate` (Mac/Linux) or `.venv\\Scripts\\activate` (Windows). Notice your prompt line changes!',
-        'Use your package installer to safely fetch an internet tool: Type `pip install requests`.',
-        'Save your environment shopping list so other developers can mirror it: Run `pip freeze > requirements.txt`.'
+        'Open your terminal REPL.',
+        'Write the logic you want to test: `def get_square(num): return num * num`.',
+        'Write your test function: `def test_get_square():`',
+        'Inside the test, add an assertion that you KNOW should pass: `assert get_square(4) == 16`.',
+        'Add another assertion: `assert get_square(0) == 0`.',
+        'Run your test by typing `test_get_square()`. Notice nothing happens! Silence means it passed perfectly!',
+        'Now deliberately break it: `assert get_square(5) == 30`.',
+        'Run it again. Watch the `AssertionError` scream at you, successfully warning you that the logic is wrong!'
       ], 
-      goal: 'You successfully initialized an isolated runtime workspace partition and captured reproducible package installations.' 
+      goal: 'You successfully implemented the foundation of automated software verification by utilizing the assertion keyword to structurally evaluate function outputs.' 
     },
     [
-      q('Why is it highly discouraged to install third-party Python packages globally across your computer system?', ['Global installations make your computer monitor display incorrect colors','It triggers package version collisions between projects and risks breaking core operating system software tools','It automatically deletes your project files when you shut down','It requires a paid subscription to function'], 1, 'Global package pollution leads to dependency management collisions and can corrupt vital python scripts that your operating system runs natively.'),
-      q('Which core execution command initializes a brand-new virtual environment directory container inside your current folder path?', ['python environment build','python3 -m venv .venv','npm init workspace','pip environment create'], 1, 'The native flag command `python3 -m venv .venv` tells Python to execute its virtual environment module and drop a structural configuration folder named `.venv`.'),
-      q('What file name convention is standard in the Python ecosystem for saving a list of project package dependencies?', ['package.json','requirements.txt','Gemfile','pom.xml'], 1, 'The `requirements.txt` file is the universal convention used by Python developers to store reproducible package manifest specifications.'),
-      q('Which modern dependency resolution speed tool is engineered to execute package installations significantly faster than traditional pip?', ['pip-legacy','uv','npm-resolver','cargo-python'], 1, 'The modern open-source tool `uv` compiles and locks dependency resolution constraints up to 100 times faster than classic package managers.')
+      q('What is the absolute primary purpose of writing Unit Tests in a software project?', ['To increase the visual graphics of a website','To automatically detect when new code changes accidentally break older, functioning code','To permanently delete error messages','To deploy code to AWS servers'], 1, 'Unit tests act as regression guards. They run constantly to ensure that refactored features and new commits do not violate the core business logic established previously.'),
+      q('What happens in Python when an `assert` statement evaluates to `False`?', ['The program instantly crashes and throws an AssertionError','Python secretly fixes the math to make it true','Python emails the developer','The program skips the line and continues'], 0, 'Assertions act as rigid boolean checkpoints. If the statement evaluates to False, the runtime violently terminates, flagging the exact failure point.'),
+      q('If you are using the industry-standard `pytest` framework, how must you name your test files so the framework can find them automatically?', ['They must be named `secure.py`','They must be zipped into a folder named `tests`','They must start with `test_` (like `test_calculator.py`)','They must have no file extension'], 2, 'Pytest utilizes auto-discovery. It systematically scans directory trees for files prefixed with `test_` or suffixed with `_test`, automatically mapping and executing the assertions inside.'),
+      q('Why is it dangerous to rely on `assert` for runtime security checks (like validating user passwords) instead of just using it for testing?', ['Asserts cannot check strings','Asserts slow down the computer too much','Python can be run in "optimized mode" which entirely ignores and skips all `assert` statements','Asserts only work on Mac computers'], 2, 'Assertions are specifically designed for developer debugging. If the interpreter runs with the `-O` optimization flag, all `assert` blocks are stripped from bytecode, destroying your security checks.')
     ],
-    ['Always isolate software tracks with a virtual environment','Activate your environment script before running package commands','Use pip freeze to output dependency lists for team reproducibility','Explore modern ultra-fast tools like uv to streamline workflow speeds']
+    ['Automated tests are safety nets that prevent you from accidentally breaking old code','The assert keyword violently crashes the program if a statement is false','Use the Pytest library and name your files test_something.py for automatic scanning','Keep tests strictly isolated so an error in one doesn\'t poison the others']
   ),
 
- L('py-14', 14, 'HTTP Requests', '🌐',
-    'Modern software applications rarely live in isolation—they talk to external web services and APIs constantly. Think of an HTTP request like sending a delivery courier to a remote warehouse with a specific order note, waiting for them to fetch the item, and receiving a package back!',
+ L('py-19', 19, 'Advanced Decorator Patterns', '🎩',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nNow that you know how to build simple decorators, let\'s look at professional-grade patterns. Decorators are the secret weapon for injecting cross-cutting logic—like security, logging, or caching—into any part of your system without touching the original code.',
     [
       { 
-        title: '1. Fetching Data (GET)', 
-        beginner: 'When you want to read information from a website or API, you use a `GET` request. In Python, writing `r = requests.get(url)` sends out the courier, and calling `r.json()` instantly unpacks the incoming digital package into a clean dictionary!', 
-        advanced: 'By default, the `requests` library will wait indefinitely for a response if a server hangs. Always pass an explicit `timeout` float parameter. For sequential networking pathways, utilize a persistent `requests.Session()` instance to enable TCP socket reuse and automatic connection pooling.' 
+        title: '1. Decorators with Arguments', 
+        beginner: 'What if you want your decorator to take an input? (e.g., `@retry(times=3)`). You need to add an extra layer of nesting: a function that returns a decorator, which returns the wrapper. It is the "Russian Nesting Doll" of Python coding.', 
+        advanced: 'Creating decorators with arguments requires three levels of closure nesting. The outer function processes the arguments, the middle level intercepts the decorated function, and the inner level handles the execution wrap.' 
       },
       { 
-        title: '2. Sending Data & Auth (POST)', 
-        beginner: 'When you want to send new information to a web server (like submitting a login form or posting a status update), you use a `POST` request. You can attach data directly using `json={}` and pass secure digital keys using secret access headers.', 
-        advanced: 'Pass a standard tuple coordinate `auth=("user", "pass")` to trigger implicit HTTP Basic Authentication. For modern Token or Bearer-based security frameworks, explicitly inject your credential keys directly into the connection header dictionary.' 
+        title: '2. functools.wraps', 
+        beginner: 'Whenever you wrap a function in a decorator, the original function "forgets" its own name and documentation. Always import `functools` and use the `@wraps(func)` decorator inside your wrapper to copy the original function\'s identity to the wrapper.', 
+        advanced: 'Without `@wraps`, the decorated function loses its `__name__` and `__doc__` attributes, which breaks introspection tools, type checkers, and documentation generators like Sphinx.' 
       },
       { 
-        title: '3. Internet Safety (Error Handling)', 
-        beginner: 'Every time an HTTP courier returns, they hand you a numeric status code. A score of `200` means total success! If anything goes wrong, calling the command `r.raise_for_status()` acts like a tripwire that intentionally triggers an error so your code can react.', 
-        advanced: 'Network calls are highly volatile. Intercept connection drops by catching `requests.RequestException`. For production-grade stability, mount a custom `HTTPAdapter` configured with a `urllib3.Retry` component to automate exponential backoff routines for handling transient 503 server overloads.' 
+        title: '3. Class-Based Decorators', 
+        beginner: 'You don\'t have to use functions to decorate! You can use a Class. By defining `__init__` (to take the function) and `__call__` (to run the wrapper logic), your object acts exactly like a function.', 
+        advanced: 'Class-based decorators are superior for managing complex stateful data between calls. `__call__` turns the instance into a callable object, allowing you to maintain internal caches or counts across multiple method executions.' 
       },
       { 
-        title: '4. Next-Gen Speeds (httpx & Async)', 
-        beginner: 'The classic `requests` tool forces your program to sit completely frozen while waiting for a web server to answer. Modern Python projects use an upgraded tool called `httpx` which allows your script to work on other tasks while requests travel across the web!', 
-        advanced: 'When managing hundreds of concurrent remote connection endpoints, blocking synchronous operations exhaust hardware threads rapidly. Switching to `httpx.AsyncClient()` lets a single event loop process non-blocking I/O multiplexing, dramatically escalating networking throughput.' 
+        title: '4. Method Decorators', 
+        beginner: 'Decorating a method inside a class is tricky because methods have `self`. Your wrapper must accept `*args` and `**kwargs` to make sure it can handle the hidden `self` argument passed to the class method.', 
+        advanced: 'The decorator must be "method-aware." By using `*args` and `**kwargs`, you ensure that the decorator doesn\'t crash when it encounters the instance reference (`self`) or class reference (`cls`) passed during bound method calls.' 
       },
     ],
     { 
-      title: 'The Real-World Live API Call', 
-      intro: 'Let\'s write a robust, network-safe script that pings a live external server, checks its operational health connection status, and unpacks its structure.', 
+      title: 'The "Retry" Security Guard', 
+      intro: 'Let\'s build a professional decorator that automatically retries a function if it crashes, which is vital for unreliable network connections.', 
       steps: [
-        'Open your command line terminal app and make sure your isolated cleanroom environment is active.',
-        'Install the preferred internet connector tool by running: `pip install requests`.',
-        'Boot up your interactive Python environment prompt line (>>>).',
-        'Import the network tool by typing `import requests` and hit Enter.',
-        'Send a safe, time-bounded request to a live endpoint: Type `r = requests.get("https://api.github.com", timeout=5)`.',
-        'Verify the health score of the return stream by printing `r.status_code` and view the raw payload data dictionary using `print(r.json())`!'
+        'Open your terminal REPL.',
+        'Import tools: `import functools`, `import time`.',
+        'Create the factory: `def retry(attempts):`.',
+        'Inside, create the decorator: `def decorator(func):`.',
+        'Inside that, use `@functools.wraps(func)` and define the `wrapper`.',
+        'Use a `for` loop inside the wrapper to try running `func()` and `except` errors, sleeping between attempts.',
+        'Test it with a function that fails twice then succeeds!'
       ], 
-      goal: 'You successfully executed a live network handshake, protected the script with a timeout cushion, and translated an external web payload.' 
+      goal: 'You successfully engineered a multi-level nesting decorator factory, maintained function identity with wraps, and implemented stateful retry logic.' 
     },
     [
-      q('What is the danger of running a standard `requests.get(url)` call without defining an explicit timeout value?', ['The code will run backwards','Python will wait forever if the server goes offline, freezing your program indefinitely','The server will charge you money for the connection','It deletes the local python cache'], 1, 'Without an explicit timeout property configuration, network operations can block your application thread forever if an external server drops packets silently.'),
-      q('Which helper statement instantly turns web server error scores (like 404 or 500) into actionable application exceptions?', ['r.json()','r.raise_for_status()','r.status_code','r.headers()'], 1, 'The `raise_for_status()` method evaluates response status codes internally, throwing a clean catchable exception if the server returns a failure marker.'),
-      q('How can you optimize performance when your application needs to make dozens of consecutive HTTP requests to the exact same host domain?', ['Re-import the requests module inside a loop','Initialize a persistent connection track using `requests.Session()`','Run the script on a faster operating system','Use string formatting to speed up the url'], 1, 'An active `Session()` instance enables connection pooling under the hood, recycling the same underlying TCP connection to skip costly handshake rituals on consecutive requests.'),
-      q('Which modern library acts as an excellent drop-in alternative to `requests` while adding native async support?', ['flask','httpx','django','urllib3'], 1, 'The `httpx` package shares an identical semantic interface with classic requests while introducing asynchronous client workflows for non-blocking network applications.')
+      q('Why is `@functools.wraps(func)` considered a mandatory best practice in professional decorators?', ['It makes the code run in parallel','It copies the original function\'s name and docstrings to the wrapper, preserving its identity for debuggers and documentation tools','It prevents the decorator from running too often','It zips the project folder'], 1, 'Without `@wraps`, the original function metadata is lost, which makes debugging and automated documentation impossible.'),
+      q('What is the "Russian Nesting Doll" pattern in decorators used for?', ['To delete the code','To pass parameters into a decorator (like @retry(times=3))','To make the computer louder','To bypass password protection'], 1, 'Decorators that accept arguments require an extra layer of outer function nesting to capture those arguments before the actual decoration happens.'),
+      q('When writing a class-based decorator, which dunder method allows the class instance to be used like a function?', ['`__init__`','`__call__`','`__str__`','`__new__`'], 1, 'The `__call__` method allows an object instance to be invoked with parentheses, making it interchangeable with functions in decorator syntax.'),
+      q('Why must your decorator wrapper include `*args` and `**kwargs`?', ['To save disk space','To ensure the wrapper can successfully receive any number of arguments or the hidden `self` instance when decorating class methods','To increase execution speed','To allow the code to run offline'], 1, '`*args` and `**kwargs` make the wrapper signature flexible, ensuring it can handle any function signature—including class methods that include a hidden `self` parameter.')
     ],
-   ['Requests makes interacting with remote REST APIs trivial','Always define explicit timeout limits on network operations to prevent script freezing','Utilize Session objects to enable connection pooling benefits across multi-calls','Transition to httpx to implement asynchronous non-blocking connection streams']
+    ['Use three levels of nesting for decorators that accept arguments','Always use @functools.wraps to keep your function names and docs intact','Class-based decorators are perfect for storing state across multiple calls','Use *args and **kwargs to ensure your decorators don\'t break when applied to class methods']
   ),
 
-  L('py-15', 15, 'Dates, Times & Timezones', '⏰',
-    'Time is one of the most deceptively complex concepts in computer science. Between leap years, daylight saving time, and global timezones, handling dates manually is a nightmare. Python provides robust built-in tools to manage the flow of time safely!',
+  L('py-20', 20, 'Generators & Iterators', '🔄',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nEverything in Python is an object, but not everything needs to be in memory at once. Iterators and Generators are how you process petabytes of data on a machine with only 8GB of RAM. They are the backbone of high-performance Python.',
     [
       { 
-        title: '1. The Time Machine (datetime)', 
-        beginner: 'The `datetime` module is your main clock. You can ask Python for the exact current time by writing `datetime.now()`. It bundles the year, month, day, hour, minute, and second into one single, clean object!', 
-        advanced: 'Never rely on local system time for structural backend logic. Always operate using UTC (Coordinated Universal Time) via `datetime.now(timezone.utc)` to prevent data corruption when servers migrate across geographic regions.' 
+        title: '1. The Iterator Protocol', 
+        beginner: 'Behind every `for` loop is an Iterator. It has two rules: `__iter__` (give me the list) and `__next__` (give me the next item). If there are no items left, it raises a `StopIteration` error. Your `for` loop secretly catches this and stops.', 
+        advanced: 'Python handles the `StopIteration` automatically within for-loops. Understanding the protocol allows you to build custom, streaming data structures that integrate natively with the language\'s loop syntax.' 
       },
       { 
-        title: '2. Formatting Time (strftime & strptime)', 
-        beginner: 'Computers read time differently than humans. Use `.strftime()` (String Format Time) to turn a computer date into a readable string like "Monday, January 5th". Use `.strptime()` (String Parse Time) to translate a human string back into computer data!', 
-        advanced: 'Memorize the C-standard format codes. `%Y` yields a 4-digit year, while `%y` yields 2 digits. Improperly parsing localized date strings without explicitly declaring the locale format risks critical cross-platform parsing failures.' 
+        title: '2. Generators as State Machines', 
+        beginner: 'A generator function is like a script that pauses. When you `yield` a value, the function doesn\'t die—it goes to sleep, saving exactly where it was. When you ask for `next()`, it wakes up right where it left off.', 
+        advanced: 'Generators hold the entire local stack frame in memory. Unlike a normal function that clears its variables on return, the generator preserves its local scope, variables, and instruction pointer between calls.' 
       },
       { 
-        title: '3. Time Travel (timedelta)', 
-        beginner: 'If you want to know what the date will be exactly 30 days from now, you can\'t just add +30 to a month (what if it rolls over to a new year?). Instead, you add a `timedelta(days=30)` object, and Python calculates the exact future calendar date perfectly!', 
-        advanced: 'The `timedelta` object normalizes all inputs down to days, seconds, and microseconds exclusively under the hood. It fully supports native mathematical operators, allowing you to seamlessly add, subtract, or divide time periods.' 
+        title: '3. Generator Delegation (yield from)', 
+        beginner: 'If you have a generator inside a generator, don\'t write a loop to yield each item. Use `yield from other_generator()`. It is a clean, optimized shorthand that hands the work over to the inner generator.', 
+        advanced: '`yield from` establishes a transparent, high-performance pipe between the caller and the sub-generator. It also handles the complex `send()` and `throw()` propagation channels required for advanced coroutine patterns.' 
       },
       { 
-        title: '4. The Timezone Trap (zoneinfo)', 
-        beginner: 'A time without a timezone is called "naive"—it\'s dangerous because nobody knows where in the world it belongs! Always make your times "aware" by attaching a timezone lock using Python\'s modern `zoneinfo` module, like `ZoneInfo("America/New_York")`.', 
-        advanced: 'Python 3.9+ introduced `zoneinfo` natively, deprecating legacy third-party libraries like `pytz`. Always store timestamps in your database in raw UTC, and only cast them to local target `ZoneInfo` states at the very last second during frontend UI rendering.' 
+        title: '4. itertools: The Pro Toolbox', 
+        beginner: 'Never write a nested loop to create combinations or permutations. The `itertools` library is a standard toolset for professional data science. It is built in C and is lightning-fast.', 
+        advanced: '`itertools` provides memory-efficient, lazy-evaluated combinatorics. Tools like `chain()`, `cycle()`, and `islice()` allow you to manipulate infinite streams of data without ever materializing an intermediate list in memory.' 
       },
     ],
     { 
-      title: 'The Global Flight Tracker', 
-      intro: 'Let\'s build a time-travel script that calculates exactly when a flight will land in a completely different global timezone.', 
+      title: 'Building a Lazy Sequence', 
+      intro: 'Let\'s create a custom generator that produces an infinite sequence of Fibonacci numbers, demonstrating how we can represent infinite data in a tiny amount of memory.', 
       steps: [
-        'Open your interactive terminal prompt (>>>).',
-        'Import the core time tools by typing: `from datetime import datetime, timedelta` and `from zoneinfo import ZoneInfo`.',
-        'Lock down your current local departure time: Type `now = datetime.now(ZoneInfo("America/Los_Angeles"))`.',
-        'Create a flight duration modifier: Type `flight_time = timedelta(hours=5, minutes=30)`.',
-        'Add them together to calculate arrival: Type `landing_la = now + flight_time`.',
-        'Instantly convert that landing time to the destination\'s local timezone: Type `landing_ny = landing_la.astimezone(ZoneInfo("America/New_York"))` and print it!'
+        'Open your terminal REPL.',
+        'Define the generator: `def fib():`.',
+        'Set state: `a, b = 0, 1`.',
+        'Start an infinite loop: `while True:`.',
+        'Yield: `yield a`.',
+        'Update: `a, b = b, a + b`.',
+        'Instantiate: `gen = fib()`.',
+        'Get numbers: `next(gen)`, `next(gen)`, `next(gen)`. Watch it calculate on demand!'
       ], 
-      goal: 'You successfully generated timezone-aware objects, performed safe calendar math, and translated temporal coordinates across global regions.' 
+      goal: 'You successfully implemented a stateful generator, understood the iterator protocol, and built a memory-efficient sequence that can run infinitely.' 
     },
     [
-      q('Why is it highly recommended to save all database timestamps exclusively in UTC (Coordinated Universal Time)?', ['UTC takes up less hard drive storage space','UTC never changes for Daylight Saving Time, preventing massive data scheduling collisions','UTC automatically translates text into different languages','It is required by the HTTP network protocol'], 1, 'UTC provides a single, immutable anchor point for time. Local timezones shift constantly due to politics and daylight saving, causing overlapping scheduling bugs.'),
-      q('Which string command allows you to parse a human-readable text sentence (like "2024-05-12") back into a functional Python datetime object?', ['strftime()','strptime()','timestamp()','isoformat()'], 1, 'The `strptime` (String Parse Time) method translates custom formatted string text back into a valid computational datetime object.'),
-      q('What built-in object allows you to safely add exactly 14 days to a current date without breaking the calendar month?', ['A standard integer (+14)','A timedelta object','A math.ceil() function','A tuple array'], 1, 'The `timedelta` class represents a specific duration of time, automatically handling complex leap-year and month-rollover math when added to a datetime object.'),
-      q('What is the modern, built-in Python module used to attach strict geographic timezone rules to a naive datetime object?', ['pytz','zoneinfo','os.time','sys.clock'], 1, 'Introduced natively in Python 3.9, the `zoneinfo` module hooks directly into the official IANA Time Zone Database to calculate precise regional timezone offsets.')
+      q('What is the fundamental benefit of a Generator over a standard List?', ['Generators are better for graphics','Generators are lazy, meaning they only calculate one item at a time and don\'t need to hold the entire sequence in RAM','Generators are always written with square brackets','Generators require an internet connection'], 1, 'Generators evaluate lazily, allowing for the processing of massive or infinite datasets using a flat, constant memory footprint.'),
+      q('What does `yield from` do?', ['It restarts the computer','It is a shorthand to hand off iteration control to another generator, piping values cleanly to the caller','It deletes the database','It converts numbers to text'], 1, '`yield from` creates an optimized sub-generator bridge, delegating iteration responsibilities and signal handling to an inner generator structure.'),
+      q('What happens when an iterator runs out of data?', ['It returns `None`','It raises a `StopIteration` exception','It starts over from the beginning','It crashes the operating system'], 1, 'Raising `StopIteration` is the official signal defined by the iterator protocol to notify the loop that the sequence is exhausted.'),
+      q('Why would you choose `itertools` over writing your own custom nested loops?', ['It is slower','It is written in optimized C code and provides battle-tested, memory-efficient patterns for complex combinatorics','It makes your code look harder to read','It requires special permissions'], 1, '`itertools` is a high-performance standard library module that provides robust, optimized building blocks for complex iterator manipulation.')
     ],
-    ['Always store data in UTC; only convert to local timezones for UI viewing','Use strftime to format dates out to strings, and strptime to parse strings into dates','Use timedelta objects to perform safe calendar math without breaking month rollovers','Use the modern zoneinfo module to make naive datetime objects timezone-aware']
+    ['The Iterator Protocol consists of __iter__ and __next__','Generators are state machines that pause and resume, keeping their local variables alive','Use yield from to hand off work to inner generators','itertools is your best friend for high-performance sequence operations']
   ),
 
- L('py-16', 16, 'Regular Expressions', '🔎',
-    'Regular Expressions (Regex) look like a chaotic mess of punctuation, but they are actually a highly efficient pattern-matching language. Think of regex like a high-tech metal detector calibrated to find specific hidden text targets—like emails, phone numbers, or dates—inside a mountain of messy raw documents!',
+  L('py-21', 21, 'Context Managers', '🚪',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nYou know `with open(...)` already, but did you know you can build your OWN context managers? They are perfect for anything that needs a "start" and an "end" phase—like locking databases, timing code, or resetting settings.',
     [
       { 
-        title: '1. Scanning Text (search vs match)', 
-        beginner: 'Python provides different ways to look for patterns. The `re.match()` tool is strict—it only checks if your pattern sits at the absolute beginning of a sentence. If you want to scan and find a pattern hidden anywhere inside a massive paragraph, always use `re.search()` instead!', 
-        advanced: 'When executing repetitive pattern matching routines across loop iterations, avoid inlining raw strings. Use `re.compile(pattern)` to compile your regex string into a reusable Regular Expression Object once, maximizing search execution speeds.' 
+        title: '1. The Context Manager Protocol', 
+        beginner: 'A context manager is just an object with two special methods: `__enter__` (setup) and `__exit__` (cleanup). When you enter the `with` block, `__enter__` runs. When you exit, `__exit__` runs automatically.', 
+        advanced: 'Context managers are the mechanism for deterministic resource cleanup. They guarantee that `__exit__` executes even if the `with` block crashes with an unhandled exception.' 
       },
       { 
-        title: '2. Pattern Codes (Common Tokens)', 
-        beginner: 'Regex uses clever secret codes called tokens. For example, `\\d` stands for any single digit number, `\\w` stands for any word letter, and a plus sign `+` means "look for one or more of these in a row". Wrapping your pattern inside raw text markers like `r"\\d+"` prevents formatting glitches!', 
-        advanced: 'Always prepend regex pattern definitions with a raw string literal prefix (`r"..."`). This instructs Python\'s internal compiler to ignore standard string backslash escape behaviors, avoiding backslash escape hell when building complex character tokens.' 
+        title: '2. Class-Based Contexts', 
+        beginner: 'If you want to create a manager that handles a connection, write a class. Put your `socket.connect()` inside `__enter__` and `socket.close()` inside `__exit__`. Now you never have to remember to close the socket again!', 
+        advanced: 'The `__exit__` method receives exception details (`exc_type`, `exc_value`, `traceback`) as arguments. If it returns `True`, it suppresses the exception; if it returns `False` (or `None`), it propagates the exception upwards.' 
       },
       { 
-        title: '3. Isolating Targets (Groups & Capture)', 
-        beginner: 'If you only want to extract a specific sub-chunk out of a long pattern match, wrap that specific part inside round parentheses `(...)`. This forms a capture group, allowing you to cleanly pull out just that isolated piece using `.group(1)`.', 
-        advanced: 'Relying on standard numeric index offsets for group isolation quickly introduces structural fragility. Utilize named capture groups using the syntax `(?P<name>...)` to turn your patterns into self-documenting code with explicit dictionary keys.' 
+        title: '3. contextlib (The Easy Way)', 
+        beginner: 'If you don\'t want to build a whole class, use the `@contextmanager` decorator. It lets you write a generator function where the code *before* the `yield` is the setup, and the code *after* the `yield` is the cleanup.', 
+        advanced: '`@contextmanager` turns a generator into a context manager. It manages the `__enter__` and `__exit__` boilerplate automatically, allowing you to focus on the setup/teardown logic using simple `try/finally` blocks.' 
       },
       { 
-        title: '4. Dynamic Swapping (Substitution)', 
-        beginner: 'If you need to find a messy text pattern and swap it out with something new, use the `re.sub()` command. It works just like a word processor\'s "Find and Replace" tool, but handles dynamic, complex patterns instead of simple exact text!', 
-        advanced: 'The substitution method `re.sub(pattern, repl, string)` accepts a callable function as its replacement argument. This allows you to inspect each match object individually and compute replacement strings dynamically at runtime.' 
+        title: '4. Real-World Usage', 
+        beginner: 'Use them for everything! Database transactions (open/commit), timing functions (start/stop), or even temporary directory switching. It keeps your code dry, safe, and readable.', 
+        advanced: 'Professional libraries like `FastAPI` and `SQLAlchemy` rely heavily on context managers to handle transient session lifecycles, ensuring connection pools are returned to the server immediately after query completion.' 
       },
     ],
     { 
-      title: 'The Automated Email Extractor', 
-      intro: 'Let\'s build a pattern scanner that instantly searches through a messy, unformatted text string and extracts all valid email addresses.', 
+      title: 'The Automatic Timer', 
+      intro: 'Let\'s build a custom context manager that automatically times any code block you place inside it, printing the total duration when the block finishes.', 
       steps: [
-        'Open your interactive workspace and make sure the active Python prompt (>>>) is listening.',
-        'Load the native regex scanning engine toolkit by typing: `import re` and hit Enter.',
-        'Build a raw token pattern that matches words, an @ symbol, and domain extensions: Type `pattern = r"[\\w.]+@[\\w.]+"`.',
-        'Create a messy text sentence string: Type `text = "ping me at contact@sage.com or support@learning.org".`',
-        'Tell Python to sweep the text and gather all matching items into a list: Type `emails = re.findall(pattern, text)`.',
-        'Print the `emails` variable to confirm that Python detected and extracted both hidden address records flawlessly!'
+        'Open your terminal REPL.',
+        'Import: `from contextlib import contextmanager`, `import time`.',
+        'Define: `@contextmanager def timer():`.',
+        'Setup: `start = time.time()`.',
+        'Yield control: `yield`.',
+        'Teardown: `print(f"Took {time.time() - start} seconds")`.',
+        'Run it: `with timer(): ... (put a slow loop here) ...`'
       ], 
-      goal: 'You successfully compiled a token pattern and used it to sweep messy text strings for structured targets.' 
+      goal: 'You successfully implemented a custom context manager using the decorator pattern, decoupling timing logic from your business code.' 
     },
     [
-      q('Why should you always write regular expressions as raw string literals, like `r"\\d+"`?', ['It makes the final regex search run exactly twice as fast','It tells Python to ignore standard string backslash escapes, avoiding complex backslash nesting glitches','It automatically capitalizes all letters inside the matched text strings','It is required to print the results onto the console screen'], 1, 'The raw string `r` prefix stops Python from processing backslashes as typical text escape commands, keeping your token patterns clean and accurate.'),
-      q('What is the difference between utilizing `re.match()` and `re.search()` in your text parsing code?', ['match() modifies text strings while search() only reads them','match() only checks the absolute beginning of a string, while search() scans the entire string text','search() is an outdated tool that has been fully replaced by match()','They execute the exact same scanning algorithm'], 1, '`re.match()` checks exclusively for patterns at the first character index slot, whereas `re.search()` scans the entire sequence path for matches.'),
-      q('What does the special named group syntax `(?P<username>\\w+)` accomplish inside a pattern?', ['It locks down the string to prevent editing','It maps the captured text match directly to a descriptive, readable name key instead of a generic index number','It forces the pattern to match only capital letters','It loops the regex pattern indefinitely until an error occurs'], 1, 'Named groups use the `(?P<name>...)` flag to link matching text chunks directly to explicit string dictionary tracking keys.'),
-      q('What is the major performance benefit of utilizing `re.compile()` on a pattern?', ['It shrinks your text file data footprint on disk','It processes and pre-bakes a pattern once so it can be reused across loops rapidly without re-parsing','It automatically fixes spelling mistakes inside your strings','It bypasses the need to import the re module'], 1, 'Pre-compiling patterns via `re.compile()` optimizes your regex logic up front, sparing your application from compiling the exact same pattern repeatedly inside loops.')
+      q('What is the main advantage of using a context manager?', ['It makes the internet faster','It automates resource setup and guaranteed cleanup (like closing files or database connections) in one clean block','It replaces the `if` statement','It makes the code run in colors'], 1, 'Context managers use `__enter__` and `__exit__` to guarantee that cleanup tasks occur deterministically, regardless of whether the block succeeds or crashes.'),
+      q('What happens in the `__exit__` method of a context manager if an error occurs inside the `with` block?', ['The context manager is ignored','The `__exit__` method still executes, receiving the error details so it can clean up resources safely','The program freezes forever','The computer shuts down'], 1, 'The `__exit__` method receives exception information as arguments, ensuring that resources (like open database locks) are released even during a crash.'),
+      q('What does the `@contextmanager` decorator turn a generator function into?', ['A standard loop','A full context manager, where the code before `yield` is the setup and code after is the teardown','An infinite loop','A binary file'], 1, '`@contextmanager` simplifies context manager creation by abstracting the dunder methods into a simple yield-based generator structure.'),
+      q('Why would you choose a Class-based context manager over the `@contextmanager` decorator?', ['It is slower','Classes are better for complex managers that need to hold persistent state or shared data across multiple calls','Classes are smaller','Classes are required for math'], 1, 'Class-based managers are more robust for complex state tracking, whereas generator-based managers (`@contextmanager`) are best for simple, transient setup/teardown logic.')
     ],
-    ['Always prepend regex patterns with an r string token prefix','re.search sweeps full strings while re.match verifies starting indices','Use round capture groups to isolate specific segments from matching targets','Pre-compile regex objects using re.compile to maximize iteration speeds']
+    ['Context managers use the __enter__ and __exit__ protocol to automate resource handling','@contextmanager is the fastest way to build a context manager without writing a class','Always place cleanup code (like close() or commit()) inside the __exit__ phase','Use context managers for database connections, timing, and file locking']
   ),
 
-  L('py-17', 17, 'Concurrency: threading, async, multiprocessing', '⚙️',
-    'Python provides three distinct ways to execute tasks concurrently. Choosing the wrong model can severely bottleneck your software—it comes down to understanding whether your code is waiting on the outside internet or heavy calculations!',
+  L('py-22', 22, 'Metaclasses & Introspection', '🧠',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nMetaclasses are the "code that builds your code." Most developers never need them, but they are how libraries like `Django` or `Pydantic` magically inspect your classes to build databases or web forms automatically.',
     [
       { 
-        title: '1. The Gatekeeper (The GIL)', 
-        beginner: 'Python uses a built-in safety lock called the Global Interpreter Lock (GIL). Think of it like a single master microphone in a kitchen—only one thread can speak or run code instructions at any given microsecond. This makes Python safe, but means standard threads can\'t speed up math calculations.', 
-        advanced: 'The GIL prevents race conditions over Python\'s internal reference-counting memory. However, hardware execution threads are still highly useful for tracking I/O bottlenecks (like network requests or disk reading) because Python automatically releases the GIL lock while waiting for hardware responses.' 
+        title: '1. Everything is an Object', 
+        beginner: 'In Python, a Class is itself an object! It was created by a "Metaclass." If you run `type(MyClass)`, it doesn\'t say "class"—it says `type`. That\'s because `type` is the default metaclass that builds every standard class you write.', 
+        advanced: 'Python uses a "Class Factory" pattern. Classes are instances of a metaclass, and objects are instances of a class. Understanding this triad is the key to deep-level framework architecture.' 
       },
       { 
-        title: '2. Kitchen Timers (asyncio)', 
-        beginner: 'The `asyncio` framework uses a single thread that manages tasks using `async def` and `await`. Think of it like a single chef who sets a digital kitchen timer for a boiling pot, immediately steps away to chop vegetables, and returns only when a timer rings! It avoids wasting time standing still.', 
-        advanced: 'The `asyncio` event loop achieves high concurrency via non-blocking OS multiplexing (like epoll or kqueue). Mixing synchronous, blocking libraries (like standard `time.sleep()` or `requests`) inside an async loop stops the entire system train—always use non-blocking equivalents.' 
+        title: '2. Introspection (dir/getattr)', 
+        beginner: 'You can inspect objects while they are running! `dir(obj)` lists every attribute and method a class has. `getattr(obj, "name")` allows you to grab a property even if you don\'t know the name ahead of time. This is how plugin systems work.', 
+        advanced: 'Introspection allows for dynamic dispatching. By dynamically querying object interfaces at runtime, you can build modular systems where the application reacts to new code without needing a restart.' 
       },
       { 
-        title: '3. Multi-Tasking (threading)', 
-        beginner: 'Standard threading spins up multiple workers inside your program. This is useful for older, traditional code that spends a lot of time waiting on slow data downloads or files, letting one worker sleep while another picks up the slack.', 
-        advanced: 'Avoid instantiating raw, unmanaged `threading.Thread` instances manually. Utilize `concurrent.futures.ThreadPoolExecutor` to handle worker pools efficiently. For modern greenfield code bases, prefer native asynchronous structural design over multi-threading loops.' 
+        title: '3. Custom Metaclasses', 
+        beginner: 'You can create a custom Metaclass to force rules on other classes. For example, you could write a Metaclass that crashes the program if a class doesn\'t have a specific docstring or a specific method. It\'s an "architectural enforcer."', 
+        advanced: 'Inheriting from `type` allows you to override `__new__`. This is the hook where the metaclass intercepts the class definition before it is fully constructed, allowing you to inject attributes, validate signatures, or modify the MRO.' 
       },
       { 
-        title: '4. Separate Kitchens (multiprocessing)', 
-        beginner: 'If your computer needs to crunch massive calculations, render video frames, or process heavy math, standard threads won\'t help due to the lock. You must use `multiprocessing`! This clones your program into completely separate kitchens with their own chefs, smashing past the lock entirely!', 
-        advanced: 'Each independent process spawns its own isolated operating system memory footprint and virtual interpreter instance. Use `ProcessPoolExecutor` paired with thread-safe `multiprocessing.Queue` instances to share data states across parallel CPU pipelines without memory corruption.' 
+        title: '4. The Use Case', 
+        beginner: 'Use introspection to build dynamic tools (like a search tool that scans all attributes). Save Metaclasses for framework development—if you ever find yourself needing to change how *classes themselves are built*, that is the time for a Metaclass.', 
+        advanced: 'Metaclasses are the ultimate "hidden" power. They are responsible for the magic in frameworks like Django ORM, where simple class definitions are magically transformed into complex SQL table mappings.' 
       },
     ],
     { 
-      title: 'The Concurrent Web Scanner', 
-      intro: 'Let\'s write an asynchronous, non-blocking networking pipeline that fires off multiple concurrent web checks simultaneously instead of waiting on them one by one.', 
+      title: 'The Inspector Gadget', 
+      intro: 'Let\'s build a simple introspection tool that scans any object you give it and prints a beautiful report of all its methods and attributes.', 
       steps: [
-        'Open your system terminal window and make sure your isolated runtime cleanroom is active.',
-        'Install the asynchronous network utility tool by running: `pip install httpx`.',
-        'Open a fresh, blank code file script workspace on your computer.',
-        'At the top, import your asynchronous runtime engines: Type `import asyncio` and `import httpx`.',
-        'Define a non-blocking web courier function by typing: `async def fetch(url):`.',
-        'Inside, open an async client and await the request link: `async with httpx.AsyncClient() as c: return (await c.get(url)).status_code`.',
-        'Bundle your concurrent tasks using `await asyncio.gather()` inside a core execution block, and fire up the loop engine using `asyncio.run(main())`!'
+        'Open your terminal REPL.',
+        'Define a demo class: `class User: name = "Sage"; def dance(self): pass`.',
+        'Create the scanner: `def scan(obj):`.',
+        'Inside, use `dir(obj)` to get the list of items.',
+        'Loop: `for attr in dir(obj):`.',
+        'Check type: `val = getattr(obj, attr)`.',
+        'Print: `print(f"{attr}: {type(val)}")`.',
+        'Run it: `scan(User())`!'
       ], 
-      goal: 'You successfully launched non-blocking parallel workers to fetch external api data simultaneously.' 
+      goal: 'You successfully performed live runtime introspection, dynamically accessing object members to build a diagnostic tool.' 
     },
     [
-      q('Which concurrency model must you use if your application is bottlenecked by heavy CPU math or video processing?', ['threading','multiprocessing','asyncio','A standard serial list comprehension'], 1, 'Multiprocessing spawns entirely separate system processes with separate execution contexts, successfully bypassing the GIL to scale across multiple CPU cores.'),
-      q('What is the modern, highly preferred choice for handling thousands of concurrent web socket or API data connections?', ['multiprocessing','asyncio cooperative loops','Legacy sequential scripting','Re-routing inputs into global arrays'], 1, 'The asynchronous event loop architecture manages massive I/O bound network pipelines on a single thread with minimal system memory overhead.'),
-      q('What exactly does Python\'s internal Global Interpreter Lock (GIL) prevent?', ['It stops files from saving down to disk','It prevents multiple system threads from executing Python code blocks simultaneously','It completely blocks internet connections','It causes loops to execute backwards'], 1, 'The GIL is a safety lock ensuring only a single thread processes Python bytecodes at any individual instant to keep internal memory allocation state-safe.'),
-      q('What severe consequence happens if you import and run a synchronous blocking library inside an asynchronous loop block?', ['Python speeds up execution automatically','It freezes the entire event loop runner, stalling all other background tasks concurrently','It encrypts the output text fields','It deletes variable attributes from memory'], 1, 'Synchronous blocking commands lack cooperative await yields, monopolizing the single execution thread and preventing the background loop engine from managing other tasks.')
+      q('What is a Metaclass in Python?', ['A secret password','A "class of a class" that dictates how a class definition itself is constructed and instantiated','A database driver','A type of loop'], 1, 'Metaclasses are the blueprint for classes, intercepting the class creation process to allow for structural modifications and automated validation.'),
+      q('Why would a developer use `getattr(obj, "attr_name")` instead of `obj.attr_name`?', ['To make the code faster','To dynamically access attributes when the attribute name is a variable or unknown until runtime','To prevent the computer from crashing','To save space'], 1, 'Dynamic access allows for "loosely coupled" code where you can interact with objects whose structure isn\'t known at compile-time (essential for plugin/API systems).'),
+      q('What does `dir(obj)` return?', ['The object size','A list of all attributes and methods available on the object','The current directory path','A list of numbers'], 1, '`dir()` is the primary introspection tool for listing the contents of an object\'s namespace.'),
+      q('If you run `type(str)`, what does it return?', ['A string','`type` (indicating that classes themselves are objects created by the `type` metaclass)','A boolean','A dictionary'], 1, 'Python is completely object-oriented; classes are objects, and their type is the `type` metaclass.')
     ],
-    ['The GIL limits Python code execution to a single thread at any one moment','Use asyncio to scale up network-heavy operations without wasting memory frames','Use multiprocessing to distribute calculation-heavy tasks across multiple CPU cores','Never mix blocking synchronous commands inside an active async event loop engine']
+    ['Classes themselves are objects created by Metaclasses','Introspection (dir/getattr) lets you scan and query code while it is running','Use Metaclasses (inheritance from type) only for framework-level architectural enforcement','Dynamic attribute access enables powerful, decoupled plugin-based architectures']
   ),
 
-  L('py-18', 18, 'Testing with pytest', '🧪',
-    'Untested code is broken code waiting to be discovered. Think of automated testing like a high-speed factory inspection rig—instead of clicking through your app manually to see if it works, you write small code checkers that verify your logic instantly!',
+  L('py-23', 23, 'Concurrent Futures', '⚡',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\n`asyncio` is great for networking, but sometimes you have "CPU-heavy" work—like processing images or crunching massive math equations. For that, you need the `concurrent.futures` module to spin up actual parallel CPU cores.',
     [
       { 
-        title: '1. Writing Simple Checkers (Basic Tests)', 
-        beginner: 'To make testing easy, name your test files starting with `test_` and name your internal functions starting with `test_`. Inside them, use the standard `assert` keyword followed by a comparison check, like `assert add(2, 3) == 5`. If the math is true, the test passes green!', 
-        advanced: 'Pytest utilizes advanced dynamic AST (Abstract Syntax Tree) assert rewriting under the hood. When a test fails, it intercepts the expression evaluation to output rich, detailed variable state inspections directly in your terminal, removing the need for legacy verbose assertions like `assertEqual()`.' 
+        title: '1. ThreadPoolExecutor', 
+        beginner: 'This launches multiple tasks at once. Each task runs in its own "thread." It is perfect for I/O tasks like downloading 50 files simultaneously. Note: Python\'s Global Interpreter Lock (GIL) limits threads to one CPU core.', 
+        advanced: 'Threads share the same memory space. Use them for I/O-bound concurrent operations where the program spends most of its time waiting for the network or disk.' 
       },
       { 
-        title: '2. Setting Up the Stage (Fixtures)', 
-        beginner: 'Sometimes a test needs mock data or a fake database to run cleanly. Adding the `@pytest.fixture` decorator above a function creates a setup wizard that automatically builds this environment right before the test starts, and cleans it up when done!', 
-        advanced: 'Manage resource lifecycles explicitly using fixture scoping flags (`function`, `class`, `module`, or `session`). Utilize `yield` statements inside fixtures to separate clean object generation patterns from trailing environmental teardown logic blocks.' 
+        title: '2. ProcessPoolExecutor', 
+        beginner: 'This launches a separate "Python process." Each process gets its own CPU core. If you need to do heavy image processing, this is your tool—it effectively bypasses the GIL and gives you real parallel speed.', 
+        advanced: 'Processes have isolated memory spaces. They communicate via serialization (pickling) data. Use this for CPU-bound tasks like encryption, compression, or data science modeling.' 
       },
       { 
-        title: '3. Matrix Testing (@parametrize)', 
-        beginner: 'Instead of copy-pasting the exact same test five times just to try out different input numbers, you can apply `@pytest.mark.parametrize`. This lets you pass a full table of different values into a single test function, running them all independently!', 
-        advanced: 'Parametrization supports clean, data-driven testing pipelines by decoupled test scenarios from core validation logic. Pytest dynamically processes each tuple input row as a separate sub-test case, preventing a single row failure from blocking trailing scenario evaluations.' 
+        title: '3. The Future Object', 
+        beginner: 'When you submit a task to the pool, you don\'t get the result immediately. You get a "Future"—a placeholder object. It means: "I am working on it, I promise to have the result eventually." You can ask it `future.result()` later.', 
+        advanced: 'Futures encapsulate the eventual state of an asynchronous operation. They support callbacks, cancelation, and state monitoring (pending, running, or finished).' 
       },
       { 
-        title: '4. Tracking Unchecked Lines (Code Coverage)', 
-        beginner: 'How do you know what parts of your program haven\'t been tested yet? You run a code coverage scan tool. It checks your codebase as tests execute and prints a clean report showing exactly which lines of code were skipped or missed!', 
-        advanced: 'Target a standard baseline code coverage metric of ~80%. Pushing aggressively for 100% code coverage introduces diminishing returns, frequently leading to fragile tests that validate trivial happy-path wrappers rather than targeting complex logical edge-cases.' 
+        title: '4. Choosing the Right Tool', 
+        beginner: 'If you are waiting on the internet (API/File), use `ThreadPoolExecutor`. If you are burning the CPU (Math/Images), use `ProcessPoolExecutor`. Choosing the wrong one can actually make your code slower!', 
+        advanced: 'Overhead is a critical metric. Spawning a new process is significantly more "expensive" in terms of OS time than spawning a thread. Use processes only for long-lived, computation-heavy tasks.' 
       },
     ],
     { 
-      title: 'Your First Pytest Suite', 
-      intro: 'Let\'s install the official test framework runner and write a modular test suite that executes matrix inputs and outputs.', 
+      title: 'The Parallel Processor', 
+      intro: 'Let\'s use the `ProcessPoolExecutor` to run a heavy math calculation across multiple CPU cores simultaneously, proving we can outrun standard sequential code.',
       steps: [
-        'Open your command line terminal shell and ensure your isolated python development environment is active.',
-        'Install the de-facto testing library across your framework layout by running: `pip install pytest`.',
-        'Create a local test script file on your machine explicitly named: `test_math.py`.',
-        'Inside that file, write a simple verification checker: `def test_sum(): assert 1 + 1 == 2`.',
-        'Run the master suite check inside your terminal shell by simply typing: `pytest`. Watch it report a green passing check!',
-        'Upgrade your file by adding a multi-case parameter table right above your function: `@pytest.mark.parametrize("a, b, expected", [(1, 2, 3), (2, 3, 5)])`. Run `pytest` again to watch it track multiple conditions!'
+        'Open your terminal REPL.',
+        'Import: `from concurrent.futures import ProcessPoolExecutor`.',
+        'Define a heavy task: `def power(x): return x**x`.',
+        'Setup: `with ProcessPoolExecutor() as executor:`.',
+        'Run: `results = list(executor.map(power, [10, 11, 12, 13]))`.',
+        'Print `results` to see your parallel output!'
       ], 
-      goal: 'You successfully initialized an automated testing harness, designed basic assertions, and integrated parametrized parameter tables.' 
+      goal: 'You successfully launched parallel CPU processes, used a pool to map inputs across cores, and aggregated the results using future objects.' 
     },
     [
-      q('What file and function name prefix convention does pytest look for when running its automatic test discovery scanner?', ['It scans files starting with `spec_`','It scans files and internal functions starting explicitly with `test_`','It only parses scripts that contain loops','It reads files named config.json'], 1, 'Pytest is built around zero-boilerplate discovery conventions, parsing all module files and local functions prefixed with `test_`.'),
-      q('What is the primary architectural purpose of utilizing a `@pytest.fixture` inside your test architecture layout?', ['It encrypts output strings to keep them secure','It provides structured, reusable data setup and environmental cleanup blocks across your test suites','It speeds up system iteration loops by bypassing errors','It automatically deletes empty files on disk'], 1, 'Fixtures are isolated context factories that configure dependencies and clean up environmental resources before and after test executions.'),
-      q('How does applying the `@pytest.mark.parametrize` decorator benefit your code testing workflow efficiency?', ['It compresses final script code sizes into a binary bundle','It maps a single test function across an entire matrix array of variable test inputs, eliminating repetitive copy-pasting','It prevents user errors from showing up inside terminals','It formats the code structure to follow standard guidelines'], 1, 'Parametrization feeds structural arrays of input data cases through a single test shell uniformly, executing each case as an independent sub-test tracking marker.'),
-      q('Does achieving 100% test line code coverage guarantee that your application is completely bug-free?', ['Yes, it proves mathematically that no logic bugs exist','No, it simply tracks that every line was executed during testing, but does not guarantee edge-case accuracy or faultless behavior','It means your application is fully connected to the cloud','It means your functions are completely immutable'], 1, 'Coverage metrics map structural line execution paths rather than logical verification integrity; 100% line coverage can still mask deep hidden edge-case logic bugs.')
+      q('What is the primary difference between a Thread and a Process in Python?', ['Threads are faster, Processes are slower','Threads share memory and are limited by the GIL; Processes have isolated memory and use separate CPU cores','Processes are for text, Threads are for numbers','There is no difference'], 1, 'Threads share a single process and memory space, constrained by the GIL, while Processes represent separate system tasks with their own memory and CPU core allocation.'),
+      q('When should you use a `ProcessPoolExecutor`?', ['For fast network calls','For CPU-heavy tasks like image processing, encryption, or heavy math calculations','For writing text files','For testing the internet'], 1, 'Processes break the GIL limitation, allowing for true parallel computation across multiple physical CPU cores for heavy mathematical logic.'),
+      q('What does a "Future" object represent?', ['An object that predicts the future','A placeholder for a result that will be calculated in the background eventually','A file that has been deleted','A type of constant'], 1, 'Futures serve as the bridge between background task submission and result retrieval, signaling the pending completion status of an execution thread.'),
+      q('What happens if you use threads to do heavy CPU math?', ['The GIL makes it perform essentially no better than a single-threaded program because only one thread can execute Python bytecode at a time','It runs 100x faster','It deletes your hard drive','It turns off your CPU fan'], 0, 'Due to the Global Interpreter Lock (GIL), multiple Python threads cannot execute bytecode simultaneously, making them ineffective for pure CPU-bound mathematical operations.')
     ],
-    ['Pytest automatically scans your project tree for files and functions starting with test_','Use standard python assert expressions for clear native failure reports','Leverage fixtures to establish reliable and repeatable application setup environments','Apply test parametrization to cycle multiple data scenarios through single assertions without duplication']
+    ['Use ThreadPoolExecutor for I/O-bound tasks (network/files)','Use ProcessPoolExecutor for CPU-bound tasks (math/images)','A Future object is a "promise" of a result that you can collect later','Understand the GIL: Threads are for waiting, Processes are for calculating']
   ),
 
-  L('py-19', 19, 'Web Scraping & Automation', '🤖',
-    'When a public website does not offer a clean data API channel, you can extract its contents using web scraping. Think of scraping like building a custom robot that automatically skims through online text, fills out forms, or downloads target information for you!',
+  L('py-24', 24, 'Packaging & Distribution', '📦',
+    '🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\nGreat, you built a library! But how do you let the rest of the world use it? Packaging turns your scattered `.py` files into a standardized, installable asset that anyone can download with `pip install my-cool-project`.',
     [
       { 
-        title: '1. Internet Etiquette (Ethics & robots.txt)', 
-        beginner: 'Before scraping a website, always read its house rules! Checking a site\'s `targetsite.com/robots.txt` file tells you exactly which pages your code is allowed to look at. Never hammer a server with thousands of rapid requests—treat websites with respect!', 
-        advanced: 'Enforce strict programmatic rate-limiting parameters (e.g., introducing a `time.sleep(1)` interval between sequential handshakes) and cache downloaded source nodes aggressively. Always prioritize a platform\'s formal API distribution channel over web scraping whenever it exists.' 
+        title: '1. Project Structure', 
+        beginner: 'Your project folder needs a specific layout. Put your code inside a sub-folder named after your project (the "package"), include a `README.md`, and a `pyproject.toml` file.', 
+        advanced: 'The `pyproject.toml` (PEP 518/621) is the modern standard for configuring builds. It defines build dependencies and metadata, replacing the archaic and discouraged `setup.py` scripts.' 
       },
       { 
-        title: '2. Parsing Static Pages (BeautifulSoup)', 
-        beginner: 'If a webpage displays its text immediately without loading complex background animations, it is static. You can fetch its code using `requests` and feed it into a tool called `BeautifulSoup` to easily sort, search, and slice out data by its HTML tags or text classes!', 
-        advanced: 'BeautifulSoup breaks raw structural HTML strings down into a navigatible node element tree hierarchy. However, it lacks an integrated JavaScript execution compilation engine; if a target web interface relies on dynamic framework rendering, simple markup string parsers will fail.' 
+        title: '2. The pyproject.toml', 
+        beginner: 'This is the "manifesto" of your package. It tells the world: "My name is X, I require these libraries, and my code starts here." It is what `pip` reads to know exactly what to do.', 
+        advanced: 'It leverages build backends like `hatch`, `flit`, or `setuptools`. It provides a clean, declarative configuration interface, ensuring that builds remain reproducible across different platforms and environments.' 
       },
       { 
-        title: '3. Browser Driving (Modern Playwright)', 
-        beginner: 'Many modern websites use heavy JavaScript that only reveals text after you click buttons, scroll down, or pass security checks. To extract data from these dynamic pages, use a modern headless browser tool called `Playwright` to simulate a real human explorer!', 
-        advanced: 'Avoid using unoptimized implicit wait calls like `time.sleep()`. Implement strict event-driven scripting by utilizing dynamic locator hooks like `page.wait_for_selector()` and prefer modern text-based target queries over brittle, tightly coupled CSS layout selectors.' 
+        title: '3. Building a Wheel', 
+        beginner: 'You don\'t upload your raw `.py` files to the internet. You "build" a Wheel (a `.whl` file). It is a zipped, pre-compiled package that `pip` knows how to unpack instantly. It is the gold standard for easy distribution.', 
+        advanced: 'Wheels are binary distributions (PEP 427). They eliminate the need for end-users to compile C-extensions from source, drastically reducing installation time and environment dependency errors.' 
       },
       { 
-        title: '4. Automated Tasks (Scheduling)', 
-        beginner: 'Once your scraper works perfectly, you can set it up to run on a set schedule automatically! You can use your computer\'s built-in scheduler tool to run your script every morning at 8:00 AM without ever clicking a button yourself.', 
-        advanced: 'To deploy script execution tasks without maintaining live physical host hardware partitions, delegate operational triggers out to serverless pipeline execution architectures. Leverage GitHub Actions cron schedules or cloud provider event hooks to automate processing pipelines effortlessly.' 
+        title: '4. PyPI (The Global Store)', 
+        beginner: 'PyPI (Python Package Index) is the "App Store" for Python. You upload your Wheel file to PyPI using a tool called `twine`, and suddenly anyone in the world can run `pip install your-package-name`.', 
+        advanced: 'PyPI enforces strict namespace security. Once you publish a project, it is permanent. Always use a TestPyPI account to verify your build configuration before deploying to the global public repository.' 
       },
     ],
     { 
-      title: 'The News Headline Extraction Factory', 
-      intro: 'Let\'s build a production-grade data extractor script that automatically targets a static informational webpage and slices out all article headlines.', 
+      title: 'The Manifest Builder', 
+      intro: 'Let\'s create a simple project manifest (`pyproject.toml`) and understand how we package our code for the public.', 
       steps: [
-        'Open your command line terminal shell screen and confirm your isolated virtual runtime environment is active.',
-        'Install your static web parsing tools by executing: `pip install requests beautifulsoup4`.',
-        'Boot up your interactive Python interpreter command line prompt (>>>).',
-        'Load your network connector and parsing engine toolkits: Type `import requests` and `from bs4 import BeautifulSoup`.',
-        'Fetch the raw HTML structural code blueprint of your target text page: Type `html = requests.get("https://news.ycombinator.com").text`.',
-        'Convert that raw string into a searchable node tree mapping: Type `soup = BeautifulSoup(html, "html.parser")`.',
-        'Execute a search query across the tree to isolate and strip title strings: Run `print([h.text.strip() for h in soup.select(".titleline")])`!'
+        'Open your terminal.',
+        'Navigate to your project folder.',
+        'Create `pyproject.toml`.',
+        'Add: `[project] name = "my-robot", version = "0.1.0", dependencies = ["requests"]`.',
+        'Look at the modern build system requirements by searching the docs for `pyproject.toml` standards.',
+        'Install the build tool: `pip install build`.',
+        'Build the project: `python -m build`.',
+        'Look inside your new `dist/` folder—there is your `.whl`!'
       ], 
-      goal: 'You successfully requested a remote web page, generated a structured element node tree, and parsed explicit elements.' 
+      goal: 'You successfully transitioned your local code into a standardized package structure, configured build metadata, and generated a distributable binary wheel.' 
     },
     [
-      q('What is the absolute first step a ethical developer should take before scraping a public website data stream?', ['Change their network settings to hide their computer location','Check the site\'s rules and constraints by visiting its `/robots.txt` path and configure respectful execution rates','Write an infinite loop to download the entire system database as fast as possible','Delete historical browser cache files'], 1, 'The `/robots.txt` file represents the official compliance boundary declaration map for scrapers, listing explicitly which directories can be safely processed.'),
-      q('Which software package must you deploy if a target web platform uses heavy JavaScript frameworks to dynamically load text?', ['A simple raw text markup tracker like BeautifulSoup alone','A full-browser engine automation framework like Playwright or Selenium','A standard mathematical looping expression','An encryption algorithm modifier'], 1, 'Dynamic modern single-page applications run complex compilation routines inside live browsers; programmatic driving suites like Playwright instantiate automated layout layers to capture these states.'),
-      q('When writing advanced automation loops, why is it highly recommended to use `page.wait_for_selector()` instead of `time.sleep(5)`?', ['Using wait_for_selector makes the program use twice as much memory','It stops waiting the exact millisecond the item appears, maximizing efficiency and eliminating fragile timing errors','It forces the website to respond faster than normal','It is required to run code on cloud servers'], 1, 'Dynamic event-driven listener targets intercept page states intelligently, preventing your loops from executing too early or idling needlessly after page renders finish.'),
-      q('What tool serves as the industry standard for parsing simple static HTML content text blocks in the Python ecosystem?', ['The global regex library module','The BeautifulSoup document parsing utility','The native system file tracking framework','The raw string slicing syntax'], 1, 'BeautifulSoup is the gold standard for navigating structural markup trees, letting you search elements across simple document structures quickly without regex expressions.')
+      q('What is the modern standard file used for configuring Python package builds and dependencies?', ['`setup.py`','`pyproject.toml`','`config.txt`','`manifest.xml`'], 1, 'PEP 518/621 standardized `pyproject.toml` as the declarative, modern configuration file for building Python projects.'),
+      q('Why is a "Wheel" (.whl) better than just sending your raw source code files to others?', ['It is smaller','It is a pre-compiled, standardized format that makes installation instant and eliminates compilation errors on the user\'s machine','It looks cooler','It is easier to hack'], 1, 'Wheels are binary distributions that bypass local compilation requirements, making installation reliable, fast, and platform-independent.'),
+      q('What is PyPI?', ['A file hosting service','The Python Package Index, the global "App Store" where developers upload packages for universal download via pip','A type of encryption','A secret Python club'], 1, 'PyPI is the centralized repository for Python packages, powering the global ecosystem you access every time you run `pip install`.'),
+      q('What tool is used to upload your finished build to the PyPI repository?', ['`build`','`twine`','`upload`','`pip`'], 1, '`twine` is the standard, secure utility used for authenticating and uploading built distribution packages to PyPI.')
     ],
-    ['Always audit a platform\'s robots.txt rules and enforce rate-limiting metrics to preserve ethics','Combine requests with BeautifulSoup to efficiently pull raw records from static page markups','Leverage Playwright automation clients to simulate browser behaviors on heavy dynamic JavaScript apps','Deploy automation scripts to serverless cloud triggers to bypass local hardware maintenance requirements']
-  ),
-  
-  L('py-20', 20, 'Capstone: Build a CLI Tool', '🏆',
-    'Real-world Python software doesn\'t just sit hidden inside editor windows—it ships to users as fully operational terminal commands! Think of this final capstone project like assembling a real-world power tool: combining blueprints, user handles, and packaging rules to distribute your code globally.',
-    [
-      { 
-        title: '1. Blueprint Blueprints (Project Structure)', 
-        beginner: 'To share a tool professionally, organize your code files inside a dedicated folder structure. Place your active code files inside an inner application directory and keep your test suite scripts sitting in an independent folder alongside it.', 
-        advanced: 'Implement the standardized modern `src/` layout pattern to prevent accidental local import shadow bugs during testing. Utilize a unified `pyproject.toml` configuration file as the single, modern source of truth manifest for package declarations.' 
-      },
-      { 
-        title: '2. The Tool Handle (argparse / typer)', 
-        beginner: 'A Command Line Interface (CLI) tool needs a clean handle so users can toggle settings! While Python includes a built-in input framework called `argparse`, modern developers love an external library called `typer` that automatically transforms regular variable annotations into beautiful terminal control screens.', 
-        advanced: 'For intricate CLI designs scaling past 5 unique sub-commands, the `typer` library (built on top of `click`) drastically reduces implementation bloat. It auto-generates deep interactive `--help` utility screens natively derived from your source documentation docstrings.' 
-      },
-      { 
-        title: '3. Universal Power Plugs (Entry Points)', 
-        beginner: 'Instead of forcing users to type long, clunky commands like `python3 path/to/my/internal_script.py`, you can wire up an internal shortcut registry! This links your python logic straight to a short, custom binary name, allowing anyone to run your application by simply typing its nickname.', 
-        advanced: 'Define explicit `console_scripts` entry coordinates inside your `pyproject.toml` build configurations. This maps terminal commands straight to internal script entry callables, enabling package installation utilities like `pipx` to cleanly provision globally sandboxed binaries.' 
-      },
-      { 
-        title: '4. Shipping to the Showroom (Publishing)', 
-        beginner: 'Once your tool is completely finished, you can publish it straight to the official global Python Package Index (PyPI) warehouse! Once uploaded, any developer anywhere on Earth can download and install your custom program instantly by simply running `pip install your-tool`!', 
-        advanced: 'Always test your builds by pushing releases to the isolated TestPyPI warehouse staging site using `twine` before finalizing public updates. Tag package iterations using SemVer compliance standards and integrate secure OpenID Connect (OIDC) trusted publishing tokens.' 
-      },
-    ],
-    { 
-      title: 'Building "wc-clone"', 
-      intro: 'Let\'s compile your full stack of Python fundamentals to build, test, and locally install a fully custom system file-analysis binary tool.', 
-      steps: [
-        'Open your command line terminal interface and ensure your project cleanroom path is active.',
-        'Create a core project manifest configuration file inside your project root exactly named: `pyproject.toml`.',
-        'Add structural package metadata headers to that file and declare a custom binary command pointer inside an `[project.scripts]` block.',
-        'Create an internal application engine script named `cli.py` that processes incoming target file paths.',
-        'Write logical expressions to open target text documents safely, count total lines, isolate separate words, and compute string character weights.',
-        'Run the local editable install flag command in your terminal shell: `pip install -e .`.',
-        'Execute your brand new global system binary from anywhere on your computer by typing: `wcclone target_document.txt`!'
-      ], 
-      goal: 'You successfully synthesized advanced project architectures, built a functional CLI parser, and deployed a local system binary.' 
-    },
-    [
-      q('Which modern configuration manifest file serves as the official single source of truth for modern Python packaging layouts?', ['setup.py','pyproject.toml','Makefile','requirements.txt'], 1, 'The `pyproject.toml` file is the unified standard for managing environment definitions, package metadata, and compiler tool configurations.'),
-      q('Which popular library leverages standard python type hints to auto-generate beautiful terminal control screens and help readouts?', ['argparse','typer','sys','os'], 1, 'The `typer` library translates native python function arguments and standard type annotations into fully responsive CLI commands automatically.'),
-      q('What utility should end-users run to download and install a Python command-line application into a globally isolated system path safely?', ['pip install','pipx install','npm global run','brew install system'], 1, 'The `pipx` manager isolates application tools inside independent virtual execution slots while simultaneously linking their binaries to your global system path.'),
-      q('Where should you upload your compiled wheel package archives to verify installation pathways safely before public open-source deployment?', ['Push straight to main GitHub branches','Upload directly to the TestPyPI staging network repository','Email code zip files to team members','Publish it to the live production PyPI marketplace instantly'], 1, 'The TestPyPI system provides a complete sandboxed testing mirror environment, enabling developers to confirm distribution packaging settings risk-free.')
-    ],
-    ['Modern frameworks use the src/ directory layout paired with pyproject.toml manifests','The typer framework streamlines terminal engine design through automatic type parsing','Configuring entry points creates direct operational terminal binary hooks for scripts','Use TestPyPI and twine pipelines to safely validate framework releases before global shipment']
-  ),
-
-  L(
-    'py-21', 21, 'Type Hints & Static Typing', '🏷️', 'Python is famous for being wonderfully dynamic, but as your applications scale into thousands of lines of code, that freedom turns into a liability. When a function expects a dictionary but accidentally receives a string, production servers crash. Static typing adds an optional, powerful safety harness to your architecture, allowing tools to catch fatal bugs while you are typing, long before the code ever actually runs.',
-    [
-      { title: '1. Type Annotations & Optional', beginner: 'Think of type hints as sticky notes you attach to your variables and function parameters saying, "I expect an integer here." It doesn\'t force Python to stop if you break the rule, but it allows your code editor to draw a red squiggly line under mistakes. If a value might sometimes be empty, you use the `Optional` type so the system knows to expect it.', advanced: 'In enterprise Python, `typing.Optional` (or the modern `| None` syntax) is critical. It forces developers to explicitly handle `None` cases, virtually eliminating the dreaded "NoneType object has no attribute..." runtime exception that plagues dynamic data pipelines.' },
-      { title: '2. Union & Literal Types', beginner: 'Sometimes a variable needs to be flexible but still protected. A `Union` lets you say "This can be a string OR a number, but absolutely nothing else." A `Literal` is even stricter: it says "This variable can only hold the exact word \'GET\' or \'POST\'."', advanced: '`Union` and `Literal` types enable static analyzers to perform "exhaustive checking." This means if you write a system that processes 3 specific Literal string commands, the type checker will throw an error if you forget to write an `if/elif` block for one of those exact scenarios.' },
-      { title: '3. TypedDict & Protocols', beginner: 'Standard dictionaries are like wildcards—you can put any key inside them. A `TypedDict` forces a dictionary to always have specific keys, like a rigid template. `Protocols` are a way of saying, "I don\'t care what kind of object this is, as long as it has a `.save()` method attached to it!"', advanced: 'Protocols implement formal "structural subtyping" (Duck Typing) at the static analysis level. This allows for brilliant decoupling in massive architectures; modules can interact through verified behavioral contracts without needing to inherit from heavily coupled Base Classes.' },
-      { title: '4. The Type-Safe Workflow', beginner: 'Adding type hints is only half the battle. To actually catch bugs, developers run a tool called `mypy` in their terminal. It acts as an incredibly strict, automated spell-checker for your code\'s logic, pointing out exactly where data types are clashing before you ship your app.', advanced: 'Modern professional workflows integrate `mypy --strict` or Microsoft\'s `pyright` directly into CI/CD pipelines. This ensures that no pull request can be merged into the main branch unless the entire application passes rigorous mathematical proofs of type safety.' }
-    ],
-    {
-      title: 'Strongly Typed Task CLI',
-      intro: 'We are going to build a completely type-safe task management script where every function boundary is rigorously protected by type annotations.',
-      steps: [
-        'Import `TypedDict`, `Literal`, and `Optional` from the standard `typing` module.',
-        'Define a `Task` TypedDict that requires a string "title", an integer "id", and a Literal "status" (either "pending" or "done").',
-        'Write a core function `add_task(task_list: list[Task], new_title: str) -> Optional[Task]:` that securely appends new data.',
-        'Intentionally write a bug where you pass an integer as a title, run `mypy script.py` in your terminal, and watch it catch the error for you.'
-      ],
-      goal: 'You successfully transitioned from writing dynamic, unpredictable scripts to authoring mathematically provable, enterprise-grade type-safe Python architectures.'
-    },
-    [
-      q('Which of the following syntax patterns represents the modern, preferred way to declare a variable that can be either an integer or None in Python 3.10+?', ['int | None', 'Optional[int]', 'Union[int, None]', 'Either[int, None]'], 0, 'While Optional[int] and Union[int, None] remain fully backward-compatible, Python 3.10 introduced the cleaner pipe (|) syntax as the modern, readable standard.'),
-      q('If a variable is typed as Literal["read", "write"], what does a static type checker do if you attempt to assign the string "append" to it?', ['It ignores it because "append" is also a string.', 'It raises a static type-checking error because "append" does not match the allowed literal values.', 'It automatically updates the type definition to include "append".', 'It crashes the Python interpreter at runtime.'], 1, 'Literal types restrict a variable to precise, explicit values. Assigning anything outside that exact literal set triggers a static validation error, catching logic flaws before deployment.'),
-      q('How does structural subtyping (Protocols) differ from traditional class inheritance chains in Python?', ['It requires explicit subclassing of a shared base class.', 'It evaluates objects entirely on their structure and behaviors (methods) rather than their explicit class hierarchy.', 'It converts dictionary objects into rigid runtime classes.', 'It disables dynamic duck typing completely.'], 1, 'Protocols implement compile-time duck typing. They verify that an object possesses the required methods or attributes without forcing modules to inherit from a heavily coupled base class.'),
-      q('What role does a tool like mypy or pyright play in an enterprise Python workflow?', ['It optimizes runtime performance by compiling python code down to native machine C code.', 'It acts as an external static analysis engine that validates code for type violations prior to execution.', 'It automatically strips type annotations from production modules to save space.', 'It manages third-party package dependencies and virtual environments.'], 1, 'Mypy and pyright serve as static type checkers. They scan source files to identify type conflicts and edge-case errors before the code is ever deployed or run.')
-    ],
-    [
-      'Type hints act as an optional safety harness, allowing static tools to catch logic flaws early without altering standard Python runtime speeds.',
-      'Modern workflows leverage the concise pipe operator (Type | None) for clean, unambiguous multi-type and optional variable definitions.',
-      'TypedDict enforces structural schemas on dictionaries, while Protocols bring formal verification to traditional dynamic duck typing.',
-      'Integrating linters like mypy into CI/CD pipelines guarantees automated, mathematical type safety before code can merge into production.'
-    ]
-  ),
-
-  L(
-    'py-22', 22, 'Advanced Functions & Functional Programming', '⚙️', 'In standard programming, functions are just lists of instructions. In Functional Programming, functions are treated like physical objects—you can pass them around, modify them, and even write functions that generate brand new functions on the fly. Mastering this paradigm results in code that is incredibly modular and heavily tested.',
-    [
-      { title: '1. Higher-Order Functions', beginner: 'A "Higher-Order Function" is a function that either accepts another function as an argument, or spits out a new function as its return value. Imagine a factory machine whose only job is to build and customize smaller machines based on your exact specifications.', advanced: 'This functional pattern enables advanced "strategy injection," where core processing logic is passed into a function dynamically at runtime. This completely eliminates hardcoded conditional chains and makes unit testing significantly easier by allowing you to inject mock strategies.' },
-      { title: '2. Closures & State Storage', beginner: 'When a function is created inside another function, it remembers the variables from the outside function—even after the outside function has finished running! This "memory bubble" is called a Closure, and it’s a brilliant way to save data without having to build an entire Class object.', advanced: 'Closures capture and encapsulate their lexical scope. They are the ideal, lightweight mechanism for maintaining internal state, configuration parameters, or caching data without the massive architectural overhead of instantiating standard Object-Oriented classes.' },
-      { title: '3. Decorators as Architecture', beginner: 'A decorator (written with the `@` symbol) is just a function that wraps around another function to give it superpower upgrades. Without changing the original function\'s code, a decorator can automatically measure how long it takes to run, or check if the user is logged in before letting it execute.', advanced: 'Decorators elegantly handle "cross-cutting concerns"—code that needs to exist everywhere (like logging, authentication, or retry logic) but shouldn\'t pollute your core business logic. They dynamically intercept, modify, and route function calls at the module loading phase.' },
-      { title: '4. Functools & Memoization', beginner: 'Sometimes a function does really heavy math. The `functools` library provides a magical decorator called `@lru_cache`. If you call a function twice with the same exact numbers, this cache remembers the first answer and spits it out instantly the second time, skipping the math entirely.', advanced: 'Memoization through `lru_cache` fundamentally alters the algorithmic time complexity profile of your application. It seamlessly transforms highly expensive, exponential recursive calls into lightning-fast $O(1)$ memory dictionary lookups.' }
-    ],
-    {
-      title: 'Dynamic Decorator Plugin System',
-      intro: 'We are going to construct a professional plugin architecture where custom functions automatically register themselves into a global framework simply by using a custom decorator.',
-      steps: [
-        'Create a global dictionary named `PLUGINS = {}` to act as your central registry.',
-        'Write a higher-order function named `register_plugin(name)` that returns a wrapper decorator.',
-        'Inside the wrapper, save the incoming function into the `PLUGINS` dictionary using the provided name.',
-        'Create three different text-processing functions and decorate them with `@register_plugin("plugin_name")`.',
-        'Write a master runner loop that iterates through the `PLUGINS` dictionary and executes all registered tools dynamically.'
-      ],
-      goal: 'You successfully built a highly decoupled, scalable plugin registry utilizing higher-order functions, closures, and custom decorators.'
-    },
-    [
-      q('What is the defining characteristic of a Python "Closure"?', ['A function that immediately deletes global variables after running', 'A dynamically generated function that remembers and retains access to variables from its original enclosing scope', 'A mandatory method inside an Object-Oriented base class', 'A function that prevents any other code from executing'], 1, 'A closure effectively "closes over" its creation environment, capturing the state of surrounding variables so they can be used securely later on.'),
-      q('How does the `@functools.lru_cache` decorator drastically improve application performance?', ['It actively compresses function code to reduce file size', 'It saves the output of expensive function calls to memory, returning the saved result instantly on subsequent identical calls', 'It encrypts function output to prevent memory leaks', 'It multithreads the function across CPU cores automatically'], 1, 'LRU Cache implements memoization, bypassing the execution logic entirely if the specific input parameters have been processed recently.'),
-      q('What is the primary architectural advantage of utilizing a custom decorator for a plugin system?', ['It strictly enforces all functions to share the exact same variable names', 'It beautifully isolates the core business logic from the structural registration mechanics', 'It makes the application run significantly slower for security reasons', 'It requires writing substantially more boilerplate code'], 1, 'Decorators keep the actual function definitions completely clean, abstracting the complex registration and metadata storage logic away into the wrapper.'),
-      q('Which built-in Python module provides advanced utilities for functional programming concepts like partial application and caching?', ['os', 'functools', 'sys', 'math'], 1, 'The `functools` module is the standard library hub for higher-order functions and operations that manipulate callable objects.')
-    ],
-    ['Utilize closures to maintain secure, lightweight state without the heavy overhead of instantiating full classes.', 'Apply custom decorators to beautifully isolate cross-cutting concerns like logging, timing, and security checks.', 'Leverage built-in memoization to effortlessly optimize highly repetitive, mathematically expensive function calls.', 'Treat functions as first-class modular objects to build deeply flexible and dynamic application architectures.']
-  ),
-
-  L(
-    'py-23', 23, 'Iterators, Generators & Lazy Evaluation', '⏳', 'When processing massive datasets—like a 50-Gigabyte server log file—trying to load everything into a standard Python list will instantly consume all your RAM and crash your computer. "Lazy Evaluation" is the professional solution: processing massive mountains of data one single piece at a time, keeping your application incredibly light and lightning-fast.',
-    [
-      { title: '1. The Iterable Protocol', beginner: 'An "Iterable" is simply any object that you can loop over, like a standard list, a string, or a dictionary. Under the hood, Python checks if the object possesses a hidden `__iter__` method, which acts as the secret instruction manual for how to hand out its items.', advanced: 'Implementing the `__iter__` dunder method returns an Iterator object. This specific mechanism forms the absolute foundation of Python\'s sequence unpacking, standard `for` loops, and sophisticated generator data pipelines.' },
-      { title: '2. The Stateful Iterator', beginner: 'While an Iterable is the actual collection of data, an "Iterator" is the little internal bookmark that remembers exactly where you currently are inside the loop. It uses a method called `__next__` to fetch the next item in line until it completely runs out.', advanced: 'Iterators are strictly stateful objects. Once they are fully exhausted, calling `__next__` intentionally raises a `StopIteration` exception. Python\'s native loops silently catch this specific exception to know exactly when to gracefully terminate the cycle.' },
-      { title: '3. Generators & Yield', beginner: 'Instead of building a massive list all at once and returning it, a "Generator" is a special function that uses the `yield` keyword. It hands you exactly one item, pauses its own execution, and patiently waits in standby mode until you ask for the next piece.', advanced: 'Generators seamlessly maintain their local state, variables, and instruction pointers automatically between successive calls. They act as highly efficient coroutines, allowing you to construct robust, memory-safe data processing pipelines with minimal boilerplate.' },
-      { title: '4. Streaming Data Pipelines', beginner: 'You can actually connect multiple generators together exactly like physical plumbing pipes! One pipe lazily reads data from a file, the next pipe filters out bad data, and the final pipe analyzes the results—all without ever holding the full file in memory.', advanced: 'By chaining generator expressions sequentially, you construct elegant "lazy pipelines" that perfectly mimic Unix shell pipes. This is the absolute optimal architectural pattern for processing multi-gigabyte log files, infinite network streams, or massive database queries.' }
-    ],
-    {
-      title: 'Infinite Streaming Log Analyzer',
-      intro: 'We will construct a highly memory-efficient, multi-stage generator pipeline capable of analyzing an infinitely large server log file line-by-line without ever crashing the system memory.',
-      steps: [
-        'Write a base generator function `read_logs(file)` that opens a text file and `yields` one line at a time.',
-        'Write a second generator `filter_errors(lines)` that takes an iterator as input and only yields lines containing the word "CRITICAL".',
-        'Write a third generator `extract_timestamp(errors)` that parses out the date from the error strings.',
-        'Chain them together: pass the output of the reader directly into the filter, and the filter into the extractor.',
-        'Run a basic `for` loop over the final pipeline, proving that the data is flowing lazily from start to finish.'
-      ],
-      goal: 'You successfully engineered a multi-stage lazy evaluation pipeline capable of chewing through infinitely massive datasets using almost zero system memory.'
-    },
-    [
-      q('What internal exception does an Iterator explicitly raise when it has absolutely no more items left to dispense?', ['EndException', 'StopIteration', 'EmptyError', 'IndexError'], 1, 'Python internally and deliberately uses the StopIteration exception as the standard signal that an iterator is fully exhausted and the loop should terminate.'),
-      q('What is the core architectural difference between an Iterable and an Iterator in Python?', ['An Iterable is the actual data collection, while the Iterator is the stateful mechanism tracking the exact current position during a loop', 'They are fundamentally the exact same thing used interchangeably', 'An Iterable strictly uses the yield keyword, while an Iterator uses the return keyword', 'An Iterator is always a standard Python list under the hood'], 0, 'The Iterable provides the raw data structure, while the Iterator manages the internal state pointer as you progress through that data.'),
-      q('Why are generators infinitely superior to standard lists for processing multi-gigabyte datasets?', ['They run approximately 10x faster on standard CPU architecture', 'They evaluate data lazily one item at a time, consuming virtually zero system memory overhead', 'They automatically serialize and save data directly to a connected SQL database', 'They natively encrypt the dataset to prevent security breaches'], 1, 'Generators yield data completely on demand, avoiding the fatal memory allocations required to load an entire massive sequence upfront.'),
-      q('How do you construct a highly efficient, lazy data pipeline in modern Python?', ['By appending massive lists together continuously', 'By chaining multiple generators together where one yields data sequentially into the next', 'By utilizing the built-in zip() function exclusively', 'By importing the heavy third-party pipeline module'], 1, 'Generator pipelines pass yielded items sequentially through multiple distinct layers of processing, perfectly mimicking the behavior of robust Unix terminal pipes.')
-    ],
-    ['Implement the __iter__ method to elevate your custom objects into native Python loopable structures.', 'Leverage the yield keyword to create incredibly memory-efficient generator coroutines.', 'Chain multiple generators together to engineer robust, lazy processing pipelines for massive datasets.', 'Always prioritize lazy evaluation over upfront list memory allocation when building enterprise data architecture.']
-  ),
-
-  L(
-    'py-24', 24, 'Context Managers & Resource Management', '🔌', 'In software engineering, every file you open, database connection you create, or network socket you spin up utilizes finite operating system handles. If your program fails to close them—often due to an unexpected crash or exception—those resources leak, causing servers to freeze and applications to run out of memory. Context managers provide a bulletproof structural pattern that guarantees resource allocation and deterministic cleanup, ensuring your applications remain stable under high enterprise workloads.',
-    [
-      { title: '1. The With Statement & RAII', beginner: 'Imagine checking out a highly valuable reference book from a library. If you forget to return it, nobody else can use it. The `with` statement in Python acts like an automated librarian. It hands you the book, lets you read it inside a secure study room, and the literal split-second you leave that room, it grabs the book out of your hands and safely returns it to the shelf, even if you tripped and fell flat on your face while reading.', advanced: 'This follows the classic RAII (Resource Acquisition Is Initialization) pattern. By utilizing `with`, Python guarantees that resource teardown occurs deterministically. It wraps the execution block in an internal `try/finally` structure at the bytecode level, ensuring that cleanup routines run even if the block throws catastrophic runtime exceptions or executes a direct return statement.' },
-      { title: '2. The Dunder Protocols', beginner: 'To turn an ordinary Python class into a smart context manager, you must give it two secret dunder methods: `__enter__` and `__exit__`. Think of `__enter__` as a specialized doorman who sets up a clean event room and hands you the microphone. Think of `__exit__` as the cleaning crew that sweeps the floors, locks the doors, and turns off the lights when the event is over.', advanced: 'The `__enter__` method sets up the target resource and returns the target value for the `as` clause. The `__exit__` method takes three precise arguments representing an unhandled exception: `exc_type`, `exc_val`, and `exc_tb`. If an exception occurred within the block, `__exit__` can inspect it, clean up resources, and return a strict Boolean value of `True` to completely swallow the error, or `False` to let it propagate up the stack.' },
-      { title: '3. Contextlib Utilities', beginner: 'Writing full classes with custom dunder methods can sometimes feel like too much work for basic tasks. The built-in `contextlib` library provides a shortcut decorator called `@contextmanager`. It allows you to convert a simple generator function that uses a single `yield` statement into a fully functional, production-ready context manager.', advanced: 'The `contextlib` module contains critical utilities for advanced production architectures. For instance, `contextlib.suppress` cleanly swallows expected operational exceptions, while `contextlib.ExitStack` allows developers to dynamically manage an arbitrary, variable number of nested context resources simultaneously, completely eliminating deep, unreadable pyramid indentations.' },
-      { title: '4. Advanced Exception Trapping', beginner: 'Inside a context manager, you can write defensive rules that look at mistakes happening during execution. If a minor error happens, your cleanup crew can quietly fix the problem, sweep it under the rug, and let the rest of your main program keep running smoothly without crashing.', advanced: 'Advanced usage involves using context managers to build atomic transactional states. If an error occurs midway through data manipulation, `__exit__` intercepts the exception, executes a structural rollback to return the system to its last known healthy state, and then flags the anomaly for logging aggregates without destabilizing the hosting process.' }
-    ],
-    {
-      title: 'Safe Database Transaction Manager',
-      intro: 'We are going to architect a robust, production-ready mock SQL database engine that utilizes custom context managers to enforce strict atomic transaction compliance and rollback behaviors.',
-      steps: [
-        'Create a mock database class that holds a dictionary of critical account balances.',
-        'Implement an explicit `__enter__` method that creates a complete, isolated memory backup copy of the database state before modifications begin.',
-        'Implement an explicit `__exit__` method with complete exception handling signatures.',
-        'Inside `__exit__`, write logic stating that if an error occurred, completely discard the corrupted working changes and restore the pristine memory backup (Rollback).',
-        'If no error occurred, confidently save the working changes permanently (Commit).',
-        'Test your class by running a transaction that fails halfway through due to a simulated network failure, and verify your database states remain perfectly uncorrupted.'
-      ],
-      goal: 'You successfully engineered a bulletproof atomic transaction manager utilizing the low-level mechanics of the context manager protocols.'
-    },
-    [
-      q('What happens if an unhandled exception occurs inside a standard `with` statement block in Python?', ['The program ignores the error and continues executing line by line', 'The context manager immediately calls `__exit__` to clean up resources, then allows the exception to bubble up standard runtime channels', 'The operating system forcefully terminates the entire script without cleanup', 'The `__enter__` method is automatically re-run to fix the error'], 1, 'Even during catastrophic block failures, Python guarantees that the `__exit__` method is safely executed to prevent system resource leakage before propagating the error.'),
-      q('What precise value must the `__exit__` method return if you want to cleanly suppress and hide an exception that occurred inside its block?', ['The integer `0`', 'The Boolean value `True`', 'The string `"success"`', 'The object reference `None`'], 1, 'Returning `True` explicitly flags Python to swallow the captured exception, preventing it from halting the rest of the application ecosystem.'),
-      q('Which utility from the standard `contextlib` module is designed to gracefully handle a highly dynamic, variable list of opened resources without nested loops?', ['contextlib.suppress', 'contextlib.ExitStack', 'contextlib.redirect_stdout', 'contextlib.closing'], 1, '`ExitStack` lets you programmatically enter a dynamic list of context managers and guarantees they are all cleaned up in reverse order when the stack exits.'),
-      q('What arguments are passed into the `__exit__` method when an execution block finishes running flawlessly?', ['No arguments are passed', 'Three references to the original object instantiation states', 'Three `None` values representing the lack of an active exception', 'A dictionary containing the local scope variables'], 2, 'If no exception occurs, `exc_type`, `exc_val`, and `exc_tb` are all passed explicitly as `None` to indicate a clean exit.')
-    ],
-    ['Always utilize with statements for file system handles, network sockets, and database clients to eliminate resource leaks.', 'Implement custom context managers to cleanly wrap setup and teardown boilerplate across distributed microservices.', 'Leverage contextlib.ExitStack when managing highly complex, multi-layered resource initialization trees.', 'Understand the triple exception signature of __exit__ to build bulletproof transactional rollback mechanisms.']
+    ['Use pyproject.toml as your single configuration manifest','Package your code into binary Wheel files for easy distribution','Use twine to securely upload your builds to the public PyPI registry','Always test your builds on TestPyPI before going public']
   ),
 
   L(
