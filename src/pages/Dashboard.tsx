@@ -74,7 +74,8 @@ const SECTIONS: SectionDef[] = [
   lessons: 12, // Ensure this matches the number of lessons in your AI_LESSONS array
   accent: 'accent-blue',
   tags: ['Foundations', 'LLMs'], 
-  desc: 'Foundations of AI, neural networks, and modern agents' 
+  desc: 'Foundations of AI, neural networks, and modern agents', 
+  trackId: 'ai-fundamentals'
 },
     ],
   },
