@@ -157,12 +157,9 @@ export async function hydrateEnrollments(
 ): Promise<void> {
   currentUserId = userId;
   if (!userId) {
-    mem = [];
-    try {
-      localStorage.removeItem(LOCAL_CACHE);
-    } catch {
-      /* noop */
-    }
+    // FIX: Instead of wiping localStorage completely, we filter `mem` 
+    // to ONLY keep the local unsupported tracks so they survive page reloads.
+    mem = mem.filter(e => DB_UNSUPPORTED.has(e.track));
     emit();
     return;
   }
