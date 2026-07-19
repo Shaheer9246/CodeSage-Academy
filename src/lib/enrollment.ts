@@ -157,10 +157,11 @@ export async function hydrateEnrollments(
 ): Promise<void> {
   currentUserId = userId;
   if (!userId) {
-    // FIX: Instead of wiping localStorage completely, we filter `mem` 
-    // to ONLY keep the local unsupported tracks so they survive page reloads.
-    mem = mem.filter(e => DB_UNSUPPORTED.has(e.track));
-    emit();
+    // FIX: Do absolutely nothing here. 
+    // When the page reloads, Supabase briefly passes 'null' before finding the user. 
+    // If we delete the Supabase tracks (like 'python') from memory here, your route guards 
+    // will panic because the prerequisite for 'pythonexpert' suddenly goes missing.
+    // By returning early, we let the local cache bridge the gap safely!
     return;
   }
 
