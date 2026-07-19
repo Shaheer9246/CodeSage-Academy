@@ -270,7 +270,10 @@ export function activeCount(): number {
 export function getStudentCount(track: TrackId): number {
   const seed = TRACK_META[track]?.seed ?? 0;
   const server = counts[track] ?? 0;
-  return seed + (server > 0 ? server : 0);
+  
+  // If server count exists, treat it as the absolute total. 
+  // Otherwise, safely fall back to the seed.
+  return server > 0 ? server : seed;
 }
 
 export async function enroll(track: TrackId): Promise<Enrollment> {
@@ -308,8 +311,10 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
         .select('*')
         .eq('track', track)
         .maybeSingle();
-      if (stats) {
-        counts[track] = stats.enrolled_count;
+     if (stats) {
+        // Use Math.max to prevent database replication lag from rolling back 
+        // the local count after a fresh enrollment.
+        counts[track] = Math.max(counts[track] ?? 0, stats.enrolled_count);
         emit();
       }
     } catch (err) {
