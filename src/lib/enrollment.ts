@@ -157,11 +157,13 @@ export async function hydrateEnrollments(
 ): Promise<void> {
   currentUserId = userId;
   if (!userId) {
-    // FIX: Do absolutely nothing here. 
-    // When the page reloads, Supabase briefly passes 'null' before finding the user. 
-    // If we delete the Supabase tracks (like 'python') from memory here, your route guards 
-    // will panic because the prerequisite for 'pythonexpert' suddenly goes missing.
-    // By returning early, we let the local cache bridge the gap safely!
+    mem = [];
+    try {
+      localStorage.removeItem(LOCAL_CACHE);
+    } catch {
+      /* noop */
+    }
+    emit();
     return;
   }
 
