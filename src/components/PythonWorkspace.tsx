@@ -104,18 +104,18 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   };
 
   const promptInput = (promptText: string): Promise<string> => {
-    setTab('term');
-    return new Promise<string>((resolve) => {
-      setPendingInput({
-        prompt: promptText || '',
-        resolve: (v: string) => {
-          write('in', `${promptText || ''}${v}\n`);
-          setPendingInput(null);
-          resolve(v);
-        },
-      });
+  setTab('term');
+  return new Promise<string>((resolve) => {
+    setPendingInput({
+      prompt: promptText || '',
+      resolve: (v: string) => {
+        write('in', `${v}\n`); // ✅ Only write the user's entered text
+        setPendingInput(null);
+        resolve(v);
+      },
     });
-  };
+  });
+};
 
   const runCode = async () => {
     if (!ready || running) return;
