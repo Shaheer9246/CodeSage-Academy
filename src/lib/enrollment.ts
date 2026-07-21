@@ -152,6 +152,18 @@ function emit() {
   window.dispatchEvent(new Event(EVENT));
 }
 
+/**
+ * Timeout wrapper for Supabase RPC calls to prevent indefinite UI hangs.
+ */
+async function callRpcWithTimeout(fnName: string, params: Record<string, any>, timeoutMs = 10000): Promise<any> {
+  return Promise.race([
+    supabase.rpc(fnName as any, params),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database request timed out. Please try again.')), timeoutMs)
+    )
+  ]);
+}
+
 export async function hydrateEnrollments(
   userId: string | null
 ): Promise<void> {
@@ -301,9 +313,9 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   // BYPASS: Only connect to Supabase if user is logged in AND track is supported
   if (currentUserId && !DB_UNSUPPORTED.has(track)) {
     try {
-      const { data, error } = await supabase.rpc('enroll_track', {
-        _track: track,
-      });
+      const { error } = await callRpcWithTimeout('enroll_track', {
+  _track: track,
+});
       if (error) throw error;
 
       const { data: stats } = await supabase
@@ -358,7 +370,7 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
   // BYPASS: Only connect to Supabase if user is logged in AND track is supported
   if (currentUserId && !DB_UNSUPPORTED.has(track)) {
     try {
-      const { error } = await supabase.rpc('update_enrollment_status', {
+      const { error } = await callRpcWithTimeout('update_enrollment_status', {
         _track: track,
         _status: status,
       });
@@ -366,20 +378,22 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
     } catch (err) {
       e.status = prevStatus;
       emit();
+      throw err; // Re-throw so UI knows it failed
     }
   }
 }
 
-export function pause(track: TrackId) {
-  void updateStatus(track, 'paused');
+// AFTER:
+export async function pause(track: TrackId): Promise<void> {
+  await updateStatus(track, 'paused');
 }
 
-export function resume(track: TrackId) {
-  void updateStatus(track, 'active');
+export async function resume(track: TrackId): Promise<void> {
+  await updateStatus(track, 'active');
 }
 
-export function end(track: TrackId) {
-  void updateStatus(track, 'ended');
+export async function end(track: TrackId): Promise<void> {
+  await updateStatus(track, 'ended');
 }
 
 export function onEnrollmentChange(cb: () => void): () => void {
