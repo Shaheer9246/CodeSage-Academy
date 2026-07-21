@@ -111,24 +111,22 @@ const PythonLessonPage = () => {
           </div>
         )}
 
-        {section === 'practical' && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
-              <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                <FlaskConical className="w-3 h-3" /> III. Practical Lab
-              </p>
-              <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
-              <p className="text-xs text-muted-foreground">Write, run, and iterate Python entirely in your browser — no setup required.</p>
-            </div>
+          <div className={section === 'practical' ? 'space-y-4 animate-fade-in' : 'hidden'}>
+  <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
+    <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+      <FlaskConical className="w-3 h-3" /> III. Practical Lab
+    </p>
+    <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
+    <p className="text-xs text-muted-foreground">Write, run, and iterate Python entirely in your browser — no setup required.</p>
+  </div>
 
-            <PythonWorkspace practical={lesson.practical} />
+  <PythonWorkspace practical={lesson.practical} />
 
-            <button onClick={() => setSection('quiz')}
-              className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
-              Take the Mastery Test <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+  <button onClick={() => setSection('quiz')}
+    className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
+    Take the Mastery Test <ChevronRight className="w-4 h-4" />
+  </button>
+</div>
 
         {section === 'quiz' && (
           <div className="space-y-4 animate-fade-in">
