@@ -39,7 +39,7 @@ const VALID_TRACK_IDS: Set<string> = new Set([
 
 // Tracks that do not exist or are not yet configured in your Supabase DB.
 // These will run strictly in localStorage so the user never gets an error.
-const DB_UNSUPPORTED = new Set<string>(['sql', 'pythonexpert', 'ai-fundamentals']);
+const DB_UNSUPPORTED = new Set<string>(['sql', 'ai-fundamentals']);
 
 export const TRACK_META: Record<
   TrackId,
