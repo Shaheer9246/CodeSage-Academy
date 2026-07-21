@@ -72,7 +72,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   const [pendingInput, setPendingInput] = useState<{ prompt: string; resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
-  const [wantLoad, setWantLoad] = useState<boolean>(true);
+  const [wantLoad] = useState<boolean>(true);
   const ready = useSkulpt(wantLoad);
 
   useEffect(() => {
@@ -83,9 +83,17 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
     if (pendingInput && inputRef.current) inputRef.current.focus();
   }, [pendingInput]);
 
+  // Clean up pending inputs on unmount
+  useEffect(() => {
+    return () => {
+      if (pendingInput) {
+        pendingInput.resolve('');
+      }
+    };
+  }, [pendingInput]);
+
   const write = (kind: Line['kind'], text: string) => {
     setLines(prev => {
-      // merge stdout chunks without newlines onto the previous line
       if (kind === 'out' && prev.length && prev[prev.length - 1].kind === 'out' && !prev[prev.length - 1].text.endsWith('\n')) {
         const copy = prev.slice();
         copy[copy.length - 1] = { kind: 'out', text: copy[copy.length - 1].text + text };
@@ -101,7 +109,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
       setPendingInput({
         prompt: promptText || '',
         resolve: (v: string) => {
-          write('in', `${promptText || ''}${v}`);
+          write('in', `${promptText || ''}${v}\n`);
           setPendingInput(null);
           resolve(v);
         },
