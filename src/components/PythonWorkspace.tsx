@@ -104,12 +104,11 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   };
 
   const promptInput = (promptText: string): Promise<string> => {
-    setTab('term');
+     setTab('term');
     return new Promise<string>((resolve) => {
       setPendingInput({
         prompt: promptText || '',
         resolve: (v: string) => {
-          // Logs the prompt text + answer accurately as a single line
           write('in', `${promptText || ''}${v}`);
           setPendingInput(null);
           resolve(v);
