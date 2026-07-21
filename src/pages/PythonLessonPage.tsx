@@ -17,14 +17,14 @@ const PythonLessonPage = () => {
   const from = sp.get('from');
   const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/python?from=dashboard' : '/python';
 
-
   const lesson = id ? getPythonLessonById(id) : undefined;
   const [section, setSection] = useState<Section>('concept');
   const [conceptView, setConceptView] = useState<'beginner' | 'advanced'>('beginner');
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('python', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('python', id); 
+  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/python" replace />;
   if (!isPythonLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/python" replace />;
 
@@ -38,7 +38,6 @@ const PythonLessonPage = () => {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       
-      // FIX: Grab the 'from' parameter and pass it to the Hurrah page!
       const fromQs = from ? `?from=${from}` : '';
       navigate(`/complete/${lesson.id}${fromQs}`);
     }
@@ -111,22 +110,23 @@ const PythonLessonPage = () => {
           </div>
         )}
 
-          <div className={section === 'practical' ? 'space-y-4 animate-fade-in' : 'hidden'}>
-  <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
-    <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-      <FlaskConical className="w-3 h-3" /> III. Practical Lab
-    </p>
-    <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
-    <p className="text-xs text-muted-foreground">Write, run, and iterate Python entirely in your browser — no setup required.</p>
-  </div>
+        {/* COMPONENT IS HIDDEN INSTEAD OF UNMOUNTED TO PREVENT BROWSER CRASHES */}
+        <div className={section === 'practical' ? 'space-y-4 animate-fade-in' : 'hidden'}>
+          <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
+            <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+              <FlaskConical className="w-3 h-3" /> III. Practical Lab
+            </p>
+            <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
+            <p className="text-xs text-muted-foreground">Write, run, and iterate Python entirely in your browser — no setup required.</p>
+          </div>
 
-  <PythonWorkspace practical={lesson.practical} />
+          <PythonWorkspace practical={lesson.practical} />
 
-  <button onClick={() => setSection('quiz')}
-    className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
-    Take the Mastery Test <ChevronRight className="w-4 h-4" />
-  </button>
-</div>
+          <button onClick={() => setSection('quiz')}
+            className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
+            Take the Mastery Test <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
 
         {section === 'quiz' && (
           <div className="space-y-4 animate-fade-in">
