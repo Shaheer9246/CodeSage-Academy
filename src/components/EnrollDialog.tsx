@@ -180,11 +180,36 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
 }
 
 function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () => void }) {
-  // Use robust string checking to ensure no UI ghosting
+  const [actioningTrack, setActioningTrack] = useState<string | null>(null);
   const list = getEnrollments().filter(e => e.status?.toLowerCase()?.trim() === 'active');
   const currentCount = list.length;
-  // Dynamically calculate how many they need to pause to get back down to 1 active track
   const numberToPause = Math.max(1, currentCount - 1);
+
+  const handlePause = async (track: TrackId) => {
+    setActioningTrack(track);
+    try {
+      await pauseTrack(track);
+      toast.success('Course paused successfully');
+      onChanged();
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to pause course');
+    } finally {
+      setActioningTrack(null);
+    }
+  };
+
+  const handleEnd = async (track: TrackId) => {
+    setActioningTrack(track);
+    try {
+      await endTrack(track);
+      toast.success('Course ended successfully');
+      onChanged();
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to end course');
+    } finally {
+      setActioningTrack(null);
+    }
+  };
 
   return (
     <>
@@ -205,18 +230,40 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
               </p>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
-              <button onClick={() => { pauseTrack(e.track); onChanged(); }} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 hover:bg-accent-yellow/25">
-                <PauseCircle className="w-3 h-3" /> Pause
+              <button
+                onClick={() => handlePause(e.track)}
+                disabled={actioningTrack !== null}
+                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 hover:bg-accent-yellow/25 disabled:opacity-50 transition-all"
+              >
+                {actioningTrack === e.track ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <PauseCircle className="w-3 h-3" />
+                )}
+                Pause
               </button>
-              <button onClick={() => { endTrack(e.track); onChanged(); }} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25">
-                <StopCircle className="w-3 h-3" /> End
+              <button
+                onClick={() => handleEnd(e.track)}
+                disabled={actioningTrack !== null}
+                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25 disabled:opacity-50 transition-all"
+              >
+                {actioningTrack === e.track ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <StopCircle className="w-3 h-3" />
+                )}
+                End
               </button>
             </div>
           </div>
         ))}
       </div>
       <div className="flex justify-end pt-2">
-        <button onClick={onBack} className="text-xs px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-foreground font-display">
+        <button
+          onClick={onBack}
+          disabled={actioningTrack !== null}
+          className="text-xs px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-foreground font-display disabled:opacity-50"
+        >
           Go back
         </button>
       </div>
