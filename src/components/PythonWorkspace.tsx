@@ -83,7 +83,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
     if (pendingInput && inputRef.current) inputRef.current.focus();
   }, [pendingInput]);
 
-  // Clean up pending inputs on unmount
+  // VERY IMPORTANT: Stops browser from freezing by cleaning up dangling promises!
   useEffect(() => {
     return () => {
       if (pendingInput) {
@@ -109,8 +109,8 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
       setPendingInput({
         prompt: promptText || '',
         resolve: (v: string) => {
-          // Write BOTH the prompt and the answer into the permanent history
-          write('in', `${promptText || ''}${v}\n`); 
+          // Logs the prompt text + answer accurately as a single line
+          write('in', `${promptText || ''}${v}`);
           setPendingInput(null);
           resolve(v);
         },
@@ -234,14 +234,14 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((l, i) => (
-            <pre
+            <div
               key={i}
               className={`whitespace-pre-wrap break-words ${
                 l.kind === 'err' ? 'text-red-400' :
                 l.kind === 'sys' ? 'text-zinc-500' :
                 l.kind === 'in'  ? 'text-sky-300' : 'text-emerald-300'
               }`}
-            >{l.text}</pre>
+            >{l.text}</div>
           ))}
           {pendingInput && (
             <form
