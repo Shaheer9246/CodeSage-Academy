@@ -521,7 +521,8 @@ animate();`
       q('What tool detects mouse clicks on 3D meshes?', ['Raycaster', 'PointLight', 'BoundingBox', 'MeshNormal'], 0)
     ],
     ['OrbitControls adds mouse control', 'Enable damping for smooth movement', 'Handle resize events', 'Raycaster detects clicks']
-  ),
+  )
+  },
 
   // Lesson 7
   lesson(
