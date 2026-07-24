@@ -17,7 +17,7 @@ import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
-import { AI_LESSONS } from '@/data/aiLessons'; // You might already have this one!
+import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons'; // Add this if missing
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 
