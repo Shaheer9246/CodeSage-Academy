@@ -100,7 +100,6 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     ctas: [{ label: 'Frontend course', route: '/learn' }],
   },
 };
-};
 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
   const navigate = useNavigate();
