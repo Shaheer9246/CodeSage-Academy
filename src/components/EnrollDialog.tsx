@@ -17,7 +17,9 @@ import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
-import { AI_LESSONS } from '@/data/aiLessons';
+import { AI_LESSONS } from '@/data/aiLessons'; // You might already have this one!
+import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons'; // Add this if missing
+import { THREE3D_LESSONS } from '@/data/three3dLessons';
 
 // Frontend lesson ids used for completion checks (matches Roadmap listing).
 const FRONTEND_LESSON_IDS = [
@@ -39,6 +41,9 @@ const PREREQ_LESSON_IDS: Partial<Record<TrackId, string[]>> = {
   python: PYTHON_LESSONS.map(l => l.id),
   local: LOCAL_LESSONS.map(l => l.id),
   sql: SQL_LESSONS.map(l => l.id),
+  three3d: THREE3D_LESSONS.map(l => l.id),
+  pythonexpert: PYTHON_EXPERT_LESSONS.map(l => l.id),
+  'ai-fundamentals': AI_LESSONS.map(l => l.id),
 };
 
 function isTrackCompleted(track: TrackId, completedLessons: string[]): boolean {
@@ -91,6 +96,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     title: 'Finish Python Programming first',
     body: 'Python Expert is an advanced-level track that builds directly on Python Programming (beginner → intermediate → advanced). Please complete Python Programming first – otherwise the expert lessons will be hard to follow.',
     ctas: [{ label: 'Python Programming course', route: '/python' }],
+  },
+  three3d: {
+    title: 'Start with Frontend Development',
+    body: '3D Web Development builds heavily on HTML, CSS, and JavaScript. We highly recommend completing the Frontend Development track first so you have the right foundation before diving into 3D canvases and WebGL!',
+    ctas: [{ label: 'Frontend course', route: '/learn' }],
   },
 };
 
