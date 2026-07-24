@@ -29,7 +29,6 @@ import SqlLearn from "./pages/SqlLearn";
 import SqlLessonPage from "./pages/SqlLessonPage";
 import Tour from "./pages/Tour";
 import Playground from "./pages/Playground";
-
 import Challenges from "./pages/Challenges";
 import Roadmap from "./pages/Roadmap";
 import LevelTest from "./pages/LevelTest";
@@ -42,6 +41,8 @@ import NotFound from "./pages/NotFound";
 import InboxPage from "./pages/Inbox";
 import PythonExpertLearn from "./pages/PythonExpertLearn";
 import PythonExpertLessonPage from "./pages/PythonExpertLessonPage";
+import Three3dLearn from "./pages/Three3dLearn";
+import Three3dLessonPage from "./pages/Three3dLessonPage";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2, Terminal } from "lucide-react";
 
@@ -147,7 +148,9 @@ const App = () => (
               <Route path="/pythonexpert" element={<ProtectedRoute><PythonExpertLearn /></ProtectedRoute>} />
               <Route path="/pyx-lesson/:id" element={<ProtectedRoute><PythonExpertLessonPage /></ProtectedRoute>} />
               <Route path="/ai-fundamentals" element={<ProtectedRoute><AiFundamentalsLearn /></ProtectedRoute>} />
-<Route path="/ai-lesson/:id" element={<ProtectedRoute><AiFundamentalsLessonPage /></ProtectedRoute>} />
+              <Route path="/ai-lesson/:id" element={<ProtectedRoute><AiFundamentalsLessonPage /></ProtectedRoute>} />
+              <Route path="/three3d" element={<ProtectedRoute><Three3dLearn /></ProtectedRoute>} />
+              <Route path="/three-lesson/:id" element={<ProtectedRoute><Three3dLessonPage /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
               <Route path="/trip" element={<Trip />} />
               <Route path="*" element={<NotFound />} />
