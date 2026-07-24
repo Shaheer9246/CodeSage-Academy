@@ -10,7 +10,7 @@ export type TrackId =
   | 'local'
   | 'sql'
   | 'pythonexpert'
-  | 'ai-fundamentals';
+  | 'ai-fundamentals'
   | 'three3d';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
