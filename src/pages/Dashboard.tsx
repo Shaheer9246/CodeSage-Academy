@@ -24,6 +24,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
+  { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber.' },
   { target: 'challenges', title: 'Challenges', body: 'Bite-sized puzzles.' },
   { target: 'playground', title: 'Code Editor', body: 'Real in-browser editor.' },
 ];
@@ -97,6 +98,12 @@ const SECTIONS: SectionDef[] = [
         tour: 'local', lessons: 15, accent: 'emerald-400',
         tags: ['DOM', 'localStorage', 'PWA'], desc: 'No backend, no server, no cost',
         trackId: 'local' },
+
+      { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Development', emoji: '🧊',
+        tour: 'three3d', lessons: 15, accent: 'accent-blue',
+        tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Build immersive 3D web experiences',
+        trackId: 'three3d' as TrackId },
+      
     ],
   },
   {
@@ -208,7 +215,7 @@ const Dashboard = () => {
     else toast.error('Could not purchase freeze');
   };
 
-  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local', '/sql', '/ai-fundamentals']);
+  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local', '/sql', '/three3d']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
     '/networking': '/n-lesson/net-1?guest=1',
@@ -218,12 +225,14 @@ const Dashboard = () => {
     '/python': '/py-lesson/py-01?guest=1',
     '/local': '/local-lesson/local-1?guest=1',
     '/sql': '/sql-lesson/sql-1?guest=1',
+    '/three3d': '/three-lesson/three3d-1?guest=1',
   };
   const ROUTE_TO_TRACK: Record<string, TrackId> = {
     '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
     '/freelance': 'freelance', '/python': 'python', '/local': 'local',
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
     '/ai-fundamentals': 'ai-fundamentals',
+    '/three3d': 'three3d' as TrackId,
   };
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
   const go = (path: string) => () => {
