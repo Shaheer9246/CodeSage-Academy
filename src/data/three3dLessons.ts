@@ -1423,4 +1423,12 @@ root.render(<App />);`
   )
 ];
   
+// Helper utilities for 3D Course lookup and unlock logic
+export const getThree3dLessonById = (id: string): Three3dLesson | undefined =>
+  THREE3D_LESSONS.find(l => l.id === id);
 
+export const isThree3dLessonUnlocked = (id: string, completedLessons: string[]): boolean => {
+  const idx = THREE3D_LESSONS.findIndex(l => l.id === id);
+  if (idx <= 0) return true;
+  return completedLessons.includes(THREE3D_LESSONS[idx - 1].id);
+};
