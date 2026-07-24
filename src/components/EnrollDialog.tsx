@@ -18,6 +18,7 @@ import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
 import { AI_LESSONS } from '@/data/aiLessons';
+import { THREE3D_LESSONS } from '@/data/three3dLessons';
 
 // Frontend lesson ids used for completion checks (matches Roadmap listing).
 const FRONTEND_LESSON_IDS = [
@@ -39,6 +40,7 @@ const PREREQ_LESSON_IDS: Partial<Record<TrackId, string[]>> = {
   python: PYTHON_LESSONS.map(l => l.id),
   local: LOCAL_LESSONS.map(l => l.id),
   sql: SQL_LESSONS.map(l => l.id),
+  three3d: THREE3D_LESSONS.map(l => l.id),
 };
 
 function isTrackCompleted(track: TrackId, completedLessons: string[]): boolean {
