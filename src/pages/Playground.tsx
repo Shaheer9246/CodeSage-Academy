@@ -148,54 +148,71 @@ const Playground = () => {
     e.target.value = '';
   };
 
- // ZIP upload — extract text-like files and 3D models
-  const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const buf = await file.arrayBuffer();
-      const zip = await JSZip.loadAsync(buf);
-      const added: FileItem[] = [];
-      const entries = Object.values(zip.files).filter((z) => !z.dir);
-      
-      for (const z of entries) {
-        const name = z.name.split('/').pop() || z.name;
-        const ext = name.split('.').pop()?.toLowerCase() || '';
-        
-        // 1. Added 3D model and texture extensions
-        const textExts = ['html', 'htm', 'css', 'js', 'jsx', 'ts', 'tsx', 'json', 'md', 'txt', 'svg', 'gltf'];
-        const binaryExts = ['glb', 'png', 'jpg', 'jpeg', 'webp'];
-        
-        if (!textExts.includes(ext) && !binaryExts.includes(ext)) continue;
-        
-        let content = '';
-        let lang = 'html';
+// ZIP upload — extract text-like files, 3D models, and resolve relative paths
+const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    const buf = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(buf);
+    const added: FileItem[] = [];
+    const entries = Object.values(zip.files).filter((z) => !z.dir);
 
-        if (textExts.includes(ext)) {
-          // Standard text extraction
-          content = await z.async('string');
-          lang = ext === 'css' ? 'css' : (['js', 'jsx', 'ts', 'tsx'].includes(ext)) ? 'javascript' : (ext === 'json' || ext === 'gltf') ? 'json' : 'html';
-        } else if (binaryExts.includes(ext)) {
-          // 2. Convert binary 3D models/images to Base64 Data URIs
-          const base64 = await z.async('base64');
-          const mimeType = ext === 'glb' ? 'model/gltf-binary' : `image/${ext}`;
-          content = `data:${mimeType};base64,${base64}`;
-          lang = 'binary'; // Prevents syntax highlighting crashes in the editor
-        }
-
-        added.push({ id: `zip-${Date.now()}-${name}`, name, lang, content });
+    // Pre-extract binary/texture Data URIs for GLTF cross-referencing
+    const assetMap: Record<string, string> = {};
+    for (const z of entries) {
+      const name = z.name.split('/').pop() || z.name;
+      const ext = name.split('.').pop()?.toLowerCase() || '';
+      if (['glb', 'png', 'jpg', 'jpeg', 'webp', 'bin'].includes(ext)) {
+        const base64 = await z.async('base64');
+        const mime = ext === 'glb' ? 'model/gltf-binary' : ext === 'bin' ? 'application/octet-stream' : `image/${ext}`;
+        assetMap[name] = `data:${mime};base64,${base64}`;
       }
-      
-      if (added.length === 0) { alert('No valid files found in zip.'); return; }
-      setFiles(prev => [...prev, ...added]);
-      setMultiMode(true);
-      setShowSidebar(true);
-    } catch (err) {
-      console.error(err);
-      alert('Could not read this zip file.');
     }
-    e.target.value = '';
-  };
+
+    for (const z of entries) {
+      const name = z.name.split('/').pop() || z.name;
+      const ext = name.split('.').pop()?.toLowerCase() || '';
+      const textExts = ['html', 'htm', 'css', 'js', 'jsx', 'ts', 'tsx', 'json', 'md', 'txt', 'svg', 'gltf'];
+      const binaryExts = ['glb', 'png', 'jpg', 'jpeg', 'webp'];
+
+      if (!textExts.includes(ext) && !binaryExts.includes(ext)) continue;
+
+      let content = '';
+      let lang = 'html';
+
+      if (ext === 'gltf') {
+        // Resolve relative URIs inside .gltf JSON files to Base64 Data URIs
+        let gltfJson = await z.async('string');
+        Object.entries(assetMap).forEach(([assetName, dataUri]) => {
+          gltfJson = gltfJson.replaceAll(`"${assetName}"`, `"${dataUri}"`);
+        });
+        content = gltfJson;
+        lang = 'json';
+      } else if (textExts.includes(ext)) {
+        content = await z.async('string');
+        lang = ext === 'css' ? 'css' : ['js', 'jsx', 'ts', 'tsx'].includes(ext) ? 'javascript' : ext === 'json' ? 'json' : 'html';
+      } else if (binaryExts.includes(ext)) {
+        content = assetMap[name] || `data:image/${ext};base64,${await z.async('base64')}`;
+        lang = 'binary';
+      }
+
+      added.push({ id: `zip-${Date.now()}-${name}`, name, lang, content });
+    }
+
+    if (added.length === 0) {
+      alert('No valid files found in zip.');
+      return;
+    }
+    setFiles(prev => [...prev, ...added]);
+    setMultiMode(true);
+    setShowSidebar(true);
+  } catch (err) {
+    console.error(err);
+    alert('Could not read this zip file.');
+  }
+  e.target.value = '';
+};
 
   const addNewFile = () => {
     const name = `file-${files.length + 1}.html`;
