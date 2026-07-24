@@ -522,6 +522,7 @@ animate();`
     ],
     ['OrbitControls adds mouse control', 'Enable damping for smooth movement', 'Handle resize events', 'Raycaster detects clicks']
   )
+  }
 
   // Lesson 7
   lesson(
