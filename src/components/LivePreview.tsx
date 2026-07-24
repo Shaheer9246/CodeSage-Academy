@@ -15,7 +15,9 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       if (!iframeRef.current) return;
 
       const closeScriptTag = '</scr' + 'ipt>';
-      const consoleOverride = `
+      
+      // Included: Console Interceptor, CDN Libraries, Babel Compiler, and Import Maps
+      const headLibraries = `
         <script>
           (function() {
             const origLog = console.log;
@@ -38,39 +40,63 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
             };
           })();
         ${closeScriptTag}
+
+        <!-- 1. Global Vanilla 3D & Animation Libraries -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">${closeScriptTag}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js">${closeScriptTag}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js">${closeScriptTag}
+        <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js">${closeScriptTag}
+
+        <!-- 2. Babel Transpiler for React/JSX support -->
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js">${closeScriptTag}
+
+        <!-- 3. ES Import Maps for React Three Fiber & Drei -->
+        <script type="importmap">
+        {
+          "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "three": "https://esm.sh/three@0.160.0",
+            "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.15.16?external=react,react-dom,three",
+            "@react-three/drei": "https://esm.sh/@react-three/drei@9.96.1?external=react,react-dom,three,@react-three/fiber"
+          }
+        }
+        ${closeScriptTag}
       `;
 
-      // Escape any literal "</script>" inside user JS so it doesn't break out
+      // Escape literal tags in JS/CSS
       const safeJs = (js || '').replace(/<\/script/gi, '</scr' + 'ipt');
-      // Same for CSS </style>
       const safeCss = (css || '').replace(/<\/style/gi, '</sty' + 'le');
 
       let finalHtml = html.trim();
 
-      // If the HTML doesn't look like a full document, wrap it
       const hasDoctype = /<!doctype\s+html>/i.test(finalHtml);
       const hasHtmlTag = /<html[\s>]/i.test(finalHtml);
       const hasBodyTag = /<body[\s>]/i.test(finalHtml);
+
+      // Construct user JS wrapped inside Babel execution tag
+      const scriptBlock = `<script type="text/babel" data-type="module">\n${safeJs}\n${closeScriptTag}`;
 
       if (!hasDoctype && !hasHtmlTag && !hasBodyTag) {
         finalHtml = `<!DOCTYPE html>
 <html>
 <head>
-  ${consoleOverride}
+  ${headLibraries}
   <style>${safeCss}</style>
 </head>
 <body>
   ${finalHtml}
-  <script>${safeJs}${closeScriptTag}
+  <div id="root"></div>
+  ${scriptBlock}
 </body>
 </html>`;
       } else {
         if (finalHtml.match(/<head[^>]*>/i)) {
-          finalHtml = finalHtml.replace(/<head[^>]*>/i, '$&' + consoleOverride);
+          finalHtml = finalHtml.replace(/<head[^>]*>/i, '$&' + headLibraries);
         } else if (finalHtml.match(/<html[^>]*>/i)) {
-          finalHtml = finalHtml.replace(/<html[^>]*>/i, '$&<head>' + consoleOverride + '</head>');
+          finalHtml = finalHtml.replace(/<html[^>]*>/i, '$&<head>' + headLibraries + '</head>');
         } else {
-          finalHtml = consoleOverride + finalHtml;
+          finalHtml = headLibraries + finalHtml;
         }
 
         if (finalHtml.match(/href=["']style\.css["']/i)) {
@@ -83,13 +109,20 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
           }
         }
 
+        // Add #root div for React rendering if it doesn't exist
+        if (!finalHtml.includes('id="root"')) {
+          if (finalHtml.match(/<body[^>]*>/i)) {
+            finalHtml = finalHtml.replace(/<body[^>]*>/i, '$&<div id="root"></div>');
+          }
+        }
+
         if (finalHtml.match(/src=["']script\.js["']/i)) {
-          finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, `<script>${safeJs}</script>`);
+          finalHtml = finalHtml.replace(/<script[^>]*src=["']script\.js["'][^>]*>[\s\S]*?<\/script>/gi, scriptBlock);
         } else if (safeJs.trim()) {
           if (finalHtml.match(/<\/body>/i)) {
-            finalHtml = finalHtml.replace(/<\/body>/i, `<script>${safeJs}</script></body>`);
+            finalHtml = finalHtml.replace(/<\/body>/i, `${scriptBlock}</body>`);
           } else {
-            finalHtml = finalHtml + `<script>${safeJs}</script>`;
+            finalHtml = finalHtml + scriptBlock;
           }
         }
       }
@@ -102,7 +135,6 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
-      // Only accept messages from our own iframe
       if (e.source !== iframeRef.current?.contentWindow) return;
       if (e.data?.type === 'console-log' && onConsoleLog) {
         onConsoleLog({ type: e.data.logType, message: e.data.message });
