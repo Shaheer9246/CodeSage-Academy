@@ -978,7 +978,7 @@ animate();`
       q('How do you free up GPU memory when deleting a geometry?', ['geometry.dispose()', 'geometry.delete()', 'geometry.clear()', 'scene.remove() only'], 0)
     ],
     ['Particles use single draw calls', 'BufferGeometry holds Float32Arrays', 'THREE.Points draws point sprites', 'Call .dispose() to prevent memory leaks']
-  )
+  ),
 
 // Lesson 12
   lesson(
