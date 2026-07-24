@@ -68,14 +68,18 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       const safeJs = (js || '').replace(/<\/script/gi, '</scr' + 'ipt');
       const safeCss = (css || '').replace(/<\/style/gi, '</sty' + 'le');
 
+      // Detect if user code requires Babel (JSX or ES module imports) or standard script tag
+      const containsJsxOrImports = /import\s+.*from|export\s+|<[A-Z][A-Za-z0-9]*/.test(safeJs);
+
+      const scriptBlock = containsJsxOrImports
+        ? `<script type="text/babel" data-type="module">\n${safeJs}\n${closeScriptTag}`
+        : `<script>\n${safeJs}\n${closeScriptTag}`;
+
       let finalHtml = html.trim();
 
       const hasDoctype = /<!doctype\s+html>/i.test(finalHtml);
       const hasHtmlTag = /<html[\s>]/i.test(finalHtml);
       const hasBodyTag = /<body[\s>]/i.test(finalHtml);
-
-      // Construct user JS wrapped inside Babel execution tag
-      const scriptBlock = `<script type="text/babel" data-type="module">\n${safeJs}\n${closeScriptTag}`;
 
       if (!hasDoctype && !hasHtmlTag && !hasBodyTag) {
         finalHtml = `<!DOCTYPE html>
