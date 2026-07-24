@@ -11,6 +11,7 @@ export type TrackId =
   | 'sql'
   | 'pythonexpert'
   | 'ai-fundamentals';
+  | 'three3d';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -34,12 +35,13 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'local',
   'sql',
   'pythonexpert',
-  'ai-fundamentals'
+  'ai-fundamentals',
+  'three3d'
 ]);
 
 // Tracks that do not exist or are not yet configured in your Supabase DB.
 // These will run strictly in localStorage so the user never gets an error.
-const DB_UNSUPPORTED = new Set<string>(['sql', 'ai-fundamentals']);
+const DB_UNSUPPORTED = new Set<string>(['sql', 'ai-fundamentals', 'three3d']);
 
 export const TRACK_META: Record<
   TrackId,
@@ -121,6 +123,15 @@ export const TRACK_META: Record<
     idPrefix: 'CS-AI',
     seed: 130,
   },
+
+ three3d: {
+    label: '3D Web Development',
+    short: '3D Web',
+    route: '/three3d',
+    idPrefix: 'CS-3D',
+    seed: 120, 
+    prereq: ['frontend'],
+  } 
 };
 
 let mem: Enrollment[] = [];
