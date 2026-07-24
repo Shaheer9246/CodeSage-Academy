@@ -10,6 +10,7 @@ import { PYTHON_LESSONS } from '@/data/pythonLessons';
 import { LOCAL_LESSONS } from '@/data/localLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
+import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
 
 type Track = { prefix: string; path: string; list: Array<{ id: string; title: string }> };
@@ -23,12 +24,13 @@ const TRACKS: Track[] = [
   { prefix: 'py-',    path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'local-', path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'sql-',   path: '/sql-lesson',   list: (SQL_LESSONS || []).map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'three3d-', path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title })) },
 ];
 
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
   'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
-  'sql-': '/sql-learn', 'ai-': '/ai-fundamentals',
+  'sql-': '/sql-learn', 'ai-': '/ai-fundamentals', 'three3d-': '/three3d',
 };
 
 const LessonComplete = () => {
