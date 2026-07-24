@@ -146,6 +146,7 @@ const SettingsPage = () => {
     { key: 'sql', label: 'SQL', match: (id: string) => id.startsWith('sql-') },
     { key: 'ai', label: 'AI Fundamentals', match: (id: string) => id.startsWith('ai-') },
     { key: 'local', label: 'Local-Only', match: (id: string) => id.startsWith('local-') },
+    { key: 'three3d', label: '3D Web Dev', match: (id: string) => id.startsWith('three3d-') },
     { key: 'challenges', label: 'Challenges', match: (id: string) => id.startsWith('challenge-') },
     { key: 'crawler', label: 'Code Crawler', match: (id: string) => id.startsWith('crawler-') },
   ].map(g => ({ ...g, count: user.completedLessons.filter(g.match).length }));
@@ -523,6 +524,7 @@ const SettingsPage = () => {
                     sql: 10,
                     ai: 12,
                     local: 15,
+                    three3d: 15,
                   };
                   const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
                   return (
