@@ -155,13 +155,27 @@ function emit() {
 /**
  * Timeout wrapper for Supabase RPC calls to prevent indefinite UI hangs.
  */
+/**
+ * Timeout wrapper for Supabase RPC calls to prevent indefinite UI hangs.
+ */
 async function callRpcWithTimeout(fnName: string, params: Record<string, any>, timeoutMs = 10000): Promise<any> {
-  return Promise.race([
-    supabase.rpc(fnName as any, params),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Database request timed out. Please try again.')), timeoutMs)
-    )
-  ]);
+  let timeoutId: number | undefined;
+  
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error('Database request timed out. Please try again.')), timeoutMs);
+  });
+  
+  try {
+    const result = await Promise.race([
+      supabase.rpc(fnName as any, params),
+      timeoutPromise
+    ]);
+    window.clearTimeout(timeoutId); // Clear the timer if DB succeeds
+    return result;
+  } catch (err) {
+    window.clearTimeout(timeoutId); // Clear the timer if DB fails
+    throw err;
+  }
 }
 
 export async function hydrateEnrollments(
@@ -313,9 +327,13 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   // BYPASS: Only connect to Supabase if user is logged in AND track is supported
   if (currentUserId && !DB_UNSUPPORTED.has(track)) {
     try {
-      const { error } = await callRpcWithTimeout('enroll_track', {
-  _track: track,
-});
+      // FIX: If the track already exists in memory (e.g. they ended it previously),
+      // we must update its status to 'active' instead of trying to insert a new row.
+      const rpcName = existing ? 'update_enrollment_status' : 'enroll_track';
+      const params = existing ? { _track: track, _status: 'active' } : { _track: track };
+
+      const { error } = await callRpcWithTimeout(rpcName, params);
+      
       if (error) throw error;
 
       const { data: stats } = await supabase
