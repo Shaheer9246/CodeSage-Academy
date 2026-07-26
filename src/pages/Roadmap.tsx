@@ -26,9 +26,9 @@ interface TrackNode {
   chapter?: string;
   milestone?: string;
   lessonIds: string[];
-  routePrefix:routePrefix:
-    | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson' | 'rf-lesson'
-    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'three-lesson';
+  routePrefix:
+    | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
+    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'three-lesson' | 'rf-lesson';
   locked?: boolean;
 }
 
@@ -117,7 +117,7 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   sql:          buildTrack(SQL_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'sql-lesson', 'Module 1: SQL Databases', 'SQL MASTER'),
   pythonexpert: buildTrack(PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'),
   three3d:      buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
-  'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
+ 'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
 };
 
 const TRACKS = [
