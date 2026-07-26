@@ -12,6 +12,7 @@ import { SQL_LESSONS } from '@/data/sqlLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
+import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 
 /* ------------------------------------------------------------------ */
 /*  TYPES + DATA (identical shape to your original — just re-authored) */
@@ -25,8 +26,8 @@ interface TrackNode {
   chapter?: string;
   milestone?: string;
   lessonIds: string[];
-  routePrefix:
-    | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
+  routePrefix:routePrefix:
+    | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson' | 'rf-lesson'
     | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'three-lesson';
   locked?: boolean;
 }
@@ -115,7 +116,8 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   local:        buildTrack(LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'local-lesson', 'Module 1: Local-Only Coding', 'LOCAL MASTER'),
   sql:          buildTrack(SQL_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'sql-lesson', 'Module 1: SQL Databases', 'SQL MASTER'),
   pythonexpert: buildTrack(PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'),
-  three3d: buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
+  three3d:      buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
+  'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
 };
 
 const TRACKS = [
@@ -129,6 +131,7 @@ const TRACKS = [
   { key: 'sql',          label: 'SQL Databases' },
   { key: 'pythonexpert', label: 'Python Expert' },
   { key: 'three3d',      label: '3D Web Dev' },
+  { key: 'real-freelance', label: 'Real Freelance' },
 ];
 
 /* ------------------------------------------------------------------ */
