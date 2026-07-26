@@ -27,6 +27,8 @@ import LocalLearn from "./pages/LocalLearn";
 import LocalLessonPage from "./pages/LocalLessonPage";
 import SqlLearn from "./pages/SqlLearn";
 import SqlLessonPage from "./pages/SqlLessonPage";
+import RealFreelanceLearn from "./pages/RealFreelanceLearn";
+import RealFreelanceLessonPage from "./pages/RealFreelanceLessonPage";
 import Tour from "./pages/Tour";
 import Playground from "./pages/Playground";
 import Challenges from "./pages/Challenges";
@@ -134,6 +136,8 @@ const App = () => (
               <Route path="/sql" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
 <Route path="/sql-learn" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
 <Route path="/sql-lesson/:id" element={<ProtectedRoute><SqlLessonPage /></ProtectedRoute>} />
+              <Route path="/real-freelance" element={<ProtectedRoute><RealFreelanceLearn /></ProtectedRoute>} />
+              <Route path="/rf-lesson/:id" element={<ProtectedRoute><RealFreelanceLessonPage /></ProtectedRoute>} />
               <Route path="/tour" element={<ProtectedRoute><Tour /></ProtectedRoute>} />
               <Route path="/playground" element={<Playground />} />
               <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
