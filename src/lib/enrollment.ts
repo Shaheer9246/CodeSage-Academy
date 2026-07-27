@@ -6,6 +6,7 @@ export type TrackId =
   | 'networking'
   | 'fullstack'
   | 'freelance'
+  | 'real-freelance'
   | 'python'
   | 'local'
   | 'sql'
@@ -31,6 +32,7 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'networking',
   'fullstack',
   'freelance',
+  'real-freelance',
   'python',
   'local',
   'sql',
@@ -41,7 +43,7 @@ const VALID_TRACK_IDS: Set<string> = new Set([
 
 // Tracks that do not exist or are not yet configured in your Supabase DB.
 // These will run strictly in localStorage so the user never gets an error.
-const DB_UNSUPPORTED = new Set<string>(['sql', 'ai-fundamentals', 'three3d']);
+const DB_UNSUPPORTED = new Set<string>(['sql', 'ai-fundamentals', 'three3d', 'real-freelance']);
 
 export const TRACK_META: Record<
   TrackId,
@@ -83,6 +85,14 @@ export const TRACK_META: Record<
     idPrefix: 'CS-FR',
     seed: 75,
     prereq: ['frontend'],
+  },
+  'real-freelance': {
+    label: 'Real-World Freelancing',
+    short: 'Real Freelance',
+    route: '/real-freelance',
+    idPrefix: 'CS-RFR',
+    seed: 842,
+    prereq: ['freelance'], 
   },
   python: {
     label: 'Python Programming',
