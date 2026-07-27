@@ -91,7 +91,7 @@ export const TRACK_META: Record<
     short: 'Real Freelance',
     route: '/real-freelance',
     idPrefix: 'CS-RFR',
-    seed: 842,
+    seed: 12,
     prereq: ['freelance'], 
   },
   python: {
