@@ -221,18 +221,19 @@ const Dashboard = () => {
     else toast.error('Could not purchase freeze');
   };
 
-  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/real-freelance', '/python', '/local', '/sql', '/three3d']);
-  const GUEST_FIRST_LESSON: Record<string, string> = {
+ const GUEST_ALLOWED = new Set<string>([
+    '/learn',       // Frontend Development
+    '/networking',  // Computer & Networking
+    '/python',      // Python
+    '/freelance',   // Freelance & Clients
+    '/sql',         // SQL Databases
+  ]);
+ const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
     '/networking': '/n-lesson/net-1?guest=1',
-    '/ai-fundamentals': '/ai-lesson/ai-1?guest=1',
-    '/fullstack': '/fs-lesson/fs-1?guest=1',
     '/freelance': '/f-lesson/free-1?guest=1',
-    '/real-freelance': '/rf-lesson/real-free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
-    '/local': '/local-lesson/local-1?guest=1',
     '/sql': '/sql-lesson/sql-1?guest=1',
-    '/three3d': '/three-lesson/three3d-1?guest=1',
   };
   const ROUTE_TO_TRACK: Record<string, TrackId> = {
     '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
@@ -245,8 +246,10 @@ const Dashboard = () => {
   const go = (path: string) => () => {
     const bare = path.split('?')[0];
     if (isGuest) {
+      if (GUEST_ALLOWED.has(bare)) {
       const gp = GUEST_FIRST_LESSON[bare];
       if (gp) return navigate(gp);
+      }
       toast.info('Sign up to unlock — 10 seconds ✨');
       return navigate('/auth');
     }
