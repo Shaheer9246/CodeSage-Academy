@@ -21,6 +21,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'ai-fundamentals', title: 'AI Fundamentals', body: 'Concepts, LLMs & Agents.' },
   { target: 'fullstack',  title: 'Full Stack Frontend', body: 'React, hooks, deployment.' },
   { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn skills into income.' },
+  { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
@@ -147,6 +148,11 @@ const SECTIONS: SectionDef[] = [
         tour: 'freelance', lessons: 12, accent: 'yellow-500',
         tags: ['Niche', 'Pitch', 'Price', 'Deliver'], desc: 'Find → Pitch → Deliver',
         trackId: 'freelance' },
+
+      { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing', emoji: '🌍',
+        tour: 'real-freelance', lessons: 10, accent: 'primary',
+        tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'Master platforms & win clients',
+        trackId: 'real-freelance' as TrackId },
     ],
   },
 ];
@@ -215,13 +221,14 @@ const Dashboard = () => {
     else toast.error('Could not purchase freeze');
   };
 
-  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/python', '/local', '/sql', '/three3d']);
+  const GUEST_ALLOWED = new Set<string>(['/learn', '/networking', '/fullstack', '/freelance', '/real-freelance', '/python', '/local', '/sql', '/three3d']);
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
     '/networking': '/n-lesson/net-1?guest=1',
     '/ai-fundamentals': '/ai-lesson/ai-1?guest=1',
     '/fullstack': '/fs-lesson/fs-1?guest=1',
     '/freelance': '/f-lesson/free-1?guest=1',
+    '/real-freelance': '/rf-lesson/real-free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
     '/local': '/local-lesson/local-1?guest=1',
     '/sql': '/sql-lesson/sql-1?guest=1',
@@ -229,7 +236,7 @@ const Dashboard = () => {
   };
   const ROUTE_TO_TRACK: Record<string, TrackId> = {
     '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
-    '/freelance': 'freelance', '/python': 'python', '/local': 'local',
+    '/freelance': 'freelance', '/real-freelance': 'real-freelance' as TrackId, '/python': 'python', '/local': 'local',
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
     '/ai-fundamentals': 'ai-fundamentals',
     '/three3d': 'three3d' as TrackId,
