@@ -19,6 +19,7 @@ import { LOCAL_LESSONS } from '@/data/localLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
 import { AI_LESSONS } from '@/data/aiLessons';
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
+import { REAL_FREELANCE_LESSONS } from '@/data/realFreelanceLessons';
 
 // Frontend lesson ids used for completion checks (matches Roadmap listing).
 const FRONTEND_LESSON_IDS = [
@@ -37,6 +38,7 @@ const PREREQ_LESSON_IDS: Partial<Record<TrackId, string[]>> = {
   networking: NETWORKING_LESSONS.map(l => l.id),
   fullstack: FULLSTACK_LESSONS.map(l => l.id),
   freelance: FREELANCE_LESSONS.map(l => l.id),
+  'real-freelance': REAL_FREELANCE_LESSONS.map(l => l.id),
   python: PYTHON_LESSONS.map(l => l.id),
   local: LOCAL_LESSONS.map(l => l.id),
   sql: SQL_LESSONS.map(l => l.id),
@@ -73,6 +75,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
       { label: 'Frontend course', route: '/learn' },
       { label: 'Full-Stack course', route: '/fullstack' },
     ],
+  },
+  'real-freelance': {
+    title: 'Finish Freelance & Clients first',
+    body: 'Real-World Freelancing builds directly on the core skills learned in Freelance & Clients. Please complete the Freelance & Clients course first so you have a strong foundation before jumping into advanced client strategies and platforms.',
+    ctas: [{ label: 'Freelance & Clients course', route: '/freelance' }],
   },
   local: {
     title: 'Start with Frontend Development',
