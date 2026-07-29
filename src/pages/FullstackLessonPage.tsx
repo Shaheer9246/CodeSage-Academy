@@ -166,25 +166,21 @@ const FullstackLessonPage = () => {
             {code && (
               <div className="glass-card rounded-2xl overflow-hidden">
                 {isMobile ? (
-                  <>
-                    <div className="flex border-b border-border/40 bg-card/60">
-                      <button onClick={() => setMobileLab('code')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs ${mobileLab === 'code' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
-                        <Code2 className="w-3.5 h-3.5" /> Code
-                      </button>
-                      <button onClick={() => setMobileLab('preview')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs ${mobileLab === 'preview' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
-                        <Eye className="w-3.5 h-3.5" /> Preview
-                      </button>
+                  /* Mobile View: Stacked Top-to-Bottom (No buttons!) */
+                  <div className="flex flex-col" style={{ height: '80vh' }}>
+                    <div className="h-1/2 border-b border-border/40 overflow-hidden">
+                      {Editor}
                     </div>
-                    <div style={{ height: '60vh' }}>
-                      {mobileLab === 'code' ? Editor : <LivePreview html={html} css={css} js={js} />}
+                    <div className="h-1/2 overflow-hidden">
+                      <LivePreview html={html} css={css} js={js} />
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  /* Changed to flex-row (left-to-right) and w-1/2 */
+                  /* Desktop View: Side-by-Side (Left-to-Right) */
                   <div className="flex flex-row" style={{ height: '75vh' }}>
-                    <div className="w-1/2 border-r border-border/40 overflow-hidden">{Editor}</div>
+                    <div className="w-1/2 border-r border-border/40 overflow-hidden">
+                      {Editor}
+                    </div>
                     <div className="w-1/2 overflow-hidden">
                       <LivePreview html={html} css={css} js={js} />
                     </div>
