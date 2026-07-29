@@ -144,8 +144,8 @@ const QuestionsPage = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 tracking-tight">
-                NEURAL_ASSESSMENT_SYSTEM
+             <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 tracking-tight">
+             NEURAL_ASSESSMENT_SYSTEM
               </h1>
               <p className="text-sm font-mono text-slate-400 flex items-center gap-2 mt-1">
                 <Terminal className="w-4 h-4" /> Initialize certification matrix.
@@ -178,12 +178,12 @@ const QuestionsPage = () => {
     const qState = examState[currentQ];
 
     return (
-      <div className="min-h-screen bg-[#050505] text-slate-300 p-4 flex flex-col md:flex-row gap-6 max-w-[1400px] mx-auto relative overflow-hidden">
+      <div className="min-h-screen bg-[#050505] text-slate-300 p-3 sm:p-4 md:p-6 flex flex-col lg:flex-row gap-4 md:gap-6 max-w-[1400px] mx-auto relative overflow-hidden">
         {/* Tech Grid Background Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
         {/* Sidebar Navigator */}
-        <div className="relative z-10 w-full md:w-72 lg:w-80">
+        <div className="relative z-10 w-full lg:w-80">
           <Navigator 
             questions={questions}
             currentQ={currentQ}
@@ -199,16 +199,16 @@ const QuestionsPage = () => {
         <div className="flex-1 relative z-10 flex flex-col">
           <AnimatePresence mode="wait">
             <motion.div 
-              key={currentQ} 
-              initial={{ x: 20, opacity: 0, filter: 'blur(4px)' }} 
-              animate={{ x: 0, opacity: 1, filter: 'blur(0px)' }} 
-              exit={{ x: -20, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ duration: 0.3 }}
-              className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-10 flex-1 flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.5)]"
-            >
-              <div className="flex justify-between items-start mb-8 gap-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
+  key={currentQ} 
+  initial={{ x: 20, opacity: 0, filter: 'blur(4px)' }} 
+  animate={{ x: 0, opacity: 1, filter: 'blur(0px)' }} 
+  exit={{ x: -20, opacity: 0, filter: 'blur(4px)' }}
+  transition={{ duration: 0.3 }}
+  className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 md:p-10 flex-1 flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+>
+  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 md:mb-8 gap-4">
+    <div>
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <span className="px-3 py-1 rounded-md bg-cyan-950/50 border border-cyan-800/50 text-cyan-400 font-mono text-[10px] uppercase tracking-widest flex items-center gap-1.5">
                       <Zap className="w-3 h-3" /> {q.topic}
                     </span>
@@ -225,10 +225,10 @@ const QuestionsPage = () => {
                   </h2>
                 </div>
                 
-                <button onClick={toggleReview} className={`p-2.5 rounded-xl transition-all flex gap-2 items-center text-xs font-mono tracking-wider border flex-shrink-0 ${qState.review ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}>
-                  <Flag className="w-4 h-4" />
-                  <span className="hidden sm:inline">{qState.review ? 'FLAGGED' : 'FLAG FOR REVIEW'}</span>
-                </button>
+                <button onClick={toggleReview} className={`p-2.5 rounded-xl transition-all flex gap-2 items-center text-xs font-mono tracking-wider border self-start sm:self-auto flex-shrink-0 ${qState.review ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}>
+  <Flag className="w-4 h-4" />
+  <span>{qState.review ? 'FLAGGED' : 'FLAG FOR REVIEW'}</span>
+</button>
               </div>
 
               <div className="space-y-4 flex-1">
@@ -239,7 +239,7 @@ const QuestionsPage = () => {
                       key={i} 
                       onClick={() => handleSelectOption(i)}
                       disabled={qState.confirmed}
-                      className={`w-full text-left px-6 py-5 rounded-xl text-sm md:text-base font-medium transition-all border relative overflow-hidden group ${
+                      className={`w-full text-left px-4 py-3.5 sm:px-6 sm:py-5 rounded-xl text-xs sm:text-sm md:text-base font-medium transition-all border relative overflow-hidden group ${
                         isPicked 
                           ? 'bg-cyan-950/30 border-cyan-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.15)]' 
                           : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20'
@@ -257,35 +257,36 @@ const QuestionsPage = () => {
                 })}
               </div>
 
-              {/* Action Footer */}
-              <div className="mt-8 pt-6 border-t border-white/10 flex justify-between items-center bg-[#050505]/50 -mx-6 -mb-6 px-6 py-4 md:-mx-10 md:-mb-10 md:px-10 md:py-6 rounded-b-2xl">
-                <div className="text-xs font-mono">
-                  {qState.confirmed ? (
-                    <span className="flex items-center gap-2 text-emerald-400"><CheckCircle2 className="w-4 h-4" /> DATA_LOCKED</span>
-                  ) : (
-                    <span className="text-slate-500 flex items-center gap-2"><Terminal className="w-4 h-4" /> AWAITING_INPUT...</span>
-                  )}
-                </div>
-                
-                <div className="flex gap-4">
-                  {!qState.confirmed ? (
-                    <button 
-                      onClick={handleConfirm} 
-                      disabled={qState.chosen === null}
-                      className="bg-cyan-500 hover:bg-cyan-400 text-black px-8 py-3 rounded-xl text-sm font-bold tracking-wider disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
-                    >
-                      <Check className="w-4 h-4" /> CONFIRM
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={currentQ + 1 < questions.length ? nextQ : finishExam}
-                      className="bg-white hover:bg-slate-200 text-black px-8 py-3 rounded-xl text-sm font-bold tracking-wider flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-                    >
-                      {currentQ + 1 < questions.length ? 'NEXT_QUERY' : 'FINISH_EXAM'} <ChevronRight className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
+            
+             {/* Action Footer */}
+<div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#050505]/50 -mx-4 -mb-4 px-4 py-4 sm:-mx-6 sm:-mb-6 sm:px-6 md:-mx-10 md:-mb-10 md:px-10 md:py-6 rounded-b-2xl">
+  <div className="text-xs font-mono text-center sm:text-left">
+    {qState.confirmed ? (
+      <span className="flex items-center justify-center sm:justify-start gap-2 text-emerald-400"><CheckCircle2 className="w-4 h-4" /> DATA_LOCKED</span>
+    ) : (
+      <span className="text-slate-500 flex items-center justify-center sm:justify-start gap-2"><Terminal className="w-4 h-4" /> AWAITING_INPUT...</span>
+    )}
+  </div>
+  
+  <div className="flex gap-4 w-full sm:w-auto">
+    {!qState.confirmed ? (
+      <button 
+        onClick={handleConfirm} 
+        disabled={qState.chosen === null}
+        className="w-full sm:w-auto justify-center bg-cyan-500 hover:bg-cyan-400 text-black px-6 sm:px-8 py-3 rounded-xl text-sm font-bold tracking-wider disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
+      >
+        <Check className="w-4 h-4" /> CONFIRM
+      </button>
+    ) : (
+      <button 
+        onClick={currentQ + 1 < questions.length ? nextQ : finishExam}
+        className="w-full sm:w-auto justify-center bg-white hover:bg-slate-200 text-black px-6 sm:px-8 py-3 rounded-xl text-sm font-bold tracking-wider flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+      >
+        {currentQ + 1 < questions.length ? 'NEXT_QUERY' : 'FINISH_EXAM'} <ChevronRight className="w-4 h-4" />
+      </button>
+    )}
+  </div>
+</div>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -307,28 +308,28 @@ const QuestionsPage = () => {
       
       <div className="max-w-3xl mx-auto space-y-6 relative z-10">
         {/* Score Card */}
-        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden shadow-2xl">
-          <div className={`absolute top-0 left-0 w-full h-1 ${passed ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,1)]' : 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,1)]'}`} />
-          
-          {passed ? (
-            <Award className="w-16 h-16 mx-auto mb-4 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-          ) : (
-            <ShieldAlert className="w-16 h-16 mx-auto mb-4 text-red-400 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
-          )}
-          
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">
-            {passed ? 'ASSESSMENT_CLEARED' : 'SYSTEM_FAILURE'}
-          </h2>
-          <p className="text-sm font-mono text-slate-400 mb-8 uppercase tracking-widest">{selectedTrack?.title}</p>
-          
-          <div className="flex justify-center items-end gap-2 mb-6">
-            <span className={`text-7xl font-bold font-mono leading-none ${passed ? 'text-emerald-400' : 'text-red-400'}`}>
-              {correctCount}
-            </span>
-            <span className="text-3xl font-mono text-slate-500 mb-1">/ {total}</span>
-          </div>
-          
-          <span className={`inline-block px-6 py-2 rounded-full text-sm font-mono tracking-widest border ${
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 md:p-12 text-center relative overflow-hidden shadow-2xl">
+  <div className={`absolute top-0 left-0 w-full h-1 ${passed ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,1)]' : 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,1)]'}`} />
+  
+  {passed ? (
+    <Award className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+  ) : (
+    <ShieldAlert className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-red-400 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
+  )}
+  
+  <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">
+    {passed ? 'ASSESSMENT_CLEARED' : 'SYSTEM_FAILURE'}
+  </h2>
+  <p className="text-xs sm:text-sm font-mono text-slate-400 mb-6 sm:mb-8 uppercase tracking-widest">{selectedTrack?.title}</p>
+  
+  <div className="flex justify-center items-end gap-2 mb-6">
+    <span className={`text-5xl sm:text-7xl font-bold font-mono leading-none ${passed ? 'text-emerald-400' : 'text-red-400'}`}>
+      {correctCount}
+    </span>
+    <span className="text-2xl sm:text-3xl font-mono text-slate-500 mb-1">/ {total}</span>
+  </div>
+  
+  <span className={`inline-block px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-mono tracking-widest border ${
             passed 
               ? 'bg-emerald-950/50 text-emerald-400 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
               : 'bg-red-950/50 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
