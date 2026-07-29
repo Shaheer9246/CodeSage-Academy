@@ -371,26 +371,38 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
           )}
 
-          {/* CODE TAB */}
+         {/* CODE */}
           {mobileTab === 'code' && (
             <div className="flex-1 flex flex-col min-h-0">
-              {/* File Tabs + Theme & Font Controls */}
-              <div className="flex items-center justify-between border-b border-border/30 bg-card/30 flex-shrink-0 px-2 py-1">
-                <div className="flex items-center overflow-x-auto gap-1 scrollbar-none">
+              {/* File Tabs + Preview Selector + Theme Controls */}
+              <div className="flex items-center justify-between border-b border-border/30 bg-card/30 flex-shrink-0 px-2 py-1 gap-1">
+                {/* File Tabs */}
+                <div className="flex items-center overflow-x-auto gap-1 scrollbar-none flex-1 min-w-0">
                   {files.map(f => (
                     <button key={f.id} onClick={() => setActiveFileId(f.id)}
-                      className={`px-2.5 py-1 text-[10px] font-mono whitespace-nowrap rounded-t border-b-2 ${
+                      className={`px-2.5 py-1 text-[10px] font-mono whitespace-nowrap rounded-t border-b-2 flex-shrink-0 ${
                         activeFileId === f.id ? 'text-foreground border-primary bg-background/60 font-semibold' : 'text-muted-foreground border-transparent hover:text-foreground'
                       }`}>{f.name}</button>
                   ))}
                 </div>
 
-                {/* Font Size & Theme Toggle */}
-                <div className="flex items-center gap-1.5 flex-shrink-0 pl-2 border-l border-border/20">
+                {/* Right Actions: Preview Source Selector, Font Size, Theme */}
+                <div className="flex items-center gap-1.5 flex-shrink-0 pl-1 border-l border-border/20">
+                  {/* HTML Preview Selector (Appears if you have multiple HTML files) */}
+                  {htmlFiles.length > 1 && (
+                    <select value={previewSrcId} onChange={e => setPreviewSrcId(e.target.value)} title="Preview source file"
+                      className="bg-primary/10 border border-primary/30 text-primary rounded text-[9px] font-semibold px-1 py-0.5 focus:outline-none">
+                      {htmlFiles.map(f => <option key={f.id} value={f.id}>👁️ {f.name}</option>)}
+                    </select>
+                  )}
+
+                  {/* Font Size Selector */}
                   <select value={fontSize} onChange={e => setFontSize(Number(e.target.value))}
                     className="bg-secondary/40 border border-border/30 rounded text-[9px] text-muted-foreground px-1 py-0.5 focus:outline-none">
                     {[12, 13, 14, 15, 16, 18, 20].map(s => <option key={s} value={s}>{s}px</option>)}
                   </select>
+
+                  {/* Theme Toggle */}
                   <button onClick={() => setEditorTheme(editorTheme === 'vs-dark' ? 'light' : 'vs-dark')}
                     className="text-muted-foreground hover:text-foreground p-1 rounded bg-secondary/30" title="Toggle Theme">
                     {editorTheme === 'vs-dark' ? <Sun className="w-3 h-3 text-yellow-400" /> : <Moon className="w-3 h-3" />}
