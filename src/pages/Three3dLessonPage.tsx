@@ -194,36 +194,16 @@ const Three3dLessonPage = () => {
 
             {code && (
               <div className="glass-card rounded-2xl overflow-hidden border border-border/40">
-                {isMobile ? (
-                  <>
-                    <div className="flex border-b border-border/40 bg-card/60">
-                      <button
-                        onClick={() => setMobileLab('code')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium ${
-                          mobileLab === 'code' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
-                        }`}
-                      >
-                        <Code2 className="w-3.5 h-3.5" /> Code
-                      </button>
-                      <button
-                        onClick={() => setMobileLab('preview')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium ${
-                          mobileLab === 'preview' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
-                        }`}
-                      >
-                        <Eye className="w-3.5 h-3.5" /> Preview
-                      </button>
-                    </div>
-                    <div style={{ height: '60vh' }}>
-                      {mobileLab === 'code' ? Editor : <LivePreview html={html} css={css} js={js} />}
-                    </div>
-                  </>
-                ) : (
-                  <div className="grid grid-cols-2" style={{ height: '60vh' }}>
-                    <div className="border-r border-border/40">{Editor}</div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 h-[80vh] lg:h-[60vh]">
+                  {/* Code Editor: Top on mobile, Left on desktop */}
+                  <div className="border-b lg:border-b-0 lg:border-r border-border/40 h-[40vh] lg:h-full">
+                    {Editor}
+                  </div>
+                  {/* Live Preview: Bottom on mobile, Right on desktop */}
+                  <div className="h-[40vh] lg:h-full bg-white/5">
                     <LivePreview html={html} css={css} js={js} />
                   </div>
-                )}
+                </div>
               </div>
             )}
 
