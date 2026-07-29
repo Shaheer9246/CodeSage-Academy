@@ -37,9 +37,10 @@ const NetworkingLearn = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          {/* Added flex-1 to the wrapper and block to the span */}
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
             <span className="text-lg sm:text-xl flex-shrink-0">🌐</span>
-            <span className="text-xs sm:text-sm font-bold font-display truncate">Computer & Networking</span>
+            <span className="text-xs sm:text-sm font-bold font-display truncate block">Computer & Networking</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 bg-primary/10 px-2 py-1 sm:px-2.5 rounded-full border border-primary/20 flex-shrink-0">
