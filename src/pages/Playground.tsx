@@ -371,17 +371,33 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
           )}
 
-          {/* CODE */}
+          {/* CODE TAB */}
           {mobileTab === 'code' && (
             <div className="flex-1 flex flex-col min-h-0">
-              <div className="flex items-center border-b border-border/30 bg-card/30 overflow-x-auto flex-shrink-0">
-                {files.map(f => (
-                  <button key={f.id} onClick={() => setActiveFileId(f.id)}
-                    className={`px-3 py-1.5 text-[10px] font-mono whitespace-nowrap border-b-2 ${
-                      activeFileId === f.id ? 'text-foreground border-primary bg-background/50' : 'text-muted-foreground border-transparent'
-                    }`}>{f.name}</button>
-                ))}
+              {/* File Tabs + Theme & Font Controls */}
+              <div className="flex items-center justify-between border-b border-border/30 bg-card/30 flex-shrink-0 px-2 py-1">
+                <div className="flex items-center overflow-x-auto gap-1 scrollbar-none">
+                  {files.map(f => (
+                    <button key={f.id} onClick={() => setActiveFileId(f.id)}
+                      className={`px-2.5 py-1 text-[10px] font-mono whitespace-nowrap rounded-t border-b-2 ${
+                        activeFileId === f.id ? 'text-foreground border-primary bg-background/60 font-semibold' : 'text-muted-foreground border-transparent hover:text-foreground'
+                      }`}>{f.name}</button>
+                  ))}
+                </div>
+
+                {/* Font Size & Theme Toggle */}
+                <div className="flex items-center gap-1.5 flex-shrink-0 pl-2 border-l border-border/20">
+                  <select value={fontSize} onChange={e => setFontSize(Number(e.target.value))}
+                    className="bg-secondary/40 border border-border/30 rounded text-[9px] text-muted-foreground px-1 py-0.5 focus:outline-none">
+                    {[12, 13, 14, 15, 16, 18, 20].map(s => <option key={s} value={s}>{s}px</option>)}
+                  </select>
+                  <button onClick={() => setEditorTheme(editorTheme === 'vs-dark' ? 'light' : 'vs-dark')}
+                    className="text-muted-foreground hover:text-foreground p-1 rounded bg-secondary/30" title="Toggle Theme">
+                    {editorTheme === 'vs-dark' ? <Sun className="w-3 h-3 text-yellow-400" /> : <Moon className="w-3 h-3" />}
+                  </button>
+                </div>
               </div>
+
               <div className="flex-1 min-h-0">
                 <CodeEditor code={activeFile.content} onChange={updateFileContent} language={activeFile.lang} theme={editorTheme} fontSize={fontSize} />
               </div>
@@ -389,15 +405,26 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
           )}
 
-          {/* PREVIEW */}
-<div className={`flex-1 flex-col min-h-0 ${mobileTab === 'preview' ? 'flex' : 'hidden'}`}>
-  <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20 flex-shrink-0">
-    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Preview
-  </div>
-  <div className="flex-1 min-h-0">
-    <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
-  </div>
-</div>
+          {/* PREVIEW TAB */}
+          <div className={`flex-1 flex-col min-h-0 ${mobileTab === 'preview' ? 'flex' : 'hidden'}`}>
+            <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center justify-between bg-card/20 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span>Live Preview</span>
+              </div>
+
+              {/* Preview Source Selector (Appears when you add/import multiple HTML files) */}
+              {htmlFiles.length > 1 && (
+                <select value={previewSrcId} onChange={e => setPreviewSrcId(e.target.value)} title="Preview source file"
+                  className="bg-secondary/60 border border-primary/40 rounded text-[10px] text-primary font-semibold px-2 py-0.5 focus:outline-none">
+                  {htmlFiles.map(f => <option key={f.id} value={f.id}>▶ {f.name}</option>)}
+                </select>
+              )}
+            </div>
+            <div className="flex-1 min-h-0">
+              <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
+            </div>
+          </div>
 
           {/* RECENT */}
           {mobileTab === 'recent' && (
