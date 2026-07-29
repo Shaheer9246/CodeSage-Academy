@@ -141,20 +141,20 @@ const Challenges = () => {
 
 <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 space-y-4 relative z-10 overflow-x-hidden">
         {/* Tier tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+<div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
           {TIERS.map(t => {
             const info = TIER_INFO[t];
             const count = CHALLENGES.filter(c => c.tier === t).length;
             const active = activeTier === t;
             return (
               <button key={t} onClick={() => setActiveTier(t)}
-                className={`px-2 py-3 rounded-xl border text-xs font-semibold transition-all ${
-                  active ? `${info.tab}` : 'bg-secondary/20 border-border/30 text-muted-foreground hover:border-primary/30'
-                }`}>
-                <div className="text-base mb-0.5">{info.icon}</div>
-                <div>{info.label}</div>
-                <div className="text-[9px] opacity-70 font-mono">{count} tasks</div>
-              </button>
+  className={`px-1.5 py-2.5 sm:px-2 sm:py-3 rounded-xl border text-xs font-semibold transition-all min-w-0 ${
+    active ? `${info.tab}` : 'bg-secondary/20 border-border/30 text-muted-foreground hover:border-primary/30'
+  }`}>
+  <div className="text-sm sm:text-base mb-0.5">{info.icon}</div>
+  <div className="truncate text-[11px] sm:text-xs">{info.label}</div>
+  <div className="text-[8px] sm:text-[9px] opacity-70 font-mono truncate">{count} tasks</div>
+</button>
             );
           })}
         </div>
@@ -169,15 +169,15 @@ const Challenges = () => {
           const info = TIER_INFO[c.tier];
           return (
             <button key={c.id} onClick={() => start(c)}
-  className="w-full glass-card rounded-xl p-3 sm:p-4 text-left hover:border-primary/20 hover:neon-border-subtle transition-all flex items-center justify-between gap-2 group overflow-hidden">
-  <div className="flex items-center gap-2.5 min-w-0 flex-1">
-    {completed && <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />}
+  className="w-full max-w-full glass-card rounded-xl p-3 sm:p-4 text-left hover:border-primary/20 hover:neon-border-subtle transition-all flex items-center justify-between gap-2 group overflow-hidden">
+  <div className="flex items-center gap-2 min-w-0 flex-1">
+    {completed && <CheckCircle2 className="w-4 h-4 text-success shrink-0" />}
     <div className="min-w-0 flex-1">
       <h3 className="font-semibold text-foreground text-xs sm:text-sm truncate group-hover:text-primary transition-colors">{c.title}</h3>
       <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.description}</p>
     </div>
   </div>
-  <span className={`text-[10px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-medium flex-shrink-0 ${info.chip}`}>
+  <span className={`text-[9px] sm:text-[10px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-medium shrink-0 ${info.chip}`}>
     +{c.xp} XP
   </span>
 </button>
