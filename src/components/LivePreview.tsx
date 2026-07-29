@@ -16,8 +16,21 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
 
       const closeScriptTag = '</scr' + 'ipt>';
       
+      const baseStyle = `
+        <style>
+          html, body {
+            background-color: #0f0a2e;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+          }
+        </style>
+      `;
+
       // Included: Console Interceptor, CDN Libraries, Babel Compiler, and Import Maps
       const headLibraries = `
+        ${baseStyle}
         <script>
           (function() {
             const origLog = console.log;
@@ -132,7 +145,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       }
 
       iframeRef.current.srcdoc = finalHtml;
-    }, 400);
+    }, 0);
 
     return () => clearTimeout(timer);
   }, [html, css, js]);
@@ -151,7 +164,8 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
   return (
     <iframe
       ref={iframeRef}
-      className="w-full h-full border-0 bg-white"
+      className="w-full h-full border-0 bg-[#0f0a2e]"
+      style={{ backgroundColor: '#0f0a2e' }}
       sandbox="allow-scripts allow-modals"
       title="Preview"
     />
