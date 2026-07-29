@@ -130,7 +130,7 @@ const Challenges = () => {
     <div className="min-h-screen bg-background relative overflow-hidden animated-bg">
       <div className="glow-orb glow-primary w-48 h-48 top-20 -right-10 opacity-20" />
 
-      <header className="border-b border-border glass-card px-4 sm:px-6 py-3 flex items-center gap-3 relative z-10">
+      <header className="border-b border-border glass-card px-3 sm:px-6 py-3 flex items-center justify-between gap-2 relative z-10 overflow-x-hidden">
         <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -139,7 +139,7 @@ const Challenges = () => {
         <span className="ml-auto text-[10px] text-muted-foreground font-mono">{done}/{total} solved</span>
       </header>
 
-      <div className="max-w-3xl mx-auto p-4 sm:p-6 space-y-4 relative z-10">
+<div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 space-y-4 relative z-10 overflow-x-hidden">
         {/* Tier tabs */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {TIERS.map(t => {
@@ -169,18 +169,18 @@ const Challenges = () => {
           const info = TIER_INFO[c.tier];
           return (
             <button key={c.id} onClick={() => start(c)}
-              className="w-full glass-card rounded-xl p-4 text-left hover:border-primary/20 hover:neon-border-subtle transition-all flex items-center justify-between group">
-              <div className="flex items-center gap-3 min-w-0">
-                {completed && <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />}
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-foreground text-sm truncate group-hover:text-primary transition-colors">{c.title}</h3>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.description}</p>
-                </div>
-              </div>
-              <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium flex-shrink-0 ml-2 ${info.chip}`}>
-                +{c.xp} XP
-              </span>
-            </button>
+  className="w-full glass-card rounded-xl p-3 sm:p-4 text-left hover:border-primary/20 hover:neon-border-subtle transition-all flex items-center justify-between gap-2 group overflow-hidden">
+  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+    {completed && <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />}
+    <div className="min-w-0 flex-1">
+      <h3 className="font-semibold text-foreground text-xs sm:text-sm truncate group-hover:text-primary transition-colors">{c.title}</h3>
+      <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.description}</p>
+    </div>
+  </div>
+  <span className={`text-[10px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-medium flex-shrink-0 ${info.chip}`}>
+    +{c.xp} XP
+  </span>
+</button>
           );
         })}
       </div>
