@@ -52,7 +52,7 @@ const NetworkingLearn = () => {
           </div>
         </div>
 
-<div className="space-y-2 sm:space-y-2.5">
+<div className="space-y-2 sm:space-y-2.5 w-full max-w-full overflow-hidden">
           {NETWORKING_LESSONS.map((lesson, i) => {
             const isCompleted = user.completedLessons.includes(lesson.id);
             const isUnlocked = isNetworkingLessonUnlocked(lesson.id, user.completedLessons);
@@ -65,7 +65,7 @@ const NetworkingLearn = () => {
                 transition={{ delay: i * 0.03 }}
                 onClick={() => isUnlocked && navigate(`/n-lesson/${lesson.id}${fromQs}`)}
                 disabled={!isUnlocked}
-                className={`w-full glass-card rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 text-left transition-all ${
+                className={`w-full max-w-full box-border glass-card rounded-xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 text-left transition-all ${
                   isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
                 }`}
               >
@@ -79,22 +79,24 @@ const NetworkingLearn = () => {
                   {lesson.icon}
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase">
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase truncate">
                     Lesson {lesson.order}
                   </p>
-                  <p className="text-sm sm:text-base font-display font-semibold text-foreground truncate">
+                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block">
                     {lesson.title}
                   </p>
                 </div>
 
-                {isCompleted ? (
-                  <Check className="w-4 h-4 text-success flex-shrink-0" />
-                ) : isUnlocked ? (
-                  <ChevronRight className="w-4 h-4 text-primary flex-shrink-0" />
-                ) : (
-                  <Lock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                )}
+                <div className="flex-shrink-0 ml-1">
+                  {isCompleted ? (
+                    <Check className="w-4 h-4 text-success" />
+                  ) : isUnlocked ? (
+                    <ChevronRight className="w-4 h-4 text-primary" />
+                  ) : (
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </div>
               </motion.button>
             );
           })}
