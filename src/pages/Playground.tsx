@@ -50,6 +50,21 @@ const Playground = () => {
   const currentCss = files.find(f => f.id === 'css')?.content || '';
   const currentJs = files.find(f => f.id === 'js')?.content || '';
 
+  const [debouncedHtml, setDebouncedHtml] = useState(currentHtml);
+  const [debouncedCss, setDebouncedCss] = useState(currentCss);
+  const [debouncedJs, setDebouncedJs] = useState(currentJs);
+
+  // ADD THE NEW USEEFFECT RIGHT HERE:
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedHtml(currentHtml);
+      setDebouncedCss(currentCss);
+      setDebouncedJs(currentJs);
+    }, 800); // 800ms delay
+
+    return () => clearTimeout(handler);
+  }, [currentHtml, currentCss, currentJs]);
+
   // Toggle multi-file mode persistence
   useEffect(() => {
     try {
@@ -381,7 +396,7 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Preview
               </div>
               <div className="flex-1 min-h-0">
-                <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
+                <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
               </div>
             </div>
           )}
@@ -583,7 +598,7 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
                   </div>
                   <div className="flex-1 min-h-0">
-                    <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
+                    <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
                   </div>
                 </div>
               </ResizablePanel>
