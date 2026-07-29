@@ -164,7 +164,7 @@ const FullstackLessonPage = () => {
             </div>
 
             {code && (
-              <div className="glass-card rounded-2xl overflow-hidden max-w-sm mx-auto w-full">
+              <div className="glass-card rounded-2xl overflow-hidden max-w-[340px] mx-auto w-full">
                 {/* Mobile: editor on top, preview below. Desktop (md+): editor left, preview right. */}
                 <div className="flex flex-col md:flex-row" style={{ height: isMobile ? '80vh' : '90vh' }}>
                   <div className="h-[55%] md:h-full md:w-[35%] min-h-0 border-b border-border/40 md:border-b-0 md:border-r overflow-hidden">
