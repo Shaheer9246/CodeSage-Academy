@@ -183,8 +183,8 @@ function groupIntoSectors(nodes: TrackNode[], statuses: Status[]): Sector[] {
 const WAVE = [0, 1, 2, 1] as const;
 const columnFor = (i: number) => WAVE[i % WAVE.length];
 
-const ROW_H = 96;         // vertical distance between nodes
-const NODE_SIZE = 68;     // hex node diameter
+const ROW_H = 80;         // tighter row height for small screens
+const NODE_SIZE = 52;     // slightly compact node diameter
 
 function SectorPod({
   sector,
@@ -211,8 +211,7 @@ function SectorPod({
   // Column X positions (0=left, 1=center, 2=right) — responsive
   const colX = (c: number) => {
     if (width < 480) {
-      // Mobile: tighter wave
-      const pad = 44;
+      const pad = 36;
       return pad + ((width - pad * 2) / 2) * (c / 2);
     }
     return 60 + ((width - 120) / 2) * (c / 2);
@@ -380,18 +379,18 @@ function SectorPod({
 
               {/* Floating label */}
               <div
-                className={`pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap ${
-                  labelLeft ? 'right-full mr-3 text-right' : 'left-full ml-3 text-left'
+                className={`pointer-events-none absolute top-1/2 -translate-y-1/2 max-w-[110px] sm:max-w-[160px] ${
+                  labelLeft ? 'right-full mr-2 sm:mr-3 text-right' : 'left-full ml-2 sm:ml-3 text-left'
                 }`}
               >
-                <p className={`font-display text-xs font-semibold leading-tight ${
+                <p className={`font-display text-[11px] sm:text-xs font-semibold leading-tight truncate ${
                   isCompleted ? 'text-foreground' :
                   isCurrent   ? 'text-primary' :
                                 'text-muted-foreground'
                 }`}>
                   {node.label}
                 </p>
-                <p className="mt-0.5 font-mono text-[9px] text-muted-foreground/70">
+                <p className="mt-0.5 font-mono text-[8px] sm:text-[9px] text-muted-foreground/70 truncate">
                   {isCompleted ? 'COMPLETE' :
                    isCurrent   ? 'IN PROGRESS →' :
                    isLocked    ? 'LOCKED' :
