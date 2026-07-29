@@ -270,11 +270,13 @@ function SectorPod({
       </div>
 
       {/* Wave field */}
-      <div
-        ref={containerRef}
-        className="relative w-full"
-        style={{ height }}
-      >
+{/* AFTER */}
+<div className="w-full overflow-x-auto pb-4 scrollbar-thin">
+  <div
+    ref={containerRef}
+    className="relative min-w-[420px] mx-auto"
+    style={{ height }}
+  >
         {/* SVG curve threading nodes */}
         {width > 0 && (
           <svg
