@@ -183,7 +183,8 @@ function groupIntoSectors(nodes: TrackNode[], statuses: Status[]): Sector[] {
 const WAVE = [0, 1, 2, 1] as const;
 const columnFor = (i: number) => WAVE[i % WAVE.length];
 
-const ROW_H = 80;         // tighter row height for small screens
+const ROW_H_MOBILE = 96;  // extra room so two-line labels below the node don't collide
+const ROW_H_DESKTOP = 80;
 const NODE_SIZE = 52;     // slightly compact node diameter
 
 function SectorPod({
@@ -205,18 +206,21 @@ function SectorPod({
     return () => ro.disconnect();
   }, []);
 
+  const isMobile = width > 0 && width < 640;
+  const ROW_H = isMobile ? ROW_H_MOBILE : ROW_H_DESKTOP;
   const rows = sector.nodes.length;
   const height = rows * ROW_H + 32;
 
   // Column X positions (0=left, 1=center, 2=right) — responsive
- const colX = (c: number) => {
-  if (width < 480) {
-    // Keeps nodes within 50% center span so 100px labels fit cleanly on both edges
-    const pad = width * 0.28;
-    return pad + ((width - pad * 2) / 2) * (c / 2);
-  }
-  return 60 + ((width - 120) / 2) * (c / 2);
-};
+  const colX = (c: number) => {
+    if (width < 480) {
+      // Keep both edge columns well inside so a ~96px label centered under the node fits.
+      const pad = Math.max(64, width * 0.22);
+      const span = Math.max(40, width - pad * 2);
+      return pad + (span / 2) * (c / 2);
+    }
+    return 60 + ((width - 120) / 2) * (c / 2);
+  };
 
   // Build SVG path threading through node centers
   const pathD = useMemo(() => {
@@ -248,15 +252,15 @@ function SectorPod({
       className="relative"
     >
       {/* Sector header — glowing panel */}
-      <div className="relative mb-4 flex items-center gap-3">
-        <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 backdrop-blur-sm">
-          <span className="font-mono text-[10px] text-primary/70">SECTOR {String(sectorIndex + 1).padStart(2, '0')}</span>
-          <div className="h-3 w-px bg-primary/30" />
-          <span className="font-display text-xs font-bold uppercase tracking-wider text-primary">
+      <div className="relative mb-4 flex items-center gap-2 sm:gap-3 w-full min-w-0 max-w-full overflow-hidden">
+        <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-2 sm:px-3 py-1.5 backdrop-blur-sm min-w-0 flex-1 sm:flex-initial overflow-hidden">
+          <span className="font-mono text-[10px] text-primary/70 shrink-0">S{String(sectorIndex + 1).padStart(2, '0')}</span>
+          <div className="h-3 w-px bg-primary/30 shrink-0" />
+          <span className="font-display text-[10px] sm:text-xs font-bold uppercase tracking-wider text-primary truncate min-w-0">
             {sector.chapter}
           </span>
         </div>
-        <div className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-border/30">
+        <div className="relative h-[2px] hidden sm:block flex-1 overflow-hidden rounded-full bg-border/30">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progressRatio * 100}%` }}
@@ -264,18 +268,19 @@ function SectorPod({
             className="h-full bg-gradient-to-r from-primary/40 to-primary shadow-[0_0_8px_hsl(var(--primary))]"
           />
         </div>
-        <span className="font-mono text-[10px] text-muted-foreground">
+        <span className="font-mono text-[10px] text-muted-foreground shrink-0 whitespace-nowrap">
           {completedCount}/{sector.nodes.length}
         </span>
       </div>
 
+
       {/* Wave field */}
-{/* AFTER */}
-<div
-  ref={containerRef}
-  className="relative w-full"
-  style={{ height }}
->
+      {/* Wave field — clipped so no absolute child can push the page wider */}
+      <div
+        ref={containerRef}
+        className="relative w-full max-w-full overflow-hidden"
+        style={{ height }}
+      >
         {/* SVG curve threading nodes */}
         {width > 0 && (
           <svg
@@ -381,8 +386,8 @@ function SectorPod({
 
               {/* Floating label */}
               <div
-  className={`pointer-events-none absolute w-[110px] sm:w-[160px] text-center sm:text-left ${
-    // On mobile (<640px): Center below node. On sm+: Float left/right.
+  className={`pointer-events-none absolute w-[92px] sm:w-[160px] max-w-[92px] sm:max-w-[160px] text-center sm:text-left ${
+    // Mobile (<640px): center under node. sm+: float left/right of node.
     labelLeft
       ? 'top-[105%] left-1/2 -translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2 sm:left-auto sm:right-full sm:mr-3 sm:translate-x-0 sm:text-right'
       : 'top-[105%] left-1/2 -translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2 sm:left-full sm:ml-3 sm:translate-x-0'
