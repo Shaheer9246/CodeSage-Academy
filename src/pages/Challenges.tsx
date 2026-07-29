@@ -59,72 +59,71 @@ const Challenges = () => {
   if (selected) {
     const tierInfo = TIER_INFO[selected.tier];
     return (
-      <div className="h-screen w-full max-w-full flex flex-col bg-background overflow-hidden">
+      <div className="h-screen w-screen max-w-[100vw] flex flex-col bg-background overflow-hidden">
         {/* Editor Header */}
-        <header className="flex items-center justify-between gap-2 px-2.5 py-2 glass-card border-b border-border shrink-0 w-full overflow-hidden">
+        <header className="flex items-center justify-between gap-2 px-2 py-2 glass-card border-b border-border shrink-0 w-full max-w-full min-w-0 overflow-hidden">
           <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
             <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <Trophy className="w-4 h-4 text-primary shrink-0" />
-            <span className="text-foreground font-semibold text-xs truncate flex-1 min-w-0">{selected.title}</span>
-            <span className={`text-[9px] px-1.5 py-0.5 rounded-full shrink-0 ${tierInfo.chip} hidden xs:inline-flex`}>
-              {tierInfo.icon} +{selected.xp} XP
-            </span>
+            <span className="text-foreground font-semibold text-xs truncate min-w-0">{selected.title}</span>
           </div>
           <button onClick={check} className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-2.5 py-1.5 rounded-lg text-[11px] font-semibold hover:opacity-90 shadow-lg shadow-primary/20 shrink-0 whitespace-nowrap">
-            Check Code
+            Check +{selected.xp}XP
           </button>
         </header>
 
         {result && (
-          <div className={`px-3 py-1.5 text-xs flex items-center gap-2 shrink-0 w-full overflow-hidden ${result === 'pass' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
+          <div className={`px-3 py-1.5 text-xs flex items-center gap-2 shrink-0 w-full max-w-full min-w-0 overflow-hidden ${result === 'pass' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
             {result === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> : <XCircle className="w-3.5 h-3.5 shrink-0" />}
-            <span className="truncate flex-1 min-w-0">{result === 'pass' ? `Challenge complete! +${selected.xp} XP 🎉` : 'Not quite — peek at the hint and try again.'}</span>
+            <span className="truncate flex-1 min-w-0">{result === 'pass' ? `Complete! +${selected.xp} XP 🎉` : 'Not quite — try the hint.'}</span>
           </div>
         )}
 
-        <div className="flex-1 flex flex-col sm:flex-row overflow-hidden w-full max-w-full">
+        <div className="flex-1 flex flex-col sm:flex-row overflow-hidden w-full max-w-full min-w-0">
           {/* Instructions Box */}
-          <div className="w-full sm:w-56 shrink-0 border-b sm:border-b-0 sm:border-r border-border p-2.5 overflow-y-auto glass-card max-h-[20vh] sm:max-h-full">
-            <p className="text-xs text-muted-foreground mb-2">{selected.description}</p>
+          <div className="w-full sm:w-56 shrink-0 border-b sm:border-b-0 sm:border-r border-border p-2.5 overflow-y-auto glass-card max-h-[18vh] sm:max-h-full min-w-0">
+            <p className="text-xs text-muted-foreground mb-2 break-words">{selected.description}</p>
             <button onClick={() => setShowHint(!showHint)} className="flex items-center gap-1.5 text-xs text-warning hover:text-warning/80">
               <Lightbulb className="w-3.5 h-3.5" /> {showHint ? 'Hide Hint' : 'Show Hint'}
             </button>
             {showHint && (
-              <div className="mt-2 p-2 bg-warning/10 border border-warning/20 rounded-lg text-xs text-warning">💡 {selected.hint}</div>
+              <div className="mt-2 p-2 bg-warning/10 border border-warning/20 rounded-lg text-xs text-warning break-words">💡 {selected.hint}</div>
             )}
           </div>
 
           {/* Code/Preview Panel */}
           <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-hidden">
             {/* File Tabs */}
-            <div className="flex items-center border-b border-border glass-card overflow-x-auto scrollbar-none shrink-0 w-full max-w-full">
+            <div className="flex items-center border-b border-border glass-card overflow-x-auto scrollbar-none shrink-0 w-full max-w-full min-w-0">
               {(['html', 'css', 'js', 'preview'] as FileTab[]).map(t => (
-                <button key={t} onClick={() => setFileTab(t)} className={`px-3 py-2 text-[10px] font-mono border-b-2 whitespace-nowrap shrink-0 ${
+                <button key={t} onClick={() => setFileTab(t)} className={`px-2.5 py-2 text-[10px] font-mono border-b-2 whitespace-nowrap shrink-0 ${
                   fileTab === t ? 'text-foreground border-primary bg-background font-bold' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
                 } ${t === 'preview' ? 'sm:hidden text-primary' : ''}`}>
                   {t === 'html' ? 'index.html' : t === 'css' ? 'style.css' : t === 'js' ? 'script.js' : '👁️ Preview'}
                 </button>
               ))}
             </div>
-            
-            {/* Main Workspace View */}
-            <div className="flex-1 min-h-0 relative flex flex-col overflow-hidden w-full max-w-full">
+
+            {/* Main Workspace View — constrained so Monaco can't overflow */}
+            <div className="flex-1 min-h-0 min-w-0 relative flex flex-col overflow-hidden w-full max-w-full">
               {fileTab === 'preview' ? (
-                <div className="w-full h-full sm:hidden overflow-hidden">
+                <div className="absolute inset-0 w-full h-full sm:hidden overflow-hidden">
                   <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleLog} />
                 </div>
               ) : (
-                <div className="w-full h-full overflow-hidden">
+                <div className="absolute inset-0 w-full h-full overflow-hidden">
                   <CodeEditor code={currentCode} onChange={setCurrent} language={fileTab === 'html' ? 'html' : fileTab === 'css' ? 'css' : 'javascript'} />
                 </div>
               )}
             </div>
-            
-            {/* Console Output locked at max 35vh height */}
-            <div className="max-h-[35vh] overflow-y-auto shrink-0 border-t border-border bg-background w-full max-w-full">
-              <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
+
+            {/* Console — capped and clipped */}
+            <div className="max-h-[30vh] overflow-hidden shrink-0 border-t border-border bg-background w-full max-w-full min-w-0">
+              <div className="w-full max-w-full min-w-0 overflow-auto max-h-[30vh]">
+                <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
+              </div>
             </div>
           </div>
 
@@ -146,29 +145,29 @@ const Challenges = () => {
   const done = CHALLENGES.filter(c => user.completedLessons.includes(`challenge-${c.id}`)).length;
 
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden animated-bg w-full max-w-full">
+    <div className="min-h-screen bg-background relative overflow-x-hidden animated-bg w-full max-w-[100vw]">
       <div className="glow-orb glow-primary w-48 h-48 top-20 -right-10 opacity-20 pointer-events-none" />
 
       {/* Main List Header */}
-      <header className="border-b border-border glass-card px-3 sm:px-6 py-3 flex items-center justify-between gap-2 relative z-10 w-full max-w-full overflow-hidden">
+      <header className="border-b border-border glass-card px-3 sm:px-6 py-3 flex items-center justify-between gap-2 relative z-10 w-full max-w-full min-w-0 overflow-hidden">
         <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <Trophy className="w-4 h-4 text-primary shrink-0 hidden sm:block" />
         <span className="text-sm sm:text-base font-bold gradient-text font-mono truncate flex-1 min-w-0">Coding Challenges</span>
-        <span className="shrink-0 text-[10px] text-muted-foreground font-mono whitespace-nowrap">{done}/{total} solved</span>
+        <span className="shrink-0 text-[10px] text-muted-foreground font-mono whitespace-nowrap">{done}/{total}</span>
       </header>
 
-      <div className="max-w-3xl mx-auto px-2.5 sm:px-6 py-4 space-y-4 relative z-10 w-full max-w-full overflow-x-hidden">
-        {/* Tier Buttons Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full max-w-full">
+      <div className="max-w-3xl mx-auto px-2 sm:px-6 py-4 space-y-4 relative z-10 w-full max-w-full min-w-0 overflow-x-hidden">
+        {/* Tier Buttons Grid — 2x2 mobile, 4-col desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full max-w-full min-w-0">
           {TIERS.map(t => {
             const info = TIER_INFO[t];
             const count = CHALLENGES.filter(c => c.tier === t).length;
             const active = activeTier === t;
             return (
               <button key={t} onClick={() => setActiveTier(t)}
-                className={`p-2 rounded-xl border text-xs font-semibold transition-all min-w-0 flex flex-col items-center justify-center text-center overflow-hidden w-full ${
+                className={`p-2 rounded-xl border text-xs font-semibold transition-all min-w-0 flex flex-col items-center justify-center text-center overflow-hidden w-full max-w-full ${
                   active ? `${info.tab}` : 'bg-secondary/20 border-border/30 text-muted-foreground hover:border-primary/30'
                 }`}>
                 <div className="text-sm mb-0.5">{info.icon}</div>
@@ -179,19 +178,19 @@ const Challenges = () => {
           })}
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-muted-foreground w-full overflow-hidden">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground w-full max-w-full min-w-0 overflow-hidden">
           <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
           <span className="truncate min-w-0">Pick a tier. Each tier rewards more XP!</span>
         </div>
 
         {/* Challenge Item Cards */}
-        <div className="space-y-2 w-full max-w-full">
+        <div className="space-y-2 w-full max-w-full min-w-0">
           {byTier.map(c => {
             const completed = user.completedLessons.includes(`challenge-${c.id}`);
             const info = TIER_INFO[c.tier];
             return (
               <button key={c.id} onClick={() => start(c)}
-                className="w-full max-w-full glass-card rounded-xl p-3 text-left hover:border-primary/20 hover:neon-border-subtle transition-all flex items-center justify-between gap-2 group overflow-hidden">
+                className="w-full max-w-full min-w-0 glass-card rounded-xl p-3 text-left hover:border-primary/20 hover:neon-border-subtle transition-all flex items-center justify-between gap-2 group overflow-hidden">
                 <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
                   {completed && <CheckCircle2 className="w-4 h-4 text-success shrink-0" />}
                   <div className="min-w-0 flex-1 overflow-hidden">
