@@ -163,11 +163,11 @@ const LocalLessonPage = () => {
             </div>
 
             {code && (
-              <div className="glass-card rounded-2xl overflow-hidden">
+                <div className="glass-card rounded-2xl overflow-hidden max-w-lg mx-auto w-full">
                 {/* Mobile: editor on top, preview below. Desktop (md+): editor left, preview right. */}
-                <div className="flex flex-col md:flex-row" style={{ height: isMobile ? '50vh' : '65vh' }}>
-                  <div className="h-[55%] md:h-full md:w-1/2 min-h-0 border-b border-border/40 md:border-b-0 md:border-r">{Editor}</div>
-                  <div className="h-[50%] md:h-full md:w-1/2 min-h-0 flex flex-col">
+                <div className="flex flex-col md:flex-row" style={{ height: isMobile ? '80vh' : '90vh' }}>
+                 <div className="h-[55%] md:h-full md:w-[40%] min-h-0 border-b border-border/40 md:border-b-0 md:border-r">{Editor}</div>
+<div className="h-[45%] md:h-full md:w-[60%] min-h-0 flex flex-col">
                     <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 shrink-0">
                       <Eye className="w-3 h-3" /> Preview
                     </div>
