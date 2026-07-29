@@ -19,28 +19,28 @@ const RealFreelanceLearn = () => {
   const progress = Math.round((completed / total) * 100);
 
   return (
-    <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
-      {/* Changed the glow color slightly to differentiate from the other freelance page */}
-      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-background grid-bg relative overflow-x-hidden">
+      {/* Fixed: Scaled down absolute blur circle for mobile screens to prevent overflow */}
+      <div className="absolute top-[-10%] right-[-5%] w-[280px] sm:w-[400px] h-[280px] sm:h-[400px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
 
-      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground">
+      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20 w-full box-border">
+        <div className="flex items-center gap-3 min-w-0">
+          <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">⚔️</span>
-            <span className="text-sm font-bold font-display">Real-World Freelancing</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-xl shrink-0">⚔️</span>
+            <span className="text-sm font-bold font-display truncate">Real-World Freelancing</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+        <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20 shrink-0">
           <Flame className="w-3.5 h-3.5 text-primary" />
           <span className="text-xs font-bold text-primary">{user.streakCount}</span>
         </div>
       </header>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto p-4 space-y-4 relative z-10">
-        <div className="glass-card rounded-2xl p-4">
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto p-4 space-y-4 relative z-10 w-full box-border">
+        <div className="glass-card rounded-2xl p-4 w-full box-border">
           <div className="flex justify-between text-xs mb-2">
             <span className="text-muted-foreground">Module Progress</span>
             <span className="text-foreground font-mono">{completed}/{total} ({progress}%)</span>
@@ -50,7 +50,7 @@ const RealFreelanceLearn = () => {
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 w-full">
           {REAL_FREELANCE_LESSONS.map((lesson, i) => {
             const isCompleted = user.completedLessons.includes(lesson.id);
             const isUnlocked = isRealFreelanceLessonUnlocked(lesson.id, user.completedLessons);
@@ -60,7 +60,7 @@ const RealFreelanceLearn = () => {
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
                 onClick={() => isUnlocked && navigate(`/rf-lesson/${lesson.id}`)}
                 disabled={!isUnlocked}
-                className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all ${
+                className={`w-full glass-card rounded-xl p-4 flex items-center gap-3 text-left transition-all box-border ${
                   isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
                 }`}
               >
@@ -73,9 +73,9 @@ const RealFreelanceLearn = () => {
                   <p className="text-[10px] font-mono text-muted-foreground uppercase">Lesson {lesson.order}</p>
                   <p className="text-sm font-display font-semibold text-foreground truncate">{lesson.title}</p>
                 </div>
-                {isCompleted ? <Check className="w-4 h-4 text-success" /> :
-                 isUnlocked ? <ChevronRight className="w-4 h-4 text-primary" /> :
-                 <Lock className="w-4 h-4 text-muted-foreground" />}
+                {isCompleted ? <Check className="w-4 h-4 text-success shrink-0" /> :
+                 isUnlocked ? <ChevronRight className="w-4 h-4 text-primary shrink-0" /> :
+                 <Lock className="w-4 h-4 text-muted-foreground shrink-0" />}
               </motion.button>
             );
           })}
