@@ -40,6 +40,7 @@ const Playground = () => {
   const [multiMode, setMultiMode] = useState<boolean>(() => {
     try { return localStorage.getItem('codesage_pg_multi') !== '0'; } catch { return true; }
   });
+  const [layoutMode, setLayoutMode] = useState<'single' | 'split'>('single');
   const [previewSrcId, setPreviewSrcId] = useState<string>('html'); // which HTML file to preview
   const fileInputRef = useRef<HTMLInputElement>(null);
   const zipInputRef = useRef<HTMLInputElement>(null);
@@ -505,6 +506,10 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             className={`flex items-center gap-1 text-[10px] px-1.5 py-1 rounded ${multiMode ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/30'}`}>
             <Layers className="w-3 h-3" /> {multiMode ? 'Multi' : 'Single'}
           </button>
+          <button onClick={() => setLayoutMode(layoutMode === 'split' ? 'single' : 'split')} title="Toggle 3-file split view"
+            className={`flex items-center gap-1 text-[10px] px-1.5 py-1 rounded ${layoutMode === 'split' ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/30'}`}>
+            <Layers className="w-3 h-3" /> {layoutMode === 'split' ? 'Split View' : 'Tab View'}
+          </button>
           {htmlFiles.length > 1 && (
             <select value={previewSrcId} onChange={e => setPreviewSrcId(e.target.value)} title="Preview source"
               className="bg-secondary/40 border border-border/30 rounded text-[10px] text-muted-foreground px-1.5 py-1 focus:outline-none">
@@ -568,42 +573,79 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center border-b border-border/30 bg-card/20 backdrop-blur-sm overflow-x-auto flex-shrink-0">
-            {files.map(f => (
-              <button key={f.id} onClick={() => setActiveFileId(f.id)}
-                className={`px-3 py-1.5 text-[10px] font-mono border-b-2 flex-shrink-0 ${
-                  activeFileId === f.id ? 'text-foreground border-primary bg-background/50' : 'text-muted-foreground border-transparent hover:bg-secondary/20'
-                }`}>{f.name}</button>
-            ))}
-          </div>
+       <div className="flex-1 flex flex-col min-w-0">
+          {/* Only show tabs if we are in 'single' mode */}
+          {layoutMode === 'single' && (
+            <div className="flex items-center border-b border-border/30 bg-card/20 backdrop-blur-sm overflow-x-auto flex-shrink-0">
+              {files.map(f => (
+                <button key={f.id} onClick={() => setActiveFileId(f.id)}
+                  className={`px-3 py-1.5 text-[10px] font-mono border-b-2 flex-shrink-0 ${
+                    activeFileId === f.id ? 'text-foreground border-primary bg-background/50' : 'text-muted-foreground border-transparent hover:bg-secondary/20'
+                  }`}>{f.name}</button>
+              ))}
+            </div>
+          )}
 
           {showPreview ? (
             <ResizablePanelGroup direction="horizontal" className="flex-1">
               <ResizablePanel defaultSize={50} minSize={25}>
-                <div className="h-full flex flex-col">
+                <div className="h-full flex flex-col bg-background">
                   <div className="flex-1 min-h-0">
-                    <CodeEditor code={activeFile.content} onChange={updateFileContent} language={activeFile.lang} theme={editorTheme} fontSize={fontSize} />
+                    {layoutMode === 'split' ? (
+                      <div className="h-full flex flex-col xl:flex-row gap-1 p-1 overflow-hidden">
+                        <div className="flex-1 border border-border/30 flex flex-col min-h-0 rounded overflow-hidden">
+                          <div className="text-[10px] px-2 py-1 bg-card/40 border-b border-border/30 text-muted-foreground">index.html</div>
+                          <CodeEditor code={currentHtml} onChange={(v) => setFiles(p => p.map(f => f.id === 'html' ? { ...f, content: v } : f))} language="html" theme={editorTheme} fontSize={fontSize} />
+                        </div>
+                        <div className="flex-1 border border-border/30 flex flex-col min-h-0 rounded overflow-hidden">
+                          <div className="text-[10px] px-2 py-1 bg-card/40 border-b border-border/30 text-muted-foreground">style.css</div>
+                          <CodeEditor code={currentCss} onChange={(v) => setFiles(p => p.map(f => f.id === 'css' ? { ...f, content: v } : f))} language="css" theme={editorTheme} fontSize={fontSize} />
+                        </div>
+                        <div className="flex-1 border border-border/30 flex flex-col min-h-0 rounded overflow-hidden">
+                          <div className="text-[10px] px-2 py-1 bg-card/40 border-b border-border/30 text-muted-foreground">script.js</div>
+                          <CodeEditor code={currentJs} onChange={(v) => setFiles(p => p.map(f => f.id === 'js' ? { ...f, content: v } : f))} language="javascript" theme={editorTheme} fontSize={fontSize} />
+                        </div>
+                      </div>
+                    ) : (
+                      <CodeEditor code={activeFile.content} onChange={updateFileContent} language={activeFile.lang} theme={editorTheme} fontSize={fontSize} />
+                    )}
                   </div>
                   <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={50} minSize={20}>
-  <div className="h-full flex flex-col">
-    <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20">
-      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
-    </div>
-    <div className="flex-1 min-h-0">
-      <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
-    </div>
-  </div>
-</ResizablePanel>
+                <div className="h-full flex flex-col">
+                  <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
+                  </div>
+                  <div className="flex-1 min-h-0">
+                    <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
+                  </div>
+                </div>
+              </ResizablePanel>
             </ResizablePanelGroup>
           ) : (
             <div className="flex-1 flex flex-col">
               <div className="flex-1 min-h-0">
-                <CodeEditor code={activeFile.content} onChange={updateFileContent} language={activeFile.lang} theme={editorTheme} fontSize={fontSize} />
+                {layoutMode === 'split' ? (
+                  <div className="h-full flex flex-col xl:flex-row gap-1 p-1 overflow-hidden">
+                    <div className="flex-1 border border-border/30 flex flex-col min-h-0 rounded overflow-hidden">
+                      <div className="text-[10px] px-2 py-1 bg-card/40 border-b border-border/30 text-muted-foreground">index.html</div>
+                      <CodeEditor code={currentHtml} onChange={(v) => setFiles(p => p.map(f => f.id === 'html' ? { ...f, content: v } : f))} language="html" theme={editorTheme} fontSize={fontSize} />
+                    </div>
+                    <div className="flex-1 border border-border/30 flex flex-col min-h-0 rounded overflow-hidden">
+                      <div className="text-[10px] px-2 py-1 bg-card/40 border-b border-border/30 text-muted-foreground">style.css</div>
+                      <CodeEditor code={currentCss} onChange={(v) => setFiles(p => p.map(f => f.id === 'css' ? { ...f, content: v } : f))} language="css" theme={editorTheme} fontSize={fontSize} />
+                    </div>
+                    <div className="flex-1 border border-border/30 flex flex-col min-h-0 rounded overflow-hidden">
+                      <div className="text-[10px] px-2 py-1 bg-card/40 border-b border-border/30 text-muted-foreground">script.js</div>
+                      <CodeEditor code={currentJs} onChange={(v) => setFiles(p => p.map(f => f.id === 'js' ? { ...f, content: v } : f))} language="javascript" theme={editorTheme} fontSize={fontSize} />
+                    </div>
+                  </div>
+                ) : (
+                  <CodeEditor code={activeFile.content} onChange={updateFileContent} language={activeFile.lang} theme={editorTheme} fontSize={fontSize} />
+                )}
               </div>
               <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
             </div>
