@@ -165,27 +165,20 @@ const FullstackLessonPage = () => {
 
             {code && (
               <div className="glass-card rounded-2xl overflow-hidden">
-                {isMobile ? (
-                  /* Mobile View: Stacked Top-to-Bottom (No buttons!) */
-                  <div className="flex flex-col" style={{ height: '80vh' }}>
-                    <div className="h-1/2 border-b border-border/40 overflow-hidden">
-                      {Editor}
+                {/* Always stacked top-to-bottom so it fits mobile widths */}
+                <div className="flex flex-col" style={{ height: isMobile ? '80vh' : '90vh' }}>
+                  <div className="h-[55%] min-h-0 border-b border-border/40 overflow-hidden">
+                    {Editor}
+                  </div>
+                  <div className="h-[45%] min-h-0 flex flex-col">
+                    <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 shrink-0">
+                      <Eye className="w-3 h-3" /> Preview
                     </div>
-                    <div className="h-1/2 overflow-hidden">
+                    <div className="flex-1 min-h-0 overflow-hidden">
                       <LivePreview html={html} css={css} js={js} />
                     </div>
                   </div>
-                ) : (
-                  /* Desktop View: Side-by-Side (Left-to-Right) */
-                  <div className="flex flex-row" style={{ height: '75vh' }}>
-                    <div className="w-1/2 border-r border-border/40 overflow-hidden">
-                      {Editor}
-                    </div>
-                    <div className="w-1/2 overflow-hidden">
-                      <LivePreview html={html} css={css} js={js} />
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             )}
 
