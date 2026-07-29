@@ -26,14 +26,14 @@ const TRACKS: Track[] = [
   { prefix: 'local-', path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'sql-',   path: '/sql-lesson',   list: (SQL_LESSONS || []).map(l => ({ id: l.id, title: l.title })) },
   { prefix: 'three3d-', path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'rf-',    path: '/rf-lesson',    list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+ { prefix: 'real-free-', path: '/rf-lesson', list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
 ];
 
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
   'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
   'sql-': '/sql-learn', 'ai-': '/ai-fundamentals', 'three3d-': '/three3d',
-  'rf-': '/real-freelance',
+  'real-free-': '/real-freelance',
 };
 
 const LessonComplete = () => {
