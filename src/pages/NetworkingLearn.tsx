@@ -21,10 +21,11 @@ const NetworkingLearn = () => {
   const progress = Math.round((completed / total) * 100);
 
   return (
-    <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
-      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-accent-blue/5 blur-[120px] pointer-events-none" />
+  <div className="min-h-screen w-full max-w-full bg-background grid-bg relative overflow-x-hidden">
+    {/* Background Glow Effect - Added hidden on small screens & strict clipping */}
+    <div className="absolute top-[-10%] right-[-5%] w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] rounded-full bg-accent-blue/5 blur-[120px] pointer-events-none overflow-hidden" />
 
-     <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-20">
+    <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-20 w-full max-w-full box-border">
   <div className="flex items-center gap-2 sm:gap-3">
           <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground p-1 transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -41,7 +42,11 @@ const NetworkingLearn = () => {
 </div>
       </header>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto p-3 sm:p-4 space-y-3 sm:space-y-4 pb-8 relative z-10">
+      <motion.div 
+      initial={{ opacity: 0, y: 10 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      className="w-full max-w-2xl mx-auto px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4 pb-8 relative z-10 box-border overflow-x-hidden"
+    >
 <div className="glass-card rounded-2xl p-3 sm:p-4">
   <div className="flex justify-between text-[10px] sm:text-xs mb-2">
     <span className="text-muted-foreground">Module Progress</span>
