@@ -182,9 +182,10 @@ const FullstackLessonPage = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="flex flex-col" style={{ height: '75vh' }}>
-                    <div className="h-1/2 border-b border-border/40 overflow-hidden">{Editor}</div>
-                    <div className="h-1/2 overflow-hidden">
+                  /* Changed to flex-row (left-to-right) and w-1/2 */
+                  <div className="flex flex-row" style={{ height: '75vh' }}>
+                    <div className="w-1/2 border-r border-border/40 overflow-hidden">{Editor}</div>
+                    <div className="w-1/2 overflow-hidden">
                       <LivePreview html={html} css={css} js={js} />
                     </div>
                   </div>
