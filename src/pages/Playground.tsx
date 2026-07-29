@@ -54,13 +54,12 @@ const Playground = () => {
   const [debouncedCss, setDebouncedCss] = useState(currentCss);
   const [debouncedJs, setDebouncedJs] = useState(currentJs);
 
-  // ADD THE NEW USEEFFECT RIGHT HERE:
-  useEffect(() => {
+ useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedHtml(currentHtml);
       setDebouncedCss(currentCss);
       setDebouncedJs(currentJs);
-    }, 800); // 800ms delay
+    }, 150); // Reduced to 150ms for snappy live updates
 
     return () => clearTimeout(handler);
   }, [currentHtml, currentCss, currentJs]);
@@ -396,7 +395,7 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Preview
               </div>
               <div className="flex-1 min-h-0">
-                <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
+              <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
               </div>
             </div>
           )}
@@ -598,7 +597,7 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
                   </div>
                   <div className="flex-1 min-h-0">
-                    <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
+                   <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
                   </div>
                 </div>
               </ResizablePanel>
