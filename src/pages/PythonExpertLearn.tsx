@@ -16,7 +16,9 @@ const PythonExpertLearn = () => {
 
   if (!user) { navigate('/auth'); return null; }
 
-  const completed = PYTHON_EXPERT_LESSONS.filter(l => user.completedLessons.includes(l.id)).length;
+  // Safe check in case completedLessons is loading or undefined
+  const userCompleted = user?.completedLessons || [];
+  const completed = PYTHON_EXPERT_LESSONS.filter(l => userCompleted.includes(l.id)).length;
   const total = PYTHON_EXPERT_LESSONS.length;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -26,8 +28,8 @@ const PythonExpertLearn = () => {
       <div className="absolute top-[-10%] right-[-5%] w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] rounded-full bg-indigo-400/5 blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-20 w-full box-border">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2">
+      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-20 w-full box-border min-w-0 overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2 overflow-hidden">
           <button 
             onClick={() => navigate(backTo)} 
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg flex-shrink-0"
@@ -35,9 +37,9 @@ const PythonExpertLearn = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
             <span className="text-lg sm:text-xl flex-shrink-0">🧠</span>
-            <span className="text-xs sm:text-sm font-bold font-display truncate block">
+            <span className="text-xs sm:text-sm font-bold font-display truncate block min-w-0">
               Python Expert
             </span>
           </div>
@@ -45,7 +47,7 @@ const PythonExpertLearn = () => {
 
         <div className="flex items-center gap-1.5 sm:gap-2 bg-primary/10 px-2 py-1 sm:px-2.5 rounded-full border border-primary/20 flex-shrink-0">
           <Flame className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[10px] sm:text-xs font-bold text-primary">{user.streakCount}</span>
+          <span className="text-[10px] sm:text-xs font-bold text-primary">{user?.streakCount || 0}</span>
         </div>
       </header>
 
@@ -77,8 +79,8 @@ const PythonExpertLearn = () => {
             </div>
           )}
           {PYTHON_EXPERT_LESSONS.map((lesson, i) => {
-            const isCompleted = user.completedLessons.includes(lesson.id);
-            const isUnlocked = isPythonExpertLessonUnlocked(lesson.id, user.completedLessons);
+            const isCompleted = userCompleted.includes(lesson.id);
+            const isUnlocked = isPythonExpertLessonUnlocked(lesson.id, userCompleted);
             return (
               <motion.button
                 key={lesson.id}
@@ -87,7 +89,8 @@ const PythonExpertLearn = () => {
                 transition={{ delay: i * 0.02 }}
                 onClick={() => isUnlocked && navigate(`/pyx-lesson/${lesson.id}${fromQs}`)}
                 disabled={!isUnlocked}
-                className={`w-full glass-card rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 text-left transition-all ${
+                /* Added min-w-0 overflow-hidden directly to button card */
+                className={`w-full glass-card rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 text-left transition-all min-w-0 overflow-hidden ${
                   isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
                 }`}
               >
@@ -97,11 +100,11 @@ const PythonExpertLearn = () => {
                   {lesson.icon}
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase truncate">
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase truncate block">
                     Lesson {lesson.order}
                   </p>
-                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block">
+                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block min-w-0">
                     {lesson.title}
                   </p>
                 </div>
