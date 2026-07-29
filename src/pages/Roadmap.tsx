@@ -271,12 +271,11 @@ function SectorPod({
 
       {/* Wave field */}
 {/* AFTER */}
-<div className="w-full overflow-x-auto pb-4 scrollbar-thin">
-  <div
-    ref={containerRef}
-    className="relative min-w-[420px] mx-auto"
-    style={{ height }}
-  >
+<div
+  ref={containerRef}
+  className="relative w-full"
+  style={{ height }}
+>
         {/* SVG curve threading nodes */}
         {width > 0 && (
           <svg
@@ -382,10 +381,11 @@ function SectorPod({
 
               {/* Floating label */}
               <div
-  className={`pointer-events-none absolute top-1/2 -translate-y-1/2 w-[100px] sm:w-[150px] ${
+  className={`pointer-events-none absolute w-[110px] sm:w-[160px] text-center sm:text-left ${
+    // On mobile (<640px): Center below node. On sm+: Float left/right.
     labelLeft
-      ? 'right-full mr-1.5 sm:mr-3 text-right'
-      : 'left-full ml-1.5 sm:ml-3 text-left'
+      ? 'top-[105%] left-1/2 -translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2 sm:left-auto sm:right-full sm:mr-3 sm:translate-x-0 sm:text-right'
+      : 'top-[105%] left-1/2 -translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2 sm:left-full sm:ml-3 sm:translate-x-0'
   }`}
 >
   <p className={`font-display text-[10px] sm:text-xs font-semibold leading-tight truncate ${
