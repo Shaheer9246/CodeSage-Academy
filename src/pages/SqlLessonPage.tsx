@@ -12,19 +12,38 @@ import { SQL_LESSONS, isSqlLessonUnlocked } from '@/data/sqlLessons';
 type Section = 'concept' | 'practical' | 'quiz';
 
 // Helper to dynamic-load SQLite WASM drivers in-browser
+let cachedSQL: any = null;
+let sqlLoadPromise: Promise<any> | null = null;
+
 const loadSqlJs = (): Promise<any> => {
-  return new Promise((resolve, reject) => {
+  if (cachedSQL) return Promise.resolve(cachedSQL);
+  if (sqlLoadPromise) return sqlLoadPromise;
+
+  sqlLoadPromise = new Promise((resolve, reject) => {
+    const init = async (initSqlJs: any) => {
+      try {
+        cachedSQL = await initSqlJs({
+          locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+        });
+        resolve(cachedSQL);
+      } catch (err) {
+        reject(err);
+      }
+    };
+
     if ((window as any).initSqlJs) {
-      resolve((window as any).initSqlJs);
+      init((window as any).initSqlJs);
       return;
     }
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
     script.async = true;
-    script.onload = () => resolve((window as any).initSqlJs);
+    script.onload = () => init((window as any).initSqlJs);
     script.onerror = () => reject(new Error('Failed to load local database driver.'));
     document.body.appendChild(script);
   });
+
+  return sqlLoadPromise;
 };
 
 interface ConsoleProps {
@@ -50,12 +69,9 @@ function SqlWorkspaceConsole({ lessonId, practical, isValidated, setIsValidated 
     setIsValidated(false);
   }, [practical, setIsValidated]);
 
-  useEffect(() => {
+ useEffect(() => {
     loadSqlJs()
-      .then(async (initSqlJs) => {
-        const SQL = await initSqlJs({
-          locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-        });
+      .then((SQL) => {
         SQLRef.current = SQL;
         setDbLoading(false);
       })
