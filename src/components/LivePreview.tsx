@@ -9,28 +9,52 @@ interface LivePreviewProps {
 
 const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const prevHtmlRef = useRef<string>('');
+  const prevJsRef = useRef<string>('');
 
   useEffect(() => {
+    const safeCss = (css || '').replace(/<\/style/gi, '</sty' + 'le');
+    const safeJs = (js || '').replace(/<\/script/gi, '</scr' + 'ipt');
+    const trimmedHtml = html.trim();
+
+    const htmlChanged = prevHtmlRef.current !== trimmedHtml;
+    const jsChanged = prevJsRef.current !== safeJs;
+
+    // ⚡ INSTANT HOT CSS RELOAD: If only CSS changed, update style tag directly without reloading iframe
+    if (!htmlChanged && !jsChanged && iframeRef.current?.contentDocument) {
+      const styleEl = iframeRef.current.contentDocument.getElementById('codesage-live-css');
+      if (styleEl) {
+        styleEl.textContent = safeCss;
+        return;
+      }
+    }
+
+    // Debounce full updates (400ms) for HTML/JS so typing doesn't reload on every single keystroke
     const timer = setTimeout(() => {
       if (!iframeRef.current) return;
 
+      // Update refs
+      prevHtmlRef.current = trimmedHtml;
+      prevJsRef.current = safeJs;
+
       const closeScriptTag = '</scr' + 'ipt>';
-      
+
+      // Base dark theme + hot-reload CSS container
       const baseStyle = `
         <style>
           html, body {
-            background-color: #0f0a2e;
+            background-color: #0f0a2e !important;
             color: #ffffff;
             margin: 0;
             padding: 0;
             min-height: 100vh;
           }
         </style>
+        <style id="codesage-live-css">${safeCss}</style>
       `;
 
-      // Included: Console Interceptor, CDN Libraries, Babel Compiler, and Import Maps
-      const headLibraries = `
-        ${baseStyle}
+      // Console capture wrapper
+      const consoleOverride = `
         <script>
           (function() {
             const origLog = console.log;
@@ -53,17 +77,23 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
             };
           })();
         ${closeScriptTag}
+      `;
 
-        <!-- 1. Global Vanilla 3D & Animation Libraries -->
+      // Three.js, GSAP, React, Babel & ESM Import Maps
+      const headLibraries = `
+        ${baseStyle}
+        ${consoleOverride}
+
+        <!-- Global Libraries -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">${closeScriptTag}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js">${closeScriptTag}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js">${closeScriptTag}
         <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js">${closeScriptTag}
 
-        <!-- 2. Babel Transpiler for React/JSX support -->
+        <!-- Babel Compiler for React/JSX -->
         <script src="https://unpkg.com/@babel/standalone/babel.min.js">${closeScriptTag}
 
-        <!-- 3. ES Import Maps for React Three Fiber & Drei -->
+        <!-- ES Module Import Maps -->
         <script type="importmap">
         {
           "imports": {
@@ -77,18 +107,14 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
         ${closeScriptTag}
       `;
 
-      // Escape literal tags in JS/CSS
-      const safeJs = (js || '').replace(/<\/script/gi, '</scr' + 'ipt');
-      const safeCss = (css || '').replace(/<\/style/gi, '</sty' + 'le');
-
-      // Detect if user code requires Babel (JSX or ES module imports) or standard script tag
+      // Detect if user JS contains JSX or ES Imports
       const containsJsxOrImports = /import\s+.*from|export\s+|<[A-Z][A-Za-z0-9]*/.test(safeJs);
 
       const scriptBlock = containsJsxOrImports
         ? `<script type="text/babel" data-type="module">\n${safeJs}\n${closeScriptTag}`
         : `<script>\n${safeJs}\n${closeScriptTag}`;
 
-      let finalHtml = html.trim();
+      let finalHtml = trimmedHtml;
 
       const hasDoctype = /<!doctype\s+html>/i.test(finalHtml);
       const hasHtmlTag = /<html[\s>]/i.test(finalHtml);
@@ -99,7 +125,6 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
 <html>
 <head>
   ${headLibraries}
-  <style>${safeCss}</style>
 </head>
 <body>
   ${finalHtml}
@@ -117,16 +142,9 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
         }
 
         if (finalHtml.match(/href=["']style\.css["']/i)) {
-          finalHtml = finalHtml.replace(/<link[^>]*href=["']style\.css["'][^>]*>/gi, `<style>${safeCss}</style>`);
-        } else if (safeCss.trim()) {
-          if (finalHtml.match(/<\/head>/i)) {
-            finalHtml = finalHtml.replace(/<\/head>/i, `<style>${safeCss}</style></head>`);
-          } else {
-            finalHtml = `<style>${safeCss}</style>` + finalHtml;
-          }
+          finalHtml = finalHtml.replace(/<link[^>]*href=["']style\.css["'][^>]*>/gi, '');
         }
 
-        // Add #root div for React rendering if it doesn't exist
         if (!finalHtml.includes('id="root"')) {
           if (finalHtml.match(/<body[^>]*>/i)) {
             finalHtml = finalHtml.replace(/<body[^>]*>/i, '$&<div id="root"></div>');
@@ -145,7 +163,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       }
 
       iframeRef.current.srcdoc = finalHtml;
-    }, 0);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [html, css, js]);
@@ -166,7 +184,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       ref={iframeRef}
       className="w-full h-full border-0 bg-[#0f0a2e]"
       style={{ backgroundColor: '#0f0a2e' }}
-      sandbox="allow-scripts allow-modals"
+      sandbox="allow-scripts allow-modals allow-same-origin"
       title="Preview"
     />
   );
