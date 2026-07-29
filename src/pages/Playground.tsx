@@ -389,16 +389,16 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
           )}
 
           {/* PREVIEW */}
-          {mobileTab === 'preview' && (
-            <div className="flex-1 flex flex-col min-h-0">
-              <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20 flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Preview
-              </div>
-              <div className="flex-1 min-h-0">
-              <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
-              </div>
-            </div>
-          )}
+{mobileTab === 'preview' && (
+  <div className="flex-1 flex flex-col min-h-0">
+    <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20 flex-shrink-0">
+      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Preview
+    </div>
+    <div className="flex-1 min-h-0">
+      <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
+    </div>
+  </div>
+)}
 
           {/* RECENT */}
           {mobileTab === 'recent' && (
@@ -592,15 +592,15 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="h-full flex flex-col">
-                  <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
-                  </div>
-                  <div className="flex-1 min-h-0">
-                   <LivePreview html={currentHtml} css={currentCss} js={currentJs} onConsoleLog={handleConsoleLog} />
-                  </div>
-                </div>
-              </ResizablePanel>
+  <div className="h-full flex flex-col">
+    <div className="px-3 py-1.5 border-b border-border/30 text-[10px] text-muted-foreground font-mono flex items-center gap-2 bg-card/20">
+      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Preview
+    </div>
+    <div className="flex-1 min-h-0">
+      <LivePreview html={debouncedHtml} css={debouncedCss} js={debouncedJs} onConsoleLog={handleConsoleLog} />
+    </div>
+  </div>
+</ResizablePanel>
             </ResizablePanelGroup>
           ) : (
             <div className="flex-1 flex flex-col">
