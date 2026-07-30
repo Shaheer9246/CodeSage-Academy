@@ -653,10 +653,7 @@ const SettingsPage = () => {
             <button 
               onClick={() => {
                 if (user) {
-                  const updatedUser = { ...user, ...editData };
-                  if (typeof updateUser === 'function') {
-                    updateUser(updatedUser);
-                  }
+                  updateUser(editData);
                 }
                 toast.success('Profile updated successfully!');
                 setShowEditModal(false);
@@ -675,9 +672,9 @@ const SettingsPage = () => {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 min-w-0 w-full">
+    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 w-full min-w-0">
       <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">{label}</span>
-      <span className="text-[10px] sm:text-xs text-foreground font-medium font-mono break-all text-right max-w-[65%] leading-tight">
+      <span className="text-[10px] sm:text-xs text-foreground font-medium font-mono break-all text-right max-w-[65%] leading-tight min-w-0">
         {value || '—'}
       </span>
     </div>
