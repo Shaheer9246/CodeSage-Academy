@@ -141,7 +141,7 @@ const SettingsPage = () => {
     { key: 'networking', label: 'Networking', match: (id: string) => id.startsWith('net-') },
     { key: 'fullstack', label: 'Full Stack', match: (id: string) => id.startsWith('fs-') },
     { key: 'freelance', label: 'Freelance', match: (id: string) => id.startsWith('free-') },
-    { key: 'realfreelance', label: 'Real-World Freelancing', match: (id: string) => id.startsWith('rf-') },
+    { key: 'realfreelance', label: 'Real-World Freelancing', match: (id: string) => id.startsWith('real-') },
     { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') && !id.startsWith('pyx-') },
     { key: 'pythonexpert', label: 'Python Expert', match: (id: string) => id.startsWith('pyx-') || id.startsWith('pyexpert-') },
     { key: 'sql', label: 'SQL', match: (id: string) => id.startsWith('sql-') },
@@ -585,9 +585,9 @@ const SettingsPage = () => {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-border/20 last:border-0">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-xs text-foreground font-medium font-mono">{value || '—'}</span>
+    <div className="flex justify-between items-center py-2 border-b border-border/20 last:border-0 gap-4">
+      <span className="text-xs text-muted-foreground flex-shrink-0">{label}</span>
+      <span className="text-xs text-foreground font-medium font-mono truncate text-right">{value || '—'}</span>
     </div>
   );
 }
