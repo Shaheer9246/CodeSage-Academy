@@ -247,6 +247,7 @@ const SqlLessonPage = () => {
   const [sp] = useSearchParams();
   
   const from = sp.get('from');
+  const isGuest = sp.get('guest') === '1';
   const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/sql-learn?from=dashboard' : '/sql-learn';
 
   const lesson = SQL_LESSONS?.find((l: any) => l.id === id);
@@ -256,9 +257,9 @@ const SqlLessonPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isValidated, setIsValidated] = useState<boolean>(false);
 
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user && !isGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/sql-learn" replace />;
-  if (!isSqlLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/sql-learn" replace />;
+  if (!isGuest && !isSqlLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/sql-learn" replace />;
 
   const correctCount = lesson.quiz ? lesson.quiz.filter((q: any, i: number) => answers[i] === q.correctIndex).length : 0;
   const totalQuizLength = lesson.quiz ? lesson.quiz.length : 0;
