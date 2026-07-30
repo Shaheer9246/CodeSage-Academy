@@ -103,7 +103,7 @@ export default function DashboardTour({ steps, onFinish }: Props) {
 
       {/* Tooltip */}
       <div
-        className="fixed pointer-events-auto w-[320px] glass-card rounded-2xl p-4 border border-primary/40 neon-glow"
+        className="fixed pointer-events-auto w-[320px] glass-card rounded-2xl p-4 border border-primary/40 neon-glow transition-all duration-300 ease-in-out"
         style={{ top: tooltipTop, left: tooltipLeft }}
       >
         <div className="flex items-center justify-between mb-2">
@@ -116,8 +116,10 @@ export default function DashboardTour({ steps, onFinish }: Props) {
             ))}
           </div>
         </div>
-        <h3 className="text-base font-display font-bold text-foreground mb-1">{step.title}</h3>
-        <p className="text-xs text-muted-foreground leading-relaxed mb-3">{step.body}</p>
+        <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+  <h3 className="text-base font-display font-bold text-foreground mb-1">{step.title}</h3>
+  <p className="text-xs text-muted-foreground leading-relaxed mb-3">{step.body}</p>
+</div>
         <div className="flex gap-2">
           <button
             onClick={onFinish}
