@@ -16,17 +16,17 @@ import SuggestionsBadge from '@/components/SuggestionsBadge';
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
-  { target: 'frontend',   title: 'Frontend Development', body: 'HTML, CSS, JS from zero.' },
+  { target: 'frontend',   title: 'Frontend Development', body: 'HTML, CSS, JS from zero. Learn to How to build a website (coding only).' },
   { target: 'networking', title: 'Computer & Networking', body: 'How machines & the internet work.' },
   { target: 'ai-fundamentals', title: 'AI Fundamentals', body: 'Concepts, LLMs & Agents.' },
-  { target: 'fullstack',  title: 'Full Stack Frontend', body: 'React, hooks, deployment.' },
+  { target: 'fullstack',  title: 'Full Stack Frontend', body: 'React, hooks, deployment. Learn How to make website live and deploy, in real world.' },
   { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn skills into income.' },
   { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
-  { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone.' },
+  { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
-  { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber.' },
-  { target: 'challenges', title: 'Challenges', body: 'Bite-sized puzzles.' },
+  { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
+  { target: 'challenges', title: 'Challenges', body: 'Bite-sized puzzles. Test your coding level.' },
   { target: 'playground', title: 'Code Editor', body: 'Real in-browser editor.' },
 ];
 
