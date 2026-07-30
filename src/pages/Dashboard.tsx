@@ -235,7 +235,7 @@ const Dashboard = () => {
     '/networking': '/n-lesson/net-1?guest=1',
     '/freelance': '/f-lesson/free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
-    '/sql': '/sql-lesson/sql-1?guest=1',
+    '/sql': '/sql-lesson/sql-01?guest=1',
   };
   const ROUTE_TO_TRACK: Record<string, TrackId> = {
     '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
