@@ -87,20 +87,22 @@ const SECTIONS: SectionDef[] = [
     Icon: Layout,
     gradient: 'from-fuchsia-400/70 via-pink-500/60 to-rose-500/70',
     tracks: [
-      { id: 'frontend', path: '/learn', title: 'Frontend Development', emoji: '📱',
+      { id: 'frontend', path: '/learn', title: 'Frontend Dev (Coding only)', emoji: '📱',
         tour: 'frontend', lessons: 50, accent: 'primary',
         tags: ['HTML', 'CSS', 'JS'], desc: 'HTML → CSS → JS → React → Deploy',
         trackId: 'frontend' },
-      { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full Stack Frontend Dev', emoji: '🚀',
+      
+      { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full Stack Frontend Dev (Live Web)', emoji: '🚀',
         tour: 'fullstack', lessons: 30, accent: 'accent-orange',
         tags: ['React', 'Hooks', 'APIs', 'TS'], desc: 'React → APIs → Testing → Deploy',
         trackId: 'fullstack' },
-      { id: 'local', path: '/local?from=dashboard', title: 'Local-Only Coding', emoji: '🏠',
+      
+      { id: 'local', path: '/local?from=dashboard', title: 'Local-Only Coding (no backend)', emoji: '🏠',
         tour: 'local', lessons: 15, accent: 'emerald-400',
         tags: ['DOM', 'localStorage', 'PWA'], desc: 'No backend, no server, no cost',
         trackId: 'local' },
 
-      { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Development', emoji: '🧊',
+      { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Dev (Animated Web)', emoji: '🧊',
         tour: 'three3d', lessons: 15, accent: 'accent-blue',
         tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Build immersive 3D web experiences',
         trackId: 'three3d' as TrackId },
@@ -144,12 +146,12 @@ const SECTIONS: SectionDef[] = [
     Icon: Briefcase,
     gradient: 'from-yellow-300/70 via-yellow-500/60 to-orange-400/70',
     tracks: [
-      { id: 'freelance', path: '/freelance?from=dashboard', title: 'Freelance & Clients', emoji: '💼',
+      { id: 'freelance', path: '/freelance?from=dashboard', title: 'Freelance & Clients (Understanding)', emoji: '💼',
         tour: 'freelance', lessons: 12, accent: 'yellow-500',
         tags: ['Niche', 'Pitch', 'Price', 'Deliver'], desc: 'Find → Pitch → Deliver',
         trackId: 'freelance' },
 
-      { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing', emoji: '🌍',
+      { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing (methods)', emoji: '🌍',
         tour: 'real-freelance', lessons: 10, accent: 'primary',
         tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'Master platforms & win clients',
         trackId: 'real-freelance' as TrackId },
