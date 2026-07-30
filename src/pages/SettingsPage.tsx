@@ -197,8 +197,8 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto p-4 space-y-4">
+  <div className="min-h-screen bg-background relative overflow-x-hidden w-full max-w-full grid-bg">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-2xl mx-auto p-4 space-y-4 box-border min-w-0">
         <h1 className="text-xl font-bold font-display text-foreground">Profile & Settings</h1>
 
         {/* Profile Card */}
@@ -672,9 +672,9 @@ const SettingsPage = () => {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 w-full min-w-0">
+    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 w-full min-w-0 box-border">
       <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">{label}</span>
-      <span className="text-[11px] text-foreground font-medium font-mono text-right flex-1 min-w-0 max-w-[180px] sm:max-w-[250px] break-all leading-tight">
+      <span className="text-[10px] sm:text-xs text-foreground font-medium font-mono text-right flex-1 min-w-0 max-w-[170px] sm:max-w-[250px] [overflow-wrap:anywhere] break-all leading-tight">
         {value || '—'}
       </span>
     </div>
