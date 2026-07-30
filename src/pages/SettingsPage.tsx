@@ -66,6 +66,8 @@ const SettingsPage = () => {
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
   // Force re-render when enrollment state changes (pause/resume/end)
   const [, setEnrollTick] = useState(0);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({ name: '', studying: '', goal: '', experienceLevel: '' });
 
   useEffect(() => { setTheme(getTheme()); }, []);
   useEffect(() => { if (user?.id) setAvatarUrl(getStoredAvatar(user.id)); }, [user?.id]);
@@ -228,14 +230,20 @@ const SettingsPage = () => {
             <InfoRow label="Member Since" value={joinDate} />
           </div>
           <button 
-            onClick={() => navigate('/edit-profile')} 
+            onClick={() => {
+              setEditData({
+                name: user.name || '',
+                studying: user.studying || '',
+                goal: user.goal || '',
+                experienceLevel: user.experienceLevel || ''
+              });
+              setShowEditModal(true);
+            }} 
             className="w-full mt-4 flex items-center justify-center gap-2 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-xs font-semibold text-foreground"
           >
             <Pencil className="w-3.5 h-3.5 text-primary" /> Edit Profile Data
           </button>
         </div>
-
-        {/* Streak Section */}
 
         {/* Streak Section */}
         <div className="glass-card rounded-2xl p-5">
@@ -587,15 +595,83 @@ const SettingsPage = () => {
         </div>
       )}
 
+      {/* Edit Profile Modal */}
+      {showEditModal && user && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setShowEditModal(false)}>
+          <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                <Pencil className="w-4 h-4 text-primary" /> Edit Profile
+              </h3>
+              <button onClick={() => setShowEditModal(false)} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Name</label>
+                <input 
+                  type="text" 
+                  value={editData.name} 
+                  onChange={e => setEditData({...editData, name: e.target.value})}
+                  className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Studying</label>
+                <input 
+                  type="text" 
+                  value={editData.studying} 
+                  onChange={e => setEditData({...editData, studying: e.target.value})}
+                  className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label>
+                <input 
+                  type="text" 
+                  value={editData.goal} 
+                  onChange={e => setEditData({...editData, goal: e.target.value})}
+                  className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label>
+                <select 
+                  value={editData.experienceLevel}
+                  onChange={e => setEditData({...editData, experienceLevel: e.target.value})}
+                  className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => {
+                toast.success('Profile updated successfully!');
+                setShowEditModal(false);
+              }}
+              className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-4">
+    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-4 w-full">
       <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">{label}</span>
-      <span className="text-xs text-foreground font-medium font-mono break-all text-right">{value || '—'}</span>
+      <span className="text-xs text-foreground font-medium font-mono break-all text-right flex-1 min-w-0">{value || '—'}</span>
     </div>
   );
 }
