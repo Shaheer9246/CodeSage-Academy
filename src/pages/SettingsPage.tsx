@@ -56,7 +56,7 @@ const ACHIEVEMENTS: Achievement[] = [
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const { user, logout, deleteAccount, resetTour } = useUser();
+ const { user, logout, deleteAccount, resetTour, updateUser } = useUser();
   const [theme, setTheme] = useState<ThemeName>('dark');
   const [autoRun, setAutoRun] = useState<boolean>(() => {
     try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
@@ -652,6 +652,12 @@ const SettingsPage = () => {
 
             <button 
               onClick={() => {
+                if (user) {
+                  const updatedUser = { ...user, ...editData };
+                  if (typeof updateUser === 'function') {
+                    updateUser(updatedUser);
+                  }
+                }
                 toast.success('Profile updated successfully!');
                 setShowEditModal(false);
               }}
@@ -669,9 +675,11 @@ const SettingsPage = () => {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-4 w-full">
+    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 min-w-0 w-full">
       <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">{label}</span>
-      <span className="text-xs text-foreground font-medium font-mono break-all text-right flex-1 min-w-0">{value || '—'}</span>
+      <span className="text-[10px] sm:text-xs text-foreground font-medium font-mono break-all text-right max-w-[65%] leading-tight">
+        {value || '—'}
+      </span>
     </div>
   );
 }
