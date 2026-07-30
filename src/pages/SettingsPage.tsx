@@ -227,7 +227,15 @@ const SettingsPage = () => {
             <InfoRow label="Experience" value={user.experienceLevel} />
             <InfoRow label="Member Since" value={joinDate} />
           </div>
+          <button 
+            onClick={() => navigate('/edit-profile')} 
+            className="w-full mt-4 flex items-center justify-center gap-2 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-xs font-semibold text-foreground"
+          >
+            <Pencil className="w-3.5 h-3.5 text-primary" /> Edit Profile Data
+          </button>
         </div>
+
+        {/* Streak Section */}
 
         {/* Streak Section */}
         <div className="glass-card rounded-2xl p-5">
@@ -585,9 +593,9 @@ const SettingsPage = () => {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-border/20 last:border-0 gap-4">
-      <span className="text-xs text-muted-foreground flex-shrink-0">{label}</span>
-      <span className="text-xs text-foreground font-medium font-mono truncate text-right">{value || '—'}</span>
+    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-4">
+      <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">{label}</span>
+      <span className="text-xs text-foreground font-medium font-mono break-all text-right">{value || '—'}</span>
     </div>
   );
 }
