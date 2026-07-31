@@ -13,6 +13,7 @@ import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
+import { JAVA_LESSONS } from '@/data/javaLessons';
 
 /* ------------------------------------------------------------------ */
 /*  TYPES + DATA (identical shape to your original — just re-authored) */
@@ -28,7 +29,8 @@ interface TrackNode {
   lessonIds: string[];
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
-    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'three-lesson' | 'rf-lesson';
+    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'three-lesson' | 'rf-lesson'
+    | 'java-lesson';
   locked?: boolean;
 }
 
@@ -118,10 +120,12 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   pythonexpert: buildTrack(PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'),
   three3d:      buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
  'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
+ java: buildTrack(JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'java-lesson', 'Module 1: Java Programming', 'JAVA COMPLETE'),
 };
 
 const TRACKS = [
   { key: 'frontend',     label: 'Frontend Dev' },
+  { key: 'java',         label: 'Java' },
   { key: 'networking',   label: 'Networking' },
   { key: 'ai-fundamentals', label: 'AI Fundamentals' },
   { key: 'fullstack',    label: 'Full Stack' },
