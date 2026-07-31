@@ -15,30 +15,36 @@ import { JAVA_LESSONS } from '@/data/javaLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
 
-type Track = { prefix: string; path: string; list: Array<{ id: string; title: string }> };
+type Track = { prefix: string; path: string; list: Array<{ id: string; title: string; keyTakeaways?: string[] }> };
 
 const TRACKS: Track[] = [
-  { prefix: 'net-',   path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'ai-', path: '/ai-lesson',       list: AI_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'free-',  path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'fs-',    path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'pyx-',   path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'py-',    path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'local-', path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'sql-',   path: '/sql-lesson',   list: (SQL_LESSONS || []).map(l => ({ id: l.id, title: l.title })) },
- { prefix: 'three3d-',   path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'three-',     path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title })) },
-  { prefix: 'java-', path: '/java-lesson', list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title })) },
- { prefix: 'real-free-', path: '/rf-lesson', list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title })) },
+  { prefix: 'net-',        path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'ai-',         path: '/ai-lesson',    list: AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'free-',       path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'fs-',         path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'pyx-',        path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'py-',         path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'local-',      path: '/local-lesson', list: LOCAL_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'sql-',        path: '/sql-lesson',   list: (SQL_LESSONS || []).map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'three3d-',    path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'three-',      path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'java-',       path: '/java-lesson',  list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'real-free-',  path: '/rf-lesson',    list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
 ];
 
 const TRACK_HOME: Record<string, string> = {
-  'net-': '/networking', 'free-': '/freelance', 'fs-': '/fullstack',
-  'py-': '/python', 'local-': '/local', 'pyx-': '/pythonexpert',
-  'sql-': '/sql-learn', 'ai-': '/ai-fundamentals', 'three3d-'  : '/three3d', 
-  'three-'    : '/three3d',
-  'real-free-': '/real-freelance',
+  'net-': '/networking', 
+  'ai-': '/ai-fundamentals', 
+  'free-': '/freelance', 
+  'fs-': '/fullstack',
+  'pyx-': '/pythonexpert', 
+  'py-': '/python', 
+  'local-': '/local',
+  'sql-': '/sql-learn', 
+  'three3d-': '/three3d', 
+  'three-': '/three3d',
   'java-': '/java',
+  'real-free-': '/real-freelance',
 };
 
 const LessonComplete = () => {
@@ -52,14 +58,23 @@ const LessonComplete = () => {
   const from = searchParams.get('from') ?? 'dashboard';
   const fromQs = `?from=${from}`;
 
-  // Find lesson + track (with bulletproof fallback for missing hyphens like 'py1')
-  let lesson: Lesson | { id: string; title: string; keyTakeaways?: string[] } | undefined = id ? getLessonById(id) : undefined;
+  // Find lesson + track
+  let lesson: Lesson | { id: string; title: string; keyTakeaways?: string[] } | undefined;
   let track: Track | undefined;
-  if (!lesson && id) {
+
+  if (id) {
+    // 1. Try finding matching custom track first
     track = TRACKS.find(t => id.startsWith(t.prefix) || id.startsWith(t.prefix.replace('-', '')));
     if (track) {
       const found = track.list.find(l => l.id === id);
-      if (found) lesson = { id: found.id, title: found.title };
+      if (found) {
+        lesson = found;
+      }
+    }
+
+    // 2. Fallback to standard core lessons if not found in custom tracks
+    if (!lesson) {
+      lesson = getLessonById(id);
     }
   }
 
@@ -78,8 +93,8 @@ const LessonComplete = () => {
   let nextTitle: string | null = null;
 
   if (track) {
-    lessonPath = TRACK_HOME[track.prefix];
-    const idx = track.list.findIndex(l => l.id === lesson.id);
+    lessonPath = TRACK_HOME[track.prefix] || '/dashboard';
+    const idx = track.list.findIndex(l => l.id === lesson!.id);
     if (idx >= 0 && idx < track.list.length - 1) {
       const nxt = track.list[idx + 1];
       nextPath = `${track.path}/${nxt.id}`;
@@ -87,7 +102,7 @@ const LessonComplete = () => {
     }
   } else {
     const all = getAllLessons();
-    const idx = all.findIndex(l => l.id === lesson.id);
+    const idx = all.findIndex(l => l.id === lesson!.id);
     if (idx >= 0 && idx < all.length - 1) {
       const nxt = all[idx + 1];
       nextPath = `/lesson/${nxt.id}`;
@@ -95,9 +110,9 @@ const LessonComplete = () => {
     }
   }
 
-  const takeaways: string[] = (lesson as { keyTakeaways?: string[] }).keyTakeaways || [
+  const takeaways: string[] = lesson.keyTakeaways || [
     `You learned ${String(lesson.title).toLowerCase()}`,
-    'You completed the practice challenge',
+    'You completed the practical challenge',
     'You earned XP and Sage Coins',
   ];
   const isLeveledUp = (user.xp - 5) > 0 && Math.floor((user.xp - 5) / 200) < Math.floor(user.xp / 200);
