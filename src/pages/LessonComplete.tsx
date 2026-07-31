@@ -15,7 +15,11 @@ import { JAVA_LESSONS } from '@/data/javaLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
 
-type Track = { prefix: string; path: string; list: Array<{ id: string; title: string; keyTakeaways?: string[] }> };
+type Track = { 
+  prefix: string; 
+  path: string; 
+  list: Array<{ id: string; title: string; keyTakeaways?: string[] }> 
+};
 
 const TRACKS: Track[] = [
   { prefix: 'net-',        path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
@@ -33,15 +37,15 @@ const TRACKS: Track[] = [
 ];
 
 const TRACK_HOME: Record<string, string> = {
-  'net-': '/networking', 
-  'ai-': '/ai-fundamentals', 
-  'free-': '/freelance', 
+  'net-': '/networking',
+  'ai-': '/ai-fundamentals',
+  'free-': '/freelance',
   'fs-': '/fullstack',
-  'pyx-': '/pythonexpert', 
-  'py-': '/python', 
+  'pyx-': '/pythonexpert',
+  'py-': '/python',
   'local-': '/local',
-  'sql-': '/sql-learn', 
-  'three3d-': '/three3d', 
+  'sql-': '/sql-learn',
+  'three3d-': '/three3d',
   'three-': '/three3d',
   'java-': '/java',
   'real-free-': '/real-freelance',
@@ -58,25 +62,31 @@ const LessonComplete = () => {
   const from = searchParams.get('from') ?? 'dashboard';
   const fromQs = `?from=${from}`;
 
-  // Find lesson + track
+  // 1. Resolve lesson & track
   let lesson: Lesson | { id: string; title: string; keyTakeaways?: string[] } | undefined;
   let track: Track | undefined;
 
   if (id) {
-    // 1. Try finding matching custom track first
+    // Check custom tracks first (including Java)
     track = TRACKS.find(t => id.startsWith(t.prefix) || id.startsWith(t.prefix.replace('-', '')));
     if (track) {
       const found = track.list.find(l => l.id === id);
-      if (found) {
-        lesson = found;
-      }
+      if (found) lesson = found;
     }
 
-    // 2. Fallback to standard core lessons if not found in custom tracks
+    // Fallback to core lessons
     if (!lesson) {
       lesson = getLessonById(id);
     }
   }
+
+  // Debugging log: Open F12 / Console in your browser to inspect these values
+  console.log('[LessonComplete Debug]', {
+    urlParamId: id,
+    resolvedLesson: lesson,
+    resolvedTrack: track,
+    userLoggedIn: !!user
+  });
 
   useEffect(() => {
     const t = setTimeout(() => setShowConfetti(false), 3000);
@@ -84,7 +94,10 @@ const LessonComplete = () => {
   }, []);
 
   if (!user) return <Navigate to="/auth" replace />;
-  if (!lesson) return <Navigate to="/dashboard" replace />;
+  if (!lesson) {
+    console.warn(`[LessonComplete] Lesson with ID "${id}" was not found! Redirecting to dashboard.`);
+    return <Navigate to="/dashboard" replace />;
+  }
 
   // Determine path/nextLesson
   let lessonPath = '/learn';
@@ -112,7 +125,7 @@ const LessonComplete = () => {
 
   const takeaways: string[] = lesson.keyTakeaways || [
     `You learned ${String(lesson.title).toLowerCase()}`,
-    'You completed the practical challenge',
+    'You completed the practice challenge',
     'You earned XP and Sage Coins',
   ];
   const isLeveledUp = (user.xp - 5) > 0 && Math.floor((user.xp - 5) / 200) < Math.floor(user.xp / 200);
