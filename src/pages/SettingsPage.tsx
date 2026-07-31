@@ -141,6 +141,7 @@ const SettingsPage = () => {
   const lessonGroups = [
     { key: 'frontend', label: 'Frontend', match: (id: string) => /^(html|css|js|react|multi|form|a11y|pro|proj)-/.test(id) },
     { key: 'networking', label: 'Networking', match: (id: string) => id.startsWith('net-') },
+    { key: 'java', label: 'Java', match: (id: string) => id.startsWith('java-') },
     { key: 'fullstack', label: 'Full Stack', match: (id: string) => id.startsWith('fs-') },
     { key: 'freelance', label: 'Freelance', match: (id: string) => id.startsWith('free-') },
     { key: 'realfreelance', label: 'Real-World Freelancing', match: (id: string) => id.startsWith('real-') },
@@ -533,6 +534,7 @@ const SettingsPage = () => {
                   // approx denominators per track (matches data files)
                   const totals: Record<string, number> = {
                     frontend: 50,
+                    java: 30,
                     networking: 13,
                     fullstack: 30,
                     freelance: 12,
