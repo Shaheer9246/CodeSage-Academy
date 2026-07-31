@@ -23,6 +23,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'freelance',  title: 'Freelance & Clients', body: 'Turn skills into income.' },
   { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
+  { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
   { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
@@ -109,6 +110,21 @@ const SECTIONS: SectionDef[] = [
       
     ],
   },
+
+  {
+    id: 'java',
+    title: 'Java',
+    subtitle: 'Enterprise & backend power',
+    Icon: Terminal,
+    gradient: 'from-orange-500/70 via-red-500/60 to-amber-500/70',
+    tracks: [
+      { id: 'java', path: '/java?from=dashboard', title: 'Java Development', emoji: '☕',
+        tour: 'java', lessons: 20, accent: 'orange-500',
+        tags: ['Syntax', 'OOP', 'Collections', 'Streams'], desc: 'Core Java → OOP → Backend Basics',
+        trackId: 'java' as TrackId },
+    ],
+  },
+  
   {
     id: 'python',
     title: 'Python',
@@ -229,6 +245,7 @@ const Dashboard = () => {
     '/python',      // Python
     '/freelance',   // Freelance & Clients
     '/sql',         // SQL Databases
+   '/java',        // Java
   ]);
  const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
@@ -236,6 +253,7 @@ const Dashboard = () => {
     '/freelance': '/f-lesson/free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
     '/sql': '/sql-lesson/sql-01?guest=1',
+    '/java': '/java-lesson/java-01?guest=1',
   };
   const ROUTE_TO_TRACK: Record<string, TrackId> = {
     '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
@@ -243,6 +261,7 @@ const Dashboard = () => {
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
     '/ai-fundamentals': 'ai-fundamentals',
     '/three3d': 'three3d' as TrackId,
+    '/java': 'java' as TrackId,
   };
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
   const go = (path: string) => () => {
