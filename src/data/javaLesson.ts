@@ -1,8 +1,5 @@
-// Java Track — Phase 1: Java Basics & Fundamentals (Lessons 1–6)
 import type { NetworkingLesson, Concept, QuizQuestion } from './networkingLessons';
-
 export type JavaLesson = NetworkingLesson;
-
 const L = (
   id: string, order: number, title: string, icon: string, philosophy: string,
   concepts: Concept[], practical: JavaLesson['practical'], quiz: QuizQuestion[],
