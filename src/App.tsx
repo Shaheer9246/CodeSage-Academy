@@ -21,6 +21,8 @@ import FreelanceLearn from "./pages/FreelanceLearn";
 import FreelanceLessonPage from "./pages/FreelanceLessonPage";
 import FullstackLearn from "./pages/FullstackLearn";
 import FullstackLessonPage from "./pages/FullstackLessonPage";
+import JavaLearn from "./pages/JavaLearn";
+import JavaLessonPage from "./pages/JavaLessonPage";
 import PythonLearn from "./pages/PythonLearn";
 import PythonLessonPage from "./pages/PythonLessonPage";
 import LocalLearn from "./pages/LocalLearn";
@@ -129,13 +131,15 @@ const App = () => (
               <Route path="/f-lesson/:id" element={<ProtectedRoute><FreelanceLessonPage /></ProtectedRoute>} />
               <Route path="/fullstack" element={<ProtectedRoute><FullstackLearn /></ProtectedRoute>} />
               <Route path="/fs-lesson/:id" element={<ProtectedRoute><FullstackLessonPage /></ProtectedRoute>} />
+              <Route path="/java" element={<ProtectedRoute><JavaLearn /></ProtectedRoute>} />
+              <Route path="/java-lesson/:id" element={<ProtectedRoute><JavaLessonPage /></ProtectedRoute>} />
               <Route path="/python" element={<ProtectedRoute><PythonLearn /></ProtectedRoute>} />
               <Route path="/py-lesson/:id" element={<ProtectedRoute><PythonLessonPage /></ProtectedRoute>} />
               <Route path="/local" element={<ProtectedRoute><LocalLearn /></ProtectedRoute>} />
               <Route path="/local-lesson/:id" element={<ProtectedRoute><LocalLessonPage /></ProtectedRoute>} />
               <Route path="/sql" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
-<Route path="/sql-learn" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
-<Route path="/sql-lesson/:id" element={<ProtectedRoute><SqlLessonPage /></ProtectedRoute>} />
+              <Route path="/sql-learn" element={<ProtectedRoute><SqlLearn /></ProtectedRoute>} />
+              <Route path="/sql-lesson/:id" element={<ProtectedRoute><SqlLessonPage /></ProtectedRoute>} />
               <Route path="/real-freelance" element={<ProtectedRoute><RealFreelanceLearn /></ProtectedRoute>} />
               <Route path="/rf-lesson/:id" element={<ProtectedRoute><RealFreelanceLessonPage /></ProtectedRoute>} />
               <Route path="/tour" element={<ProtectedRoute><Tour /></ProtectedRoute>} />
