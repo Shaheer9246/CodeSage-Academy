@@ -26,7 +26,9 @@ const JavaLessonPage = () => {
   const { isGuest: __pgGuest } = useGuestLessonGate('java', id); 
   if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/java" replace />;
-  if (!isJavaLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/java" replace />;
+ if (!__pgGuest && !isJavaLessonUnlocked(lesson.id, (user?.completedLessons || []))) {
+  return <Navigate to="/java" replace />;
+}
 
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
   const passed = correctCount >= 3;
