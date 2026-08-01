@@ -405,8 +405,8 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
   }
   emit();
 
-  // BYPASS: Only connect to Supabase if user is logged in AND track is supported
-  if (currentUserId && !DB_UNSUPPORTED.has(track)) {
+  if (currentUserId) {
+
     try {
       const { error } = await callRpcWithTimeout('update_enrollment_status', {
         _track: track,
