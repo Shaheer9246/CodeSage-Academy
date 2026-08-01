@@ -2,7 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
 import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getAllLessons } from '@/data/lessons';
+import {
+  ALL_LESSON_IDS,
+  LESSON_TRACK_KEYS,
+  TRACK_LESSON_IDS,
+  TRACK_LESSON_LABELS,
+  completedCountFor,
+} from '@/data/lessonIndex';
+
 import { motion } from 'framer-motion';
 import { applyTheme, getTheme, THEMES, ThemeName } from '@/lib/theme';
 import { Switch } from '@/components/ui/switch';
