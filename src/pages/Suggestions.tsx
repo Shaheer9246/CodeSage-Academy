@@ -95,9 +95,11 @@ const Suggestions = () => {
     const ch = supabase
       .channel('suggestions-feed')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestions' }, () => refresh())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestion_votes' }, () => refresh())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [refresh]);
+
 
   // Mark suggestions as read when the user opens the page
   useEffect(() => {
