@@ -200,7 +200,7 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         // Resolve relative URIs inside .gltf JSON files to Base64 Data URIs
         let gltfJson = await z.async('string');
         Object.entries(assetMap).forEach(([assetName, dataUri]) => {
-          gltfJson = gltfJson.replaceAll(`"${assetName}"`, `"${dataUri}"`);
+          gltfJson = gltfJson.split(`"${assetName}"`).join(`"${dataUri}"`);
         });
         content = gltfJson;
         lang = 'json';
