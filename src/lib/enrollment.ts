@@ -133,15 +133,23 @@ export const TRACK_META: Record<
     seed: 130,
   },
 
- three3d: {
+  three3d: {
     label: '3D Web Development',
     short: '3D Web',
     route: '/three3d',
     idPrefix: 'CS-3D',
-    seed: 120, 
+    seed: 120,
     prereq: ['frontend'],
-  } 
+  },
+  java: {
+    label: 'Java Programming',
+    short: 'Java',
+    route: '/java',
+    idPrefix: 'CS-JV',
+    seed: 150,
+  },
 };
+
 
 let mem: Enrollment[] = [];
 let counts: Partial<Record<TrackId, number>> = {};
