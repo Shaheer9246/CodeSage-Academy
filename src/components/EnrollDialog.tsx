@@ -11,7 +11,7 @@ import {
 } from '@/lib/enrollment';
 import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
-import { TRACK_LESSON_IDS, isTrackCompleted as isTrackDone, LessonTrackKey } from '@/data/lessonIndex';
+import { isTrackCompleted as isTrackDone, LessonTrackKey } from '@/data/lessonIndex';
 
 
 
