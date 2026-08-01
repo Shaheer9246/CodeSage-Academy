@@ -344,8 +344,8 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   }
   emit();
 
-  // BYPASS: Only connect to Supabase if user is logged in AND track is supported
-  if (currentUserId && !DB_UNSUPPORTED.has(track)) {
+  if (currentUserId) {
+
     try {
       // FIX: If the track already exists in memory (e.g. they ended it previously),
       // we must update its status to 'active' instead of trying to insert a new row.
