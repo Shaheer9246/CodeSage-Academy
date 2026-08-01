@@ -9,6 +9,7 @@ No TypeScript errors right now — a full typecheck passes clean. The real bugs 
 Cause (verified): completing a lesson calls a server function that rejects any lesson ID not present in the `lesson_registry` table. That table has 167 IDs and contains none of the Java, 3D, Real-Freelance, SQL or AI lesson IDs, so the tick appears instantly then vanishes on reload.
 
 Fix:
+
 - Generate the full ID list from every lesson data file and load the missing IDs into `lesson_registry`.
 - Add a small shared module that exports every track's lesson IDs from one place, so future tracks can't drift again.
 - Surface the failure instead of silently swallowing it: if the server rejects a completion, show a toast rather than leaving a fake tick.
@@ -16,11 +17,13 @@ Fix:
 ## 2. Enrollment system
 
 Problems found:
+
 - `java`, `sql`, `ai-fundamentals`, `three3d`, `real-freelance` are not real tracks in the database. `java` isn't even in the track list in code (the Dashboard force-casts it), which is why touching lesson files near it breaks the app.
 - Those five tracks are hard-coded as "database unsupported" and run in browser storage only, so their student counts are fake and reset per device.
 - Student counts mix a hardcoded seed number with the real count, so the number shown is not the real number of students.
 
 Fix:
+
 - Add `java` (and the other missing tracks) as first-class tracks: track list, metadata, route, prerequisites, dashboard mapping.
 - Widen the database's allowed-track list to cover all 11 tracks and remove the "unsupported" bypass so every enrollment persists to the account.
 - Show the true student count from the server. Seeds are kept only as a display floor for brand-new tracks with zero students, or dropped entirely — see the question below.
@@ -31,6 +34,7 @@ Fix:
 - Add a web app manifest (name, icons, theme colour matching the dark orange theme, standalone display).
 - Generate app icons (192, 512, maskable, Apple touch icon).
 - Add the manifest and icon tags to the page head.
+- this is from user: SO bro...... i want you to chagne the app logo..... i don't have anything in my mind..... so make a unique new an dfantasitc logo for our app everywhere where needed. the logo should be unique and for an aesthethic platform. 
 
 This makes CodeSage installable from Chrome/Edge on desktop and "Add to Home Screen" on phones. No offline mode is included unless you ask for it.
 
@@ -43,7 +47,15 @@ This makes CodeSage installable from Chrome/Edge on desktop and "Add to Home Scr
 
 - New `suggestion_votes` table (one vote per user per suggestion, switchable between up and down, removable by clicking again).
 - Vote counts read live so totals update in real time across users.
-- Up/down buttons on each suggestion card with the current score and your own vote highlighted.
+- Up/down buttons on each suggestion card with the current score and your own vote highlighted.  
+  
+6. 2 mober things to add.... 1 is privacy and term and policy page then 2 a contact page...... if we nee dto run add these 2 things are improtatns. 
+
+&nbsp;
+
+&nbsp;
+
+6. i have one more question kinldy give me the list of courses... that we can add in future but there isn't anyplace those can be find for free. mean we will keep them for less amount.. so we can earn a bit...... 
 
 ## Your two questions
 
