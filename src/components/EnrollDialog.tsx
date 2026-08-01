@@ -13,7 +13,7 @@ import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
 import { TRACK_LESSON_IDS, isTrackCompleted as isTrackDone, LessonTrackKey } from '@/data/lessonIndex';
 
-const PREREQ_LESSON_IDS = TRACK_LESSON_IDS;
+
 
 function isTrackCompleted(track: TrackId, completedLessons: string[]): boolean {
   return isTrackDone(track as LessonTrackKey, completedLessons);
