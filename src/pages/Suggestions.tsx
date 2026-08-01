@@ -44,6 +44,10 @@ const Suggestions = () => {
   const [adminDeletePw, setAdminDeletePw] = useState('');
   const [postedToday, setPostedToday] = useState(false);
 
+  const sb = supabase as unknown as {
+    from: (t: string) => any;
+  };
+
   const refresh = useCallback(async () => {
     const { data: suggestionsData, error: suggestionsError } = await supabase
       .from('suggestions')
@@ -55,13 +59,13 @@ const Suggestions = () => {
     let userVotes: Record<string, 'up' | 'down'> = {};
 
     if (user) {
-      const { data: votesData } = await supabase
+      const { data: votesData } = await sb
         .from('suggestion_votes')
         .select('suggestion_id, vote_type')
         .eq('user_id', user.id);
 
       if (votesData) {
-        userVotes = votesData.reduce((acc, curr) => {
+        userVotes = votesData.reduce((acc: Record<string, 'up' | 'down'>, curr: any) => {
           acc[curr.suggestion_id] = curr.vote_type as 'up' | 'down';
           return acc;
         }, {} as Record<string, 'up' | 'down'>);
@@ -216,10 +220,10 @@ const Suggestions = () => {
     try {
       if (newVoteState === null) {
         // Delete vote from DB
-        await supabase.from('suggestion_votes').delete().eq('suggestion_id', suggestionId).eq('user_id', user.id);
+        await sb.from('suggestion_votes').delete().eq('suggestion_id', suggestionId).eq('user_id', user.id);
       } else {
         // Upsert vote in DB
-        await supabase.from('suggestion_votes').upsert({
+        await sb.from('suggestion_votes').upsert({
           suggestion_id: suggestionId,
           user_id: user.id,
           vote_type: type
@@ -227,7 +231,7 @@ const Suggestions = () => {
       }
 
       // Sync actual database counters for the suggestion
-      await supabase.from('suggestions').update({
+      await sb.from('suggestions').update({
         upvotes: newUpvotes,
         downvotes: newDownvotes
       }).eq('id', suggestionId);
