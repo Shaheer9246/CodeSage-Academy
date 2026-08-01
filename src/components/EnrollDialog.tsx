@@ -11,44 +11,14 @@ import {
 } from '@/lib/enrollment';
 import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
-import { NETWORKING_LESSONS } from '@/data/networkingLessons';
-import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
-import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
-import { PYTHON_LESSONS } from '@/data/pythonLessons';
-import { LOCAL_LESSONS } from '@/data/localLessons';
-import { SQL_LESSONS } from '@/data/sqlLessons';
-import { AI_LESSONS } from '@/data/aiLessons';
-import { THREE3D_LESSONS } from '@/data/three3dLessons';
+import { TRACK_LESSON_IDS, isTrackCompleted as isTrackDone, LessonTrackKey } from '@/data/lessonIndex';
 
-// Frontend lesson ids used for completion checks (matches Roadmap listing).
-const FRONTEND_LESSON_IDS = [
-  'html-1','html-2','html-3','html-4','html-5','html-6','html-7','html-8','html-9','html-10',
-  'css-1','css-2','css-3','css-4','css-5','css-6',
-  'js-1','js-2','js-3','js-4','js-5',
-  'html-int-1','html-int-2','css-int-1','css-int-2','css-int-3','js-int-1','js-int-2','js-int-3','js-int-4',
-  'react-1','react-2','react-3','react-4','react-int-1',
-  'multi-1','multi-2','multi-3','form-1','form-2','a11y-1',
-  'js-exp-1','js-exp-2','js-exp-3','css-exp-1','css-exp-2','react-exp-1',
-  'pro-1','pro-2','pro-3','proj-1','proj-2',
-];
-
-const PREREQ_LESSON_IDS: Partial<Record<TrackId, string[]>> = {
-  frontend: FRONTEND_LESSON_IDS,
-  networking: NETWORKING_LESSONS.map(l => l.id),
-  fullstack: FULLSTACK_LESSONS.map(l => l.id),
-  freelance: FREELANCE_LESSONS.map(l => l.id),
-  python: PYTHON_LESSONS.map(l => l.id),
-  local: LOCAL_LESSONS.map(l => l.id),
-  sql: SQL_LESSONS.map(l => l.id),
-  three3d: THREE3D_LESSONS.map(l => l.id),
-};
+const PREREQ_LESSON_IDS = TRACK_LESSON_IDS;
 
 function isTrackCompleted(track: TrackId, completedLessons: string[]): boolean {
-  const ids = PREREQ_LESSON_IDS[track];
-  if (!ids || ids.length === 0) return false;
-  const set = new Set(completedLessons);
-  return ids.every(id => set.has(id));
+  return isTrackDone(track as LessonTrackKey, completedLessons);
 }
+
 
 
 interface Props {
