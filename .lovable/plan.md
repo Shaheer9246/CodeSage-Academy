@@ -1,74 +1,61 @@
-## Fix navigation-after-completion + Python "first lesson undone" bug
+# CodeSage: PWA, Enrollment Fix, Real Progress, Suggestion Votes
 
-### Root causes found
+## Health check first
 
-**1. LocalLessonPage drops the `?from=` param on completion**
-`src/pages/LocalLessonPage.tsx` line 50 does:
+No TypeScript errors right now — a full typecheck passes clean. The real bugs are logic/data ones, listed below.
 
-```ts
-navigate('/complete/' + lesson.id);   // ❌ no fromQs
-```
+## 1. Lessons showing as "not done" (Java, 3D Web Dev, Real-World Freelancing)
 
-So the flow `dashboard → /local?from=dashboard → /local-lesson/x?from=dashboard → Urrhhaa` lands on `/complete/x` **without** `?from=dashboard`. From then on, every "Next"/"Lesson Path" button in `LessonComplete` inherits an empty `from`, so `PythonLearn`/`LocalLearn`'s back button falls into the `else` branch and sends the user to `/roadmap` instead of `/dashboard`.
+Cause (verified): completing a lesson calls a server function that rejects any lesson ID not present in the `lesson_registry` table. That table has 167 IDs and contains none of the Java, 3D, Real-Freelance, SQL or AI lesson IDs, so the tick appears instantly then vanishes on reload.
 
-Fix: mirror what `PythonLessonPage.handleSubmit` already does:
+Fix:
+- Generate the full ID list from every lesson data file and load the missing IDs into `lesson_registry`.
+- Add a small shared module that exports every track's lesson IDs from one place, so future tracks can't drift again.
+- Surface the failure instead of silently swallowing it: if the server rejects a completion, show a toast rather than leaving a fake tick.
 
-```ts
-const fromQs = from ? `?from=${from}` : '';
-navigate(`/complete/${lesson.id}${fromQs}`);
-```
+## 2. Enrollment system
 
-(LocalLessonPage already reads `from` via `useSearchParams`, we just have to append it.)
+Problems found:
+- `java`, `sql`, `ai-fundamentals`, `three3d`, `real-freelance` are not real tracks in the database. `java` isn't even in the track list in code (the Dashboard force-casts it), which is why touching lesson files near it breaks the app.
+- Those five tracks are hard-coded as "database unsupported" and run in browser storage only, so their student counts are fake and reset per device.
+- Student counts mix a hardcoded seed number with the real count, so the number shown is not the real number of students.
 
-**2. Python: same class of bug happens after several `Next` clicks**
-The Python page already appends `fromQs` on the *first* completion, but `LessonComplete`'s `Next` button navigates to `/py-lesson/py-2?from=dashboard` — good. However on that new lesson page, the user re-enters `handleSubmit`, and everything works... **until** `LessonComplete`'s `Lesson Path` button is used, which navigates to `/python?from=dashboard`. That path is still fine.
+Fix:
+- Add `java` (and the other missing tracks) as first-class tracks: track list, metadata, route, prerequisites, dashboard mapping.
+- Widen the database's allowed-track list to cover all 11 tracks and remove the "unsupported" bypass so every enrollment persists to the account.
+- Show the true student count from the server. Seeds are kept only as a display floor for brand-new tracks with zero students, or dropped entirely — see the question below.
+- Keep the 2-active-track rule, and make prerequisite checks use the shared lesson-ID module so adding a lesson file can never break the dialog again.
 
-The only path that actually loses `from` for Python is when a lesson has no `from` param to begin with — which happens after the *Local* bug pollutes the chain if the user swapped tracks, OR when `from` is missing on the very first jump. To be safe, harden `LessonComplete` to default `from=dashboard` when it's absent (users only reach the Urrhhaa screen through the app, and dashboard is the correct home). Change:
+## 3. Installable app (PWA) for mobile and desktop
 
-```ts
-const from = searchParams.get('from') ?? 'dashboard';
-const fromQs = `?from=${from}`;
-```
+- Add a web app manifest (name, icons, theme colour matching the dark orange theme, standalone display).
+- Generate app icons (192, 512, maskable, Apple touch icon).
+- Add the manifest and icon tags to the page head.
 
-This guarantees every `Next` / `Lesson Path` / `Review` button carries `from=dashboard`, so `PythonLearn` / `LocalLearn` will always send the back arrow to `/dashboard` instead of `/roadmap`.
+This makes CodeSage installable from Chrome/Edge on desktop and "Add to Home Screen" on phones. No offline mode is included unless you ask for it.
 
-**3. Python "first lesson (py-01) becomes undone" after several lessons**
-`PYTHON_LESSONS[0].id === 'py-01'` (leading zero) while lessons 2–20 use `py-2 … py-20`. Nothing in the app normalizes it, so storage/read is symmetrical. However `isPythonLessonUnlocked` compares raw ids, and `completeLesson` writes `py-01` to the DB — this all works.
+## 4. Settings: real lesson groups and real progress
 
-The visible symptom ("first lesson unchecked, lessons 2–5 checked, lesson 6 unlocked") happens because after completing lesson 5, `isPythonLessonUnlocked('py-6')` returns `true` (previous lesson is completed), which unlocks lesson 6. That part is expected. The *only* actual bug is the missing checkmark on lesson 1, and that is caused by an **optimistic write race** in `UserContext.completeLesson`:
+- Replace the ID-prefix guessing with the shared lesson-ID module, so each track's group shows `completed / actual total`.
+- Overall progress becomes completed across all tracks divided by the true grand total, instead of only counting frontend lessons.
 
-- Lesson 1 completes → optimistic setUser adds `py-01`, async server fetch returns `completed_lessons = []` (server hasn't received the write yet because it's the same round-trip), we then `UPDATE completed_lessons = [...[], 'py-01']`. Fine.
-- Lesson 2 completes fast → optimistic setUser adds `py-2`, server fetch races the previous update and may return `[]` again → we `UPDATE completed_lessons = ['py-2']`, **overwriting `py-01**`.
+## 5. Suggestions: upvote / downvote
 
-Fix: replace the "fetch then write full array" pattern with the existing `award_lesson` RPC (already in the DB, uses `array_append` server-side and is idempotent):
+- New `suggestion_votes` table (one vote per user per suggestion, switchable between up and down, removable by clicking again).
+- Vote counts read live so totals update in real time across users.
+- Up/down buttons on each suggestion card with the current score and your own vote highlighted.
 
-```ts
-const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
-if (!error && data) applyServerProfile(data);
-```
+## Your two questions
 
-Keep the optimistic `setUser` for instant UI feedback, but let the RPC be the authoritative writer. This eliminates the read-modify-write race and also correctly awards XP/coins/badges server-side.
+**Do you have to run migrations manually if you give me your Supabase ID?**
+No. Database changes go through the migration tool here — you approve it in chat and it runs itself. You never open a dashboard or run SQL by hand.
 
-Note: `award_lesson` requires the lesson id to exist in `lesson_registry`. We need a small data migration to insert all Python / Local / Networking / Freelance / Fullstack / Python-Expert lesson ids into `lesson_registry` so the RPC accepts them. (Currently only some ids are registered, which is why the previous author bypassed the RPC with a direct update.)
+**If we switch to a different Supabase project, does it break anything and do users move?**
+Users and their data do **not** move automatically. A new project starts empty: all 850 profiles, 596 enrollments, suggestions and announcements stay in the old project, and everyone would have to sign up again. Switching also needs the whole schema (tables, policies, functions, triggers) re-created there. It's doable as a deliberate migration with an export/import step, but it is not a flip of a switch — I'd recommend staying on the current backend unless there's a strong reason.
 
-4. **Enrollment issue:**
-  1. he enrollment is not happening according ot what we decided. you should check it out the files for enrollments. (user concept) (becasue we don't have any user yet so we will add mock number of enrollments so if a new student come they don't feel alone. they should feel like more other students are also doing the same thing).
-  2. (user concept part 2) (when a new user will join now then the mock number add one user if it was 200 then now it will become 201 from all user all over the app). 
-  3. Now if any user end the enrollment then the become which were added while the user enroll that number must substract from it. like 200 --> 201 ---> 200). 
-    &nbsp;
-    **Note:** only the number show first will be mock not the whole enrollment system. the system is real. 
-  &nbsp;
+## Technical notes
 
-&nbsp;
-
-### Files to change
-
-1. `src/pages/LocalLessonPage.tsx` — append `fromQs` in `handleSubmit`.
-2. `src/pages/LessonComplete.tsx` — default `from` to `'dashboard'` when missing.
-3. `src/contexts/UserContext.tsx` — rewrite `completeLesson` to call `award_lesson` RPC, keeping optimistic UI.
-4. src/lib/enrollment.ts -- check the and update the concept according to the user will. 
-5. New migration — `INSERT ... ON CONFLICT DO NOTHING` every lesson id from the six track files into `public.lesson_registry`.
-
-### Out of scope
-
-No visual/layout changes. No changes to `PythonLearn`, `PythonLessonPage`, `LocalLearn` (their nav already reads `from` correctly; fixing sources upstream fixes them).
+- New file `src/data/lessonIndex.ts` exporting `TRACK_LESSON_IDS: Record<TrackId, string[]>` plus `ALL_LESSON_IDS`, built by importing each track's exported lesson array. Used by `lesson_registry` seeding, `EnrollDialog` prerequisites, `SettingsPage` groups, and Roadmap totals.
+- Migration: insert missing `lesson_registry` rows; relax the `enroll_track` track whitelist to all 11 track IDs; create `suggestion_votes` (`user_id`, `suggestion_id`, `value smallint`) with grants, RLS (users manage own vote, all authenticated can read), and add the table to the realtime publication.
+- `src/lib/enrollment.ts`: delete `DB_UNSUPPORTED`, add `java` to `TrackId`/`VALID_TRACK_IDS`/`TRACK_META`, and change `getStudentCount` to report the server value.
+- PWA: `public/manifest.webmanifest` + icons in `public/`, tags in `index.html`. No service worker, no `vite-plugin-pwa`.
