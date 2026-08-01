@@ -133,27 +133,32 @@ const SettingsPage = () => {
 
 
   const joinDate = user.joinDate ? new Date(user.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
-  const totalLessons = getAllLessons().length;
+  const totalLessons = ALL_LESSON_IDS.length;
   const completedCount = user.completedLessons.length;
   const progress = totalLessons ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-  // Track breakdown for detail dialogs — now includes SQL and Python Expert
+  // Track breakdown built from the real lesson IDs in each track's data file.
   const lessonGroups = [
-    { key: 'frontend', label: 'Frontend', match: (id: string) => /^(html|css|js|react|multi|form|a11y|pro|proj)-/.test(id) },
-    { key: 'networking', label: 'Networking', match: (id: string) => id.startsWith('net-') },
-    { key: 'java', label: 'Java', match: (id: string) => id.startsWith('java-') },
-    { key: 'fullstack', label: 'Full Stack', match: (id: string) => id.startsWith('fs-') },
-    { key: 'freelance', label: 'Freelance', match: (id: string) => id.startsWith('free-') },
-    { key: 'realfreelance', label: 'Real-World Freelancing', match: (id: string) => id.startsWith('real-') },
-    { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') && !id.startsWith('pyx-') },
-    { key: 'pythonexpert', label: 'Python Expert', match: (id: string) => id.startsWith('pyx-') || id.startsWith('pyexpert-') },
-    { key: 'sql', label: 'SQL', match: (id: string) => id.startsWith('sql-') },
-    { key: 'ai', label: 'AI Fundamentals', match: (id: string) => id.startsWith('ai-') },
-    { key: 'local', label: 'Local-Only', match: (id: string) => id.startsWith('local-') },
-    { key: 'three3d', label: '3D Web Dev', match: (id: string) => id.startsWith('three3d-') },
-    { key: 'challenges', label: 'Challenges', match: (id: string) => id.startsWith('challenge-') },
-    { key: 'crawler', label: 'Code Crawler', match: (id: string) => id.startsWith('crawler-') },
-  ].map(g => ({ ...g, count: user.completedLessons.filter(g.match).length }));
+    ...LESSON_TRACK_KEYS.map(key => ({
+      key,
+      label: TRACK_LESSON_LABELS[key],
+      total: TRACK_LESSON_IDS[key].length,
+      count: completedCountFor(key, user.completedLessons),
+    })),
+    {
+      key: 'challenges',
+      label: 'Challenges',
+      total: 0,
+      count: user.completedLessons.filter(id => id.startsWith('challenge-')).length,
+    },
+    {
+      key: 'crawler',
+      label: 'Code Crawler',
+      total: 0,
+      count: user.completedLessons.filter(id => id.startsWith('crawler-')).length,
+    },
+  ];
+
 
   // 7-day streak calendar
   const today = new Date();
