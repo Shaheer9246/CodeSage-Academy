@@ -314,13 +314,12 @@ export function activeCount(): number {
 }
 
 export function getStudentCount(track: TrackId): number {
+  // Baseline community size + real enrolled learners from the database.
   const seed = TRACK_META[track]?.seed ?? 0;
   const server = counts[track] ?? 0;
-  
-  // If server count exists, treat it as the absolute total. 
-  // Otherwise, safely fall back to the seed.
-  return server > 0 ? server : seed;
+  return seed + server;
 }
+
 
 export async function enroll(track: TrackId): Promise<Enrollment> {
   if (!isActive(track) && activeCount() >= 2) {
