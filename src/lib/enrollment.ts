@@ -219,9 +219,6 @@ export async function hydrateEnrollments(
       supabase.from('track_stats').select('*'),
     ]);
 
-    // Keep any local unsupported tracks so they are not wiped when DB hydrates
-    const localUnsupported = mem.filter(e => DB_UNSUPPORTED.has(e.track));
-
     mem = ((enr || []) as {
       track: string;
       status: string;
@@ -235,13 +232,6 @@ export async function hydrateEnrollments(
         enrolledAt: new Date(r.enrolled_at).getTime() || Date.now(),
       }));
 
-    // Merge our local unsupported track states back into our memory array
-    localUnsupported.forEach(local => {
-      if (!mem.some(m => m.track === local.track)) {
-        mem.push(local);
-      }
-    });
-
     counts = {};
     ((stats || []) as { track: string; enrolled_count: number }[]).forEach(
       s => {
@@ -250,14 +240,6 @@ export async function hydrateEnrollments(
         }
       }
     );
-
-    // Re-populate counts for local unsupported tracks if missing
-    DB_UNSUPPORTED.forEach(track => {
-      const hasLocal = mem.some(e => e.track === track);
-      if (hasLocal && !counts[track as TrackId]) {
-        counts[track as TrackId] = 1;
-      }
-    });
 
     // Enforce the 2-active-track limit on hydration. If the DB carries over
     // more than 2 active tracks from earlier sessions, auto-pause the older
@@ -272,18 +254,17 @@ export async function hydrateEnrollments(
       });
       // Best-effort DB sync (fire-and-forget)
       toPause.forEach(e => {
-        if (!DB_UNSUPPORTED.has(e.track)) {
-          try {
-            void supabase.rpc('update_enrollment_status', {
-              _track: e.track,
-              _status: 'paused',
-            });
-          } catch {
-            /* noop */
-          }
+        try {
+          void supabase.rpc('update_enrollment_status', {
+            _track: e.track,
+            _status: 'paused',
+          });
+        } catch {
+          /* noop */
         }
       });
     }
+
 
     emit();
   } catch (err) {
