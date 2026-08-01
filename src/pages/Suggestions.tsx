@@ -229,12 +229,8 @@ const Suggestions = () => {
           vote_type: type
         }, { onConflict: 'suggestion_id,user_id' });
       }
+      // Counters are maintained server-side by a database trigger.
 
-      // Sync actual database counters for the suggestion
-      await sb.from('suggestions').update({
-        upvotes: newUpvotes,
-        downvotes: newDownvotes
-      }).eq('id', suggestionId);
 
     } catch (error) {
       console.error(error);
