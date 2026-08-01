@@ -95,9 +95,11 @@ const Suggestions = () => {
     const ch = supabase
       .channel('suggestions-feed')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestions' }, () => refresh())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestion_votes' }, () => refresh())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [refresh]);
+
 
   // Mark suggestions as read when the user opens the page
   useEffect(() => {
@@ -229,12 +231,8 @@ const Suggestions = () => {
           vote_type: type
         }, { onConflict: 'suggestion_id,user_id' });
       }
+      // Counters are maintained server-side by a database trigger.
 
-      // Sync actual database counters for the suggestion
-      await sb.from('suggestions').update({
-        upvotes: newUpvotes,
-        downvotes: newDownvotes
-      }).eq('id', suggestionId);
 
     } catch (error) {
       console.error(error);

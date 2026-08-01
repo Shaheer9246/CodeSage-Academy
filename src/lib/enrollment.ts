@@ -12,7 +12,8 @@ export type TrackId =
   | 'sql'
   | 'pythonexpert'
   | 'ai-fundamentals'
-  | 'three3d';
+  | 'three3d'
+  | 'java';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -38,12 +39,10 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'sql',
   'pythonexpert',
   'ai-fundamentals',
-  'three3d'
+  'three3d',
+  'java'
 ]);
 
-// Tracks that do not exist or are not yet configured in your Supabase DB.
-// These will run strictly in localStorage so the user never gets an error.
-const DB_UNSUPPORTED = new Set<string>(['sql', 'ai-fundamentals', 'three3d', 'real-freelance']);
 
 export const TRACK_META: Record<
   TrackId,
@@ -134,15 +133,23 @@ export const TRACK_META: Record<
     seed: 130,
   },
 
- three3d: {
+  three3d: {
     label: '3D Web Development',
     short: '3D Web',
     route: '/three3d',
     idPrefix: 'CS-3D',
-    seed: 120, 
+    seed: 120,
     prereq: ['frontend'],
-  } 
+  },
+  java: {
+    label: 'Java Programming',
+    short: 'Java',
+    route: '/java',
+    idPrefix: 'CS-JV',
+    seed: 150,
+  },
 };
+
 
 let mem: Enrollment[] = [];
 let counts: Partial<Record<TrackId, number>> = {};
@@ -220,9 +227,6 @@ export async function hydrateEnrollments(
       supabase.from('track_stats').select('*'),
     ]);
 
-    // Keep any local unsupported tracks so they are not wiped when DB hydrates
-    const localUnsupported = mem.filter(e => DB_UNSUPPORTED.has(e.track));
-
     mem = ((enr || []) as {
       track: string;
       status: string;
@@ -236,13 +240,6 @@ export async function hydrateEnrollments(
         enrolledAt: new Date(r.enrolled_at).getTime() || Date.now(),
       }));
 
-    // Merge our local unsupported track states back into our memory array
-    localUnsupported.forEach(local => {
-      if (!mem.some(m => m.track === local.track)) {
-        mem.push(local);
-      }
-    });
-
     counts = {};
     ((stats || []) as { track: string; enrolled_count: number }[]).forEach(
       s => {
@@ -251,14 +248,6 @@ export async function hydrateEnrollments(
         }
       }
     );
-
-    // Re-populate counts for local unsupported tracks if missing
-    DB_UNSUPPORTED.forEach(track => {
-      const hasLocal = mem.some(e => e.track === track);
-      if (hasLocal && !counts[track as TrackId]) {
-        counts[track as TrackId] = 1;
-      }
-    });
 
     // Enforce the 2-active-track limit on hydration. If the DB carries over
     // more than 2 active tracks from earlier sessions, auto-pause the older
@@ -273,18 +262,17 @@ export async function hydrateEnrollments(
       });
       // Best-effort DB sync (fire-and-forget)
       toPause.forEach(e => {
-        if (!DB_UNSUPPORTED.has(e.track)) {
-          try {
-            void supabase.rpc('update_enrollment_status', {
-              _track: e.track,
-              _status: 'paused',
-            });
-          } catch {
-            /* noop */
-          }
+        try {
+          void supabase.rpc('update_enrollment_status', {
+            _track: e.track,
+            _status: 'paused',
+          });
+        } catch {
+          /* noop */
         }
       });
     }
+
 
     emit();
   } catch (err) {
@@ -315,13 +303,12 @@ export function activeCount(): number {
 }
 
 export function getStudentCount(track: TrackId): number {
+  // Baseline community size + real enrolled learners from the database.
   const seed = TRACK_META[track]?.seed ?? 0;
   const server = counts[track] ?? 0;
-  
-  // If server count exists, treat it as the absolute total. 
-  // Otherwise, safely fall back to the seed.
-  return server > 0 ? server : seed;
+  return seed + server;
 }
+
 
 export async function enroll(track: TrackId): Promise<Enrollment> {
   if (!isActive(track) && activeCount() >= 2) {
@@ -345,8 +332,8 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   }
   emit();
 
-  // BYPASS: Only connect to Supabase if user is logged in AND track is supported
-  if (currentUserId && !DB_UNSUPPORTED.has(track)) {
+  if (currentUserId) {
+
     try {
       // FIX: If the track already exists in memory (e.g. they ended it previously),
       // we must update its status to 'active' instead of trying to insert a new row.
@@ -406,8 +393,8 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
   }
   emit();
 
-  // BYPASS: Only connect to Supabase if user is logged in AND track is supported
-  if (currentUserId && !DB_UNSUPPORTED.has(track)) {
+  if (currentUserId) {
+
     try {
       const { error } = await callRpcWithTimeout('update_enrollment_status', {
         _track: track,

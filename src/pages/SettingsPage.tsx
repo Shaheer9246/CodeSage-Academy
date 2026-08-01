@@ -2,7 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
 import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getAllLessons } from '@/data/lessons';
+import {
+  ALL_LESSON_IDS,
+  LESSON_TRACK_KEYS,
+  TRACK_LESSON_IDS,
+  TRACK_LESSON_LABELS,
+  completedCountFor,
+} from '@/data/lessonIndex';
+
 import { motion } from 'framer-motion';
 import { applyTheme, getTheme, THEMES, ThemeName } from '@/lib/theme';
 import { Switch } from '@/components/ui/switch';
@@ -133,27 +140,32 @@ const SettingsPage = () => {
 
 
   const joinDate = user.joinDate ? new Date(user.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
-  const totalLessons = getAllLessons().length;
+  const totalLessons = ALL_LESSON_IDS.length;
   const completedCount = user.completedLessons.length;
   const progress = totalLessons ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-  // Track breakdown for detail dialogs — now includes SQL and Python Expert
+  // Track breakdown built from the real lesson IDs in each track's data file.
   const lessonGroups = [
-    { key: 'frontend', label: 'Frontend', match: (id: string) => /^(html|css|js|react|multi|form|a11y|pro|proj)-/.test(id) },
-    { key: 'networking', label: 'Networking', match: (id: string) => id.startsWith('net-') },
-    { key: 'java', label: 'Java', match: (id: string) => id.startsWith('java-') },
-    { key: 'fullstack', label: 'Full Stack', match: (id: string) => id.startsWith('fs-') },
-    { key: 'freelance', label: 'Freelance', match: (id: string) => id.startsWith('free-') },
-    { key: 'realfreelance', label: 'Real-World Freelancing', match: (id: string) => id.startsWith('real-') },
-    { key: 'python', label: 'Python', match: (id: string) => id.startsWith('py-') && !id.startsWith('pyx-') },
-    { key: 'pythonexpert', label: 'Python Expert', match: (id: string) => id.startsWith('pyx-') || id.startsWith('pyexpert-') },
-    { key: 'sql', label: 'SQL', match: (id: string) => id.startsWith('sql-') },
-    { key: 'ai', label: 'AI Fundamentals', match: (id: string) => id.startsWith('ai-') },
-    { key: 'local', label: 'Local-Only', match: (id: string) => id.startsWith('local-') },
-    { key: 'three3d', label: '3D Web Dev', match: (id: string) => id.startsWith('three3d-') },
-    { key: 'challenges', label: 'Challenges', match: (id: string) => id.startsWith('challenge-') },
-    { key: 'crawler', label: 'Code Crawler', match: (id: string) => id.startsWith('crawler-') },
-  ].map(g => ({ ...g, count: user.completedLessons.filter(g.match).length }));
+    ...LESSON_TRACK_KEYS.map(key => ({
+      key,
+      label: TRACK_LESSON_LABELS[key],
+      total: TRACK_LESSON_IDS[key].length,
+      count: completedCountFor(key, user.completedLessons),
+    })),
+    {
+      key: 'challenges',
+      label: 'Challenges',
+      total: 0,
+      count: user.completedLessons.filter(id => id.startsWith('challenge-')).length,
+    },
+    {
+      key: 'crawler',
+      label: 'Code Crawler',
+      total: 0,
+      count: user.completedLessons.filter(id => id.startsWith('crawler-')).length,
+    },
+  ];
+
 
   // 7-day streak calendar
   const today = new Date();
@@ -530,28 +542,13 @@ const SettingsPage = () => {
 
             {detailModal === 'progress' && (
               <div className="space-y-2">
-                {lessonGroups.filter(g => !['challenges', 'crawler'].includes(g.key)).map(g => {
-                  // approx denominators per track (matches data files)
-                  const totals: Record<string, number> = {
-                    frontend: 50,
-                    java: 30,
-                    networking: 13,
-                    fullstack: 30,
-                    freelance: 12,
-                    realfreelance: 12,
-                    python: 30,
-                    pythonexpert: 30,
-                    sql: 10,
-                    ai: 12,
-                    local: 15,
-                    three3d: 15,
-                  };
-                  const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
+                {lessonGroups.filter(g => g.total > 0).map(g => {
+                  const pct = Math.min(100, Math.round((g.count / g.total) * 100));
                   return (
                     <div key={g.key}>
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-foreground">{g.label}</span>
-                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
+                        <span className="text-primary font-mono">{g.count}/{g.total} · {pct}%</span>
                       </div>
                       <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
                         <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
@@ -559,6 +556,7 @@ const SettingsPage = () => {
                     </div>
                   );
                 })}
+
                 <div className="pt-3 border-t border-border/20 grid grid-cols-3 gap-2 text-center">
                   <div className="bg-secondary/20 rounded-lg p-2">
                     <p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</p>

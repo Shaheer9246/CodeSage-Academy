@@ -229,34 +229,72 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestion_votes: {
+        Row: {
+          created_at: string
+          suggestion_id: string
+          updated_at: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          suggestion_id: string
+          updated_at?: string
+          user_id: string
+          vote_type?: string
+        }
+        Update: {
+          created_at?: string
+          suggestion_id?: string
+          updated_at?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_votes_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suggestions: {
         Row: {
           created_at: string
+          downvotes: number
           id: string
           reply: string | null
           reply_at: string | null
           text: string
           updated_at: string
+          upvotes: number
           user_id: string
           username: string
         }
         Insert: {
           created_at?: string
+          downvotes?: number
           id?: string
           reply?: string | null
           reply_at?: string | null
           text: string
           updated_at?: string
+          upvotes?: number
           user_id: string
           username?: string
         }
         Update: {
           created_at?: string
+          downvotes?: number
           id?: string
           reply?: string | null
           reply_at?: string | null
           text?: string
           updated_at?: string
+          upvotes?: number
           user_id?: string
           username?: string
         }
@@ -305,11 +343,13 @@ export type Database = {
         Args: { _id: string; _password: string; _text: string }
         Returns: {
           created_at: string
+          downvotes: number
           id: string
           reply: string | null
           reply_at: string | null
           text: string
           updated_at: string
+          upvotes: number
           user_id: string
           username: string
         }
@@ -497,11 +537,13 @@ export type Database = {
         Args: { _id: string; _password: string; _reply: string }
         Returns: {
           created_at: string
+          downvotes: number
           id: string
           reply: string | null
           reply_at: string | null
           text: string
           updated_at: string
+          upvotes: number
           user_id: string
           username: string
         }
