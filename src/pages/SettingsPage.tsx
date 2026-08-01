@@ -542,28 +542,13 @@ const SettingsPage = () => {
 
             {detailModal === 'progress' && (
               <div className="space-y-2">
-                {lessonGroups.filter(g => !['challenges', 'crawler'].includes(g.key)).map(g => {
-                  // approx denominators per track (matches data files)
-                  const totals: Record<string, number> = {
-                    frontend: 50,
-                    java: 30,
-                    networking: 13,
-                    fullstack: 30,
-                    freelance: 12,
-                    realfreelance: 12,
-                    python: 30,
-                    pythonexpert: 30,
-                    sql: 10,
-                    ai: 12,
-                    local: 15,
-                    three3d: 15,
-                  };
-                  const pct = totals[g.key] ? Math.min(100, Math.round((g.count / totals[g.key]) * 100)) : 0;
+                {lessonGroups.filter(g => g.total > 0).map(g => {
+                  const pct = Math.min(100, Math.round((g.count / g.total) * 100));
                   return (
                     <div key={g.key}>
                       <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-foreground">{g.label}</span>
-                        <span className="text-primary font-mono">{g.count}/{totals[g.key] || '?'} · {pct}%</span>
+                        <span className="text-primary font-mono">{g.count}/{g.total} · {pct}%</span>
                       </div>
                       <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
                         <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
@@ -571,6 +556,7 @@ const SettingsPage = () => {
                     </div>
                   );
                 })}
+
                 <div className="pt-3 border-t border-border/20 grid grid-cols-3 gap-2 text-center">
                   <div className="bg-secondary/20 rounded-lg p-2">
                     <p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</p>
