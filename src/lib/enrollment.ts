@@ -356,13 +356,13 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   if (currentUserId) {
 
     try {
-      // FIX: If the track already exists in memory (e.g. they ended it previously),
-      // we must update its status to 'active' instead of trying to insert a new row.
-      const rpcName = existing ? 'update_enrollment_status' : 'enroll_track';
-      const params = existing ? { _track: track, _status: 'active' } : { _track: track };
+      // enroll_track upserts (ON CONFLICT DO UPDATE status='active'), so it is
+      // safe whether or not a row already exists. Relying on the local cache to
+      // pick the RPC was the source of the "stuck validating / timeout" bug:
+      // a stale cached row made us call update_enrollment_status for a track
+      // that had no server row at all.
+      const { error } = await callRpcWithTimeout('enroll_track', { _track: track });
 
-      const { error } = await callRpcWithTimeout(rpcName, params);
-      
       if (error) throw error;
 
       const { data: stats } = await supabase
@@ -377,6 +377,20 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
         emit();
       }
     } catch (err) {
+      // A timeout does not always mean failure — the write may have landed.
+      // Ask the server what the truth is before rolling the UI back.
+      const serverStatus = await verifyServerStatus(track);
+      if (serverStatus === 'active') {
+        emit();
+        return (
+          mem.find(e => e.track === track) || {
+            track,
+            status: 'active',
+            enrolledAt: Date.now(),
+          }
+        );
+      }
+
       if (existing) {
         if (oldStatus) existing.status = oldStatus;
       } else {
@@ -386,8 +400,13 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
         counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
       }
       emit();
-      throw err;
+      throw new Error(
+        (err as Error)?.message === 'TIMEOUT'
+          ? 'The server took too long to respond. Check your connection and try again.'
+          : (err as Error)?.message || 'Could not start this track. Please try again.'
+      );
     }
+
   }
 
   return (
