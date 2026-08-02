@@ -101,14 +101,14 @@ const RealFreelanceLearn = () => {
                   navigate(`/real-freelance-lesson/${lesson.id}${fromQs}`)
                 }
                 disabled={!isUnlocked}
-                className={`w-full glass-card rounded-xl p-3.5 sm:p-4 flex items-center gap-3 text-left transition-all touch-manipulation active:scale-[0.99] min-h-[64px] ${
+                className={`w-full glass-card rounded-xl p-3.5 sm:p-4 flex items-center gap-3 text-left transition-all touch-manipulation active:scale-[0.99] h-auto min-h-[64px] ${
                   isUnlocked
                     ? 'hover:neon-border cursor-pointer'
                     : 'opacity-50 cursor-not-allowed'
                 }`}
               >
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg sm:text-xl border ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg sm:text-xl border self-center ${
                     isCompleted
                       ? 'bg-success/15 border-success/30'
                       : 'bg-primary/10 border-primary/20'
@@ -117,17 +117,17 @@ const RealFreelanceLearn = () => {
                   {lesson.icon || '💼'}
                 </div>
 
-                <div className="flex-1 min-w-0 pr-1 py-0.5">
+                <div className="flex-1 min-w-0 pr-1 py-0.5 overflow-hidden">
                   <p className="text-[10px] sm:text-xs font-mono text-muted-foreground uppercase truncate mb-0.5">
                     Lesson {lesson.order || i + 1}
                   </p>
 
-                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground leading-snug break-words">
+                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground leading-normal whitespace-normal break-words">
                     {lesson.title}
                   </p>
                 </div>
 
-                <div className="flex-shrink-0 ml-1">
+                <div className="flex-shrink-0 ml-1 self-center">
                   {isCompleted ? (
                     <Check className="w-4 h-4 text-success" />
                   ) : isUnlocked ? (
