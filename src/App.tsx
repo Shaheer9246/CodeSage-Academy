@@ -8,6 +8,9 @@ import AppShell from "@/components/AppShell";
 import Auth from "./pages/Auth";
 import Welcome from "./pages/Welcome";
 import Trip from "./pages/Trip";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Learn from "./pages/Learn";
@@ -161,6 +164,10 @@ const App = () => (
               <Route path="/three-lesson/:id" element={<ProtectedRoute><Three3dLessonPage /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
               <Route path="/trip" element={<Trip />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Privacy />} />
+              <Route path="/contact" element={<Contact />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppShell>

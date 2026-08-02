@@ -81,6 +81,16 @@ const Welcome = () => {
           <p className="text-[10px] text-muted-foreground/60 text-center mt-6 font-mono">
             No credit card · No subscriptions · Open for everyone
           </p>
+          <div className="flex items-center justify-center gap-3 mt-3 text-[10px] font-mono text-muted-foreground/60">
+            <button onClick={() => navigate('/privacy')} className="hover:text-primary transition-colors">
+              Privacy &amp; Terms
+            </button>
+            <span>·</span>
+            <button onClick={() => navigate('/contact')} className="hover:text-primary transition-colors">
+              Contact
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
