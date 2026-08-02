@@ -35,27 +35,27 @@ const JavaLearn = () => {
       <div className="absolute top-[-10%] right-[-5%] w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] rounded-full bg-orange-500/5 blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-20 w-full box-border">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2">
+      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20 w-full box-border">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-3">
           <button
             onClick={() => navigate('/dashboard')}
-            className="text-muted-foreground hover:text-foreground p-1 rounded-lg transition-colors flex-shrink-0"
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg transition-colors flex-shrink-0 touch-manipulation active:scale-95"
+            aria-label="Back to dashboard"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          {/* Added flex-1 and min-w-0 to the wrapper, and block to the text span to fix truncation */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="text-lg sm:text-xl flex-shrink-0">☕</span>
-            <span className="text-xs sm:text-sm font-bold font-display truncate block">
+            <span className="text-sm font-bold font-display truncate block">
               Java Programming
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-primary/10 px-2 py-1 sm:px-2.5 rounded-full border border-primary/20 flex-shrink-0">
+        <div className="flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20 flex-shrink-0">
           <Flame className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[10px] sm:text-xs font-bold text-primary">
+          <span className="text-xs font-bold text-primary">
             {user.streakCount}
           </span>
         </div>
@@ -65,7 +65,7 @@ const JavaLearn = () => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto p-3 sm:p-4 space-y-3 sm:space-y-4 pb-8 relative z-10 w-full box-border"
+        className="max-w-2xl mx-auto px-4 py-4 sm:py-6 space-y-3 sm:space-y-4 pb-12 relative z-10 w-full box-border"
       >
         {/* Progress Card */}
         <div className="glass-card rounded-2xl p-3 sm:p-4">
@@ -104,14 +104,14 @@ const JavaLearn = () => {
                   navigate(`/java-lesson/${lesson.id}${fromQs}`)
                 }
                 disabled={!isUnlocked}
-                className={`w-full glass-card rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 text-left transition-all ${
+                className={`w-full glass-card rounded-xl p-3.5 sm:p-4 flex items-center gap-3 text-left transition-all touch-manipulation active:scale-[0.99] min-h-[64px] ${
                   isUnlocked
                     ? 'hover:neon-border cursor-pointer'
                     : 'opacity-50 cursor-not-allowed'
                 }`}
               >
                 <div
-                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg sm:text-xl border ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg sm:text-xl border ${
                     isCompleted
                       ? 'bg-success/15 border-success/30'
                       : 'bg-primary/10 border-primary/20'
@@ -120,19 +120,17 @@ const JavaLearn = () => {
                   {lesson.icon}
                 </div>
 
-                {/* Added min-w-0 to flex-1 container to allow children to truncate */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase truncate">
+                <div className="flex-1 min-w-0 pr-1">
+                  <p className="text-[10px] sm:text-xs font-mono text-muted-foreground uppercase truncate">
                     Lesson {lesson.order}
                   </p>
 
-                  {/* Added block to the text span so truncate works properly */}
-                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block">
+                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block leading-snug">
                     {lesson.title}
                   </p>
                 </div>
 
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 ml-1">
                   {isCompleted ? (
                     <Check className="w-4 h-4 text-success" />
                   ) : isUnlocked ? (
