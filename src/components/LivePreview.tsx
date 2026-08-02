@@ -19,18 +19,37 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
 
     const htmlChanged = prevHtmlRef.current !== trimmedHtml;
     const jsChanged = prevJsRef.current !== safeJs;
+    const doc = iframeRef.current?.contentDocument;
+    const booted = !!doc?.getElementById('codesage-live-css');
 
     // ⚡ INSTANT HOT CSS RELOAD: If only CSS changed, update style tag directly without reloading iframe
-    if (!htmlChanged && !jsChanged && iframeRef.current?.contentDocument) {
-      const styleEl = iframeRef.current.contentDocument.getElementById('codesage-live-css');
-      if (styleEl) {
-        styleEl.textContent = safeCss;
-        return;
+    if (!htmlChanged && !jsChanged) {
+      if (booted) {
+        const styleEl = doc!.getElementById('codesage-live-css');
+        if (styleEl && styleEl.textContent !== safeCss) styleEl.textContent = safeCss;
       }
+      return;
     }
 
-    // Debounce full updates (400ms) for HTML/JS so typing doesn't reload on every single keystroke
+    // ⚡ HOT HTML SWAP: markup-only projects never need a full reload, so typing
+    // in the HTML pane no longer blanks the preview for a frame.
+    if (booted && htmlChanged && !jsChanged && !safeJs.trim() && !/<html[\s>]|<!doctype/i.test(trimmedHtml)) {
+      const timer = setTimeout(() => {
+        const liveDoc = iframeRef.current?.contentDocument;
+        if (!liveDoc?.body) return;
+        prevHtmlRef.current = trimmedHtml;
+        const root = liveDoc.getElementById('root');
+        liveDoc.body.innerHTML = trimmedHtml + '<div id="root"></div>';
+        void root;
+        const styleEl = liveDoc.getElementById('codesage-live-css');
+        if (styleEl) styleEl.textContent = safeCss;
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+
+    // Debounce full updates for HTML/JS so typing doesn't reload on every single keystroke
     const timer = setTimeout(() => {
+
       if (!iframeRef.current) return;
 
       // Update refs
