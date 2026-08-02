@@ -1,4 +1,4 @@
-// Python Track — 20 lessons (beginner → advanced)
+// Python Track — 30 lessons (beginner → advanced)
 import type { NetworkingLesson, Concept, QuizQuestion } from './networkingLessons';
 
 export type PythonLesson = NetworkingLesson;
