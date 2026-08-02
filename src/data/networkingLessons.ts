@@ -964,6 +964,415 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
   ],
   keyTakeaways: ['Ping for availability.', 'Traceroute to find blockages.', 'Curl for quick header debugging.'],
 },
+
+  {
+    id: 'net-14',
+    module: 'Module 1: DevOps & Infrastructure Fundamentals',
+    order: 14,
+    title: 'Containerization & Docker',
+    icon: '🐳',
+    philosophy: 'Think of Docker as shipping containers for software. Instead of saying "it works on my machine," Docker bundles your code, dependencies, and OS into a standardized box that runs identically anywhere.',
+    concepts: [
+      {
+        title: '1. Containers vs Virtual Machines',
+        beginner: 'Virtual Machines emulate an entire hardware system; Containers share the host OS kernel and stay lightweight.',
+        advanced: 'Containers isolate processes in user space using Linux `namespaces` and `cgroups`. They boot in seconds and use a fraction of the memory compared to full hypervisor VMs.',
+      },
+      {
+        title: '2. Images & Dockerfiles',
+        beginner: 'A Dockerfile is the recipe; a Docker Image is the frozen snapshot created from that recipe.',
+        advanced: 'Docker build layers are cached individually. Structure your `Dockerfile` so that less frequently changed commands (like `npm install`) happen before copying application source code to optimize build times.',
+      },
+      {
+        title: '3. Docker Compose',
+        beginner: 'A tool for running multi-container applications (e.g., app server + database) with a single command.',
+        advanced: 'Uses a declarative `docker-compose.yml` file to manage container networks, volume bindings, environment variables, and restart policies.',
+      },
+    ],
+    practical: {
+      title: 'Container Inspection & Run',
+      intro: 'Practice working with container images and commands.',
+      steps: [
+        'Run `docker run -d -p 8080:80 nginx` in your terminal.',
+        'Open `localhost:8080` in your browser to see the default Nginx welcome page.',
+        'Run `docker ps` to list active containers and view container IDs.',
+        'Run `docker stop <container_id>` to shut down the running server.',
+      ],
+      goal: 'Understand how isolated software environments bind to local network ports.',
+    },
+    quiz: [
+      {
+        question: 'Why are Docker containers lighter than traditional Virtual Machines?',
+        options: [
+          'They do not require CPU power',
+          'They share the host operating system kernel',
+          'They only work with static HTML',
+          'They bypass network security',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'What file serves as the "recipe" for creating a custom Docker image?',
+        options: ['docker-compose.json', 'Dockerfile', 'package.json', 'Makefile'],
+        correctIndex: 1,
+      },
+      {
+        question: 'What is the primary function of Docker Compose?',
+        options: [
+          'To write JavaScript unit tests',
+          'To define and run multi-container applications using a YAML file',
+          'To register domain names',
+          'To replace git version control',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'In `docker run -p 8080:80 nginx`, what does `8080:80` specify?',
+        options: [
+          'RAM memory allocation limits',
+          'Mapping host port 8080 to container port 80',
+          'File permission levels',
+          'Maximum allowed network connections',
+        ],
+        correctIndex: 1,
+      },
+    ],
+    keyTakeaways: [
+      'Containers eliminate "works on my machine" bugs by bundling dependencies.',
+      'Docker images use cached layers defined in a Dockerfile.',
+      'Docker Compose orchestra-configures multi-service local environments.',
+      'Port mapping links host machine ports to internal container ports.',
+    ],
+  },
+
+  {
+    id: 'net-15',
+    module: 'Module 1: DevOps & Infrastructure Fundamentals',
+    order: 15,
+    title: 'CI/CD Pipelines — Automation & Deployment',
+    icon: '⚡',
+    philosophy: 'Continuous Integration and Continuous Deployment (CI/CD) turn manual release processes into an automated assembly line. Code goes from git push to production automatically after passing tests.',
+    concepts: [
+      {
+        title: '1. Continuous Integration (CI)',
+        beginner: 'Automatically running tests and linters every time a developer pushes new code.',
+        advanced: 'Triggers automated build runners on PRs. Catches merge conflicts, syntax errors, and broken test suites before code hits the main branch.',
+      },
+      {
+        title: '2. Continuous Deployment (CD)',
+        beginner: 'Automatically deploying code that passes tests directly to staging or production servers.',
+        advanced: 'Employs strategies like Blue-Green deployments or Canary releases to update live applications without causing downtime for users.',
+      },
+      {
+        title: '3. Secrets Management in Pipelines',
+        beginner: 'Never hardcode passwords or API keys in your git repository.',
+        advanced: 'Inject secrets dynamically at runtime or build time using Environment Variables managed via GitHub Secrets, HashiCorp Vault, or AWS Secrets Manager.',
+      },
+    ],
+    practical: {
+      title: 'Analyze a CI/CD Workflow Specification',
+      intro: 'Understand how GitHub Actions configures build pipelines.',
+      steps: [
+        'Locate or create `.github/workflows/main.yml` in your project root.',
+        'Define trigger conditions under `on: [push, pull_request]`.',
+        'Configure build jobs: checkout code, setup Node.js, run `npm install`, and execute `npm test`.',
+        'Observe test outputs directly inside the GitHub Pull Request interface.',
+      ],
+      goal: 'Learn how automated workflows enforce software quality before deployment.',
+    },
+    quiz: [
+      {
+        question: 'What is the main objective of Continuous Integration (CI)?',
+        options: [
+          'To automatically charge client credit cards',
+          'To automatically build and test code changes frequently',
+          'To replace database indexes',
+          'To redesign website CSS UI',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'Where should API keys and database credentials be stored for CI/CD runners?',
+        options: [
+          'Inside public index.js files',
+          'In encrypted repository/pipeline secrets',
+          'In git commit messages',
+          'In HTML meta tags',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'What is a "Canary Deployment"?',
+        options: [
+          'Testing code exclusively on mobile devices',
+          'Rolling out updates to a small subset of users before full release',
+          'Deleting old database backups',
+          'Encrypting SSH keys',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'Which event typically triggers a CI pipeline in Git workflows?',
+        options: [
+          'Closing the web browser',
+          'Pushing code to a branch or opening a Pull Request',
+          'Restarting the server computer',
+          'Downloading a PDF file',
+        ],
+        correctIndex: 1,
+      },
+    ],
+    keyTakeaways: [
+      'CI automates testing and linting on every code submission.',
+      'CD automates release deployments to zero-downtime environments.',
+      'Keep secrets out of source control using secure environment variables.',
+      'Pipeline configuration files (YAML) specify triggers, jobs, and steps.',
+    ],
+  },
+
+  {
+    id: 'net-16',
+    module: 'Module 1: DevOps & Infrastructure Fundamentals',
+    order: 16,
+    title: 'Reverse Proxies & Load Balancing',
+    icon: '⚖️',
+    philosophy: 'A Reverse Proxy stands in front of your application servers as a single front door. It routes incoming client traffic, balances workload, and offloads encryption work.',
+    concepts: [
+      {
+        title: '1. Forward vs Reverse Proxy',
+        beginner: 'A forward proxy protects clients (hiding the user); a reverse proxy protects servers (hiding backend architecture).',
+        advanced: 'Clients only interact with the Reverse Proxy URL/IP. The proxy forwards requests internally to private app servers based on routing rules.',
+      },
+      {
+        title: '2. Load Balancing Strategies',
+        beginner: 'Distributing incoming web traffic across multiple servers so no single server gets overwhelmed.',
+        advanced: 'Algorithms include Round Robin (equal distribution), Least Connections (sends traffic to idle servers), and IP Hash (maintains session stickiness).',
+      },
+      {
+        title: '3. SSL Termination',
+        beginner: 'Decrypting secure HTTPS traffic at the proxy level before handing off to internal servers.',
+        advanced: 'Offloads complex TLS cipher calculation from app processes, enabling high-performance unencrypted HTTP communication over isolated internal networks.',
+      },
+    ],
+    practical: {
+      title: 'Inspect Proxy Headers',
+      intro: 'Observe how proxies pass client context to backend applications.',
+      steps: [
+        'Send a request through a proxied endpoint (e.g., via Cloudflare or Nginx).',
+        'Examine server request headers for `X-Forwarded-For` (original client IP).',
+        'Check `X-Forwarded-Proto` (confirms whether original client used HTTP or HTTPS).',
+        'Observe `Host` header rewrites performed by the proxy layer.',
+      ],
+      goal: 'Understand how backend servers preserve client metadata behind proxy layers.',
+    },
+    quiz: [
+      {
+        question: 'What is a primary purpose of a Reverse Proxy?',
+        options: [
+          'To format CSS styling',
+          'To route, secure, and load balance incoming requests to backend servers',
+          'To store browser local storage',
+          'To generate client-side React components',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'Which load balancing algorithm distributes incoming requests sequentially across a server pool?',
+        options: ['Least Connections', 'Round Robin', 'IP Pinning', 'Random Drop'],
+        correctIndex: 1,
+      },
+      {
+        question: 'What does SSL Termination at the reverse proxy accomplish?',
+        options: [
+          'Disables security completely',
+          'Handles heavy TLS decryption at the proxy, reducing load on backend servers',
+          'Prevents browsers from caching images',
+          'Saves storage space on hard drives',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'Which HTTP header tells a backend server the real IP address of the original client through a proxy?',
+        options: ['X-Forwarded-For', 'User-Agent', 'Content-Type', 'Accept-Encoding'],
+        correctIndex: 0,
+      },
+    ],
+    keyTakeaways: [
+      'Reverse proxies act as the single entry point to backend server clusters.',
+      'Load balancers distribute traffic using algorithms like Round Robin or Least Connections.',
+      'SSL termination offloads encryption processing from application code.',
+      'Headers like `X-Forwarded-For` preserve client context across proxy hops.',
+    ],
+  },
+
+  {
+    id: 'net-17',
+    module: 'Module 1: DevOps & Infrastructure Fundamentals',
+    order: 17,
+    title: 'Cloud Architecture & Infrastructure as Code',
+    icon: '🏗️',
+    philosophy: 'Modern infrastructure isn\'t configured by clicking buttons in a cloud console — it is defined as code. Infrastructure as Code (IaC) lets you version, review, and provision entire cloud environments repeatably.',
+    concepts: [
+      {
+        title: '1. Infrastructure as Code (IaC)',
+        beginner: 'Writing configuration scripts (like Terraform or CloudFormation) to spin up cloud servers automatically.',
+        advanced: 'Declarative IaC files define the desired end state of cloud assets. Tools manage state tracking and execute delta updates without destroying existing resources.',
+      },
+      {
+        title: '2. Serverless vs Containers',
+        beginner: 'Serverless functions run code on demand without managing servers; Containers run persistent background processes.',
+        advanced: 'Serverless (e.g., AWS Lambda) scales down to zero when idle, but can suffer from "cold starts". Containers provide predictable performance and full runtime environment control.',
+      },
+      {
+        title: '3. Virtual Private Cloud (VPC) & Subnets',
+        beginner: 'Isolating your cloud servers in a private network virtual wall.',
+        advanced: 'Divide infrastructure into Public Subnets (load balancers, web gateways) and Private Subnets (databases, internal microservices) with strict Security Group rules.',
+      },
+    ],
+    practical: {
+      title: 'Analyze IaC Configuration Declarations',
+      intro: 'Review how cloud resources are defined declaratively.',
+      steps: [
+        'Examine a sample Terraform file (`main.tf`) or CloudFormation template.',
+        'Locate resource definitions for virtual servers, storage buckets, and subnets.',
+        'Identify dependencies between resources (e.g., database attaching to a private subnet).',
+        'Understand how `terraform plan` previews changes before applying them live.',
+      ],
+      goal: 'Grasp how cloud topology is version-controlled like standard application code.',
+    },
+    quiz: [
+      {
+        question: 'What is a major benefit of Infrastructure as Code (IaC)?',
+        options: [
+          'Eliminates the need for software testing',
+          'Enables automated, repeatable, version-controlled cloud resource deployment',
+          'Speeds up user typing speed',
+          'Prevents SQL syntax errors',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'Where should production database servers be placed inside a cloud network?',
+        options: [
+          'In a Public Subnet with open IP access',
+          'In a Private Subnet without direct public internet exposure',
+          'Directly on the client browser',
+          'In a DNS TXT record',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'What is a known characteristic of Serverless architecture (e.g., AWS Lambda)?',
+        options: [
+          'Requires manual OS kernel upgrades',
+          'Executes code on-demand and can scale to zero when idle',
+          'Does not support JavaScript',
+          'Runs continuously on dedicated hardware 24/7',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'What does `terraform plan` do?',
+        options: [
+          'Deletes all project files',
+          'Previews changes to cloud infrastructure before applying them',
+          'Compiles TypeScript to JavaScript',
+          'Installs npm packages',
+        ],
+        correctIndex: 1,
+      },
+    ],
+    keyTakeaways: [
+      'IaC tools (Terraform) version control cloud topology using declarative configurations.',
+      'Public subnets host web gateways; private subnets keep databases insulated.',
+      'Serverless scales on demand and charges per execution, but watch out for cold starts.',
+      'Infrastructure changes should undergo code review just like application code.',
+    ],
+  },
+
+  {
+    id: 'net-18',
+    module: 'Module 1: DevOps & Infrastructure Fundamentals',
+    order: 18,
+    title: 'Monitoring, Logging & Observability',
+    icon: '📊',
+    philosophy: 'You can\'t fix what you can\'t see. Observability combines Metrics, Logs, and Traces (the Three Pillars) so you can diagnose system health issues before users even notice them.',
+    concepts: [
+      {
+        title: '1. The Three Pillars of Observability',
+        beginner: 'Metrics (numbers over time), Logs (event records), and Traces (the exact path of a request through microservices).',
+        advanced: 'Metrics show *that* something is wrong (CPU spike); Logs show *why* it failed (error stack trace); Traces show *where* latency occurred across services.',
+      },
+      {
+        title: '2. Health Checks & Alerts',
+        beginner: 'Automated pings that verify if your application is alive and responding correctly.',
+        advanced: 'Endpoints like `/healthz` return 200 OK when DB connections, cache pools, and disk spaces are healthy. PagerDuty/Sentry integrations alert engineers when SLA thresholds breach.',
+      },
+      {
+        title: '3. Centralized Logging',
+        beginner: 'Aggregating log output from hundreds of isolated servers into one searchable dashboard.',
+        advanced: 'Tools like the ELK stack (Elasticsearch, Logstash, Kibana) or Datadog collect structured JSON logs, enabling fast querying across distributed infrastructure during incident triage.',
+      },
+    ],
+    practical: {
+      title: 'Structured Logging & Health Check Design',
+      intro: 'Practice designing diagnostic indicators for web servers.',
+      steps: [
+        'Create a `/api/health` endpoint returning JSON status details (`{ status: "ok", uptime: 3600 }`).',
+        'Replace plain `console.log("error")` statements with structured JSON logs (`{ level: "error", timestamp: "...", traceId: "..." }`).',
+        'Simulate a failed database connection and observe the health check returning a 503 Service Unavailable code.',
+      ],
+      goal: 'Learn how to structure application runtime telemetry for production monitoring systems.',
+    },
+    quiz: [
+      {
+        question: 'What are the "Three Pillars of Observability"?',
+        options: [
+          'HTML, CSS, and JavaScript',
+          'Metrics, Logs, and Traces',
+          'CPU, RAM, and SSD',
+          'GET, POST, and DELETE',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'What is the purpose of Distributed Tracing?',
+        options: [
+          'To trace physical ethernet cables in a data center',
+          'To track a single request\'s journey through multiple distributed microservices',
+          'To draw UI animations on a web canvas',
+          'To auto-complete code in VS Code',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'Why are structured JSON logs preferred over plain text strings in production?',
+        options: [
+          'They look prettier in the terminal',
+          'They can be easily indexed, searched, and parsed by log aggregation systems',
+          'They take zero bytes of disk space',
+          'They run faster in client browsers',
+        ],
+        correctIndex: 1,
+      },
+      {
+        question: 'What should a `/healthz` API endpoint check before returning a `200 OK` status?',
+        options: [
+          'If the company website colors are updated',
+          'If crucial internal services like database and cache connections are functional',
+          'If the developer is logged into GitHub',
+          'If the client browser supports dark mode',
+        ],
+        correctIndex: 1,
+      },
+    ],
+    keyTakeaways: [
+      'Observability relies on Metrics, Logs, and Traces.',
+      'Structured JSON logging enables fast querying across aggregated logs.',
+      'Health check endpoints (`/healthz`) communicate service status to load balancers.',
+      'Distributed tracing pinpoints performance bottlenecks in microservice architectures.',
+    ],
+  },
 ];
 
 export const getNetworkingLessonById = (id: string): NetworkingLesson | undefined =>
