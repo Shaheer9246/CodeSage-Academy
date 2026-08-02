@@ -186,13 +186,13 @@ function emit() {
 /**
  * Timeout wrapper for Supabase RPC calls to prevent indefinite UI hangs.
  */
-async function callRpcWithTimeout(fnName: string, params: Record<string, any>, timeoutMs = 10000): Promise<any> {
+async function callRpcWithTimeout(fnName: string, params: Record<string, any>, timeoutMs = 20000): Promise<any> {
   let timeoutId: number | undefined;
-  
+
   const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error('Database request timed out. Please try again.')), timeoutMs);
+    timeoutId = window.setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs);
   });
-  
+
   try {
     const result = await Promise.race([
       supabase.rpc(fnName as any, params),
@@ -205,6 +205,27 @@ async function callRpcWithTimeout(fnName: string, params: Record<string, any>, t
     throw err;
   }
 }
+
+/**
+ * Reads the authoritative row for a track straight from the table.
+ * Used to confirm whether a slow/timed-out RPC actually applied.
+ */
+async function verifyServerStatus(track: TrackId): Promise<EnrollmentStatus | null> {
+  if (!currentUserId) return null;
+  try {
+    const { data } = await supabase
+      .from('enrollments')
+      .select('status')
+      .eq('user_id', currentUserId)
+      .eq('track', track)
+      .maybeSingle();
+    const s = (data as { status?: string } | null)?.status?.toLowerCase();
+    return (s as EnrollmentStatus) || null;
+  } catch {
+    return null;
+  }
+}
+
 
 export async function hydrateEnrollments(
   userId: string | null
@@ -335,13 +356,13 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
   if (currentUserId) {
 
     try {
-      // FIX: If the track already exists in memory (e.g. they ended it previously),
-      // we must update its status to 'active' instead of trying to insert a new row.
-      const rpcName = existing ? 'update_enrollment_status' : 'enroll_track';
-      const params = existing ? { _track: track, _status: 'active' } : { _track: track };
+      // enroll_track upserts (ON CONFLICT DO UPDATE status='active'), so it is
+      // safe whether or not a row already exists. Relying on the local cache to
+      // pick the RPC was the source of the "stuck validating / timeout" bug:
+      // a stale cached row made us call update_enrollment_status for a track
+      // that had no server row at all.
+      const { error } = await callRpcWithTimeout('enroll_track', { _track: track });
 
-      const { error } = await callRpcWithTimeout(rpcName, params);
-      
       if (error) throw error;
 
       const { data: stats } = await supabase
@@ -356,6 +377,20 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
         emit();
       }
     } catch (err) {
+      // A timeout does not always mean failure — the write may have landed.
+      // Ask the server what the truth is before rolling the UI back.
+      const serverStatus = await verifyServerStatus(track);
+      if (serverStatus === 'active') {
+        emit();
+        return (
+          mem.find(e => e.track === track) || {
+            track,
+            status: 'active',
+            enrolledAt: Date.now(),
+          }
+        );
+      }
+
       if (existing) {
         if (oldStatus) existing.status = oldStatus;
       } else {
@@ -365,8 +400,13 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
         counts[track] = Math.max(0, (counts[track] ?? 1) - 1);
       }
       emit();
-      throw err;
+      throw new Error(
+        (err as Error)?.message === 'TIMEOUT'
+          ? 'The server took too long to respond. Check your connection and try again.'
+          : (err as Error)?.message || 'Could not start this track. Please try again.'
+      );
     }
+
   }
 
   return (
@@ -402,10 +442,21 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
       });
       if (error) throw error;
     } catch (err) {
+      // Confirm with the server before undoing the optimistic change.
+      const serverStatus = await verifyServerStatus(track);
+      if (serverStatus === status) {
+        emit();
+        return;
+      }
       e.status = prevStatus;
       emit();
-      throw err; // Re-throw so UI knows it failed
+      throw new Error(
+        (err as Error)?.message === 'TIMEOUT'
+          ? 'The server took too long to respond. Check your connection and try again.'
+          : (err as Error)?.message || 'Could not update this track. Please try again.'
+      );
     }
+
   }
 }
 
