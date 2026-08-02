@@ -120,12 +120,12 @@ const JavaLearn = () => {
                   {lesson.icon}
                 </div>
 
-                <div className="flex-1 min-w-0 pr-1">
-                  <p className="text-[10px] sm:text-xs font-mono text-muted-foreground uppercase truncate">
+                <div className="flex-1 min-w-0 pr-1 py-0.5">
+                  <p className="text-[10px] sm:text-xs font-mono text-muted-foreground uppercase truncate mb-0.5">
                     Lesson {lesson.order}
                   </p>
 
-                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block leading-snug">
+                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground leading-snug break-words">
                     {lesson.title}
                   </p>
                 </div>
