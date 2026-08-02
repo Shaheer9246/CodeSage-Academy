@@ -186,13 +186,13 @@ function emit() {
 /**
  * Timeout wrapper for Supabase RPC calls to prevent indefinite UI hangs.
  */
-async function callRpcWithTimeout(fnName: string, params: Record<string, any>, timeoutMs = 10000): Promise<any> {
+async function callRpcWithTimeout(fnName: string, params: Record<string, any>, timeoutMs = 20000): Promise<any> {
   let timeoutId: number | undefined;
-  
+
   const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error('Database request timed out. Please try again.')), timeoutMs);
+    timeoutId = window.setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs);
   });
-  
+
   try {
     const result = await Promise.race([
       supabase.rpc(fnName as any, params),
@@ -205,6 +205,27 @@ async function callRpcWithTimeout(fnName: string, params: Record<string, any>, t
     throw err;
   }
 }
+
+/**
+ * Reads the authoritative row for a track straight from the table.
+ * Used to confirm whether a slow/timed-out RPC actually applied.
+ */
+async function verifyServerStatus(track: TrackId): Promise<EnrollmentStatus | null> {
+  if (!currentUserId) return null;
+  try {
+    const { data } = await supabase
+      .from('enrollments')
+      .select('status')
+      .eq('user_id', currentUserId)
+      .eq('track', track)
+      .maybeSingle();
+    const s = (data as { status?: string } | null)?.status?.toLowerCase();
+    return (s as EnrollmentStatus) || null;
+  } catch {
+    return null;
+  }
+}
+
 
 export async function hydrateEnrollments(
   userId: string | null
