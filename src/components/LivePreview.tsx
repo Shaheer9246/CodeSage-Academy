@@ -182,7 +182,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       }
 
       iframeRef.current.srcdoc = finalHtml;
-    }, 400);
+    }, 600);
 
     return () => clearTimeout(timer);
   }, [html, css, js]);
