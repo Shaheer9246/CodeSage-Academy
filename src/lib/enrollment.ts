@@ -442,10 +442,21 @@ async function updateStatus(track: TrackId, status: EnrollmentStatus) {
       });
       if (error) throw error;
     } catch (err) {
+      // Confirm with the server before undoing the optimistic change.
+      const serverStatus = await verifyServerStatus(track);
+      if (serverStatus === status) {
+        emit();
+        return;
+      }
       e.status = prevStatus;
       emit();
-      throw err; // Re-throw so UI knows it failed
+      throw new Error(
+        (err as Error)?.message === 'TIMEOUT'
+          ? 'The server took too long to respond. Check your connection and try again.'
+          : (err as Error)?.message || 'Could not update this track. Please try again.'
+      );
     }
+
   }
 }
 
