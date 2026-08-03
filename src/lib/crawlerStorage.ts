@@ -56,6 +56,3 @@ export function writeSave(s: CrawlerSave) {
 export function clearSave() {
   try { localStorage.removeItem(KEY); } catch { /* ignore */ }
 }
-export function clearSave() {
-  try { localStorage.removeItem(KEY); } catch { /* ignore */ }
-}
