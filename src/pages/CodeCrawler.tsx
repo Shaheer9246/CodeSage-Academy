@@ -342,13 +342,23 @@ function SetupScreen({
 
           <div>
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Track</label>
-            <div className="grid grid-cols-4 gap-2 mt-2">
-              {(['html', 'css', 'js', 'all'] as Track[]).map(t => (
-                <button key={t} onClick={() => setTrack(t)}
-                  className={`py-2.5 rounded-xl border text-xs font-semibold uppercase ${
-                    track === t ? 'bg-primary/15 border-primary/40 text-primary neon-glow' : 'bg-secondary/20 border-border/30 text-foreground'
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+              {([
+                { id: 'html', label: 'HTML', icon: '< >' },
+                { id: 'css', label: 'CSS', icon: '#' },
+                { id: 'js', label: 'JS', icon: '{ }' },
+                { id: 'python', label: 'Python', icon: '🐍' },
+                { id: 'java', label: 'Java', icon: '☕' },
+                { id: 'cs', label: 'CS Theory', icon: '🧠' },
+                { id: 'networking', label: 'Network', icon: '🌐' },
+                { id: 'all', label: 'Mix All', icon: '🎲' },
+              ] as { id: Track; label: string; icon: string }[]).map(t => (
+                <button key={t.id} onClick={() => setTrack(t.id)}
+                  className={`py-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
+                    track === t.id ? 'bg-primary/15 border-primary/40 text-primary neon-glow' : 'bg-secondary/20 border-border/30 text-foreground hover:bg-secondary/30'
                   }`}>
-                  {t}
+                  <span className="text-base">{t.icon}</span>
+                  {t.label}
                 </button>
               ))}
             </div>
