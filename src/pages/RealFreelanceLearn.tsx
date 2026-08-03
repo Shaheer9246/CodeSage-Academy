@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { REAL_FREELANCE_LESSONS, isRealFreelanceLessonUnlocked } from '@/data/realFreelanceLessons';
+import { REAL_FREELANCE_LESSONS, isRealFreelanceLessonUnlocked } from '@/data/realfreelanceLesson';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
