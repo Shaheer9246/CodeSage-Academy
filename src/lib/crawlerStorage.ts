@@ -1,3 +1,6 @@
+import type { Track, Difficulty } from '@/data/crawlerPuzzles';
+import type { Grid, Facing } from '@/lib/mazeGen';
+
 export type GameMode = 'zen' | 'core';
 
 export interface CrawlerSave {
@@ -50,9 +53,6 @@ export function writeSave(s: CrawlerSave) {
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* ignore */ }
 }
 
-export function clearSave() {
-  try { localStorage.removeItem(KEY); } catch { /* ignore */ }
-}
 export function clearSave() {
   try { localStorage.removeItem(KEY); } catch { /* ignore */ }
 }

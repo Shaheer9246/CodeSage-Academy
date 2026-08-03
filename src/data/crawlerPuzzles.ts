@@ -1,6 +1,10 @@
+export type PuzzleTrack = 'html' | 'css' | 'js' | 'python' | 'java' | 'cs' | 'networking';
+export type Track = PuzzleTrack | 'all';
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export interface Puzzle {
   id: string;
-  track: 'html' | 'css' | 'js';
+  track: PuzzleTrack;
   difficulty: Difficulty;
   brokenCode: string;
   expectedFix: string;
