@@ -179,6 +179,102 @@ export const PUZZLES: Puzzle[] = [
     brokenCode: 'const evens = arr.where(n % 2 === 0);', expectedFix: 'const evens = arr.filter(n => n % 2 === 0);', message: 'Filtered!', explanation: 'JavaScript arrays use `.filter()` to create a new array with elements that pass a test.' },
   { id: 'j-h-5', track: 'js', difficulty: 'hard', timeLimit: 45, hint: 'addEventListener with callback.',
     brokenCode: 'btn.click = handle;', expectedFix: 'btn.addEventListener("click", handle);', message: 'Listener bound!', explanation: 'Assigning to `.onclick` overwrites existing listeners. `addEventListener` is safer and allows multiple listeners.' },
+// ════════════════════════════════════════════════════════════════
+  // 🐍 PYTHON TRACK
+  // ════════════════════════════════════════════════════════════════
+  // ── PYTHON EASY ──
+  { id: 'py-e-1', track: 'python', difficulty: 'easy', timeLimit: 30, hint: 'Python 3 requires parentheses for print.',
+    brokenCode: 'print "Hello World"', expectedFix: 'print("Hello World")',
+    choices: ['print("Hello World")', 'print "Hello World"', 'console.log("Hello World")', 'echo("Hello World")'],
+    message: 'Printed!', explanation: 'In Python 3, `print` is a function, so it requires parentheses around its arguments.' },
+  { id: 'py-e-2', track: 'python', difficulty: 'easy', timeLimit: 30, hint: 'Python uses len() for length.',
+    brokenCode: 'my_list.length', expectedFix: 'len(my_list)',
+    choices: ['len(my_list)', 'my_list.length', 'my_list.size()', 'length(my_list)'],
+    message: 'Measured!', explanation: 'Unlike JS or Java, Python uses the built-in `len()` function instead of a `.length` property.' },
+  { id: 'py-e-3', track: 'python', difficulty: 'easy', timeLimit: 30, hint: 'Python uses def for functions.',
+    brokenCode: 'function add(a, b): return a + b', expectedFix: 'def add(a, b):\n    return a + b',
+    choices: ['def add(a, b):\n    return a + b', 'function add(a, b):\n    return a + b', 'def add(a, b) { return a + b }', 'func add(a, b): return a + b'],
+    message: 'Defined!', explanation: 'Python uses the `def` keyword to define functions, followed by a colon and indented code.' },
+
+  // ── PYTHON MEDIUM ──
+  { id: 'py-m-1', track: 'python', difficulty: 'medium', timeLimit: 35, hint: 'List comprehension syntax.',
+    brokenCode: 'squares = [x * x for x in range(5)]', expectedFix: 'squares = [x**2 for x in range(5)]',
+    choices: ['squares = [x**2 for x in range(5)]', 'squares = [x * x for x in range(5)]', 'squares = map(x => x*x, range(5))', 'squares = [Math.pow(x, 2) for x in range(5)]'],
+    message: 'Comprehended!', explanation: 'While `x * x` works, the idiomatic Python way to write exponents is the `**` operator (e.g., `x**2`).' },
+  { id: 'py-m-2', track: 'python', difficulty: 'medium', timeLimit: 35, hint: 'Dictionary key access.',
+    brokenCode: 'user = {"name": "Alice"}\nprint(user.name)', expectedFix: 'user = {"name": "Alice"}\nprint(user["name"])',
+    choices: ['user = {"name": "Alice"}\nprint(user["name"])', 'user = {"name": "Alice"}\nprint(user.name)', 'user = {"name": "Alice"}\nprint(user->name)', 'user = {"name": "Alice"}\nprint(user(name))'],
+    message: 'Accessed!', explanation: 'Python dictionaries use bracket notation `["key"]` to access values, unlike JS objects which can use dot notation.' },
+
+  // ── PYTHON HARD ──
+  { id: 'py-h-1', track: 'python', difficulty: 'hard', timeLimit: 45, hint: 'Generators use yield.',
+    brokenCode: 'def count():\n    for i in range(3):\n        return i', expectedFix: 'def count():\n    for i in range(3):\n        yield i',
+    message: 'Generated!', explanation: 'Using `return` stops the function completely. `yield` pauses it, returning a value and resuming on the next call, creating a generator.' },
+
+  // ════════════════════════════════════════════════════════════════
+  // ☕ JAVA TRACK
+  // ════════════════════════════════════════════════════════════════
+  // ── JAVA EASY ──
+  { id: 'jv-e-1', track: 'java', difficulty: 'easy', timeLimit: 30, hint: 'Standard output in Java.',
+    brokenCode: 'console.log("Hello");', expectedFix: 'System.out.println("Hello");',
+    choices: ['System.out.println("Hello");', 'console.log("Hello");', 'print("Hello");', 'System.print("Hello");'],
+    message: 'Printed!', explanation: 'Java uses `System.out.println()` to print to the console, not `console.log()`.' },
+  { id: 'jv-e-2', track: 'java', difficulty: 'easy', timeLimit: 30, hint: 'String comparison in Java.',
+    brokenCode: 'if (str1 == str2) {}', expectedFix: 'if (str1.equals(str2)) {}',
+    choices: ['if (str1.equals(str2)) {}', 'if (str1 == str2) {}', 'if (str1 === str2) {}', 'if (equals(str1, str2)) {}'],
+    message: 'Compared!', explanation: 'In Java, `==` compares object references (memory addresses). You must use `.equals()` to compare the actual text inside Strings.' },
+
+  // ── JAVA MEDIUM ──
+  { id: 'jv-m-1', track: 'java', difficulty: 'medium', timeLimit: 35, hint: 'ArrayList initialization.',
+    brokenCode: 'List<String> list = new List<>();', expectedFix: 'List<String> list = new ArrayList<>();',
+    choices: ['List<String> list = new ArrayList<>();', 'List<String> list = new List<>();', 'ArrayList<String> list = new List<String>();', 'var list = new List();'],
+    message: 'Instantiated!', explanation: '`List` is an interface in Java, so you cannot instantiate it directly with `new`. You must use a concrete class like `ArrayList`.' },
+
+  // ════════════════════════════════════════════════════════════════
+  // 🧠 COMPUTER SCIENCE (CS) TRACK
+  // ════════════════════════════════════════════════════════════════
+  // ── CS EASY ──
+  { id: 'cs-e-1', track: 'cs', difficulty: 'easy', timeLimit: 30, hint: 'First In, First Out.',
+    brokenCode: 'Scenario: A line at a grocery store. Which data structure mimics this?', expectedFix: 'Queue',
+    choices: ['Queue', 'Stack', 'Array', 'Tree'],
+    message: 'Queued!', explanation: 'A Queue follows FIFO (First-In-First-Out) order, exactly like a line of people waiting.' },
+  { id: 'cs-e-2', track: 'cs', difficulty: 'easy', timeLimit: 30, hint: 'Binary basics.',
+    brokenCode: 'What is the decimal value of the binary number 101?', expectedFix: '5',
+    choices: ['5', '3', '10', '101'],
+    message: 'Converted!', explanation: 'In binary (base 2), 101 means (1 * 4) + (0 * 2) + (1 * 1) = 5.' },
+
+  // ── CS MEDIUM ──
+  { id: 'cs-m-1', track: 'cs', difficulty: 'medium', timeLimit: 35, hint: 'Searching algorithms.',
+    brokenCode: 'What is the absolute requirement for using Binary Search?', expectedFix: 'The array must be sorted',
+    choices: ['The array must be sorted', 'The array must contain integers', 'The array must have an even length', 'The array must be small'],
+    message: 'Searched!', explanation: 'Binary search works by repeatedly dividing the search interval in half. This is only possible if the data is sorted beforehand.' },
+  { id: 'cs-m-2', track: 'cs', difficulty: 'medium', timeLimit: 35, hint: 'Big O Notation.',
+    brokenCode: 'What is the time complexity of accessing an element in a Hash Table (Dictionary) by its key?', expectedFix: 'O(1)',
+    choices: ['O(1)', 'O(n)', 'O(log n)', 'O(n^2)'],
+    message: 'Optimized!', explanation: 'Hash tables use a hashing function to compute the exact memory location of a value, resulting in O(1) or "constant time" average access.' },
+
+  // ════════════════════════════════════════════════════════════════
+  // 🌐 NETWORKING TRACK
+  // ════════════════════════════════════════════════════════════════
+  // ── NET EASY ──
+  { id: 'net-e-1', track: 'networking', difficulty: 'easy', timeLimit: 30, hint: 'Web protocols.',
+    brokenCode: 'Which protocol securely encrypts data sent between a browser and a server?', expectedFix: 'HTTPS',
+    choices: ['HTTPS', 'HTTP', 'FTP', 'SMTP'],
+    message: 'Secured!', explanation: 'HTTPS (Hypertext Transfer Protocol Secure) uses TLS/SSL to encrypt data, protecting it from eavesdroppers.' },
+  { id: 'net-e-2', track: 'networking', difficulty: 'easy', timeLimit: 30, hint: 'The phonebook of the internet.',
+    brokenCode: 'What system translates human-readable domain names (like google.com) into IP addresses?', expectedFix: 'DNS',
+    choices: ['DNS', 'DHCP', 'HTTP', 'TCP'],
+    message: 'Resolved!', explanation: 'DNS (Domain Name System) acts like a phonebook, mapping domain names to the numerical IP addresses computers use to route traffic.' },
+
+  // ── NET MEDIUM ──
+  { id: 'net-m-1', track: 'networking', difficulty: 'medium', timeLimit: 35, hint: 'Reliable vs Fast transport.',
+    brokenCode: 'You are building a live video streaming app. Which transport protocol is best to minimize lag, even if a few frames drop?', expectedFix: 'UDP',
+    choices: ['UDP', 'TCP', 'HTTP', 'FTP'],
+    message: 'Streamed!', explanation: 'UDP (User Datagram Protocol) is connectionless and doesn\'t guarantee delivery, making it much faster and ideal for real-time video/audio where a dropped frame isn\'t a disaster.' },
+  { id: 'net-m-2', track: 'networking', difficulty: 'medium', timeLimit: 35, hint: 'HTTP Status Codes.',
+    brokenCode: 'Your frontend requests a user profile, but the server returns a 404 status code. What does this mean?', expectedFix: 'Not Found',
+    choices: ['Not Found', 'Server Error', 'Unauthorized', 'Success'],
+    message: 'Handled!', explanation: '404 means "Not Found". The server is reachable, but the specific resource (like a user ID that doesn\'t exist) could not be located.' },
 ];
 
 export function pickPuzzles(track: Track, difficulty: Difficulty, count: number): Puzzle[] {
@@ -190,5 +286,6 @@ export function pickPuzzles(track: Track, difficulty: Difficulty, count: number)
 }
 
 export function normalize(s: string): string {
+  // Slightly updated to handle plain text answers (like "Queue" or "DNS") better while still stripping code whitespace
   return s.replace(/\s+/g, ' ').replace(/\s*([<>{}();,:])\s*/g, '$1').trim().toLowerCase();
 }
