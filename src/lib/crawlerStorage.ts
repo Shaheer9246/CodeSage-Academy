@@ -1,3 +1,6 @@
+import type { Track, Difficulty } from '@/data/crawlerPuzzles';
+import type { Grid, Facing } from '@/lib/mazeGen';
+
 export type GameMode = 'zen' | 'core';
 
 export interface CrawlerSave {
