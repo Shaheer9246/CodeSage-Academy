@@ -149,8 +149,8 @@ const SECTIONS: SectionDef[] = [
     Icon: Database,
     gradient: 'from-emerald-400/70 via-teal-400/60 to-cyan-500/70',
     tracks: [
-      { id: 'sql', path: '/sql?from=dashboard', title: 'SQL Databases', emoji: '🛢️',
-        tour: 'sql', lessons: 10, accent: 'emerald-500',
+      { id: 'sql', path: '/sql?from=dashboard', title: 'SQL & PostgreSQL: Backend Database Engineering', emoji: '🛢️',
+        tour: 'sql', lessons: 18, accent: 'emerald-500',
         tags: ['Queries', 'Joins', 'Schemas'], desc: 'Queries → Joins → DB Design',
         trackId: 'sql' as TrackId },
     ],
