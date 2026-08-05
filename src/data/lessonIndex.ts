@@ -11,6 +11,7 @@ import { PYTHON_EXPERT_LESSONS } from './pythonExpertLessons';
 import { LOCAL_LESSONS } from './localLessons';
 import { SQL_LESSONS } from './sqlLessons';
 import { AI_LESSONS } from './aiFundamentalsLesson';
+import { INTERMEDIATE_AI_LESSONS } from './intermediateAiLesson';
 import { THREE3D_LESSONS } from './three3dLessons';
 import { JAVA_LESSONS } from './javaLesson';
 
@@ -25,6 +26,7 @@ export type LessonTrackKey =
   | 'local'
   | 'sql'
   | 'ai-fundamentals'
+  | 'intermediate-ai'
   | 'three3d'
   | 'java';
 
@@ -41,6 +43,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   local: ids(LOCAL_LESSONS),
   sql: ids(SQL_LESSONS),
   'ai-fundamentals': ids(AI_LESSONS),
+  'intermediate-ai': ids(INTERMEDIATE_AI_LESSONS),
   three3d: ids(THREE3D_LESSONS),
   java: ids(JAVA_LESSONS),
 };
@@ -56,6 +59,7 @@ export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
   local: 'Local-Only',
   sql: 'SQL',
   'ai-fundamentals': 'AI Fundamentals',
+  'intermediate-ai': 'Intermediate AI',
   three3d: '3D Web Dev',
   java: 'Java',
 };
