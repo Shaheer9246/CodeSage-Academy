@@ -1172,6 +1172,252 @@ export const SQL_LESSONS: SQLLesson[] = [
       'Appreciate how PostgreSQL Row-Level Security (RLS) acts as a kernel-level fail-safe.',
       'Use Roles and Views to enforce the Principle of Least Privilege.'
     ]
+  },
+  {
+    id: 'sql-16',
+    order: 16,
+    module: 'Database Administration & Scaling',
+    icon: '🧹',
+    title: 'MVCC & Database Maintenance (VACUUM)',
+    philosophy:
+      'Relational databases do not actually overwrite data when you run an UPDATE, nor do they instantly destroy it on DELETE. To allow thousands of users to read and write simultaneously without locking the entire system, PostgreSQL uses MVCC (Multi-Version Concurrency Control). It creates new rows and leaves the old ones behind as "dead tuples." Without regular maintenance, these ghost rows will bloat your storage, destroy query performance, and eventually crash the database.',
+    concepts: [
+      {
+        title: '1. Multi-Version Concurrency Control (MVCC)',
+        beginner:
+          'Imagine two people editing a shared document. Instead of ripping the pencil out of your hand when I want to edit a sentence, the database just makes a copy of the sentence for me to edit, while you keep reading the old one. Once I save, the old sentence is marked as "dead".',
+        advanced:
+          'MVCC provides transaction isolation without read/write locks. Every transaction is assigned a sequential ID (TXID). An UPDATE operation actually inserts a brand-new row with the current TXID and marks the old row\'s xmax value to indicate it expires after this transaction, leaving a "dead tuple" on the physical disk.'
+      },
+      {
+        title: '2. VACUUM and Dead Tuples',
+        beginner:
+          'Because dead rows are left behind on the hard drive, your database slowly fills up with invisible garbage. Running the VACUUM command is like taking out the trash. It tells the database to find those dead rows and mark their disk space as available for new data.',
+        advanced:
+          'A standard VACUUM scans the table pages, identifies dead tuples invisible to all active transactions, and adds their pointers to the Free Space Map (FSM). It does not shrink the physical file size. A VACUUM FULL aggressively rewrites the entire table heap to reclaim OS-level disk space, but requires an exclusive lock that blocks all API traffic.'
+      },
+      {
+        title: '3. Transaction ID Wraparound',
+        beginner:
+          'Databases use an internal counter to track changes. If a massive database makes billions of changes, the counter will eventually run out of numbers and reset to zero. If this happens without preparation, the database gets confused about what data is old or new, causing catastrophic data loss.',
+        advanced:
+          'PostgreSQL uses 32-bit transaction IDs. At ~2 billion transactions, the TXID wraps around. PostgreSQL prevents the "wraparound data loss" apocalypse by running a special process called autovacuum which periodically "freezes" old rows, marking them with a special flag indicating they are permanently older than all active transactions.'
+      }
+    ],
+    practical: {
+      title: 'Reclaiming Disk Space',
+      intro:
+        'In this simulation, we have a sessions table where thousands of users have logged in and out, generating massive amounts of deleted rows (dead tuples). Your task is to execute the database maintenance command to sweep the database, rebuild the internal data structures, and free up the wasted space.',
+      steps: [
+        'Unlike SELECT or UPDATE, database administration commands are often single keywords.',
+        'Type the command VACUUM; to initiate the garbage collection sweep.',
+        'Note: In production PostgreSQL, you rarely run this manually as a background daemon named autovacuum handles it, but DBAs must know how to trigger it during emergencies.'
+      ],
+      goal: 'Execute the VACUUM command to clear dead tuples and reclaim disk space.',
+      starterQuery: '-- Write your maintenance command here\n',
+      solutionQuery: 'VACUUM;',
+      seedSql: `CREATE TABLE sessions (id INTEGER PRIMARY KEY, user_id INTEGER, token TEXT); INSERT INTO sessions VALUES (1, 101, 'abc'); INSERT INTO sessions VALUES (2, 102, 'def'); INSERT INTO sessions VALUES (3, 103, 'ghi'); -- Simulate dead tuple creation DELETE FROM sessions WHERE id IN (1, 2);`
+    },
+    quiz: [
+      {
+        question:
+          'Why does PostgreSQL leave "dead tuples" behind after an UPDATE or DELETE operation?',
+        options: [
+          'Because deleting data instantly would damage the hard drive',
+          'To support MVCC, ensuring other active transactions can still read the old version of the data without being locked out',
+          'Because SQL syntax does not have a permanent delete function',
+          'To automatically back up the data to the cloud'
+        ],
+        correctIndex: 1,
+        explanation:
+          'MVCC avoids locking the database by keeping the old row (tuple) alive just in case another user is currently running a query that started before the data was changed.'
+      },
+      {
+        question:
+          'What is the critical difference between a standard VACUUM and a VACUUM FULL in PostgreSQL?',
+        options: [
+          'VACUUM FULL deletes the entire table; standard VACUUM only deletes empty rows',
+          'VACUUM runs on memory; VACUUM FULL runs on the hard drive',
+          'Standard VACUUM frees space for future database inserts without locking the table; VACUUM FULL rewrites the physical disk file to shrink its size but locks the table entirely',
+          'There is no functional difference'
+        ],
+        correctIndex: 2,
+        explanation:
+          'Standard VACUUM is safe for production traffic because it just updates the Free Space Map. VACUUM FULL rewrites the table structure completely, locking out your backend API during the process.'
+      }
+    ],
+    milestones: [
+      'Understand the mechanics of Multi-Version Concurrency Control (MVCC).',
+      'Identify database bloat caused by dead tuples during high-write operations.',
+      'Deploy the VACUUM command to maintain database health and Free Space Maps.',
+      'Comprehend the risks of Transaction ID Wraparound in extreme-scale systems.'
+    ]
+  },
+  {
+    id: 'sql-17',
+    order: 17,
+    module: 'Database Administration & Scaling',
+    icon: '🗄️',
+    title: 'Table Partitioning',
+    philosophy:
+      'When a single table reaches billions of rows—like tracking 5 years of temperature sensors or financial ledgers—basic B-Tree indexes become massively bloated and slow. Deleting old data takes hours. To scale, DBAs use Table Partitioning: secretly slicing one massive logical table into dozens of smaller physical tables (like dividing by month or region) behind the scenes.',
+    concepts: [
+      {
+        title: '1. What is Declarative Partitioning?',
+        beginner:
+          'Imagine keeping 10 years of tax receipts in one giant cardboard box. Finding one from 2019 is a nightmare. Partitioning is like buying a filing cabinet with a drawer for each year. Your application still just asks the database for "receipts", but the database engine automatically routes the data to the correct drawer.',
+        advanced:
+          'PostgreSQL Declarative Partitioning allows you to define a parent logical table that stores no data itself, and multiple child physical tables (partitions) that inherit the schema. The query planner automatically routes INSERTs to the correct physical heap based on predefined partition bounds.'
+      },
+      {
+        title: '2. Partitioning Strategies (Range, List, Hash)',
+        beginner:
+          'You have to tell the database HOW to divide the data. "Range" splits data by numbers or dates (e.g., Jan, Feb, March). "List" splits data by exact categories (e.g., Store_NY, Store_LA). "Hash" splits data randomly but evenly across a set number of buckets to balance server load.',
+        advanced:
+          'Range partitioning is dominant for time-series data, allowing instant archival (dropping a partition is an O(1) metadata operation, whereas a massive DELETE is an O(N) WAL-heavy operation). Hash partitioning is used for evenly distributing heavily skewed tenant IDs across physical shards.'
+      },
+      {
+        title: '3. Partition Pruning',
+        beginner:
+          'The biggest speed boost comes from reading. If your backend asks for data from "March 2026", the database looks at your filing cabinet, completely ignores the other 11 drawers, and only searches the March drawer. This saves massive amounts of time.',
+        advanced:
+          'Partition Pruning occurs during the query planning phase. The PostgreSQL optimizer evaluates the WHERE clause against the partition boundary definitions. If the constraints prove a partition cannot contain matching rows, the planner entirely excludes that physical table from the execution node graph.'
+      }
+    ],
+    practical: {
+      title: 'Simulating Partition Routing',
+      intro:
+        "While SQLite does not have PostgreSQL's automatic declarative partitioning, DBAs used to simulate it manually (and still do in simpler DBs). We have created two physical child tables: logs_2025 and logs_2026. Your goal is to create a VIEW named all_logs that combines them using UNION ALL, effectively creating a single logical table your API can query.",
+      steps: [
+        'Start with CREATE VIEW all_logs AS.',
+        'Write a query to select everything from the first partition: SELECT * FROM logs_2025.',
+        'Add the UNION ALL keyword to glue the next result set to the bottom of the first.',
+        'Write the query for the second partition: SELECT * FROM logs_2026.',
+        'End with a semicolon.'
+      ],
+      goal: 'Construct a unified logical View that spans across multiple physical table partitions.',
+      starterQuery: 'CREATE VIEW all_logs AS\n',
+      solutionQuery:
+        'CREATE VIEW all_logs AS\nSELECT * FROM logs_2025\nUNION ALL\nSELECT * FROM logs_2026;',
+      seedSql: `CREATE TABLE logs_2025 (id INTEGER PRIMARY KEY, msg TEXT, year INTEGER DEFAULT 2025); CREATE TABLE logs_2026 (id INTEGER PRIMARY KEY, msg TEXT, year INTEGER DEFAULT 2026); INSERT INTO logs_2025 VALUES (1, 'System started', 2025); INSERT INTO logs_2026 VALUES (2, 'User login', 2026);`
+    },
+    quiz: [
+      {
+        question:
+          'What is the massive administrative benefit of using Range Partitioning for time-series logs?',
+        options: [
+          'It automatically translates timestamps into different timezones',
+          'Instead of running an expensive DELETE query to remove a billion old logs, you can instantly DROP the physical partition table containing that month',
+          'It forces the database to compress text files',
+          'It prevents hackers from reading time-based data'
+        ],
+        correctIndex: 1,
+        explanation:
+          'Dropping a physical partition is a virtually instantaneous file-system operation (O(1)), bypassing the massive MVCC bloat and transaction log overhead of running a standard DELETE query on billions of rows.'
+      },
+      {
+        question: 'What is Partition Pruning?',
+        options: [
+          'When the database automatically deletes old rows based on a timer',
+          'When the database compresses data to save hard drive space',
+          'When the query planner evaluates your WHERE clause and completely skips searching physical partitions that it knows cannot contain your target data',
+          'When a database administrator manually shuts down unused servers'
+        ],
+        correctIndex: 2,
+        explanation:
+          'Partition pruning allows the database engine to completely ignore irrelevant physical tables, reducing disk I/O massively compared to scanning a single monolithic table.'
+      }
+    ],
+    milestones: [
+      'Understand the physical limitations of monolithic tables at the billion-row scale.',
+      'Differentiate between Range, List, and Hash partitioning architectures.',
+      'Leverage partitioning for O(1) data archival and bulk deletion.',
+      'Appreciate how the query planner utilizes Partition Pruning for extreme performance.'
+    ]
+  },
+  {
+    id: 'sql-18',
+    order: 18,
+    module: 'Database Administration & Scaling',
+    icon: '🧭',
+    title: 'Advanced Indexing (BRIN, GiST, pgvector)',
+    philosophy:
+      'A standard B-Tree index is perfect for sorting numbers or alphabetizing names. However, B-Trees fail completely if you need to search a map for "restaurants within 5 miles," search millions of documents for a specific paragraph, or find AI similarities. To reach true expert status, DBAs deploy specialized mathematical index structures built for specific data shapes.',
+    concepts: [
+      {
+        title: '1. BRIN (Block Range Indexes)',
+        beginner:
+          'If you have a billion rows of timestamped sensor data, a B-Tree index would be gigantic and consume all your server RAM. A BRIN index is like a cheat sheet. Instead of indexing every single row, it just remembers: "Page 1 contains dates from Jan 1 to Jan 5. Page 2 has Jan 6 to Jan 10." It is incredibly tiny and surprisingly fast.',
+        advanced:
+          'BRIN is designed for naturally correlated massive datasets. It stores the minimum and maximum values for contiguous physical disk blocks (pages). It sacrifices the exact precision of a B-Tree to achieve a footprint that is often 99% smaller, making it the industry standard for Petabyte-scale append-only logs.'
+      },
+      {
+        title: '2. GiST and Spatial Data (PostGIS)',
+        beginner:
+          'You cannot sort a 2D map on a 1D list. If Uber needs to find drivers near you, it uses a GiST index. GiST draws invisible "bounding boxes" around geographic areas. If you are searching in Manhattan, the index immediately discards the bounding box for Brooklyn, narrowing the search instantly.',
+        advanced:
+          'GiST (Generalized Search Tree) allows PostgreSQL to index complex data types like geometric shapes, IP subnets, and overlapping ranges. Paired with the PostGIS extension, it evaluates geometric overlaps (&&), distance boundaries, and polygon intersections at scale.'
+      },
+      {
+        title: '3. AI and pgvector (HNSW)',
+        beginner:
+          'Artificial Intelligence converts concepts (like sentences or images) into massive lists of numbers called vectors. To find "similar" concepts, you must calculate the distance between these lists. Modern databases use special HNSW indexes to map these vectors into 3D space and quickly navigate to the closest matches.',
+        advanced:
+          'The pgvector extension introduces vector types to PostgreSQL. Standard exact-nearest-neighbor (KNN) searches require scanning every row. To scale AI RAG (Retrieval-Augmented Generation) pipelines, DBAs deploy HNSW (Hierarchical Navigable Small World) indexes, an approximate nearest-neighbor graph algorithm that trades a tiny bit of accuracy for massive speed.'
+      }
+    ],
+    practical: {
+      title: 'Full-Text Search Indexing',
+      intro:
+        'While we cannot run a spatial GiST index in this browser, we can simulate another advanced index type: Full-Text Search. A B-Tree cannot quickly find a word buried inside a paragraph. We have created an SQLite FTS5 virtual table (an advanced inverted index) named documents. Find the title of any document that contains the word "database".',
+      steps: [
+        'Select the title column.',
+        'Target the specialized documents table.',
+        'Instead of using WHERE text = ... or a slow LIKE, use the specialized MATCH operator.',
+        "Write your filter as: WHERE documents MATCH 'database'.",
+        'End with a semicolon.'
+      ],
+      goal: 'Query an advanced inverted index to perform high-speed full-text substring search.',
+      starterQuery:
+        '-- Write your query here using the MATCH operator\nSELECT title FROM documents WHERE ',
+      solutionQuery:
+        "SELECT title FROM documents WHERE documents MATCH 'database';",
+      seedSql: `-- SQLite specific advanced indexing (FTS5 extension) CREATE VIRTUAL TABLE documents USING fts5(title, content); INSERT INTO documents VALUES ('SQL Guide', 'A database is a fortress of integrity.'); INSERT INTO documents VALUES ('CSS Tips', 'Learn to style web pages beautifully.'); INSERT INTO documents VALUES ('Nodejs Intro', 'Build backend servers easily.');`
+    },
+    quiz: [
+      {
+        question:
+          'When should a DBA choose a BRIN index over a standard B-Tree index?',
+        options: [
+          'When indexing text columns for autocomplete features',
+          'When indexing AI embedding vectors',
+          'When indexing massive, naturally ordered time-series data (like logs) where saving RAM and disk space is prioritized over exact precision',
+          'When the database is hosted on a Windows server'
+        ],
+        correctIndex: 2,
+        explanation:
+          "BRIN is heavily utilized on massive append-only tables (like logs or IoT metrics). Because the data is naturally sorted by time, BRIN's block-range summaries can skip 99% of the table while taking up almost zero RAM."
+      },
+      {
+        question:
+          'What is the primary function of a GiST index in a system like PostGIS?',
+        options: [
+          'To encrypt user passwords dynamically',
+          'To efficiently query two-dimensional spatial data, overlapping bounding boxes, and geometric shapes',
+          'To translate foreign languages via AI',
+          'To enforce multi-tenant Row-Level Security'
+        ],
+        correctIndex: 1,
+        explanation:
+          'GiST (Generalized Search Tree) handles multidimensional data that B-Trees cannot process, making it the backbone of geospatial applications, mapping services, and range-overlap tracking.'
+      }
+    ],
+    milestones: [
+      'Understand the limitations of B-Tree structures on massive or multidimensional data.',
+      'Deploy BRIN indexes to optimize massive time-series logging tables.',
+      'Appreciate the role of GiST and PostGIS in modern mapping and spatial backends.',
+      'Recognize how pgvector and HNSW indexes power AI similarity search natively inside PostgreSQL.'
+    ]
   }
 ];
 
