@@ -20,6 +20,8 @@ import NetworkingLessonPage from "./pages/NetworkingLessonPage";
 import NetworkingLearn from "./pages/NetworkingLearn";
 import AiFundamentalsLearn from "./pages/AiFundamentalsLearn";
 import AiFundamentalsLessonPage from "./pages/AiFundamentalsLessonPage";
+import IntermediateAiLearn from "./pages/IntermediateAiLearn";
+import IntermediateAiLessonPage from "./pages/IntermediateAiLessonPage";
 import FreelanceLearn from "./pages/FreelanceLearn";
 import FreelanceLessonPage from "./pages/FreelanceLessonPage";
 import FullstackLearn from "./pages/FullstackLearn";
@@ -160,6 +162,8 @@ const App = () => (
               <Route path="/pyx-lesson/:id" element={<ProtectedRoute><PythonExpertLessonPage /></ProtectedRoute>} />
               <Route path="/ai-fundamentals" element={<ProtectedRoute><AiFundamentalsLearn /></ProtectedRoute>} />
               <Route path="/ai-lesson/:id" element={<ProtectedRoute><AiFundamentalsLessonPage /></ProtectedRoute>} />
+              <Route path="/intermediate-ai" element={<ProtectedRoute><IntermediateAiLearn /></ProtectedRoute>} />
+              <Route path="/iai-lesson/:id" element={<ProtectedRoute><IntermediateAiLessonPage /></ProtectedRoute>} />
               <Route path="/three3d" element={<ProtectedRoute><Three3dLearn /></ProtectedRoute>} />
               <Route path="/three-lesson/:id" element={<ProtectedRoute><Three3dLessonPage /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
