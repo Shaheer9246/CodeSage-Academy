@@ -1,10 +1,14 @@
+// src/components/JavaWorkspace.tsx
 import { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw, Trash2, Coffee, Terminal, Lightbulb, Loader2 } from 'lucide-react';
-import CodeEditor from './CodeEditor'; // Assuming this uses your existing CodeEditor
+import CodeEditor from './CodeEditor';
 
 interface JavaWorkspaceProps {
   starterCode?: string;
-  practical: {
+  initialCode?: string;       // Used by Challenges.tsx
+  onCodeChange?: (code: string) => void; // Used by Challenges.tsx
+  embedded?: boolean;         // Hides assignment tabs to save space
+  practical?: {
     title: string;
     intro: string;
     steps: string[];
@@ -22,18 +26,35 @@ const DEFAULT_STARTER = `public class Main {
 }
 `;
 
-const JavaWorkspace = ({ starterCode, practical }: JavaWorkspaceProps) => {
-  const initial = starterCode ?? DEFAULT_STARTER;
+const JavaWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false, practical }: JavaWorkspaceProps) => {
+  const initial = initialCode ?? starterCode ?? DEFAULT_STARTER;
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([
     { kind: 'sys', text: '$ Java 17 (Client-side simulation) — press ▶ Run Code to start.' }
   ]);
   const [running, setRunning] = useState(false);
-  const [tab, setTab] = useState<'assign' | 'term'>('assign');
+  const [tab, setTab] = useState<'assign' | 'term'>(embedded ? 'term' : 'assign');
   const [pendingInput, setPendingInput] = useState<{ resolve: (v: string) => void } | null>(null);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
+
+  // Sync code up to parent (Challenges.tsx) for validation
+  useEffect(() => {
+    if (onCodeChange) {
+      onCodeChange(code);
+    }
+  }, [code, onCodeChange]);
+
+  // Reset workspace when switching challenges
+  useEffect(() => {
+    if (embedded && initialCode !== undefined) {
+      setCode(initialCode);
+      setLines([{ kind: 'sys', text: '$ Java 17 — Ready.' }]);
+      setRunning(false);
+      setPendingInput(null);
+    }
+  }, [initialCode, embedded]);
 
   // Auto-scroll terminal
   useEffect(() => {
@@ -66,7 +87,7 @@ const JavaWorkspace = ({ starterCode, practical }: JavaWorkspaceProps) => {
 
   const runCode = async () => {
     if (running) return;
-    setTab('term');
+    if (!embedded) setTab('term');
     setRunning(true);
     write('sys', '$ javac Main.java');
     
@@ -78,14 +99,7 @@ const JavaWorkspace = ({ starterCode, practical }: JavaWorkspaceProps) => {
       // Simulate execution delay
       await new Promise(res => setTimeout(res, 400));
 
-      // ----------------------------------------------------------------------
-      // EXECUTION LOGIC FOR LOVABLE:
-      // Since true in-browser Java compilation requires complex WASM (CheerpJ),
-      // for beginner lessons we can simulate basic outputs by parsing the code,
-      // or you can replace this block with a fetch() call to a secure API.
-      // ----------------------------------------------------------------------
-      
-      // Basic extraction of System.out.println for visual feedback in lessons
+      // Basic extraction of System.out.println for visual feedback
       const printMatches = code.matchAll(/System\.out\.print(?:ln)?\("(.*?)"\);/g);
       let foundOutput = false;
       
@@ -108,14 +122,18 @@ const JavaWorkspace = ({ starterCode, practical }: JavaWorkspaceProps) => {
     }
   };
 
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode);
+  };
+
   const resetCode = () => setCode(initial);
   const clearConsole = () => setLines([{ kind: 'sys', text: '$ console cleared' }]);
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden border border-primary/20">
+    <div className={`glass-card overflow-hidden border border-primary/20 ${embedded ? 'h-full flex flex-col rounded-none border-0 bg-background' : 'rounded-2xl'}`}>
       <div className="flex items-center justify-between px-3 py-2 bg-secondary/40 border-b border-border/30">
         <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
-          <Coffee className="w-3 h-3" /> Java Lab
+          <Coffee className="w-3 h-3" /> {embedded ? 'Java Terminal' : 'Java Lab'}
         </div>
         
         <div className="flex items-center gap-1">
@@ -137,33 +155,35 @@ const JavaWorkspace = ({ starterCode, practical }: JavaWorkspaceProps) => {
       </div>
 
       {/* Editor */}
-      <div className="h-[260px] md:h-[320px] border-b border-border/30">
-        <CodeEditor code={code} onChange={setCode} language="java" showShortcuts={false} />
+      <div className={`${embedded ? 'flex-1 min-h-0' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
+        <CodeEditor code={code} onChange={handleCodeChange} language="java" showShortcuts={false} />
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-border/30 bg-secondary/20">
-        <button
-          onClick={() => setTab('assign')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
-            tab === 'assign' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-          }`}
-        >
-          <Lightbulb className="w-3 h-3" /> Assignment
-        </button>
-        <button
-          onClick={() => setTab('term')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
-            tab === 'term' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-          }`}
-        >
-          <Terminal className="w-3 h-3" /> Terminal
-          {pendingInput && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-        </button>
-      </div>
+      {/* Tabs - Hide if embedded */}
+      {!embedded && (
+        <div className="flex border-b border-border/30 bg-secondary/20">
+          <button
+            onClick={() => setTab('assign')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
+              tab === 'assign' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
+            }`}
+          >
+            <Lightbulb className="w-3 h-3" /> Assignment
+          </button>
+          <button
+            onClick={() => setTab('term')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
+              tab === 'term' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
+            }`}
+          >
+            <Terminal className="w-3 h-3" /> Terminal
+            {pendingInput && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+          </button>
+        </div>
+      )}
 
       {/* Panels */}
-      {tab === 'assign' ? (
+      {(!embedded && tab === 'assign' && practical) ? (
         <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto">
           <div>
             <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-1">Goal</p>
@@ -191,7 +211,7 @@ const JavaWorkspace = ({ starterCode, practical }: JavaWorkspaceProps) => {
       ) : (
         <div
           ref={termRef}
-          className="bg-zinc-950 text-emerald-300 font-mono text-[11px] leading-relaxed p-3 max-h-[300px] min-h-[180px] overflow-y-auto"
+          className={`bg-zinc-950 text-emerald-300 font-mono text-[11px] leading-relaxed p-3 overflow-y-auto ${embedded ? 'flex-1 min-h-[120px]' : 'max-h-[300px] min-h-[180px]'}`}
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((l, i) => {
