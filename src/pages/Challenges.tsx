@@ -2,11 +2,13 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ArrowLeft, CheckCircle2, XCircle, Trophy, Lightbulb, Sparkles, Code2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Trophy, Lightbulb, Sparkles } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
-import { CHALLENGES, TIER_INFO, ChallengeDef, Tier, Language } from '@/data/challengesData';
+import PythonWorkspace from '@/components/PythonWorkspace';
+import JavaWorkspace from '@/components/JavaWorkspace';
+import { CHALLENGES, TIER_INFO, ChallengeDef, Tier } from '@/data/challengesData';
 
 function normalize(code: string): string {
   return code.toLowerCase().replace(/'/g, '"').replace(/\s+/g, ' ').replace(/\s*=\s*/g, '=');
@@ -20,12 +22,12 @@ const Challenges = () => {
   const { user, completeLesson } = useUser();
   const [activeTier, setActiveTier] = useState<Tier>('Easy');
   const [selected, setSelected] = useState<ChallengeDef | null>(null);
-  
+
   // Frontend State
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
-  
+
   // Python/Java State (Single file)
   const [scriptCode, setScriptCode] = useState('');
 
@@ -44,13 +46,13 @@ const Challenges = () => {
 
   const start = (c: ChallengeDef) => {
     setSelected(c);
-    setResult(null); 
-    setShowHint(false); 
+    setResult(null);
+    setShowHint(false);
     setConsoleLogs([]);
 
     if (c.language === 'frontend') {
-      setHtmlCode(c.initialHtml || ''); 
-      setCssCode(c.initialCss || ''); 
+      setHtmlCode(c.initialHtml || '');
+      setCssCode(c.initialCss || '');
       setJsCode(c.initialJs || '');
       setFileTab('html');
     } else {
@@ -60,7 +62,7 @@ const Challenges = () => {
 
   const check = () => {
     if (!selected) return;
-    
+
     let codeToCheck = '';
     if (selected.language === 'frontend') {
       codeToCheck = htmlCode + '\n' + cssCode + '\n' + jsCode;
@@ -70,14 +72,9 @@ const Challenges = () => {
 
     const all = normalize(codeToCheck);
     const passed = selected.validationKeywords.every(k => all.includes(normalize(k)));
-    
+
     setResult(passed ? 'pass' : 'fail');
     if (passed) completeLesson(`challenge-${selected.id}`);
-    
-    // Simulate console output for non-frontend if passed (optional visual feedback)
-    if (passed && selected.language !== 'frontend') {
-        handleLog({ type: 'info', message: `Execution successful. Output matched expectations.` });
-    }
   };
 
   // Determine current code for frontend tabs
@@ -103,7 +100,7 @@ const Challenges = () => {
             <Trophy className="w-4 h-4 text-primary shrink-0" />
             <span className="text-foreground font-semibold text-xs truncate min-w-0">{selected.title}</span>
             <span className={`text-[9px] px-1.5 py-0.5 rounded border ${tierInfo.chip} uppercase font-bold`}>
-                {selected.language}
+              {selected.language}
             </span>
           </div>
           <button onClick={check} className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-2.5 py-1.5 rounded-lg text-[11px] font-semibold hover:opacity-90 shadow-lg shadow-primary/20 shrink-0 whitespace-nowrap">
@@ -132,28 +129,18 @@ const Challenges = () => {
 
           {/* Code/Preview Panel */}
           <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-hidden">
-            
+
             {/* TABS: Only show for Frontend */}
             {isFrontend && (
-                <div className="flex items-center border-b border-border glass-card overflow-x-auto scrollbar-none shrink-0 w-full max-w-full min-w-0">
+              <div className="flex items-center border-b border-border glass-card overflow-x-auto scrollbar-none shrink-0 w-full max-w-full min-w-0">
                 {(['html', 'css', 'js', 'preview'] as FileTab[]).map(t => (
-                    <button key={t} onClick={() => setFileTab(t)} className={`px-2.5 py-2 text-[10px] font-mono border-b-2 whitespace-nowrap shrink-0 ${
+                  <button key={t} onClick={() => setFileTab(t)} className={`px-2.5 py-2 text-[10px] font-mono border-b-2 whitespace-nowrap shrink-0 ${
                     fileTab === t ? 'text-foreground border-primary bg-background font-bold' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/20'
-                    } ${t === 'preview' ? 'sm:hidden text-primary' : ''}`}>
+                  } ${t === 'preview' ? 'sm:hidden text-primary' : ''}`}>
                     {t === 'html' ? 'index.html' : t === 'css' ? 'style.css' : t === 'js' ? 'script.js' : '👁️ Preview'}
-                    </button>
+                  </button>
                 ))}
-                </div>
-            )}
-
-            {/* Non-Frontend Header */}
-            {!isFrontend && (
-                 <div className="flex items-center border-b border-border glass-card px-3 py-2 shrink-0">
-                    <Code2 className="w-3.5 h-3.5 mr-2 text-primary" />
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                        {selected.language === 'python' ? 'main.py' : 'Main.java'}
-                    </span>
-                 </div>
+              </div>
             )}
 
             {/* Main Workspace View */}
@@ -168,35 +155,48 @@ const Challenges = () => {
                 <div className="absolute inset-0 w-full h-full overflow-hidden">
                   <CodeEditor code={currentFrontendCode} onChange={setFrontendCurrent} language={fileTab === 'html' ? 'html' : fileTab === 'css' ? 'css' : 'javascript'} />
                 </div>
-              ) : (
-                // Python / Java Editor
+              ) : selected.language === 'python' ? (
+                // Python Workspace (Editor + Terminal)
                 <div className="absolute inset-0 w-full h-full overflow-hidden">
-                  <CodeEditor 
-                    code={scriptCode} 
-                    onChange={setScriptCode} 
-                    language={selected.language === 'python' ? 'python' : 'java'} 
+                  <PythonWorkspace
+                    key={selected.id}
+                    initialCode={scriptCode}
+                    onCodeChange={setScriptCode}
+                    embedded
+                  />
+                </div>
+              ) : (
+                // Java Workspace (Editor + Terminal)
+                <div className="absolute inset-0 w-full h-full overflow-hidden">
+                  <JavaWorkspace
+                    key={selected.id}
+                    initialCode={scriptCode}
+                    onCodeChange={setScriptCode}
+                    embedded
                   />
                 </div>
               )}
             </div>
 
-            {/* Console */}
-            <div className="max-h-[30vh] overflow-hidden shrink-0 border-t border-border bg-background w-full max-w-full min-w-0">
-              <div className="w-full max-w-full min-w-0 overflow-auto max-h-[30vh]">
-                <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
+            {/* Console — Frontend only (Python/Java workspaces have their own terminal) */}
+            {isFrontend && (
+              <div className="max-h-[30vh] overflow-hidden shrink-0 border-t border-border bg-background w-full max-w-full min-w-0">
+                <div className="w-full max-w-full min-w-0 overflow-auto max-h-[30vh]">
+                  <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Desktop Preview (Only for Frontend) */}
           {isFrontend && (
             <div className="hidden sm:flex flex-1 flex-col min-w-0 border-l border-border w-full overflow-hidden">
-                <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono glass-card flex items-center gap-2 shrink-0">
+              <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono glass-card flex items-center gap-2 shrink-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Preview
-                </div>
-                <div className="flex-1 min-h-0 overflow-hidden">
+              </div>
+              <div className="flex-1 min-h-0 overflow-hidden">
                 <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleLog} />
-                </div>
+              </div>
             </div>
           )}
         </div>
@@ -222,7 +222,7 @@ const Challenges = () => {
       </header>
 
       <div className="max-w-3xl mx-auto px-2 sm:px-6 py-4 space-y-4 relative z-10 w-full max-w-full min-w-0 overflow-x-hidden">
-        {/* Tier Buttons Grid */}
+        {/* Tier Buttons Grid — 2x2 mobile, 4-col desktop */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full max-w-full min-w-0">
           {TIERS.map(t => {
             const info = TIER_INFO[t];
@@ -258,8 +258,8 @@ const Challenges = () => {
                   {completed && <CheckCircle2 className="w-4 h-4 text-success shrink-0" />}
                   <div className="min-w-0 flex-1 overflow-hidden">
                     <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-foreground text-xs sm:text-sm truncate group-hover:text-primary transition-colors">{c.title}</h3>
-                        <span className="text-[8px] px-1 py-0 rounded bg-secondary text-muted-foreground border border-border uppercase">{c.language}</span>
+                      <h3 className="font-semibold text-foreground text-xs sm:text-sm truncate group-hover:text-primary transition-colors">{c.title}</h3>
+                      <span className="text-[8px] px-1 py-0 rounded bg-secondary text-muted-foreground border border-border uppercase">{c.language}</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.description}</p>
                   </div>
