@@ -17,10 +17,12 @@ import { sqlTrack } from '@/data/exams/sql';
 import { fundamentalsTrack } from '@/data/exams/fundamentals';
 import { aiTrack } from '@/data/exams/ai';
 import { frontendTrack } from '@/data/exams/frontend';
+import { javaTrack } from '@/data/exams/java';
 import { ExamTrack, Question } from '@/data/exams/python'; // Shared interfaces
 
 const ALL_TRACKS: ExamTrack[] = [
   pythonTrack,
+  javaTrack,
   sqlTrack,
   fundamentalsTrack,
   aiTrack,
