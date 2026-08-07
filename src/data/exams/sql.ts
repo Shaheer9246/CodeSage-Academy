@@ -4,7 +4,7 @@ import { ExamTrack } from './python';
 
 export const sqlTrack: ExamTrack = {
   id: 'sql',
-  title: 'Database Admin & PostgreSQL',
+  title: 'Relational Databases: SQL & PostgreSQL',
   description: 'Master relational databases, complex joins, window functions, MVCC, triggers, JSONB, and advanced PostgreSQL performance tuning.',
   totalAvailable: 24,
   questions: [
