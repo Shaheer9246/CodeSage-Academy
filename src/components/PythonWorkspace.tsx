@@ -1,3 +1,4 @@
+// src/components/PythonWorkspace.tsx
 import { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw, Trash2, FlaskConical, Terminal, Lightbulb, Loader2 } from 'lucide-react';
 import CodeEditor from './CodeEditor';
@@ -10,7 +11,10 @@ declare global {
 
 interface PythonWorkspaceProps {
   starterCode?: string;
-  practical: {
+  initialCode?: string;       // Used by Challenges.tsx
+  onCodeChange?: (code: string) => void; // Used by Challenges.tsx
+  embedded?: boolean;         // Hides assignment tabs to save space
+  practical?: {
     title: string;
     intro: string;
     steps: string[];
@@ -63,17 +67,34 @@ type Line = { kind: 'out' | 'err' | 'in' | 'sys'; text: string };
 
 const DEFAULT_STARTER = `# Write your Python code here\nname = input("What's your name? ")\nprint("Hello,", name, "— welcome to Python!")\n`;
 
-const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
-  const initial = starterCode ?? DEFAULT_STARTER;
+const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false, practical }: PythonWorkspaceProps) => {
+  const initial = initialCode ?? starterCode ?? DEFAULT_STARTER;
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([{ kind: 'sys', text: '$ Python 3 (Skulpt in-browser runtime) — press ▶ Run Code to start.' }]);
   const [running, setRunning] = useState(false);
-  const [tab, setTab] = useState<'assign' | 'term'>('assign');
+  const [tab, setTab] = useState<'assign' | 'term'>(embedded ? 'term' : 'assign');
   const [pendingInput, setPendingInput] = useState<{ resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
   const [wantLoad] = useState<boolean>(true);
   const ready = useSkulpt(wantLoad);
+
+  // Sync code up to parent (Challenges.tsx) for validation
+  useEffect(() => {
+    if (onCodeChange) {
+      onCodeChange(code);
+    }
+  }, [code, onCodeChange]);
+
+  // Reset workspace when switching challenges
+  useEffect(() => {
+    if (embedded && initialCode !== undefined) {
+      setCode(initialCode);
+      setLines([{ kind: 'sys', text: '$ Python 3 — Ready.' }]);
+      setRunning(false);
+      setPendingInput(null);
+    }
+  }, [initialCode, embedded]);
 
   useEffect(() => {
     if (termRef.current) termRef.current.scrollTop = termRef.current.scrollHeight;
@@ -103,7 +124,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
   };
 
   const promptInput = (): Promise<string> => {
-    setTab('term');
+    if (!embedded) setTab('term');
     return new Promise<string>((resolve) => {
       setPendingInput({
         resolve: (v: string) => {
@@ -128,7 +149,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
 
   const runCode = async () => {
     if (!ready || running) return;
-    setTab('term');
+    if (!embedded) setTab('term');
     setRunning(true);
     write('sys', '$ python main.py');
     try {
@@ -156,14 +177,18 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
     }
   };
 
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode);
+  };
+
   const resetCode = () => setCode(initial);
   const clearConsole = () => setLines([{ kind: 'sys', text: '$ console cleared' }]);
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden border border-primary/20">
+    <div className={`glass-card overflow-hidden border border-primary/20 ${embedded ? 'h-full flex flex-col rounded-none border-0 bg-background' : 'rounded-2xl'}`}>
       <div className="flex items-center justify-between px-3 py-2 bg-secondary/40 border-b border-border/30">
         <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
-          <FlaskConical className="w-3 h-3" /> Python Lab
+          <FlaskConical className="w-3 h-3" /> {embedded ? 'Python Terminal' : 'Python Lab'}
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -184,33 +209,35 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
       </div>
 
       {/* Editor */}
-      <div className="h-[260px] md:h-[320px] border-b border-border/30">
-        <CodeEditor code={code} onChange={setCode} language="python" showShortcuts={false} />
+      <div className={`${embedded ? 'flex-1 min-h-0' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
+        <CodeEditor code={code} onChange={handleCodeChange} language="python" showShortcuts={false} />
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-border/30 bg-secondary/20">
-        <button
-          onClick={() => setTab('assign')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
-            tab === 'assign' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-          }`}
-        >
-          <FlaskConical className="w-3 h-3" /> Assignment
-        </button>
-        <button
-          onClick={() => setTab('term')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
-            tab === 'term' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-          }`}
-        >
-          <Terminal className="w-3 h-3" /> Terminal
-          {pendingInput && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-        </button>
-      </div>
+      {/* Tabs - Hide if embedded */}
+      {!embedded && (
+        <div className="flex border-b border-border/30 bg-secondary/20">
+          <button
+            onClick={() => setTab('assign')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
+              tab === 'assign' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
+            }`}
+          >
+            <FlaskConical className="w-3 h-3" /> Assignment
+          </button>
+          <button
+            onClick={() => setTab('term')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
+              tab === 'term' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
+            }`}
+          >
+            <Terminal className="w-3 h-3" /> Terminal
+            {pendingInput && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+          </button>
+        </div>
+      )}
 
       {/* Panels */}
-      {tab === 'assign' ? (
+      {(!embedded && tab === 'assign' && practical) ? (
         <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto">
           <div>
             <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-1">Goal</p>
@@ -238,7 +265,7 @@ const PythonWorkspace = ({ starterCode, practical }: PythonWorkspaceProps) => {
       ) : (
         <div
           ref={termRef}
-          className="bg-zinc-950 text-emerald-300 font-mono text-[11px] leading-relaxed p-3 max-h-[300px] min-h-[180px] overflow-y-auto"
+          className={`bg-zinc-950 text-emerald-300 font-mono text-[11px] leading-relaxed p-3 overflow-y-auto ${embedded ? 'flex-1 min-h-[120px]' : 'max-h-[300px] min-h-[180px]'}`}
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((l, i) => {
