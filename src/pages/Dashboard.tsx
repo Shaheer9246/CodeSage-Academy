@@ -66,19 +66,6 @@ const SECTIONS: SectionDef[] = [
         tour: 'networking', lessons: 13, accent: 'accent-blue',
         tags: ['Hardware', 'OS', 'DNS', 'HTTP'], desc: 'Hardware → OS → Networking → Security',
         trackId: 'networking' },
-      // Placeholder for future AI Fundamentals
-      { 
-  id: 'ai-fundamentals', 
-  path: '/ai-fundamentals?from=dashboard', 
-  title: 'AI Fundamentals', 
-  emoji: '🧠',
-  tour: 'ai-fundamentals', 
-  lessons: 12, // Ensure this matches the number of lessons in your AI_LESSONS array
-  accent: 'accent-blue',
-  tags: ['Foundations', 'LLMs'], 
-  desc: 'Foundations of AI, neural networks, and modern agents', 
-  trackId: 'ai-fundamentals'
-},
     ],
   },
   {
@@ -108,6 +95,40 @@ const SECTIONS: SectionDef[] = [
         tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Build immersive 3D web experiences',
         trackId: 'three3d' as TrackId },
       
+    ],
+  },
+
+  {
+    id: 'ai',
+    title: 'Artificial Intelligence',
+    subtitle: 'From core fundamentals to advanced fine-tuning & agents',
+    Icon: Sparkles,
+    gradient: 'from-purple-500/70 via-indigo-500/60 to-blue-500/70',
+    tracks: [
+      { 
+        id: 'ai-fundamentals', 
+        path: '/ai-fundamentals?from=dashboard', 
+        title: 'AI Fundamentals', 
+        emoji: '🧠',
+        tour: 'ai-fundamentals', 
+        lessons: 12,
+        accent: 'accent-blue',
+        tags: ['Foundations', 'LLMs', 'Agents'], 
+        desc: 'Foundations of AI, neural networks, and modern agents', 
+        trackId: 'ai-fundamentals'
+      },
+      { 
+        id: 'intermediate-ai', 
+        path: '/intermediate-ai?from=dashboard', 
+        title: 'Intermediate AI', 
+        emoji: '🤖',
+        tour: 'intermediate-ai', 
+        lessons: 10,
+        accent: 'primary',
+        tags: ['PEFT', 'LoRA', 'RAG', 'Fine-Tuning'], 
+        desc: 'Deepen knowledge in fine-tuning, RAG, vector DBs & production AI', 
+        trackId: 'intermediate-ai' as TrackId
+      },
     ],
   },
 
@@ -260,6 +281,7 @@ const Dashboard = () => {
     '/freelance': 'freelance', '/real-freelance': 'real-freelance' as TrackId, '/python': 'python', '/local': 'local',
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
     '/ai-fundamentals': 'ai-fundamentals',
+    '/intermediate-ai': 'intermediate-ai' as TrackId,
     '/three3d': 'three3d' as TrackId,
     '/java': 'java' as TrackId,
   };
