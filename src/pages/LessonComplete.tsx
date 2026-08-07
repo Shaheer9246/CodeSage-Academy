@@ -4,6 +4,7 @@ import { useUser } from '@/contexts/UserContext';
 import { getLessonById, getAllLessons, type Lesson } from '@/data/lessons';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
 import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
+import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
@@ -24,6 +25,7 @@ type Track = {
 const TRACKS: Track[] = [
   { prefix: 'net-',        path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'ai-',         path: '/ai-lesson',    list: AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'aiin-', path: '/intermediate-ai-lesson', list: INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'free-',       path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'fs-',         path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'pyx-',        path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
@@ -39,6 +41,7 @@ const TRACKS: Track[] = [
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking',
   'ai-': '/ai-fundamentals',
+  'aiin-': '/intermediate-ai',
   'free-': '/freelance',
   'fs-': '/fullstack',
   'pyx-': '/pythonexpert',
