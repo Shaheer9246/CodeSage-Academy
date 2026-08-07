@@ -1,27 +1,53 @@
+// src/components/ChallengePanel.tsx
+
 import { CheckCircle2, XCircle, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Lesson } from '@/data/lessons';
 
 interface ChallengePanelProps {
   lesson: Lesson;
-  html: string;
-  css: string;
-  js: string;
+  // Frontend props (optional now)
+  html?: string;
+  css?: string;
+  js?: string;
+  // Python/Java prop (optional now)
+  scriptCode?: string; 
   onBack: () => void;
   onComplete: () => void;
 }
 
-const ChallengePanel = ({ lesson, html, css, js, onBack, onComplete }: ChallengePanelProps) => {
+const ChallengePanel = ({ 
+  lesson, 
+  html = '', 
+  css = '', 
+  js = '', 
+  scriptCode = '', // Default to empty string
+  onBack, 
+  onComplete 
+}: ChallengePanelProps) => {
   const [result, setResult] = useState<'pass' | 'fail' | null>(null);
 
   if (!lesson.challenge) return null;
 
   const checkCode = () => {
-    // Combine all code for validation
-    const allCode = (html + '\n' + css + '\n' + js).toLowerCase();
+    let codeToCheck = '';
+
+    // Determine which code to validate based on what was passed
+    // If scriptCode has content (or if we are in a non-frontend context), use it.
+    // Otherwise combine frontend files.
+    if (scriptCode || lesson.language === 'python' || lesson.language === 'java') {
+        codeToCheck = scriptCode;
+    } else {
+        codeToCheck = html + '\n' + css + '\n' + js;
+    }
+
+    const normalizedCode = codeToCheck.toLowerCase().replace(/\s+/g, ' ');
+    
+    // Validate against keywords
     const passed = lesson.challenge!.validationKeywords.every(kw =>
-      allCode.includes(kw.toLowerCase())
+      normalizedCode.includes(kw.toLowerCase())
     );
+
     setResult(passed ? 'pass' : 'fail');
     if (passed) {
       setTimeout(() => onComplete(), 1500);
@@ -35,6 +61,13 @@ const ChallengePanel = ({ lesson, html, css, js, onBack, onComplete }: Challenge
           <ArrowLeft className="w-4 h-4" />
         </button>
         <span className="text-sm font-semibold text-primary">🏆 Challenge</span>
+        
+        {/* Optional: Show language badge if available in lesson data */}
+        {lesson.language && lesson.language !== 'frontend' && (
+             <span className="text-[9px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border uppercase ml-auto">
+                {lesson.language}
+             </span>
+        )}
       </div>
 
       <div className="flex-1 overflow-auto p-4">
@@ -42,13 +75,13 @@ const ChallengePanel = ({ lesson, html, css, js, onBack, onComplete }: Challenge
         <p className="text-sm text-muted-foreground mb-4">{lesson.challenge.instruction}</p>
 
         {result === 'pass' && (
-          <div className="flex items-center gap-2 p-3 bg-success/10 rounded-lg text-success text-sm">
+          <div className="flex items-center gap-2 p-3 bg-success/10 rounded-lg text-success text-sm animate-in fade-in slide-in-from-top-2">
             <CheckCircle2 className="w-5 h-5" />
             <span className="font-semibold">Great job! Challenge completed! 🎉</span>
           </div>
         )}
         {result === 'fail' && (
-          <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg text-destructive text-sm">
+          <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg text-destructive text-sm animate-in fade-in slide-in-from-top-2">
             <XCircle className="w-5 h-5" />
             <span>Not quite right. Check the requirements and try again.</span>
           </div>
@@ -58,7 +91,7 @@ const ChallengePanel = ({ lesson, html, css, js, onBack, onComplete }: Challenge
       <div className="px-4 py-3 border-t border-border">
         <button
           onClick={checkCode}
-          className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
+          className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
         >
           Check My Code
         </button>
