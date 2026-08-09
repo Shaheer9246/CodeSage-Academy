@@ -64,7 +64,7 @@ const ChallengePanel = ({
         <span className="text-sm font-semibold text-primary">🏆 Challenge</span>
         
         {/* Optional: Show language badge if available in lesson data */}
-        {lesson.language && lesson.language !== 'frontend' && (
+        {lesson.language && (lesson.language as string) !== 'frontend' && (
              <span className="text-[9px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border uppercase ml-auto">
                 {lesson.language}
              </span>
