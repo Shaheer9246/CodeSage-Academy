@@ -101,13 +101,13 @@ const PythonExpertLearn = () => {
                 </div>
 
                 <div className="flex-1 min-w-0 overflow-hidden">
-                  <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase truncate block">
-                    Lesson {lesson.order}
-                  </p>
-                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground truncate block min-w-0">
-                    {lesson.title}
-                  </p>
-                </div>
+                 <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase truncate block">
+                   Lesson {lesson.order}
+                 </p>
+                  <p className="text-xs sm:text-sm font-display font-semibold text-foreground line-clamp-2 block min-w-0 leading-tight">
+                   {lesson.title}
+                 </p>
+               </div>
 
                 <div className="flex-shrink-0">
                   {isCompleted ? <Check className="w-4 h-4 text-success" /> :
