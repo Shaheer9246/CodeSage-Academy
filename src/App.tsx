@@ -10,6 +10,7 @@ import Welcome from "./pages/Welcome";
 import Trip from "./pages/Trip";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import ResetPassword from "./pages/ResetPassword";
 
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
@@ -124,6 +125,7 @@ const App = () => (
           <AppShell>
             <Routes>
               <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
