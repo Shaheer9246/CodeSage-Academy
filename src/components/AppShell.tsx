@@ -76,7 +76,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 md:ml-[72px] pb-20 md:pb-0">
+      <main className="flex-1 min-w-0 md:ml-[72px] pb-20 md:pb-0">
         {children}
       </main>
 
