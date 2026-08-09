@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Mail, Lock, User, Loader2, Terminal, ShieldAlert } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, Terminal, ShieldAlert, Sparkles } from 'lucide-react';
 import {
   getLockRemaining, getAttemptsLeft, registerFailure, clearFailures, formatRemaining, MAX_ATTEMPTS,
 } from '@/lib/loginGuard';
@@ -31,6 +31,19 @@ const Auth = () => {
   }, [email]);
 
   const attemptsLeft = email.trim() ? getAttemptsLeft(email) : MAX_ATTEMPTS;
+
+  const generateStrongPassword = () => {
+    const length = 16;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=';
+    let password = '';
+    const randomValues = new Uint32Array(length);
+    crypto.getRandomValues(randomValues);
+    for (let i = 0; i < length; i++) {
+      password += charset[randomValues[i] % charset.length];
+    }
+    setPassword(password);
+    setShowPassword(true); // Auto-show so user can see and copy it
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,15 +151,28 @@ const Auth = () => {
                 className="w-full bg-secondary/50 border border-border rounded-xl pl-10 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono" />
             </div>
             {mode !== 'forgot' && (
-              <div className="relative group">
-                <Lock className="absolute left-3.5 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <input type={showPassword ? 'text' : 'password'} placeholder="password" value={password} onChange={e => setPassword(e.target.value)}
-                  disabled={locked}
-                  className="w-full bg-secondary/50 border border-border rounded-xl pl-10 pr-10 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono disabled:opacity-50" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+              <>
+                <div className="relative group">
+                  <Lock className="absolute left-3.5 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <input type={showPassword ? 'text' : 'password'} placeholder="password" value={password} onChange={e => setPassword(e.target.value)}
+                    disabled={locked}
+                    className="w-full bg-secondary/50 border border-border rounded-xl pl-10 pr-10 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono disabled:opacity-50" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                
+                {mode === 'signup' && (
+                  <button
+                    type="button"
+                    onClick={generateStrongPassword}
+                    className="w-full bg-primary/10 border border-primary/30 rounded-xl px-3 py-2.5 text-xs font-mono text-primary hover:bg-primary/20 hover:neon-glow transition-all flex items-center justify-center gap-2"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    generate_strong_password()
+                  </button>
+                )}
+              </>
             )}
 
             {locked && (
