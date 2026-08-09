@@ -29,7 +29,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex grid-bg">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-[72px] border-r border-border/30 bg-card/20 backdrop-blur-xl fixed left-0 top-0 bottom-0 z-30">
         <div className="flex items-center justify-center py-5 border-b border-border/20">
