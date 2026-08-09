@@ -402,7 +402,7 @@ const SettingsPage = () => {
             {ACHIEVEMENTS.map(ach => {
               const unlocked = ach.check(user);
               return (
-                  <div key={ach.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                <div key={ach.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                   unlocked ? 'bg-primary/5 border border-primary/20' : 'bg-secondary/10 border border-border/20 opacity-50'
                 }`}>
                   <span className="text-lg flex-shrink-0">{ach.icon}</span>
