@@ -69,6 +69,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: '3D Web Development builds heavily on HTML, CSS, and JavaScript. We highly recommend completing the Frontend Development track first so you have the right foundation before diving into 3D canvases and WebGL!',
     ctas: [{ label: 'Frontend course', route: '/learn' }],
   },
+  'intermediate-ai': {
+    title: 'Start with AI Fundamentals',
+    body: 'Intermediate AI covers advanced topics like PEFT, LoRA/QLoRA, fine-tuning, and model quantization. We strongly recommend completing AI Fundamentals first to build a solid grasp of LLM architecture.',
+    ctas: [{ label: 'AI Fundamentals course', route: '/ai-fundamentals' }],
+  },
 };
 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
