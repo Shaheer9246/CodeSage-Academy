@@ -369,6 +369,9 @@ const Dashboard = () => {
                 <>
                 
                   <button onClick={() => navigate('/suggestions')} 
+  className="grid place-items-center bg-secondary/40 border border-border/40 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all active:scale-95 cursor-pointer">
+  <SuggestionsBadge />
+</button><button onClick={() => navigate('/suggestions')} 
                     className="grid place-items-center bg-accent-yellow/10 border border-accent-yellow/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all active:scale-95 cursor-pointer">
                     <SuggestionsBadge />
                   </button>
