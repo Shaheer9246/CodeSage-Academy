@@ -412,9 +412,6 @@ const SettingsPage = () => {
                   </div>
                   {unlocked ? <Check className="w-4 h-4 text-primary flex-shrink-0" /> : <Lock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />}
                 </div>
-                  </div>
-                  {unlocked ? <Check className="w-4 h-4 text-primary" /> : <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
-                </div>
               );
             })}
           </div>
