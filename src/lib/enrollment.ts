@@ -12,6 +12,7 @@ export type TrackId =
   | 'sql'
   | 'pythonexpert'
   | 'ai-fundamentals'
+  | 'intermediate-ai'
   | 'three3d'
   | 'java';
 
@@ -39,6 +40,7 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'sql',
   'pythonexpert',
   'ai-fundamentals',
+  'intermediate-ai',
   'three3d',
   'java'
 ]);
@@ -131,6 +133,15 @@ export const TRACK_META: Record<
     route: '/ai-fundamentals',
     idPrefix: 'CS-AI',
     seed: 130,
+  },
+  
+  'intermediate-ai': {
+    label: 'Intermediate AI & Fine-Tuning',
+    short: 'Interm AI',
+    route: '/intermediate-ai',
+    idPrefix: 'CS-AIIN',
+    seed: 85,
+    prereq: ['ai-fundamentals'],
   },
 
   three3d: {
