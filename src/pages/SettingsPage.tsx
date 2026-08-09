@@ -383,10 +383,10 @@ const SettingsPage = () => {
             <p className="text-xs text-muted-foreground">No badges yet. Start learning to earn badges!</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {user.badges.map(b => (
-                <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
-                  <span className="text-sm">{BADGE_INFO[b]?.icon || '🏅'}</span>
-                  <span className="text-xs font-medium text-foreground">{BADGE_INFO[b]?.label || b}</span>
+                  {user.badges.map(b => (
+                <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 max-w-full">
+                  <span className="text-sm flex-shrink-0">{BADGE_INFO[b]?.icon || '🏅'}</span>
+                  <span className="text-xs font-medium text-foreground truncate">{BADGE_INFO[b]?.label || b}</span>
                 </div>
               ))}
             </div>
@@ -402,13 +402,16 @@ const SettingsPage = () => {
             {ACHIEVEMENTS.map(ach => {
               const unlocked = ach.check(user);
               return (
-                <div key={ach.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                  <div key={ach.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                   unlocked ? 'bg-primary/5 border border-primary/20' : 'bg-secondary/10 border border-border/20 opacity-50'
                 }`}>
-                  <span className="text-lg">{ach.icon}</span>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-foreground">{ach.label}</p>
-                    <p className="text-[10px] text-muted-foreground">{ach.description}</p>
+                  <span className="text-lg flex-shrink-0">{ach.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-foreground break-words">{ach.label}</p>
+                    <p className="text-[10px] text-muted-foreground break-words">{ach.description}</p>
+                  </div>
+                  {unlocked ? <Check className="w-4 h-4 text-primary flex-shrink-0" /> : <Lock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />}
+                </div>
                   </div>
                   {unlocked ? <Check className="w-4 h-4 text-primary" /> : <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
                 </div>
@@ -532,8 +535,8 @@ const SettingsPage = () => {
               <div className="space-y-1.5">
                 {lessonGroups.map(g => (
                   <div key={g.key} className="flex items-center justify-between bg-secondary/20 rounded-lg px-3 py-2 border border-border/20">
-                    <span className="text-xs text-foreground">{g.label}</span>
-                    <span className="text-xs text-primary font-mono font-bold">{g.count}</span>
+                    <span className="text-xs text-foreground min-w-0 flex-1 mr-2 break-words">{g.label}</span>
+                    <span className="text-xs text-primary font-mono font-bold flex-shrink-0">{g.count}</span>
                   </div>
                 ))}
                 <p className="text-[10px] text-muted-foreground text-center pt-2">Total: {completedCount} lessons completed</p>
@@ -546,9 +549,9 @@ const SettingsPage = () => {
                   const pct = Math.min(100, Math.round((g.count / g.total) * 100));
                   return (
                     <div key={g.key}>
-                      <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-foreground">{g.label}</span>
-                        <span className="text-primary font-mono">{g.count}/{g.total} · {pct}%</span>
+                       <div className="flex items-center justify-between text-[11px] mb-1">
+                        <span className="text-foreground min-w-0 flex-1 mr-2 break-words">{g.label}</span>
+                        <span className="text-primary font-mono flex-shrink-0">{g.count}/{g.total} · {pct}%</span>
                       </div>
                       <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
                         <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
@@ -581,12 +584,23 @@ const SettingsPage = () => {
                   <span className="text-xs text-muted-foreground">total XP · level {user.level || 1}</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground">XP sources:</p>
-                <ul className="space-y-1 text-[11px]">
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Lessons completed</span><span className="font-mono text-primary">{completedCount} × 5 XP</span></li>
-        
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Exams passed</span><span className="font-mono text-primary">{user.completedTests?.length || 0} entries</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Challenges solved</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span>Crawler runs</span><span className="font-mono text-primary">{lessonGroups.find(g => g.key === 'crawler')?.count || 0} × 10 XP</span></li>
+                 <ul className="space-y-1 text-[11px]">
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
+                    <span className="min-w-0 flex-1 mr-2 break-words">Lessons completed</span>
+                    <span className="font-mono text-primary flex-shrink-0">{completedCount} × 5 XP</span>
+                  </li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
+                    <span className="min-w-0 flex-1 mr-2 break-words">Exams passed</span>
+                    <span className="font-mono text-primary flex-shrink-0">{user.completedTests?.length || 0} entries</span>
+                  </li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
+                    <span className="min-w-0 flex-1 mr-2 break-words">Challenges solved</span>
+                    <span className="font-mono text-primary flex-shrink-0">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</span>
+                  </li>
+                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
+                    <span className="min-w-0 flex-1 mr-2 break-words">Crawler runs</span>
+                    <span className="font-mono text-primary flex-shrink-0">{lessonGroups.find(g => g.key === 'crawler')?.count || 0} × 10 XP</span>
+                  </li>
                 </ul>
                 <p className="text-[10px] text-muted-foreground text-center pt-2">Earn 10 XP for a Streak Freeze from the Dashboard XP Shop ❄️</p>
               </div>
@@ -672,7 +686,7 @@ const SettingsPage = () => {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 w-full min-w-0 box-border">
+    <div className="flex justify-between items-start py-2 border-b border-border/20 last:border-0 gap-2 w-full min-w-0 box-border overflow-hidden">
       <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">{label}</span>
       <span className="text-[10px] sm:text-xs text-foreground font-medium font-mono text-right flex-1 min-w-0 max-w-[170px] sm:max-w-[250px] [overflow-wrap:anywhere] break-all leading-tight">
         {value || '—'}
