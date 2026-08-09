@@ -80,7 +80,7 @@ const IntermediateAiLearn = () => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.02 }}
-                onClick={() => isUnlocked && navigate(`/intermediate-ai-lesson/${lesson.id}${fromQs}`)}
+                onClick={() => isUnlocked && navigate(`/iai-lesson/${lesson.id}${fromQs}`)}
                 disabled={!isUnlocked}
                 className={`w-full glass-card rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 text-left transition-all ${
                   isUnlocked ? 'hover:neon-border cursor-pointer' : 'opacity-50 cursor-not-allowed'
