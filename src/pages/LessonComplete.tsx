@@ -72,7 +72,7 @@ const LessonComplete = () => {
 
   if (id) {
     // Check custom tracks first (including Java)
-    track = TRACKS.find(t => id.startsWith(t.prefix) || id.startsWith(t.prefix.replace('-', '')));
+   track = TRACKS.find(t => id.startsWith(t.prefix));
     if (track) {
       const found = track.list.find(l => l.id === id);
       if (found) lesson = found;
