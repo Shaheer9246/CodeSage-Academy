@@ -35,7 +35,8 @@ const ChallengePanel = ({
     // Determine which code to validate based on what was passed
     // If scriptCode has content (or if we are in a non-frontend context), use it.
     // Otherwise combine frontend files.
-    if (scriptCode || lesson.language === 'python' || lesson.language === 'java') {
+    const lang = lesson.language as string | undefined;
+    if (scriptCode || lang === 'python' || lang === 'java') {
         codeToCheck = scriptCode;
     } else {
         codeToCheck = html + '\n' + css + '\n' + js;
@@ -63,7 +64,7 @@ const ChallengePanel = ({
         <span className="text-sm font-semibold text-primary">🏆 Challenge</span>
         
         {/* Optional: Show language badge if available in lesson data */}
-        {lesson.language && lesson.language !== 'frontend' && (
+        {lesson.language && (lesson.language as string) !== 'frontend' && (
              <span className="text-[9px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border uppercase ml-auto">
                 {lesson.language}
              </span>
