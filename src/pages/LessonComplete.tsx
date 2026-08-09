@@ -25,7 +25,7 @@ type Track = {
 const TRACKS: Track[] = [
   { prefix: 'net-',        path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'ai-',         path: '/ai-lesson',    list: AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
-   { prefix: 'aiin-',       path: '/iai-lesson',   list: INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  
   { prefix: 'free-',       path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'fs-',         path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'pyx-',        path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
@@ -35,6 +35,7 @@ const TRACKS: Track[] = [
   { prefix: 'three3d-',    path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'three-',      path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'java-',       path: '/java-lesson',  list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+   { prefix: 'aiin-',       path: '/iai-lesson',   list: INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'real-free-',  path: '/rf-lesson',    list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
 ];
 
