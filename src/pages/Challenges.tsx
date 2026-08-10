@@ -1,5 +1,5 @@
 // src/pages/Challenges.tsx
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { ArrowLeft, CheckCircle2, XCircle, Trophy, Lightbulb, Sparkles } from 'lucide-react';
@@ -36,11 +36,29 @@ const Challenges = () => {
   const [fileTab, setFileTab] = useState<FileTab>('html');
   const [consoleLogs, setConsoleLogs] = useState<{ type: string; message: string }[]>([]);
 
-  const handleLog = useCallback((log: { type: string; message: string }) => {
+const handleLog = useCallback((log: { type: string; message: string }) => {
     setConsoleLogs(prev => [...prev, log]);
   }, []);
 
-  const byTier = useMemo(() => CHALLENGES.filter(c => c.tier === activeTier), [activeTier]);
+  // 1. Language state initialized from localStorage
+  type FilterLang = 'All' | 'frontend' | 'python' | 'java';
+  const [activeLang, setActiveLang] = useState<FilterLang>(() => {
+    return (localStorage.getItem('codesage_challenge_lang') as FilterLang) || 'All';
+  });
+
+  // 2. Save to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('codesage_challenge_lang', activeLang);
+  }, [activeLang]);
+
+  // 3. Filter by BOTH Tier and Language
+  const filteredChallenges = useMemo(() => {
+    return CHALLENGES.filter(c => {
+      const matchesTier = c.tier === activeTier;
+      const matchesLang = activeLang === 'All' || c.language === activeLang;
+      return matchesTier && matchesLang;
+    });
+  }, [activeTier, activeLang]);
 
   if (!user) { navigate('/auth'); return null; }
 
@@ -226,7 +244,7 @@ const Challenges = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full max-w-full min-w-0">
           {TIERS.map(t => {
             const info = TIER_INFO[t];
-            const count = CHALLENGES.filter(c => c.tier === t).length;
+            const count = CHALLENGES.filter(c => c.tier === t && (activeLang === 'All' || c.language === activeLang)).length;
             const active = activeTier === t;
             return (
               <button key={t} onClick={() => setActiveTier(t)}
@@ -246,9 +264,26 @@ const Challenges = () => {
           <span className="truncate min-w-0">Pick a tier. Each tier rewards more XP!</span>
         </div>
 
+        {/* Language Filter Buttons */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+          {(['All', 'frontend', 'python', 'java'] as FilterLang[]).map(lang => (
+            <button
+              key={lang}
+              onClick={() => setActiveLang(lang)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold capitalize whitespace-nowrap transition-all ${
+                activeLang === lang
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground'
+              }`}
+            >
+              {lang}
+            </button>
+          ))}
+        </div>
+
         {/* Challenge Item Cards */}
         <div className="space-y-2 w-full max-w-full min-w-0">
-          {byTier.map(c => {
+          {filteredChallenges.map(c => {
             const completed = user.completedLessons.includes(`challenge-${c.id}`);
             const info = TIER_INFO[c.tier];
             return (
