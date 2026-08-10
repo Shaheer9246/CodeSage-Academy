@@ -24,6 +24,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
   { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
+  { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Expert.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
   { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
@@ -147,6 +148,19 @@ const SECTIONS: SectionDef[] = [
   },
   
   {
+    id: 'cpp',
+    title: 'C++',
+    subtitle: 'Memory, pointers & raw performance',
+    Icon: Cpu,
+    gradient: 'from-blue-500/70 via-sky-500/60 to-indigo-500/70',
+    tracks: [
+      { id: 'cpp', path: '/cpp?from=dashboard', title: 'C++ Programming', emoji: '⚙️',
+        tour: 'cpp', lessons: 30, accent: 'accent-blue',
+        tags: ['Compilers', 'Pointers', 'STL', 'RAII'], desc: 'Syntax → Memory → STL → High Performance',
+        trackId: 'cpp' as TrackId },
+    ],
+  },
+  {
     id: 'python',
     title: 'Python',
     subtitle: 'Beginner script to production expert',
@@ -217,7 +231,7 @@ const Dashboard = () => {
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [enrollTick, setEnrollTick] = useState(0);
 
- type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'ai' | 'sql' | 'fundamentals' | 'career';
+ type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'career';
   
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
@@ -295,6 +309,7 @@ const Dashboard = () => {
     '/intermediate-ai': 'intermediate-ai' as TrackId,
     '/three3d': 'three3d' as TrackId,
     '/java': 'java' as TrackId,
+    '/cpp': 'cpp' as TrackId,
   };
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
   const go = (path: string) => () => {
@@ -489,6 +504,7 @@ const Dashboard = () => {
               { id: 'frontend', label: 'Frontend' },
               { id: 'python', label: 'Python' },
               { id: 'java', label: 'Java' },
+              { id: 'cpp', label: 'C++' },
               { id: 'sql', label: 'SQL & Backend' },
               { id: 'ai', label: 'AI' },
               { id: 'fundamentals', label: 'Fundamentals' },
