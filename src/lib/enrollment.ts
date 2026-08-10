@@ -14,7 +14,8 @@ export type TrackId =
   | 'ai-fundamentals'
   | 'intermediate-ai'
   | 'three3d'
-  | 'java';
+  | 'java'
+  | 'cpp';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -42,7 +43,8 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'ai-fundamentals',
   'intermediate-ai',
   'three3d',
-  'java'
+  'java',
+  'cpp'
 ]);
 
 
@@ -158,6 +160,13 @@ export const TRACK_META: Record<
     route: '/java',
     idPrefix: 'CS-JV',
     seed: 150,
+  },
+  cpp: {
+    label: 'C++ Programming',
+    short: 'C++',
+    route: '/cpp',
+    idPrefix: 'CS-CPP',
+    seed: 95,
   },
 };
 

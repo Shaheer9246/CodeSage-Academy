@@ -13,6 +13,7 @@ import DashboardTour, { TourStep } from '@/components/DashboardTour';
 import EnrollDialog from '@/components/EnrollDialog';
 import { TrackId, isEnrolled, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
 import SuggestionsBadge from '@/components/SuggestionsBadge';
+import { completedCountFor, lessonCountFor, type LessonTrackKey } from '@/data/lessonIndex';
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
@@ -24,6 +25,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
   { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
+  { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Expert.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
   { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
@@ -147,6 +149,19 @@ const SECTIONS: SectionDef[] = [
   },
   
   {
+    id: 'cpp',
+    title: 'C++',
+    subtitle: 'Memory, pointers & raw performance',
+    Icon: Cpu,
+    gradient: 'from-blue-500/70 via-sky-500/60 to-indigo-500/70',
+    tracks: [
+      { id: 'cpp', path: '/cpp?from=dashboard', title: 'C++ Programming', emoji: '⚙️',
+        tour: 'cpp', lessons: 30, accent: 'accent-blue',
+        tags: ['Compilers', 'Pointers', 'STL', 'RAII'], desc: 'Syntax → Memory → STL → High Performance',
+        trackId: 'cpp' as TrackId },
+    ],
+  },
+  {
     id: 'python',
     title: 'Python',
     subtitle: 'Beginner script to production expert',
@@ -199,8 +214,12 @@ const SECTIONS: SectionDef[] = [
 /* ---------- Section collapse persistence ---------- */
 const COLLAPSE_KEY = 'dash.sections.collapsed.v1';
 function loadCollapsed(): Record<string, boolean> {
-  try { return JSON.parse(localStorage.getItem(COLLAPSE_KEY) || '{}'); }
-  catch { return {}; }
+  try {
+    const raw = localStorage.getItem(COLLAPSE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  // First visit: keep the catalog tidy — everything folded, nothing overwhelming.
+  return Object.fromEntries(SECTIONS.map(s => [s.id, true]));
 }
 
 const Dashboard = () => {
@@ -217,7 +236,7 @@ const Dashboard = () => {
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [enrollTick, setEnrollTick] = useState(0);
 
- type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'ai' | 'sql' | 'fundamentals' | 'career';
+ type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'career';
   
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
@@ -295,6 +314,7 @@ const Dashboard = () => {
     '/intermediate-ai': 'intermediate-ai' as TrackId,
     '/three3d': 'three3d' as TrackId,
     '/java': 'java' as TrackId,
+    '/cpp': 'cpp' as TrackId,
   };
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
   const go = (path: string) => () => {
@@ -319,6 +339,18 @@ const Dashboard = () => {
   /* Total tracks / enrolled for HUD */
   const allTracks = useMemo(() => SECTIONS.flatMap(s => s.tracks), []);
   const enrolledCount = allTracks.filter(t => t.trackId && isEnrolled(t.trackId)).length;
+
+  const myTracks = useMemo(
+    () => allTracks
+      .filter(t => t.trackId && !isGuest && isEnrolled(t.trackId))
+      .map(t => {
+        const key = t.trackId as unknown as LessonTrackKey;
+        const total = lessonCountFor(key) || t.lessons || 0;
+        const done = completedCountFor(key, user?.completedLessons || []);
+        return { track: t, done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+      }),
+    [allTracks, isGuest, user?.completedLessons, enrollTick],
+  );
 
   // Find their primary enrolled track to resume
   const firstEnrolledTrack = useMemo(() => 
@@ -481,6 +513,33 @@ const Dashboard = () => {
           </motion.div>
         )}
 
+        {/* ============ YOUR TRACKS ============ */}
+        {!isGuest && myTracks.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            className="glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-display font-bold uppercase tracking-wider text-muted-foreground">Your tracks</p>
+              <span className="text-[9px] font-mono text-muted-foreground">{myTracks.length} active</span>
+            </div>
+            {myTracks.map(({ track, done, total, pct }) => (
+              <button key={track.id} onClick={go(track.path)}
+                className="w-full text-left rounded-xl p-2.5 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-lg shrink-0">{track.emoji}</span>
+                  <p className="text-xs font-display font-semibold truncate flex-1">{track.title}</p>
+                  <span className="text-[10px] font-mono text-primary shrink-0">{done}/{total}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </div>
+                <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                  <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
+                </div>
+              </button>
+            ))}
+          </motion.div>
+        )}
+
         {/* ============ CATEGORY FILTER BAR ============ */}
         <div className="w-full overflow-x-auto scrollbar-none py-1">
           <div className="flex items-center gap-1.5 min-w-max pb-2">
@@ -489,6 +548,7 @@ const Dashboard = () => {
               { id: 'frontend', label: 'Frontend' },
               { id: 'python', label: 'Python' },
               { id: 'java', label: 'Java' },
+              { id: 'cpp', label: 'C++' },
               { id: 'sql', label: 'SQL & Backend' },
               { id: 'ai', label: 'AI' },
               { id: 'fundamentals', label: 'Fundamentals' },
