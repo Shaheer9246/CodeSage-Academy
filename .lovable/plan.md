@@ -29,7 +29,7 @@ A single maintenance guide covering:
 - **How each runtime works** — HTML/CSS/JS live preview, Python (Skulpt), SQL, Java and C++ workspaces, and their limits.
 - **How the backend enforces progress** — the security-definer functions (`award_lesson`, `complete_test`, `enroll_track`, `update_streak`, admin RPCs) and why lesson ids are validated.
 
-## 3. Dashboard restructure (proposal implemented after your OK)
+## 3. Dashboard restructure (I pick the structure below and build it, polished)
 
 Current dashboard shows every track as a flat wall of tiles. Proposed structure:
 
