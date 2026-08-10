@@ -217,10 +217,8 @@ const Dashboard = () => {
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [, setEnrollTick] = useState(0);
 
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
-  const toggleSection = (id: string) => {
-    // Category Filter State
-  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'ai' | 'sql' | 'fundamentals' | 'career';
+ type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'ai' | 'sql' | 'fundamentals' | 'career';
+  
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
   });
@@ -228,6 +226,10 @@ const Dashboard = () => {
   useEffect(() => {
     localStorage.setItem('codesage_dashboard_category', selectedCategory);
   }, [selectedCategory]);
+
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
+  
+  const toggleSection = (id: string) => {
     setCollapsed(prev => {
       const next = { ...prev, [id]: !prev[id] };
       try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next)); } catch {}
