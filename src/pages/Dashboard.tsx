@@ -219,6 +219,15 @@ const Dashboard = () => {
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
   const toggleSection = (id: string) => {
+    // Category Filter State
+  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'ai' | 'sql' | 'fundamentals' | 'career';
+  const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
+    return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('codesage_dashboard_category', selectedCategory);
+  }, [selectedCategory]);
     setCollapsed(prev => {
       const next = { ...prev, [id]: !prev[id] };
       try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next)); } catch {}
@@ -308,6 +317,11 @@ const Dashboard = () => {
   /* Total tracks / enrolled for HUD */
   const allTracks = useMemo(() => SECTIONS.flatMap(s => s.tracks), []);
   const enrolledCount = allTracks.filter(t => t.trackId && isEnrolled(t.trackId)).length;
+
+  // Find their primary enrolled track to resume
+  const firstEnrolledTrack = useMemo(() => 
+    allTracks.find(t => t.trackId && !isGuest && isEnrolled(t.trackId)),
+  [allTracks, isGuest, enrollTick]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
@@ -437,9 +451,69 @@ const Dashboard = () => {
           </div>
         </motion.button>
 
+        {/* ============ CONTINUE LEARNING HERO ============ */}
+        {!isGuest && firstEnrolledTrack && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/20 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Continue Learning
+                </div>
+                <h2 className="text-base sm:text-lg font-bold font-display text-foreground truncate">
+                  {firstEnrolledTrack.title}
+                </h2>
+                <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                  Keep your momentum going! You're doing great.
+                </p>
+              </div>
+              <button
+                onClick={go(firstEnrolledTrack.path)}
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 self-start sm:self-center"
+              >
+                Resume Lesson →
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ============ CATEGORY FILTER BAR ============ */}
+        <div className="w-full overflow-x-auto scrollbar-none py-1">
+          <div className="flex items-center gap-1.5 min-w-max pb-2">
+            {[
+              { id: 'All', label: 'All Courses' },
+              { id: 'frontend', label: 'Frontend' },
+              { id: 'python', label: 'Python' },
+              { id: 'java', label: 'Java' },
+              { id: 'sql', label: 'SQL & Backend' },
+              { id: 'ai', label: 'AI' },
+              { id: 'fundamentals', label: 'Fundamentals' },
+              { id: 'career', label: 'Career' },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedCategory(tab.id as DashboardCategory)}
+                className={`px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all ${
+                  selectedCategory === tab.id
+                    ? 'bg-primary text-primary-foreground shadow-sm neon-border'
+                    : 'bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground border border-border/40'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ============ SECTIONS ============ */}
         <div className="space-y-3">
-          {SECTIONS.map((section, i) => {
+          {SECTIONS.filter(section => {
+            if (selectedCategory === 'All') return true;
+            if (selectedCategory === 'sql') return section.id === 'backend';
+            return section.id === selectedCategory;
+          }).map((section, i) => {
             const isCollapsed = !!collapsed[section.id];
             const enrolled = section.tracks.filter(t => t.trackId && isEnrolled(t.trackId)).length;
             return (
