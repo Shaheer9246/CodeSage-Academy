@@ -215,7 +215,7 @@ const Dashboard = () => {
   const [theme, setTheme] = useState<ThemeName>(() => getTheme());
   const [tourReady, setTourReady] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
-  const [, setEnrollTick] = useState(0);
+  const [enrollTick, setEnrollTick] = useState(0);
 
  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'ai' | 'sql' | 'fundamentals' | 'career';
   
