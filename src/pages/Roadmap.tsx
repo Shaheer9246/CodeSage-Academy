@@ -15,6 +15,7 @@ import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson'; // <-- AD
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { JAVA_LESSONS } from '@/data/javaLessons';
+import { CPP_LESSONS } from '@/data/cppLessons';
 
 /* ------------------------------------------------------------------ */
 /*  TYPES + DATA (identical shape to your original — just re-authored) */
@@ -31,7 +32,7 @@ interface TrackNode {
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
     | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'intermediate-ai-lesson' | 'three-lesson' | 'rf-lesson'
-    | 'java-lesson';
+    | 'java-lesson' | 'cpp-lesson';
   locked?: boolean;
 }
 
@@ -122,12 +123,14 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   pythonexpert: buildTrack(PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'),
   three3d:      buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
  'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
+ cpp: buildTrack(CPP_LESSONS.filter(l => !('type' in l)).map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚙️' })), 'cpp-lesson', 'Module 1: C++ Foundations', 'C++ MASTER'),
  java: buildTrack(JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'java-lesson', 'Module 1: Java Programming', 'JAVA COMPLETE'),
 };
 
 const TRACKS = [
   { key: 'frontend',     label: 'Frontend Dev' },
   { key: 'java',         label: 'Java' },
+  { key: 'cpp',          label: 'C++' },
   { key: 'networking',   label: 'Networking' },
   { key: 'ai-fundamentals', label: 'AI Fundamentals' },
   { key: 'intermediate-ai', label: 'Intermediate AI' },
