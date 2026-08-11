@@ -206,7 +206,7 @@ const Welcome = () => {
                   onClick={() => navigate('/trip')}
                   className="flex-1 bg-transparent border border-border/50 text-foreground font-semibold text-sm py-3 rounded-xl hover:border-violet-500/40 hover:text-violet-400 transition-all flex items-center justify-center gap-2"
                 >
-                  <Compass className="w-4 h-4" /> Test Drive a Lesson 🚗
+                  <Compass className="w-4 h-4" /> Demo Lesson ⚡
                 </button>
               </div>
             </motion.div>
