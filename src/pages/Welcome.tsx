@@ -191,7 +191,7 @@ const Welcome = () => {
                 className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-bold text-sm px-8 py-3.5 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:scale-[1.02] transition-all flex items-center justify-center gap-3 group"
               >
                 <span className="font-mono text-xs opacity-70 group-hover:opacity-100 transition-opacity">~/ $</span>
-                <span>Initialize Session</span>
+                <span>Start Building</span>
                 <Rocket className="w-4 h-4 ml-auto" />
               </button>
 
@@ -200,13 +200,13 @@ const Welcome = () => {
                   onClick={() => navigate('/playground')}
                   className="flex-1 glass-card border border-border/50 text-foreground font-semibold text-sm py-3 rounded-xl hover:border-cyan-500/40 hover:text-cyan-400 transition-all flex items-center justify-center gap-2"
                 >
-                  <Code2 className="w-4 h-4" /> Open Sandbox
+                  <Code2 className="w-4 h-4" /> Instant Sandbox
                 </button>
                 <button
                   onClick={() => navigate('/trip')}
                   className="flex-1 bg-transparent border border-border/50 text-foreground font-semibold text-sm py-3 rounded-xl hover:border-violet-500/40 hover:text-violet-400 transition-all flex items-center justify-center gap-2"
                 >
-                  <Compass className="w-4 h-4" /> View Roadmap
+                  <Compass className="w-4 h-4" /> Test Drive a Lesson 🚗
                 </button>
               </div>
             </motion.div>
