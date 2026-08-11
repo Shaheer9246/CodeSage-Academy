@@ -65,7 +65,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-sky-400/70 via-cyan-400/60 to-blue-500/70',
     tracks: [
       { id: 'networking', path: '/networking?from=dashboard', title: 'Computer & Networking', emoji: '🌐',
-        tour: 'networking', lessons: 30, accent: 'accent-blue',
+        tour: 'networking', lessons: 13, accent: 'accent-blue',
         tags: ['Hardware', 'OS', 'DNS', 'HTTP'], desc: 'Hardware → OS → Networking → Security',
         trackId: 'networking' },
     ],
@@ -78,22 +78,22 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-fuchsia-400/70 via-pink-500/60 to-rose-500/70',
     tracks: [
       { id: 'frontend', path: '/learn', title: 'Frontend Dev (Coding only)', emoji: '📱',
-        tour: 'frontend', lessons: 50, accent: 'primary',
+        tour: 'frontend', lessons: 52, accent: 'primary',
         tags: ['HTML', 'CSS', 'JS'], desc: 'HTML → CSS → JS → React → Deploy',
         trackId: 'frontend' },
       
       { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full Stack Frontend Dev (Live Web)', emoji: '🚀',
-        tour: 'fullstack', lessons: 30, accent: 'accent-orange',
+        tour: 'fullstack', lessons: 28, accent: 'accent-orange',
         tags: ['React', 'Hooks', 'APIs', 'TS'], desc: 'React → APIs → Testing → Deploy',
         trackId: 'fullstack' },
       
       { id: 'local', path: '/local?from=dashboard', title: 'Local-Only Coding (no backend)', emoji: '🏠',
-        tour: 'local', lessons: 30, accent: 'emerald-400',
+        tour: 'local', lessons: 15, accent: 'emerald-400',
         tags: ['DOM', 'localStorage', 'PWA'], desc: 'No backend, no server, no cost',
         trackId: 'local' },
 
       { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Dev (Animated Web)', emoji: '🧊',
-        tour: 'three3d', lessons: 30, accent: 'accent-blue',
+        tour: 'three3d', lessons: 16, accent: 'accent-blue',
         tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Build immersive 3D web experiences',
         trackId: 'three3d' as TrackId },
       
@@ -113,7 +113,7 @@ const SECTIONS: SectionDef[] = [
         title: 'AI Fundamentals', 
         emoji: '🧠',
         tour: 'ai-fundamentals', 
-        lessons: 30,
+        lessons: 12,
         accent: 'accent-blue',
         tags: ['Foundations', 'LLMs', 'Agents'], 
         desc: 'Foundations of AI, neural networks, and modern agents', 
@@ -125,7 +125,7 @@ const SECTIONS: SectionDef[] = [
         title: 'Intermediate AI', 
         emoji: '🤖',
         tour: 'intermediate-ai', 
-        lessons: 30,
+        lessons: 8,
         accent: 'primary',
         tags: ['PEFT', 'LoRA', 'RAG', 'Fine-Tuning'], 
         desc: 'Deepen knowledge in fine-tuning, RAG, vector DBs & production AI', 
@@ -169,7 +169,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-yellow-400/70 via-amber-400/60 to-orange-500/70',
     tracks: [
       { id: 'python', path: '/python?from=dashboard', title: 'Python Programming', emoji: '🐍',
-        tour: 'python', lessons: 30, accent: 'yellow-400',
+        tour: 'python', lessons: 32, accent: 'yellow-400',
         tags: ['Syntax', 'Functions', 'OOP', 'async'], desc: 'Beginner → Advanced → Capstone',
         trackId: 'python' },
       { id: 'pythonexpert', path: '/pythonexpert?from=dashboard', title: 'Full Stack Python Expert', emoji: '🧙‍♂️',
@@ -186,7 +186,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-emerald-400/70 via-teal-400/60 to-cyan-500/70',
     tracks: [
       { id: 'sql', path: '/sql?from=dashboard', title: 'SQL & PostgreSQL: Backend Database Engineering', emoji: '🛢️',
-        tour: 'sql', lessons: 30, accent: 'emerald-500',
+        tour: 'sql', lessons: 18, accent: 'emerald-500',
         tags: ['Queries', 'Joins', 'Schemas'], desc: 'Queries → Joins → DB Design',
         trackId: 'sql' as TrackId },
     ],
@@ -199,12 +199,12 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-yellow-300/70 via-yellow-500/60 to-orange-400/70',
     tracks: [
       { id: 'freelance', path: '/freelance?from=dashboard', title: 'Freelance & Clients (Understanding)', emoji: '💼',
-        tour: 'freelance', lessons: 30, accent: 'yellow-500',
+        tour: 'freelance', lessons: 12, accent: 'yellow-500',
         tags: ['Niche', 'Pitch', 'Price', 'Deliver'], desc: 'Find → Pitch → Deliver',
         trackId: 'freelance' },
 
       { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing (methods)', emoji: '🌍',
-        tour: 'real-freelance', lessons: 8, accent: 'primary',
+        tour: 'real-freelance', lessons: 12, accent: 'primary',
         tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'Master platforms & win clients',
         trackId: 'real-freelance' as TrackId },
     ],
