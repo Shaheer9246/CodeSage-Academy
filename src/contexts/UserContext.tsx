@@ -162,6 +162,31 @@ function readCachedProfile(): UserProfile | null {
   } catch { return null; }
 }
 
+// --- Offline-safe lesson completion queue -------------------------------
+// If award_lesson fails (expired token, flaky network), the completion is
+// parked here and retried on the next load, so progress is never silently
+// lost after a refresh.
+const PENDING_KEY = 'codesage_pending_lessons';
+
+function readPending(): string[] {
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    const arr = raw ? (JSON.parse(raw) as string[]) : [];
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'string') : [];
+  } catch { return []; }
+}
+
+function writePending(ids: string[]) {
+  try {
+    if (ids.length) localStorage.setItem(PENDING_KEY, JSON.stringify([...new Set(ids)]));
+    else localStorage.removeItem(PENDING_KEY);
+  } catch { /* ignore */ }
+}
+
+function queuePending(id: string) {
+  writePending([...readPending(), id]);
+}
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Hydrate synchronously from cache so we never flash "initializing CodeSage"
   // for a user that's already signed in.
