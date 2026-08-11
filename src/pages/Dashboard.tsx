@@ -335,7 +335,7 @@ const Dashboard = () => {
 
   const displayName = user?.name || 'Explorer';
   const xp = user?.xp || 0;
-  const streak = user?.streakCount || 0;
+  const streak = user?.streakCount ?? user?.streak ?? 0;
 
   /* Total tracks / enrolled for HUD */
   const allTracks = useMemo(() => SECTIONS.flatMap(s => s.tracks), []);
@@ -360,6 +360,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
+      {/* 1. Daily Streak Modal */}
+      {user && <StreakModal streakCount={streak} />}
+
       {/* Ambient orbs */}
       <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-accent-blue/5 blur-[180px] pointer-events-none" />
