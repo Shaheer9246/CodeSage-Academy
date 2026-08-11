@@ -114,3 +114,54 @@ Anonymous users cannot execute any of these; every table has RLS and explicit gr
 - **Change the admin password** → update the `admin_password` row in `app_secrets`.
 - **Change enrollment limits / prerequisites** → `src/lib/enrollment.ts` (`TRACK_META.prereq`, active-track limit) and `EnrollDialog.tsx` copy.
 - **Reset a user's progress** → clear their `completed_lessons` array in `profiles`.
+
+---
+
+## 12. Admin console (`/admin`)
+
+Open **Settings → Admin** (small link at the bottom) or go straight to `/admin`. You must be signed in *and* type the admin password; the password is kept in `sessionStorage` only, so it is gone when the tab closes.
+
+**Password:** unchanged — `admin-codesage-1994`, stored as the `admin_password` row in the `app_secrets` table. To change it:
+`update app_secrets set value = '<new password>', updated_at = now() where key = 'admin_password';`
+That single row controls the admin console, announcement posting, and suggestion edit/delete/reply.
+
+### What the console shows
+
+Top cards: total students, total lessons recorded in the database, total XP, students with at least one active track.
+Search box: matches name, email, username or student ID.
+Each row expands into:
+
+| Group | Fields |
+|---|---|
+| Identity | email, username, student ID, user id |
+| Dates | joined (auth account creation), last sign-in, email confirmed, last active |
+| Onboarding | date of birth, studying, has a job, experience level, goal |
+| Gamification | XP, level, streak, sage coins, badges |
+| Enrollments | every track with status (`active` / `paused` / `ended`) and enrolment date |
+| Lessons in the database | per-track bar `done/total` built from `src/data/lessonIndex.ts`, plus the raw `completed_lessons` array exactly as stored in Supabase |
+| Other | tests passed, unlocked sections, promo codes, suggestions posted |
+
+The "raw lesson IDs" block is the ground truth: if a lesson is missing there, the server never recorded it (see §7 and the offline retry queue in `UserContext.tsx`).
+
+### Where it lives
+
+- Page: `src/pages/Admin.tsx` (route added in `src/App.tsx`).
+- Data: one database function, `admin_list_users(_password)`, `SECURITY DEFINER`, returns a JSON array. It joins `profiles` with `auth.users` (for email / sign-in dates) and `enrollments`, and refuses to run without a valid admin password. Anonymous users cannot execute it.
+
+### Editing the console
+
+- **Show another profile column** → add it to the `SELECT` inside `admin_list_users` (new migration) and add a `<Field …/>` in `Admin.tsx`.
+- **Change per-track lesson totals** → they come from `TRACK_LESSON_IDS` in `src/data/lessonIndex.ts`; nothing to change in the admin page.
+- **Add an admin action (ban, reset progress…)** → write a new `SECURITY DEFINER` function that checks `app_secrets.admin_password` the same way, then call it from `Admin.tsx` with the password already held in state.
+
+## 13. Suggestion notifications
+
+- Badge component: `src/components/SuggestionsBadge.tsx` (shown in the dashboard header).
+- Unread = suggestions whose `updated_at` is newer than your `suggestion_reads.last_seen_at`, counting **other people's** posts plus **admin replies on your own** posts.
+- Opening `/suggestions` calls `mark_suggestions_read()` and fires a `suggestions:read` window event so the badge clears instantly.
+- Live updates need the table in the realtime publication — `suggestions` and `announcements` are both published with `REPLICA IDENTITY FULL`. There is also a 60-second poll and a window-focus refresh as a fallback.
+
+## 14. Terms & Privacy
+
+- `src/pages/Terms.tsx` (`/terms`) and `src/pages/Privacy.tsx` (`/privacy`). Both are plain text inside `<Section>` blocks — edit the text directly, no database involved.
+- Sign-up now requires ticking the acceptance box in `src/pages/Auth.tsx`; without it the form refuses to submit.
