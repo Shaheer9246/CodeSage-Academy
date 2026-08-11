@@ -188,10 +188,23 @@ function groupIntoSectors(nodes: TrackNode[], statuses: Status[]): Sector[] {
 /*  SERPENTINE WAVE — 3-COLUMN LAYOUT with SVG curve threading nodes  */
 /* ------------------------------------------------------------------ */
 
-// Wave pattern: 0=left, 1=center, 2=right, 1=center, 0=left ...
-// This creates a smoother S-wave than the boring 2-col zig-zag.
-const WAVE = [0, 1, 2, 1] as const;
-const columnFor = (i: number) => WAVE[i % WAVE.length];
+// Dynamic wave: 3 cols on mobile/tablet, 5 cols on desktop (≥1024px)
+// Pattern goes 0 → max → 0 smoothly: e.g. 5 cols = [0,1,2,3,4,3,2,1]
+function getColumnCount(width: number): number {
+  if (width >= 1024) return 5;   // desktop: wide serpentine
+  if (width >= 768)  return 4;   // tablet: medium
+  return 3;                       // mobile: current behavior
+}
+
+function buildWave(cols: number): number[] {
+  const up = Array.from({ length: cols }, (_, i) => i);
+  const down = Array.from({ length: cols - 2 }, (_, i) => cols - 2 - i);
+  return [...up, ...down]; // e.g. 5 cols → [0,1,2,3,4,3,2,1]
+}
+
+// Fallback for SSR / first render before width is known
+const DEFAULT_WAVE = buildWave(3);
+const columnFor = (i: number, wave: number[] = DEFAULT_WAVE) => wave[i % wave.length];
 
 const ROW_H_MOBILE = 96;  // extra room so two-line labels below the node don't collide
 const ROW_H_DESKTOP = 80;
@@ -216,28 +229,35 @@ function SectorPod({
     return () => ro.disconnect();
   }, []);
 
-  const isMobile = width > 0 && width < 640;
-  const ROW_H = isMobile ? ROW_H_MOBILE : ROW_H_DESKTOP;
-  const rows = sector.nodes.length;
-  const height = rows * ROW_H + 32;
+ const cols = getColumnCount(width);
+const wave = width > 0 ? buildWave(cols) : DEFAULT_WAVE;
+const maxCol = cols - 1;
+const isMobile = width > 0 && width < 640;          // ← ADD THIS
+const ROW_H = isMobile ? ROW_H_MOBILE : ROW_H_DESKTOP;  // ← ADD THIS
+const rows = sector.nodes.length;
+const height = rows * ROW_H + 32;
 
- // Column X positions (0=left, 1=center, 2=right) — responsive
-  const colX = (c: number) => {
-    if (width < 640) {
-      const pad = 56; 
-      const span = Math.max(100, width - pad * 2);
-      return pad + span * (c / 2); 
-    }
-    return 60 + (width - 120) * (c / 2);
-  };
+ const colX = (c: number) => {
+  if (width < 640) {
+    const pad = 56;
+    const span = Math.max(100, width - pad * 2);
+    return pad + span * (c / maxCol);
+  }
+  if (width < 1024) {
+    // tablet
+    return 70 + (width - 140) * (c / maxCol);
+  }
+  // desktop — wider padding so labels don't clip at edges
+  return 100 + (width - 200) * (c / maxCol);
+};
 
   // Build SVG path threading through node centers
   const pathD = useMemo(() => {
     if (!width) return '';
     const pts = sector.nodes.map((_, i) => ({
-      x: colX(columnFor(i)),
-      y: 16 + i * ROW_H + ROW_H / 2,
-    }));
+  x: colX(columnFor(i, wave)),   // ✅ passes dynamic wave
+  y: 16 + i * ROW_H + ROW_H / 2,
+}));
     if (pts.length < 2) return '';
     let d = `M ${pts[0].x} ${pts[0].y}`;
     for (let i = 1; i < pts.length; i++) {
@@ -247,7 +267,7 @@ function SectorPod({
     }
     return d;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, sector.nodes.length]);
+ }, [width, sector.nodes.length, wave, maxCol]);
 
   // Progress along the curve based on completion
   const completedCount = sector.nodes.filter(n => n.status === 'completed').length;
@@ -316,15 +336,15 @@ function SectorPod({
         {/* Nodes */}
         {sector.nodes.map((entry, i) => {
           const { node, status } = entry;
-          const cx = colX(columnFor(i));
+          const cx = colX(columnFor(i, wave)); 
           const cy = 16 + i * ROW_H + ROW_H / 2;
           const isCurrent = status === 'current';
           const isCompleted = status === 'completed';
           const isLocked = status === 'locked';
 
           // Label side (put label opposite of node lean to keep it visible)
-          const col = columnFor(i);
-          const labelLeft = col === 2;
+          const col = columnFor(i, wave);          
+           const labelLeft = col > maxCol / 2;  
 
           return (
             <div
