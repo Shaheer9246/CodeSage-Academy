@@ -106,6 +106,8 @@ const SettingsPage = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
+  const [showAllBadges, setShowAllBadges] = useState(false);
+  const [showAllAchievements, setShowAllAchievements] = useState(false);
   // Force re-render when enrollment state changes (pause/resume/end)
   const [, setEnrollTick] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -411,14 +413,25 @@ const SettingsPage = () => {
 
         {/* Badges */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-primary" /> Badges
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold font-display flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-primary" /> Badges ({user.badges.length})
+            </h3>
+            {user.badges.length > 6 && (
+              <button 
+                onClick={() => setShowAllBadges(!showAllBadges)} 
+                className="text-xs text-primary font-semibold hover:underline"
+              >
+                {showAllBadges ? 'Show Less' : `Show All (${user.badges.length})`}
+              </button>
+            )}
+          </div>
+
           {user.badges.length === 0 ? (
             <p className="text-xs text-muted-foreground">No badges yet. Start learning to earn badges!</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-                  {user.badges.map(b => (
+              {(showAllBadges ? user.badges : user.badges.slice(0, 6)).map(b => (
                 <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 max-w-full">
                   <span className="text-sm flex-shrink-0">{BADGE_INFO[b]?.icon || '🏅'}</span>
                   <span className="text-xs font-medium text-foreground truncate">{BADGE_INFO[b]?.label || b}</span>
@@ -430,11 +443,22 @@ const SettingsPage = () => {
 
         {/* Achievements */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
-            <Target className="w-4 h-4 text-primary" /> Achievements
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold font-display flex items-center gap-2">
+              <Target className="w-4 h-4 text-primary" /> Achievements ({ACHIEVEMENTS.length})
+            </h3>
+            {ACHIEVEMENTS.length > 3 && (
+              <button 
+                onClick={() => setShowAllAchievements(!showAllAchievements)} 
+                className="text-xs text-primary font-semibold hover:underline"
+              >
+                {showAllAchievements ? 'Show Less' : `Show All (${ACHIEVEMENTS.length})`}
+              </button>
+            )}
+          </div>
+
           <div className="space-y-2">
-            {ACHIEVEMENTS.map(ach => {
+            {(showAllAchievements ? ACHIEVEMENTS : ACHIEVEMENTS.slice(0, 3)).map(ach => {
               const unlocked = ach.check(user);
               return (
                 <div key={ach.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
