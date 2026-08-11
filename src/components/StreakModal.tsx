@@ -1,64 +1,65 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Flame, X, Sparkles, Check } from 'lucide-react';
 
 /**
  * ==============================================================================
- * SYSTEM_LOGS: Hacker/Cyberpunk themed motivational directives
+ * DEV_QUOTES: Encouraging, coding-focused quotes
  * ==============================================================================
  */
-const SYSTEM_LOGS = [
-  "> CONSISTENCY.EXE > Transforms average into excellence.",
-  "> DELTA_UPDATES > Small daily patches compile to stunning results.",
-  "> OVERRIDE_TARGET > Focus on progress. Perfection is a trap.",
-  "> INIT_SEQUENCE > The secret of getting ahead is getting started.",
-  "> FUTURE_SELF.SYS > Acknowledging today's effort...",
-  "> SKILL_TREE.SYS > Daily commits detected. Upgrading capabilities..."
+const DEV_QUOTES = [
+  "Consistency compiles success.",
+  "Small daily commits lead to major releases.",
+  "Focus on progress, not perfection. Keep building!",
+  "The best way to learn is to ship a little every day.",
+  "Your future self will thank you for today's logic.",
+  "Code a little every day, and watch your skills scale."
 ];
 
 /**
  * ==============================================================================
- * useStreakMonitor: Headless UI hook for streak tracking and modal state
+ * useStreakMonitor: Headless hook for streak state
  * ==============================================================================
  */
 interface UseStreakMonitorReturn {
   isOpen: boolean;
-  activeLog: string;
+  quote: string;
   todayIdx: number;
   daysOfWeek: string[];
-  terminateProcess: () => void;
+  closeModal: () => void;
 }
 
 function useStreakMonitor(): UseStreakMonitorReturn {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeLog, setActiveLog] = useState('');
+  const [quote, setQuote] = useState('');
   
-  const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const todayIdx = new Date().getDay();
 
-  const bootSequence = useCallback(() => {
+  const initializeStreak = useCallback(() => {
     const today = new Date().toISOString().split('T')[0];
-    const lastAccess = localStorage.getItem('codesage_sys_access_log');
+    const lastShown = localStorage.getItem('codesage_streak_shown_date');
 
-    if (lastAccess !== today) {
-      const randomLog = SYSTEM_LOGS[Math.floor(Math.random() * SYSTEM_LOGS.length)];
-      setActiveLog(randomLog);
+    if (lastShown !== today) {
+      const randomQuote = DEV_QUOTES[Math.floor(Math.random() * DEV_QUOTES.length)];
+      setQuote(randomQuote);
       setIsOpen(true);
-      localStorage.setItem('codesage_sys_access_log', today);
+      localStorage.setItem('codesage_streak_shown_date', today);
     }
   }, []);
 
   useEffect(() => {
-    bootSequence();
-  }, [bootSequence]);
+    initializeStreak();
+  }, [initializeStreak]);
 
-  const terminateProcess = useCallback(() => setIsOpen(false), []);
+  const closeModal = useCallback(() => setIsOpen(false), []);
 
-  return { isOpen, activeLog, todayIdx, daysOfWeek, terminateProcess };
+  return { isOpen, quote, todayIdx, daysOfWeek, closeModal };
 }
 
 /**
  * ==============================================================================
- * StreakModal: CRT Terminal UI Component
+ * StreakModal: Modern, compact, developer-friendly UI
  * ==============================================================================
  */
 interface StreakModalProps {
@@ -66,107 +67,103 @@ interface StreakModalProps {
 }
 
 export function StreakModal({ streakCount }: StreakModalProps) {
-  const { isOpen, activeLog, todayIdx, daysOfWeek, terminateProcess } = useStreakMonitor();
+  const { isOpen, quote, todayIdx, daysOfWeek, closeModal } = useStreakMonitor();
 
   if (!isOpen) return null;
 
+  // Soft spring animation for a premium feel
+  const modalVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { type: 'spring', stiffness: 300, damping: 25 }
+    },
+    exit: { opacity: 0, y: 10, scale: 0.95, transition: { duration: 0.15 } }
+  };
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
         <motion.div
-          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="relative w-full max-w-md bg-black border border-green-500/40 shadow-[0_0_40px_rgba(34,197,94,0.15)] rounded-sm overflow-hidden font-mono text-green-400"
+          variants={modalVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          // Compact mobile sizing
+          className="relative w-full max-w-[340px] bg-background border border-border/60 shadow-2xl rounded-2xl overflow-hidden"
         >
-          {/* CRT Scanlines & RGB Sub-pixel Overlay */}
-          <div 
-            className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_3px,4px_100%] opacity-40"
-            aria-hidden="true"
-          />
-          {/* CRT Vignette / Screen Glow */}
-          <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-b from-transparent via-green-500/5 to-black/40" aria-hidden="true" />
+          {/* Subtle Top Gradient Accent */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500" />
 
-          {/* Terminal Header Bar */}
-          <div className="flex items-center justify-between px-3 py-2 bg-green-500/10 border-b border-green-500/40 text-[10px] tracking-widest text-green-300 uppercase relative z-30">
-            <span>bash-5.1$ ./streak_monitor.sh</span>
-            <div className="flex gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 hover:bg-red-400 cursor-pointer" onClick={terminateProcess} title="SIGKILL" />
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-            </div>
-          </div>
+          {/* Close Button */}
+          <button
+            onClick={closeModal}
+            className="absolute top-3 right-3 text-muted-foreground/60 hover:text-foreground p-1.5 rounded-full hover:bg-secondary/80 transition-colors z-10"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
 
-          {/* Main Terminal Content */}
-          <div className="p-6 relative z-30">
-            {/* Command Prompt Intro */}
-            <div className="mb-4 text-xs opacity-80">
-              <span className="text-cyan-400">root@codesage</span>:<span className="text-purple-400">~/user/streaks</span>$ cat current_status.log
-            </div>
-
-            {/* Header Status */}
-            <motion.h2
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl font-bold text-green-400 mb-1 tracking-tight"
-              style={{ textShadow: '0 0 8px rgba(34,197,94,0.8)' }}
-            >
-              [ACCESS GRANTED] STREAK LVL: <span className="text-yellow-400" style={{ textShadow: '0 0 8px rgba(250,204,21,0.8)' }}>{String(streakCount).padStart(2, '0')}</span>
-            </motion.h2>
-            
-            <p className="text-[10px] text-green-500/70 mb-6 uppercase tracking-widest">
-              &gt; Uptime maintained. System operational.
-            </p>
-
-            {/* System Log (Quote) */}
+          <div className="px-6 pt-8 pb-6 text-center">
+            {/* Animated Icon Container */}
             <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-              className="bg-green-500/5 border border-green-500/30 p-4 mb-6 relative"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+              className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/10 border border-orange-500/20 flex items-center justify-center relative"
             >
-              <div className="absolute top-2 right-2 text-[9px] text-green-500/50 tracking-wider">SYS.LOG</div>
-              <p className="text-sm text-green-300 leading-relaxed pr-8">
-                <span className="text-green-500 mr-1">$</span> {activeLog}
-                <motion.span 
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ repeat: Infinity, duration: 0.8 }}
-                  className="inline-block w-2 h-4 bg-green-400 ml-1 align-middle" 
-                />
-              </p>
+              <Flame className="w-8 h-8 text-orange-500" fill="currentColor" />
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                className="absolute inset-0 bg-orange-500/20 rounded-2xl blur-md -z-10"
+              />
             </motion.div>
 
-            {/* Cycle Map (7-Day Progress) */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-3 border-b border-green-500/20 pb-1">
-                <p className="text-[10px] uppercase tracking-widest text-cyan-400/80">
-                  [ SECTOR MAP: LAST 7 CYCLES ]
-                </p>
-                <p className="text-[10px] text-green-500/50">MEM_DUMP</p>
-              </div>
-              <div className="grid grid-cols-7 gap-2 text-center text-[10px]">
+            {/* Heading & Git Commit Metaphor */}
+            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-1">
+              Day <span className="text-orange-500">{streakCount}</span>
+            </h2>
+            <p className="text-xs text-muted-foreground font-mono mb-5">
+              git commit -m "Kept the streak alive 🔥"
+            </p>
+
+            {/* Quote Box (Syntax Highlighting Style) */}
+            <div className="bg-secondary/40 border-l-2 border-primary/50 rounded-r-lg p-3 mb-6 text-left">
+              <p className="text-[13px] text-foreground/90 leading-relaxed italic">
+                "{quote}"
+              </p>
+            </div>
+
+            {/* 7-Day Tracker */}
+            <div className="mb-6">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 font-semibold text-left px-1">
+                Weekly Uptime
+              </p>
+              <div className="flex justify-between gap-1.5">
                 {daysOfWeek.map((day, i) => {
                   const isActive = i <= todayIdx && i >= todayIdx - Math.min(streakCount - 1, todayIdx);
                   const isToday = i === todayIdx;
 
                   return (
-                    <div key={i} className="flex flex-col items-center gap-1.5">
-                      <span className={`font-bold ${isToday ? 'text-yellow-400' : 'text-green-500/60'}`}>{day}</span>
+                    <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
+                      <span className={`text-[9px] font-medium ${isToday ? 'text-foreground' : 'text-muted-foreground/60'}`}>
+                        {day}
+                      </span>
                       <div
-                        className={`w-9 h-9 flex items-center justify-center border transition-all ${
+                        className={`w-full aspect-square rounded-lg flex items-center justify-center transition-all ${
                           isToday
-                            ? 'border-yellow-400 bg-yellow-400/20 text-yellow-400 shadow-[0_0_12px_rgba(250,204,21,0.4)]'
+                            ? 'bg-orange-500 text-white shadow-[0_0_12px_rgba(249,115,22,0.4)]'
                             : isActive
-                            ? 'border-green-500 bg-green-500/20 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.3)]'
-                            : 'border-green-500/30 bg-black text-green-500/20'
+                            ? 'bg-primary/15 text-primary border border-primary/30'
+                            : 'bg-secondary/50 text-muted-foreground/40 border border-border/40'
                         }`}
                       >
                         {isActive ? (
-                          <span className="text-xs font-bold tracking-tighter">{isToday ? '0x1' : '0x0'}</span>
+                          <Flame className={`w-3.5 h-3.5 ${isToday ? 'fill-current' : ''}`} />
                         ) : (
-                          <span className="text-xs">---</span>
+                          <div className="w-1 h-1 rounded-full bg-current opacity-30" />
                         )}
                       </div>
                     </div>
@@ -175,17 +172,14 @@ export function StreakModal({ streakCount }: StreakModalProps) {
               </div>
             </div>
 
-            {/* Execute Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={terminateProcess}
-              className="w-full bg-green-500/10 border border-green-500 text-green-400 font-bold py-3 hover:bg-green-500 hover:text-black transition-all text-sm tracking-widest relative group overflow-hidden"
-              style={{ textShadow: '0 0 5px rgba(34,197,94,0.5)' }}
+            {/* CTA Button */}
+            <button
+              onClick={closeModal}
+              className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-3 hover:opacity-90 active:scale-[0.98] transition-all text-sm shadow-lg shadow-primary/10 flex items-center justify-center gap-2"
             >
-              <span className="relative z-10">&gt; EXECUTE: CONTINUE_CODING.sh</span>
-              <div className="absolute inset-0 bg-green-400 opacity-0 group-hover:opacity-20 transition-opacity" />
-            </motion.button>
+              <Sparkles className="w-4 h-4" />
+              Keep Coding
+            </button>
           </div>
         </motion.div>
       </div>
