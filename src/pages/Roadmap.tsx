@@ -123,7 +123,7 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   pythonexpert: buildTrack(PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'),
   three3d:      buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
  'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
- cpp: buildTrack(CPP_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚙️', chapter: l.chapter })), 'cpp-lesson', 'Module 1: C++ Foundations', 'C++ MASTER'),
+ cpp: buildTrack(CPP_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚙️' })), 'cpp-lesson', 'Module 1: C++ Foundations', 'C++ MASTER'),
  java: buildTrack(JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'java-lesson', 'Module 1: Java Programming', 'JAVA COMPLETE'),
 };
 
