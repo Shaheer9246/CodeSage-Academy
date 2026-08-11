@@ -221,15 +221,14 @@ function SectorPod({
   const rows = sector.nodes.length;
   const height = rows * ROW_H + 32;
 
-  // Column X positions (0=left, 1=center, 2=right) — responsive
+ // Column X positions (0=left, 1=center, 2=right) — responsive
   const colX = (c: number) => {
-    if (width < 480) {
-      // Keep both edge columns well inside so a ~96px label centered under the node fits.
-      const pad = Math.max(64, width * 0.22);
-      const span = Math.max(40, width - pad * 2);
-      return pad + (span / 2) * (c / 2);
+    if (width < 640) {
+      const pad = 56; 
+      const span = Math.max(100, width - pad * 2);
+      return pad + span * (c / 2); 
     }
-    return 60 + ((width - 120) / 2) * (c / 2);
+    return 60 + (width - 120) * (c / 2);
   };
 
   // Build SVG path threading through node centers
