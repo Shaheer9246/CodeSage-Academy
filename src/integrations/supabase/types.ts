@@ -360,6 +360,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_list_users: { Args: { _password: string }; Returns: Json }
       award_lesson: {
         Args: { _lesson_id: string }
         Returns: {
