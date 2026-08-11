@@ -397,14 +397,26 @@ useEffect(() => {
     });
 
     // Server-authoritative write via the idempotent award_lesson RPC.
-    // Using array_append server-side eliminates the read-modify-write race
-    // that previously wiped earlier completions (e.g. py-01) on rapid sequential completes.
-    const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
-    if (error) {
-      console.error('award_lesson failed:', error.message);
-      return;
+    // Retry a couple of times before parking it in the pending queue, so a
+    // flaky connection or a just-expired token can never silently drop XP.
+    let lastError: string | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
+      if (!error) {
+        if (data) applyServerProfile(data);
+        return;
+      }
+      lastError = error.message;
+      await new Promise(r => setTimeout(r, 600 * (attempt + 1)));
     }
-    if (data) applyServerProfile(data);
+
+    console.error('award_lesson failed:', lastError);
+    queuePending(lessonId);
+    toast({
+      title: 'Progress saved locally',
+      description: "We couldn't reach the server. Your lesson will sync automatically next time you open CodeSage.",
+      variant: 'destructive',
+    });
   };
 
   const completeTest = async (testId: string) => {
