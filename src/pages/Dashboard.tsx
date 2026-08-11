@@ -360,8 +360,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
-      {/* 1. Daily Streak Modal */}
-      {user && <StreakModal streakCount={streak} />}
+      {/* 1. Daily Streak Modal - Hidden if the Tour is currently active */}
+      {user && !showTour && <StreakModal streakCount={streak} />}
 
       {/* Ambient orbs */}
       <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
