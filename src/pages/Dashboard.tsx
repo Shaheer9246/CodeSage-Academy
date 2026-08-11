@@ -113,7 +113,7 @@ const SECTIONS: SectionDef[] = [
         title: 'AI Fundamentals', 
         emoji: '🧠',
         tour: 'ai-fundamentals', 
-        lessons: 12,
+        lessons: 30,
         accent: 'accent-blue',
         tags: ['Foundations', 'LLMs', 'Agents'], 
         desc: 'Foundations of AI, neural networks, and modern agents', 
