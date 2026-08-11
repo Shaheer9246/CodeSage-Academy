@@ -73,9 +73,12 @@ export default function SuggestionsBadge() {
     >
       <MessageSquare className="w-3.5 h-3.5 text-primary" />
       {unread > 0 && (
-        <span className="text-[10px] font-bold text-primary min-w-[14px] text-center">
-          {unread > 9 ? '9+' : unread}
-        </span>
+        <>
+          <span className="text-[10px] font-bold text-primary min-w-[14px] text-center">
+            {unread > 9 ? '9+' : unread}
+          </span>
+          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse border border-background" />
+        </>
       )}
     </button>
   );
