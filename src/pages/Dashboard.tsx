@@ -143,7 +143,7 @@ const SECTIONS: SectionDef[] = [
     tracks: [
       { id: 'java', path: '/java?from=dashboard', title: 'Java Development', emoji: '☕',
         tour: 'java', lessons: 30, accent: 'orange-500',
-        tags: ['Syntax', 'OOP', 'Collections', 'Streams'], desc: 'Core Java → OOP → Backend Basics',
+        tags: ['Core Java', 'OOP', 'Spring Boot'], desc: 'Core Java → OOP → Spring Boot APIs',
         trackId: 'java' as TrackId },
     ],
   },
