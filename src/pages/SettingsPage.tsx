@@ -108,7 +108,7 @@ const SettingsPage = () => {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
   const [showAllBadges, setShowAllBadges] = useState(false);
-  const [showStreakModal] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   // Force re-render when enrollment state changes (pause/resume/end)
   const [, setEnrollTick] = useState(0);
