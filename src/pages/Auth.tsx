@@ -43,6 +43,7 @@ const Auth = () => {
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [lockLeft, setLockLeft] = useState(0);
   const [bootCount, setBootCount] = useState(0);
   const [uptime, setUptime] = useState(0);
@@ -146,6 +147,7 @@ const Auth = () => {
         if (!username.trim()) { setError('Username is required'); setSubmitting(false); return; }
         if (!email.trim()) { setError('Email is required'); setSubmitting(false); return; }
         if (passed < CHECKS.length) { setError('Password too weak — complete all requirements below'); setSubmitting(false); return; }
+        if (!acceptedTerms) { setError('You must accept the Terms of Service and Privacy Policy'); setSubmitting(false); return; }
         const err = await signup(username, email, password);
         if (err) { setError(err); setSubmitting(false); }
       }
@@ -155,7 +157,7 @@ const Auth = () => {
     }
   };
 
-  const switchMode = (m: Mode) => { setMode(m); setError(''); setInfo(''); setSubmitting(false); setPassword(''); setShowPassword(false); };
+  const switchMode = (m: Mode) => { setMode(m); setError(''); setInfo(''); setSubmitting(false); setPassword(''); setShowPassword(false); setAcceptedTerms(false); };
 
   const locked = isLogin && lockLeft > 0;
 
@@ -333,6 +335,23 @@ const Auth = () => {
                       </div>
                     )}
                   </>
+                )}
+
+                {mode === 'signup' && (
+                  <label className="flex items-start gap-2.5 cursor-pointer select-none bg-black/20 border border-border/40 rounded-lg px-3 py-2.5">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={e => setAcceptedTerms(e.target.checked)}
+                      className="mt-0.5 w-3.5 h-3.5 accent-primary flex-shrink-0"
+                    />
+                    <span className="text-[11px] leading-relaxed text-muted-foreground">
+                      I have read and accept the{' '}
+                      <a href="/terms" target="_blank" rel="noreferrer" className="text-primary hover:underline">Terms of Service</a>
+                      {' '}and the{' '}
+                      <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary hover:underline">Privacy Policy</a>.
+                    </span>
+                  </label>
                 )}
 
                 {locked && (

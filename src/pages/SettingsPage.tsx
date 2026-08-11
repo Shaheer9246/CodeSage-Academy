@@ -124,7 +124,7 @@ const SettingsPage = () => {
       console.warn('Failed to persist autoRun setting', error);
     }
   }, [autoRun]);
-  useEffect(() => onEnrollmentChange(() => setEnfrollTick(t => t + 1)), []);
+  useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
 
   const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
 
@@ -577,7 +577,14 @@ const SettingsPage = () => {
           </button>
         </div>
 
-        <div className="text-center pt-4 pb-2">
+        <div className="text-center pt-4 pb-2 space-y-2">
+          <div className="flex items-center justify-center gap-3 text-[10px] font-mono text-muted-foreground">
+            <button onClick={() => navigate('/terms')} className="hover:text-primary">Terms</button>
+            <span>·</span>
+            <button onClick={() => navigate('/privacy')} className="hover:text-primary">Privacy</button>
+            <span>·</span>
+            <button onClick={() => navigate('/admin')} className="hover:text-primary">Admin</button>
+          </div>
           <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v1.1.10</p>
         </div>
       </motion.div>
@@ -756,11 +763,7 @@ const SettingsPage = () => {
 
     {/* Streak Modal Popup */}
       {user && (
-        <StreakModal
-          isOpen={showStreakModal}
-          onClose={() => setShowStreakModal(false)}
-          user={user}
-        />
+        <StreakModal streakCount={user.streakCount} forceOpen={showStreakModal} onClose={() => setShowStreakModal(false)} />
       )}
 
     </div>

@@ -108,7 +108,10 @@ const Suggestions = () => {
         const { error } = await supabase.rpc('mark_suggestions_read');
         if (error) {
           console.error('Failed to mark suggestions as read:', error);
+          return;
         }
+        // Tell the dashboard badge to clear itself immediately.
+        window.dispatchEvent(new Event('suggestions:read'));
       };
       
       markAsRead();

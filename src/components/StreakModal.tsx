@@ -60,12 +60,18 @@ function useStreakMonitor(): UseStreakMonitorReturn {
  */
 interface StreakModalProps {
   streakCount: number;
+  /** Force the modal open (e.g. from a "view streak" button). */
+  forceOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function StreakModal({ streakCount }: StreakModalProps) {
+export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProps) {
   const { isOpen, quote, todayIdx, daysOfWeek, closeModal } = useStreakMonitor();
 
-  if (!isOpen) return null;
+  const open = isOpen || !!forceOpen;
+  const close = () => { closeModal(); onClose?.(); };
+
+  if (!open) return null;
 
   // Soft spring animation for a premium feel
   const modalVariants = {
@@ -74,7 +80,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
       opacity: 1, 
       y: 0, 
       scale: 1,
-      transition: { type: 'spring', stiffness: 300, damping: 25 }
+      transition: { type: 'spring' as const, stiffness: 300, damping: 25 }
     },
     exit: { opacity: 0, y: 10, scale: 0.95, transition: { duration: 0.15 } }
   };
@@ -95,7 +101,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
 
           {/* Close Button */}
           <button
-            onClick={closeModal}
+            onClick={close}
             className="absolute top-3 right-3 text-muted-foreground/60 hover:text-foreground p-1.5 rounded-full hover:bg-secondary/80 transition-colors z-10"
           >
             <X className="w-3.5 h-3.5" />
@@ -106,7 +112,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.1, type: 'spring' as const, stiffness: 200 }}
               className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/10 border border-orange-500/20 flex items-center justify-center relative"
             >
               <Flame className="w-8 h-8 text-orange-500" fill="currentColor" />
@@ -170,7 +176,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
 
             {/* CTA Button */}
             <button
-              onClick={closeModal}
+              onClick={close}
               className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-3 hover:opacity-90 active:scale-[0.98] transition-all text-sm shadow-lg shadow-primary/10 flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
