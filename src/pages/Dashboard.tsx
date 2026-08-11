@@ -204,7 +204,7 @@ const SECTIONS: SectionDef[] = [
         trackId: 'freelance' },
 
       { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing (methods)', emoji: '🌍',
-        tour: 'real-freelance', lessons: 30, accent: 'primary',
+        tour: 'real-freelance', lessons: 8, accent: 'primary',
         tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'Master platforms & win clients',
         trackId: 'real-freelance' as TrackId },
     ],
