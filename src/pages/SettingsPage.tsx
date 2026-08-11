@@ -36,29 +36,64 @@ type Achievement = {
 };
 
 const BADGE_INFO: Record<string, { icon: string; label: string }> = {
+  // Level & Profile Ranks
   'lite': { icon: '🌱', label: 'Lite Coder' },
   'silver': { icon: '🥈', label: 'Silver Coder' },
   'gold': { icon: '🥇', label: 'Gold Coder' },
   'premium': { icon: '💎', label: 'Premium Coder' },
   'elite': { icon: '👑', label: 'Elite Coder' },
+
+  // Course & Track Completion
+  'html-hero': { icon: '📄', label: 'HTML Hero' },
+  'css-wizard': { icon: '🎨', label: 'CSS Wizard' },
+  'js-jedi': { icon: '⚡', label: 'JS Jedi' },
+  'frontend-arch': { icon: '🛡️', label: 'Frontend Architect' },
+  'fullstack-pro': { icon: '🌐', label: 'Full-Stack Engineer' },
+  'python-novice': { icon: '🐍', label: 'Python Novice' },
+  'python-elite': { icon: '🐉', label: 'Python Elite' },
+  'java-specialist': { icon: '☕', label: 'Java Specialist' },
+  'cpp-master': { icon: '⚙️', label: 'C++ Systems Master' },
+  'freelance-pro': { icon: '💼', label: 'Freelance Ready' },
+
+  // Milestones & Activities
   'test-passer': { icon: '📜', label: 'Test Ace' },
   'streak-3': { icon: '🔥', label: '3-Day Streak' },
   'streak-7': { icon: '⚡', label: '7-Day Streak' },
   'streak-30': { icon: '🏆', label: '30-Day Streak' },
-  'html-hero': { icon: '🛡️', label: 'HTML Hero' },
-  'js-jedi': { icon: '⚡', label: 'JS Jedi' },
-  'css-wizard': { icon: '🎨', label: 'CSS Wizard' },
+  'challenge-slayer': { icon: '🗡️', label: 'Challenge Slayer' },
+  'crawler-champ': { icon: '🕷️', label: 'Crawler Champ' },
+  'xp-hoarder': { icon: '✨', label: 'XP Master' },
 };
 
 const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first-lesson', label: 'First Lesson', icon: '🎯', description: 'Complete your first lesson', check: u => u.completedLessons.length >= 1 },
-  { id: 'five-lessons', label: '5 Lessons', icon: '📚', description: 'Complete 5 lessons', check: u => u.completedLessons.length >= 5 },
-  { id: 'ten-lessons', label: '10 Lessons', icon: '🏅', description: 'Complete 10 lessons', check: u => u.completedLessons.length >= 10 },
-  { id: 'streak-3', label: '3-Day Streak', icon: '🔥', description: 'Maintain a 3-day streak', check: u => u.streakCount >= 3 },
-  { id: 'streak-7', label: '7-Day Streak', icon: '⚡', description: '7 days in a row', check: u => u.streakCount >= 7 },
-  { id: 'test-pass', label: 'Test Ace', icon: '📜', description: 'Pass a level test', check: u => u.completedTests?.length >= 1 },
+  // --- Getting Started & Milestones ---
+  { id: 'first-lesson', label: 'First Steps', icon: '🎯', description: 'Complete your first lesson', check: u => u.completedLessons.length >= 1 },
+  { id: 'five-lessons', label: 'Getting Into The Groove', icon: '📚', description: 'Complete 5 total lessons', check: u => u.completedLessons.length >= 5 },
+  { id: 'twenty-lessons', label: 'Dedicated Learner', icon: '🏅', description: 'Complete 20 total lessons', check: u => u.completedLessons.length >= 20 },
+  { id: 'half-century', label: 'Half Century', icon: '💯', description: 'Complete 50 total lessons', check: u => u.completedLessons.length >= 50 },
+
+  // --- Track Specific Achievements ---
   { id: 'all-html', label: 'HTML Master', icon: '📄', description: 'Complete all HTML lessons', check: u => u.completedLessons.filter(l => l.startsWith('html')).length >= 6 },
   { id: 'all-css', label: 'CSS Wizard', icon: '🎨', description: 'Complete all CSS lessons', check: u => u.completedLessons.filter(l => l.startsWith('css')).length >= 6 },
+  { id: 'all-js', label: 'JS Jedi', icon: '⚡', description: 'Complete all JS lessons', check: u => u.completedLessons.filter(l => l.startsWith('js')).length >= 6 },
+  { id: 'fullstack-dev', label: 'Full-Stack Developer', icon: '🌐', description: 'Complete 28 Frontend & Full-Stack lessons', check: u => u.completedLessons.filter(l => l.startsWith('frontend') || l.startsWith('html') || l.startsWith('css') || l.startsWith('js')).length >= 28 },
+  { id: 'python-track', label: 'Python Whisperer', icon: '🐍', description: 'Complete Python Beginner to Expert tracks', check: u => u.completedLessons.filter(l => l.startsWith('py') || l.startsWith('python')).length >= 10 },
+  { id: 'java-track', label: 'Java Architect', icon: '☕', description: 'Complete Java Beginner to Expert tracks', check: u => u.completedLessons.filter(l => l.startsWith('java')).length >= 10 },
+  { id: 'cpp-track', label: 'C++ Hardcore', icon: '⚙️', description: 'Complete C++ Beginner to Advanced tracks', check: u => u.completedLessons.filter(l => l.startsWith('cpp')).length >= 10 },
+  { id: 'freelance-ready', label: 'Freelance Hustler', icon: '💼', description: 'Complete all Freelancing modules', check: u => u.completedLessons.filter(l => l.startsWith('freelance')).length >= 5 },
+
+  // --- Exams & Practice ---
+  { id: 'test-pass', label: 'Test Ace', icon: '📜', description: 'Pass your first level test or exam', check: u => (u.completedTests?.length || 0) >= 1 },
+  { id: 'exam-veteran', label: 'Exam Veteran', icon: '🎓', description: 'Pass 5 distinct tests or exams', check: u => (u.completedTests?.length || 0) >= 5 },
+  { id: 'challenge-solver', label: 'Challenge Slayer', icon: '🗡️', description: 'Solve 5 Code Challenges', check: u => u.completedLessons.filter(l => l.startsWith('challenge-')).length >= 5 },
+  { id: 'crawler-master', label: 'Crawler Master', icon: '🕷️', description: 'Complete 5 Code Crawler exercises', check: u => u.completedLessons.filter(l => l.startsWith('crawler-')).length >= 5 },
+
+  // --- Streaks & XP ---
+  { id: 'streak-3', label: '3-Day Streak', icon: '🔥', description: 'Maintain a 3-day coding streak', check: u => u.streakCount >= 3 },
+  { id: 'streak-7', label: '7-Day Streak', icon: '⚡', description: 'Maintain a 7-day coding streak', check: u => u.streakCount >= 7 },
+  { id: 'streak-30', label: '30-Day Power Coder', icon: '🏆', description: 'Maintain a 30-day coding streak', check: u => u.streakCount >= 30 },
+  { id: 'xp-500', label: 'XP Collector', icon: '✨', description: 'Earn 500 total XP', check: u => (u.xp || 0) >= 500 },
+  { id: 'xp-2000', label: 'XP Titan', icon: '👑', description: 'Earn 2,000 total XP', check: u => (u.xp || 0) >= 2000 },
 ];
 
 const SettingsPage = () => {
