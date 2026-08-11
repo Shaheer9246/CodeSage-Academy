@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
+import { StreakModal } from '@/components/StreakModal';
 import {
   Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus,
   HelpCircle, Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown,
