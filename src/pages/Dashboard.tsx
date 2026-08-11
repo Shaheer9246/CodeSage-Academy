@@ -465,29 +465,6 @@ const Dashboard = () => {
             color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
         </div>
 
-        {/* Code Crawler featured */}
-        <motion.button
-          initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-          onClick={go('/games/crawler')}
-          className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10" />
-          <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-xl bg-accent-orange/15 grid place-items-center border border-accent-orange/30 neon-glow shrink-0">
-                <Gamepad2 className="w-5 h-5 text-accent-orange" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-base font-bold font-display flex items-center gap-2 truncate">
-                  Code Crawler
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent-orange/15 text-accent-orange border border-accent-orange/30 font-mono">NEW</span>
-                </p>
-                <p className="text-[10px] text-muted-foreground truncate">Maze runner · fix code at every gate</p>
-              </div>
-            </div>
-            <ChevronRight className="w-5 h-5 text-primary shrink-0" />
-          </div>
-        </motion.button>
 
         {/* ============ CONTINUE LEARNING HERO ============ */}
         {!isGuest && firstEnrolledTrack && (
@@ -651,6 +628,30 @@ const Dashboard = () => {
           })}
         </div>
 
+       {/* Code Crawler featured */}
+        <motion.button
+          initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+          onClick={go('/games/crawler')}
+          className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10" />
+          <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-accent-orange/15 grid place-items-center border border-accent-orange/30 neon-glow shrink-0">
+                <Gamepad2 className="w-5 h-5 text-accent-orange" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-base font-bold font-display flex items-center gap-2 truncate">
+                  Code Crawler
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent-orange/15 text-accent-orange border border-accent-orange/30 font-mono">NEW</span>
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">Maze runner · fix code at every gate</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-primary shrink-0" />
+          </div>
+        </motion.button>
+        
         {/* Suggestions */}
         <motion.button
           initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
