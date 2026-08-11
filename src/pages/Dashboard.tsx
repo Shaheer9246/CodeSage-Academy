@@ -88,12 +88,12 @@ const SECTIONS: SectionDef[] = [
         trackId: 'fullstack' },
       
       { id: 'local', path: '/local?from=dashboard', title: 'Local-Only Coding (no backend)', emoji: '🏠',
-        tour: 'local', lessons: 15, accent: 'emerald-400',
+        tour: 'local', lessons: 30, accent: 'emerald-400',
         tags: ['DOM', 'localStorage', 'PWA'], desc: 'No backend, no server, no cost',
         trackId: 'local' },
 
       { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Dev (Animated Web)', emoji: '🧊',
-        tour: 'three3d', lessons: 15, accent: 'accent-blue',
+        tour: 'three3d', lessons: 30, accent: 'accent-blue',
         tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Build immersive 3D web experiences',
         trackId: 'three3d' as TrackId },
       
