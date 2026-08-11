@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, Lock, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, CheckCircle2, ArrowUp } from 'lucide-react';
 
 const steps = [
   { key: 'name', question: 'What is your name?', placeholder: 'Enter your full name', type: 'text' },
@@ -14,46 +14,65 @@ const steps = [
 
 const Onboarding = () => {
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState<'up' | 'down'>('up');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { user, completeOnboarding } = useUser();
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout>();
 
-  // Ref array to trigger smooth scroll to specific question cards
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Auto-focus text/date inputs on step change
+  useEffect(() => {
+    if (!isTransitioning && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [currentIndex, isTransitioning]);
 
   if (!user) return null;
 
-  // Check if step at `index` is unlocked (all previous questions answered)
-  const isUnlocked = (index: number) => {
-    if (index === 0) return true;
-    for (let i = 0; i < index; i++) {
-      const val = answers[steps[i].key];
-      if (!val || val.trim().length === 0) return false;
-    }
-    return true;
+  const currentStep = steps[currentIndex];
+  const currentValue = answers[currentStep.key] || '';
+  const progress = ((currentIndex + (currentValue.trim() ? 1 : 0)) / steps.length) * 100;
+
+  const goToStep = (nextIndex: number) => {
+    if (nextIndex < 0 || nextIndex >= steps.length || isTransitioning) return;
+    setDirection(nextIndex > currentIndex ? 'up' : 'down');
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentIndex(nextIndex);
+      setIsTransitioning(false);
+    }, 400); // Match CSS transition duration
   };
 
-  const scrollToStep = (nextIndex: number) => {
-    if (nextIndex < steps.length && cardRefs.current[nextIndex]) {
-      setTimeout(() => {
-        cardRefs.current[nextIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 200);
-    }
-  };
-
-  const handleAnswerChange = (key: string, val: string, index: number) => {
+  const handleAnswer = (key: string, val: string, autoAdvance = false) => {
     setAnswers(prev => ({ ...prev, [key]: val }));
-    // Auto-scroll to next step on choice click
-    if (val.trim() && index < steps.length - 1) {
-      scrollToStep(index + 1);
+
+    if (autoAdvance && val.trim()) {
+      // Debounce text/date inputs so users can finish typing
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        goToStep(currentIndex + 1);
+      }, 800);
     }
   };
 
-  const completedCount = steps.filter(s => answers[s.key] && answers[s.key].trim().length > 0).length;
-  const isAllComplete = completedCount === steps.length;
+  const handleChoiceSelect = (key: string, val: string) => {
+    setAnswers(prev => ({ ...prev, [key]: val }));
+    // Instant advance for choices/cards
+    setTimeout(() => goToStep(currentIndex + 1), 150);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && currentValue.trim() && currentIndex < steps.length - 1) {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      goToStep(currentIndex + 1);
+    }
+  };
 
   const handleSubmit = async () => {
-    if (!isAllComplete || submitting) return;
+    if (currentIndex !== steps.length - 1 || !currentValue.trim() || submitting) return;
     setSubmitting(true);
     try {
       await completeOnboarding(answers);
@@ -64,201 +83,221 @@ const Onboarding = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background flex justify-center p-4 py-12 relative overflow-y-auto ambient-grid scroll-smooth">
-      <div className="absolute top-[-15%] left-[20%] w-[400px] h-[400px] rounded-full bg-primary/4 blur-[120px] pointer-events-none" />
+  // Animation classes based on transition state
+  const getCardAnimationClass = () => {
+    if (!isTransitioning) return 'translate-y-0 opacity-100 scale-100';
+    return direction === 'up'
+      ? '-translate-y-[120%] opacity-0 scale-95'
+      : 'translate-y-[120%] opacity-0 scale-95';
+  };
 
-      <div className="w-full max-w-lg relative z-10 animate-fade-in space-y-6 pb-20">
-        {/* Header */}
-        <div className="text-center mb-6 sticky top-0 bg-background/80 backdrop-blur-md py-4 z-20 border-b border-border/20">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center neon-glow border border-primary/20">
-              <Terminal className="w-5 h-5 text-primary" />
-            </div>
-            <span className="text-xl font-bold text-primary font-mono neon-text">CodeSage</span>
-          </div>
+  const getNextCardPreviewClass = () => {
+    if (!isTransitioning) return 'translate-y-[120%] opacity-0 scale-95';
+    return direction === 'up'
+      ? 'translate-y-0 opacity-100 scale-100'
+      : '-translate-y-0 opacity-100 scale-100';
+  };
 
-          {/* Progress bar */}
-          <div className="flex gap-1.5 max-w-xs mx-auto mt-3">
-            {steps.map((_, i) => (
-              <div
-                key={i}
-                className={`flex-1 h-1.5 rounded-full transition-all duration-500 ${
-                  answers[steps[i].key]?.trim()
-                    ? 'bg-primary neon-glow'
-                    : isUnlocked(i)
-                    ? 'bg-primary/30'
-                    : 'bg-secondary/40'
+  const renderInput = () => {
+    const commonInputClass =
+      'w-full bg-background/50 border border-border/60 rounded-2xl px-5 py-4 text-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:bg-secondary/20 focus:shadow-[0_0_20px_hsl(153,100%,50%,0.06)] transition-all font-mono';
+
+    switch (currentStep.type) {
+      case 'text':
+        return (
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder={currentStep.placeholder}
+            value={currentValue}
+            onChange={e => handleAnswer(currentStep.key, e.target.value, true)}
+            onKeyDown={handleKeyDown}
+            className={commonInputClass}
+            autoFocus
+          />
+        );
+
+      case 'date':
+        return (
+          <input
+            ref={inputRef as any}
+            type="date"
+            value={currentValue}
+            onChange={e => handleAnswer(currentStep.key, e.target.value, true)}
+            onKeyDown={handleKeyDown}
+            className={`${commonInputClass} cursor-pointer`}
+            autoFocus
+          />
+        );
+
+      case 'choice':
+        return (
+          <div className="space-y-2.5">
+            {currentStep.options?.map(opt => (
+              <button
+                key={opt}
+                onClick={() => handleChoiceSelect(currentStep.key, opt)}
+                className={`w-full text-left px-5 py-4 rounded-2xl border transition-all duration-200 text-base font-mono group ${
+                  currentValue === opt
+                    ? 'border-primary bg-primary/10 text-primary shadow-[0_0_15px_hsl(153,100%,50%,0.1)]'
+                    : 'border-border/40 bg-secondary/10 text-foreground hover:border-primary/30 hover:bg-secondary/20 hover:translate-x-1'
                 }`}
-              />
+              >
+                <span className="flex items-center justify-between">
+                  {opt}
+                  {currentValue === opt && <CheckCircle2 className="w-4 h-4" />}
+                </span>
+              </button>
             ))}
           </div>
+        );
+
+      case 'goalCards':
+        return (
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { val: 'Learn Code', icon: <Code2 className="w-8 h-8" /> },
+              { val: 'Edit Code Live', icon: <Pen className="w-8 h-8" /> },
+            ].map(g => (
+              <button
+                key={g.val}
+                onClick={() => handleChoiceSelect(currentStep.key, g.val)}
+                className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-200 group ${
+                  currentValue === g.val
+                    ? 'bg-primary/10 border-primary/40 shadow-[0_0_20px_hsl(153,100%,50%,0.1)]'
+                    : 'bg-secondary/10 border-border/30 hover:border-primary/20 hover:bg-secondary/20 hover:-translate-y-0.5'
+                }`}
+              >
+                <div className={`mb-3 transition-colors ${currentValue === g.val ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
+                  {g.icon}
+                </div>
+                <span className="font-semibold text-xs uppercase tracking-wider font-mono text-foreground">
+                  {g.val}
+                </span>
+              </button>
+            ))}
+          </div>
+        );
+
+      case 'expCards':
+        return (
+          <div className="space-y-2.5">
+            {[
+              { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5" /> },
+              { val: 'Experienced', icon: <Rocket className="w-5 h-5" /> },
+            ].map(e => (
+              <button
+                key={e.val}
+                onClick={() => handleChoiceSelect(currentStep.key, e.val)}
+                className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all duration-200 text-sm font-mono group ${
+                  currentValue === e.val
+                    ? 'border-primary/50 bg-primary/10 shadow-[0_0_15px_hsl(153,100%,50%,0.1)]'
+                    : 'border-border/40 bg-secondary/10 hover:border-primary/20 hover:bg-secondary/20 hover:translate-x-1'
+                }`}
+              >
+                <span className={`transition-colors ${currentValue === e.val ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
+                  {e.icon}
+                </span>
+                <span className="font-semibold uppercase tracking-wide text-foreground">{e.val}</span>
+                {currentValue === e.val && <CheckCircle2 className="w-4 h-4 ml-auto text-primary" />}
+              </button>
+            ))}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const isLastStep = currentIndex === steps.length - 1;
+  const canSubmit = isLastStep && currentValue.trim();
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden ambient-grid">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo Header */}
+        <div className="flex items-center justify-center gap-2 mb-10 animate-fade-in">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 neon-glow">
+            <Terminal className="w-5 h-5 text-primary" />
+          </div>
+          <span className="text-xl font-bold text-primary font-mono neon-text">CodeSage</span>
         </div>
 
-        {/* Questions Form Stack */}
-        {steps.map((s, index) => {
-          const unlocked = isUnlocked(index);
-          const currentVal = answers[s.key] || '';
-          const isFilled = currentVal.trim().length > 0;
-
-          return (
-            <div
-              key={s.key}
-              ref={el => (cardRefs.current[index] = el)}
-              className={`glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-500 transform ${
-                !unlocked
-                  ? 'opacity-40 grayscale pointer-events-none scale-95 border-border/20'
-                  : isFilled
-                  ? 'border-primary/40 bg-secondary/10'
-                  : 'border-primary/60 shadow-[0_0_20px_hsl(153,100%,50%,0.08)] scale-100'
-              }`}
-            >
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-
-              {/* Status Header */}
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">
-                  Question {index + 1} of {steps.length}
-                </p>
-
-                {isFilled ? (
-                  <span className="flex items-center gap-1 text-xs text-primary font-mono">
-                    <CheckCircle2 className="w-4 h-4" /> Answered
-                  </span>
-                ) : !unlocked ? (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
-                    <Lock className="w-3.5 h-3.5" /> Locked
-                  </span>
-                ) : null}
-              </div>
-
-              <h2 className="text-lg font-semibold text-foreground mb-4 font-mono">
-                {s.question}
-                {unlocked && !isFilled && <span className="text-primary animate-pulse">_</span>}
-              </h2>
-
-              {/* Text Input */}
-              {s.type === 'text' && (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    disabled={!unlocked}
-                    placeholder={s.placeholder}
-                    value={currentVal}
-                    onChange={e => setAnswers({ ...answers, [s.key]: e.target.value })}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && currentVal.trim() && index < steps.length - 1) {
-                        scrollToStep(index + 1);
-                      }
-                    }}
-                    className="w-full bg-secondary/40 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_12px_hsl(153,100%,50%,0.1)] transition-all text-sm font-mono"
-                  />
-                  {currentVal.trim() && index < steps.length - 1 && (
-                    <button
-                      onClick={() => scrollToStep(index + 1)}
-                      className="px-4 py-3 bg-primary/20 text-primary border border-primary/30 rounded-xl hover:bg-primary/30 transition-all font-mono text-xs font-bold"
-                    >
-                      Next
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Date Input */}
-              {s.type === 'date' && (
-                <div className="flex gap-2">
-                  <input
-                    type="date"
-                    disabled={!unlocked}
-                    value={currentVal}
-                    onChange={e => handleAnswerChange(s.key, e.target.value, index)}
-                    className="w-full bg-secondary/40 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm font-mono"
-                  />
-                </div>
-              )}
-
-              {/* Choice Buttons */}
-              {s.type === 'choice' && (
-                <div className="space-y-2">
-                  {s.options?.map(opt => (
-                    <button
-                      key={opt}
-                      disabled={!unlocked}
-                      onClick={() => handleAnswerChange(s.key, opt, index)}
-                      className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm font-mono ${
-                        currentVal === opt
-                          ? 'border-primary/50 bg-primary/10 text-primary neon-border'
-                          : 'border-border/40 bg-secondary/20 text-foreground hover:border-primary/20 hover:bg-secondary/30'
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Goal Cards */}
-              {s.type === 'goalCards' && (
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { val: 'Learn Code', icon: <Code2 className="w-8 h-8 text-primary" /> },
-                    { val: 'Edit Code Live', icon: <Pen className="w-8 h-8 text-primary" /> },
-                  ].map(g => (
-                    <button
-                      key={g.val}
-                      disabled={!unlocked}
-                      onClick={() => handleAnswerChange(s.key, g.val, index)}
-                      className={`flex flex-col items-center justify-center p-6 rounded-xl border transition-all ${
-                        currentVal === g.val
-                          ? 'bg-primary/10 border-primary/30 neon-border'
-                          : 'bg-secondary/20 border-border/40 hover:border-primary/20'
-                      }`}
-                    >
-                      <div className="mb-2">{g.icon}</div>
-                      <span className="font-semibold text-xs text-foreground uppercase tracking-wide font-mono">
-                        {g.val}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Experience Level Cards */}
-              {s.type === 'expCards' && (
-                <div className="space-y-2">
-                  {[
-                    { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5 text-primary" /> },
-                    { val: 'Experienced', icon: <Rocket className="w-5 h-5 text-primary" /> },
-                  ].map(e => (
-                    <button
-                      key={e.val}
-                      disabled={!unlocked}
-                      onClick={() => handleAnswerChange(s.key, e.val, index)}
-                      className={`w-full flex items-center gap-3 px-5 py-4 rounded-xl border transition-all text-sm font-mono ${
-                        currentVal === e.val
-                          ? 'border-primary/50 bg-primary/10 neon-border'
-                          : 'border-border/40 bg-secondary/20 hover:bg-secondary/30'
-                      }`}
-                    >
-                      {e.icon}
-                      <span className="font-semibold text-foreground uppercase tracking-wide">{e.val}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+        {/* Card Viewport - Fixed height container for smooth transitions */}
+        <div className="relative h-[420px] perspective-1000">
+          {/* Current / Exiting Card */}
+          <div
+            className={`absolute inset-0 glass-card rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] ${getCardAnimationClass()}`}
+          >
+            {/* Integrated Progress Bar */}
+            <div className="w-full h-1 bg-secondary/30 rounded-full mb-6 overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-500 ease-out neon-glow"
+                style={{ width: `${progress}%` }}
+              />
             </div>
-          );
-        })}
 
-        {/* Submit Button */}
-        <button
-          onClick={handleSubmit}
-          disabled={!isAllComplete || submitting}
-          className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:neon-glow disabled:opacity-30 transition-all text-sm font-mono uppercase tracking-wider shadow-lg sticky bottom-4 z-20"
-        >
-          {submitting ? 'Submitting...' : 'start()'}
-          <ChevronRight className="w-4 h-4" />
-        </button>
+            {/* Question Counter */}
+            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-mono mb-3">
+              Step {currentIndex + 1} / {steps.length}
+            </p>
+
+            {/* Question Title */}
+            <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight">
+              {currentStep.question}
+              {!isTransitioning && <span className="text-primary animate-pulse ml-0.5">_</span>}
+            </h2>
+
+            {/* Input Area */}
+            <div className="flex-1 flex flex-col justify-center">
+              {renderInput()}
+            </div>
+
+            {/* Manual Next Hint for text/date */}
+            {(currentStep.type === 'text' || currentStep.type === 'date') && currentValue.trim() && !isTransitioning && (
+              <div className="mt-4 flex items-center justify-end gap-1.5 text-xs text-muted-foreground font-mono animate-fade-in">
+                Press Enter or wait
+                <ArrowUp className="w-3 h-3 rotate-90" />
+              </div>
+            )}
+          </div>
+
+          {/* Incoming Card Preview (only visible during transition) */}
+          {isTransitioning && currentIndex + 1 < steps.length && (
+            <div
+              className={`absolute inset-0 glass-card rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] ${getNextCardPreviewClass()}`}
+            >
+              <div className="w-full h-1 bg-secondary/30 rounded-full mb-6 overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${((currentIndex + 1) / steps.length) * 100}%` }}
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-mono mb-3">
+                Step {currentIndex + 2} / {steps.length}
+              </p>
+              <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight">
+                {steps[currentIndex + 1].question}
+              </h2>
+            </div>
+          )}
+        </div>
+
+        {/* Submit Button - Only shows on last step when answered */}
+        <div className={`mt-6 transition-all duration-300 ${canSubmit ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+          <button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:neon-glow disabled:opacity-50 transition-all text-sm font-mono uppercase tracking-widest shadow-[0_4px_30px_hsl(153,100%,50%,0.2)]"
+          >
+            {submitting ? 'Initializing...' : 'start()'}
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
