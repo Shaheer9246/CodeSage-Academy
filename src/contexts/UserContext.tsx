@@ -230,7 +230,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         console.error('Profile fetch error:', error.message);
       }
       if (data) {
-        setUser(dbRowToProfile(data, authUser.email || ''));
+        let row = data;
+        // Retry any completions that failed to reach the server earlier.
+        const pending = readPending();
+        if (pending.length) {
+          const stillPending: string[] = [];
+          for (const id of pending) {
+            const { data: awarded, error: awardErr } = await supabase.rpc('award_lesson', { _lesson_id: id });
+            if (awardErr) stillPending.push(id);
+            else if (awarded) row = (Array.isArray(awarded) ? awarded[0] : awarded) as typeof data;
+          }
+          writePending(stillPending);
+        }
+        setUser(dbRowToProfile(row, authUser.email || ''));
       } else {
         const defaultProfile = buildDefaultProfile();
         const { error: insertError } = await supabase.from('profiles').insert({
