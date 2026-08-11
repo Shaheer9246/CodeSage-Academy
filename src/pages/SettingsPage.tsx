@@ -124,7 +124,7 @@ const SettingsPage = () => {
       console.warn('Failed to persist autoRun setting', error);
     }
   }, [autoRun]);
-  useEffect(() => onEnrollmentChange(() => setEnfrollTick(t => t + 1)), []);
+  useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
 
   const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
 
@@ -756,11 +756,7 @@ const SettingsPage = () => {
 
     {/* Streak Modal Popup */}
       {user && (
-        <StreakModal
-          isOpen={showStreakModal}
-          onClose={() => setShowStreakModal(false)}
-          user={user}
-        />
+        <StreakModal streakCount={user.streakCount} />
       )}
 
     </div>

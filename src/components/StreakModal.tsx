@@ -74,7 +74,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
       opacity: 1, 
       y: 0, 
       scale: 1,
-      transition: { type: 'spring', stiffness: 300, damping: 25 }
+      transition: { type: 'spring' as const, stiffness: 300, damping: 25 }
     },
     exit: { opacity: 0, y: 10, scale: 0.95, transition: { duration: 0.15 } }
   };
@@ -106,7 +106,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.1, type: 'spring' as const, stiffness: 200 }}
               className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/10 border border-orange-500/20 flex items-center justify-center relative"
             >
               <Flame className="w-8 h-8 text-orange-500" fill="currentColor" />

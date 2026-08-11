@@ -335,7 +335,7 @@ const Dashboard = () => {
 
   const displayName = user?.name || 'Explorer';
   const xp = user?.xp || 0;
-  const streak = user?.streakCount ?? user?.streak ?? 0;
+  const streak = user?.streakCount ?? 0;
 
   /* Total tracks / enrolled for HUD */
   const allTracks = useMemo(() => SECTIONS.flatMap(s => s.tracks), []);
