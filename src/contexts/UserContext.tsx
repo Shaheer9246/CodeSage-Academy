@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { toast } from '@/hooks/use-toast';
 
 export interface UserProfile {
   id: string;
@@ -162,6 +163,31 @@ function readCachedProfile(): UserProfile | null {
   } catch { return null; }
 }
 
+// --- Offline-safe lesson completion queue -------------------------------
+// If award_lesson fails (expired token, flaky network), the completion is
+// parked here and retried on the next load, so progress is never silently
+// lost after a refresh.
+const PENDING_KEY = 'codesage_pending_lessons';
+
+function readPending(): string[] {
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    const arr = raw ? (JSON.parse(raw) as string[]) : [];
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'string') : [];
+  } catch { return []; }
+}
+
+function writePending(ids: string[]) {
+  try {
+    if (ids.length) localStorage.setItem(PENDING_KEY, JSON.stringify([...new Set(ids)]));
+    else localStorage.removeItem(PENDING_KEY);
+  } catch { /* ignore */ }
+}
+
+function queuePending(id: string) {
+  writePending([...readPending(), id]);
+}
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Hydrate synchronously from cache so we never flash "initializing CodeSage"
   // for a user that's already signed in.
@@ -205,7 +231,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         console.error('Profile fetch error:', error.message);
       }
       if (data) {
-        setUser(dbRowToProfile(data, authUser.email || ''));
+        let row = data;
+        // Retry any completions that failed to reach the server earlier.
+        const pending = readPending();
+        if (pending.length) {
+          const stillPending: string[] = [];
+          for (const id of pending) {
+            const { data: awarded, error: awardErr } = await supabase.rpc('award_lesson', { _lesson_id: id });
+            if (awardErr) stillPending.push(id);
+            else if (awarded) row = (Array.isArray(awarded) ? awarded[0] : awarded) as typeof data;
+          }
+          writePending(stillPending);
+        }
+        setUser(dbRowToProfile(row, authUser.email || ''));
       } else {
         const defaultProfile = buildDefaultProfile();
         const { error: insertError } = await supabase.from('profiles').insert({
@@ -360,14 +398,26 @@ useEffect(() => {
     });
 
     // Server-authoritative write via the idempotent award_lesson RPC.
-    // Using array_append server-side eliminates the read-modify-write race
-    // that previously wiped earlier completions (e.g. py-01) on rapid sequential completes.
-    const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
-    if (error) {
-      console.error('award_lesson failed:', error.message);
-      return;
+    // Retry a couple of times before parking it in the pending queue, so a
+    // flaky connection or a just-expired token can never silently drop XP.
+    let lastError: string | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
+      if (!error) {
+        if (data) applyServerProfile(data);
+        return;
+      }
+      lastError = error.message;
+      await new Promise(r => setTimeout(r, 600 * (attempt + 1)));
     }
-    if (data) applyServerProfile(data);
+
+    console.error('award_lesson failed:', lastError);
+    queuePending(lessonId);
+    toast({
+      title: 'Progress saved locally',
+      description: "We couldn't reach the server. Your lesson will sync automatically next time you open CodeSage.",
+      variant: 'destructive',
+    });
   };
 
   const completeTest = async (testId: string) => {
