@@ -213,14 +213,14 @@ const SECTIONS: SectionDef[] = [
 ];
 
 /* ---------- Section collapse persistence ---------- */
-const COLLAPSE_KEY = 'dash.sections.collapsed.v1';
+const COLLAPSE_KEY = 'dash.sections.collapsed.v2'; // Changed to v2 to reset old caches
 function loadCollapsed(): Record<string, boolean> {
   try {
     const raw = localStorage.getItem(COLLAPSE_KEY);
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
-  // First visit: keep the catalog tidy — everything folded, nothing overwhelming.
-  return Object.fromEntries(SECTIONS.map(s => [s.id, true]));
+  // First visit: keep everything EXPANDED by default so the Tour can find the targets!
+  return Object.fromEntries(SECTIONS.map(s => [s.id, false]));
 }
 
 const Dashboard = () => {
