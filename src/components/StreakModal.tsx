@@ -2,11 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, X, Sparkles, Check } from 'lucide-react';
 
-/**
- * ==============================================================================
- * DEV_QUOTES: Encouraging, coding-focused quotes
- * ==============================================================================
- */
+
 const DEV_QUOTES = [
   "Consistency compiles success.",
   "Small daily commits lead to major releases.",
