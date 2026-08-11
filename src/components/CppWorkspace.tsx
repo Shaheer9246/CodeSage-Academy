@@ -22,16 +22,20 @@ interface CppWorkspaceProps {
   };
 }
 
-// Lightweight C++ interpreter loaded from CDN
-const JSCPP_MAIN = 'https://cdn.jsdelivr.net/npm/JSCPP@2.0.9/dist/JSCPP.es5.min.js';
+// FIX 1: The 2.0.9 npm package is missing the 'dist' folder on jsDelivr, causing a 404.
+// Using 2.0.6 which is confirmed to have the dist folder [[25]].
+const JSCPP_MAIN = 'https://cdn.jsdelivr.net/npm/JSCPP@2.0.6/dist/JSCPP.es5.min.js';
 
-// Web Worker script: Runs in the background so the UI never freezes.
-// No SharedArrayBuffer needed! It just takes the pre-filled input string and runs to completion.
+// FIX 2: Web Workers don't have a 'window' object. UMD scripts often crash with "window is not defined".
+// We alias 'self' to 'window' before importing the script to prevent this crash.
 const WORKER_CODE = `
   try {
-    importScripts("https://cdn.jsdelivr.net/npm/JSCPP@2.0.9/dist/JSCPP.es5.min.js");
+    if (typeof window === 'undefined') {
+      self.window = self;
+    }
+    importScripts("${JSCPP_MAIN}");
   } catch (e) {
-    self.postMessage({ type: 'error', error: 'Failed to load C++ interpreter.' });
+    self.postMessage({ type: 'error', error: 'Failed to load C++ interpreter: ' + (e.message || e) });
   }
 
   self.onmessage = function(e) {
@@ -42,9 +46,8 @@ const WORKER_CODE = `
           write: (s) => self.postMessage({ type: 'out', text: s })
         },
         unsigned_overflow: "warn",
-        maxTimeout: 5000 // Prevent infinite loops from crashing the tab
+        maxTimeout: 5000
       };
-      // Run the code with the pre-filled input
       const exitCode = JSCPP.run(code, input, config);
       self.postMessage({ type: 'done', exitCode });
     } catch (err) {
@@ -72,8 +75,11 @@ function loadScript(src: string): Promise<void> {
   });
 }
 
+// FIX 3: Return a 'failed' state so the UI doesn't get stuck on "Loading..." forever if the CDN fails.
 function useJSCPP(enabled: boolean) {
   const [ready, setReady] = useState<boolean>(typeof window !== 'undefined' && !!window.JSCPP);
+  const [failed, setFailed] = useState(false);
+
   useEffect(() => {
     if (ready || !enabled) return;
     let cancelled = false;
@@ -81,18 +87,22 @@ function useJSCPP(enabled: boolean) {
       try {
         await loadScript(JSCPP_MAIN);
         if (!cancelled) setReady(true);
-      } catch {
-        /* handled by UI */
+      } catch (err) {
+        console.error("Failed to load JSCPP script:", err);
+        if (!cancelled) {
+          setReady(true); // Allow the user to click the button and see the terminal error
+          setFailed(true);
+        }
       }
     })();
     return () => { cancelled = true; };
   }, [ready, enabled]);
-  return ready;
+  
+  return { ready, failed };
 }
 
 type Line = { kind: 'out' | 'err' | 'in' | 'sys'; text: string };
 
-// Default starter code that works perfectly with the default input "World"
 const DEFAULT_STARTER = `#include <iostream>
 using namespace std;
 
@@ -110,7 +120,6 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
   const initial = initialCode ?? starterCode ?? DEFAULT_STARTER;
   const [code, setCode] = useState(initial);
   
-  // Standard Input state: User provides this BEFORE running
   const [inputText, setInputText] = useState('World'); 
   
   const [lines, setLines] = useState<Line[]>([{ kind: 'sys', text: '$ C++ (JSCPP in-browser interpreter) — press ▶ Run Code to start.' }]);
@@ -119,7 +128,7 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
   
   const termRef = useRef<HTMLDivElement>(null);
   const [wantLoad] = useState<boolean>(true);
-  const ready = useJSCPP(wantLoad);
+  const { ready, failed } = useJSCPP(wantLoad);
 
   useEffect(() => {
     if (onCodeChange) onCodeChange(code);
@@ -150,6 +159,12 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
 
   const runCode = async () => {
     if (!ready || running) return;
+    
+    if (failed || !window.JSCPP) {
+        write('err', 'Failed to load C++ interpreter. Please check your internet connection or try refreshing the page.');
+        return;
+    }
+
     if (!embedded) setTab('term');
     setRunning(true);
     write('sys', '$ g++ main.cpp && ./a.out');
@@ -164,8 +179,6 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
     try {
       let runOnMainThread = false;
       
-      // We use a standard Web Worker to keep the UI buttery smooth.
-      // No SharedArrayBuffer required because we pass the whole input string at once!
       try {
         const blob = new Blob([WORKER_CODE], { type: 'application/javascript' });
         workerUrl = URL.createObjectURL(blob);
@@ -175,7 +188,7 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
           let timeoutId: any = setTimeout(() => {
             runOnMainThread = true;
             resolveRun();
-          }, 6000); // Fallback timeout
+          }, 6000); 
 
           worker!.onmessage = (e) => {
             clearTimeout(timeoutId);
@@ -200,11 +213,21 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
 
         if (runOnMainThread) throw new Error("Fallback to main thread");
       } catch (err) {
-        // Fallback: If CSP blocks Blob workers, run on main thread
         console.warn("Worker blocked or failed, running on main thread.", err);
         await new Promise(resolve => setTimeout(resolve, 50)); 
-        if (!window.JSCPP) await loadScript(JSCPP_MAIN);
+        
+        // FIX 4: Robust main thread fallback
+        if (!window.JSCPP) {
+            try {
+                await loadScript(JSCPP_MAIN);
+            } catch (e) {
+                throw new Error("Failed to load C++ interpreter on main thread.");
+            }
+        }
+        
         const JSCPP = window.JSCPP;
+        if (!JSCPP) throw new Error("JSCPP global not found after loading script.");
+
         const config = {
           stdio: { write: (s: string) => write('out', s) },
           unsigned_overflow: "warn",
@@ -250,12 +273,10 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
         </div>
       </div>
 
-      {/* Editor */}
       <div className={`${embedded ? 'flex-1 min-h-0' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
         <CodeEditor code={code} onChange={handleCodeChange} language="cpp" showShortcuts={false} />
       </div>
 
-      {/* Tabs - Hide if embedded */}
       {!embedded && (
         <div className="flex border-b border-border/30 bg-secondary/20">
           <button
@@ -277,7 +298,6 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
         </div>
       )}
 
-      {/* Panels */}
       {(!embedded && tab === 'assign' && practical) ? (
         <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto">
           <div>
@@ -306,7 +326,6 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
       ) : (
         <div className={`flex flex-col bg-zinc-950 ${embedded ? 'flex-1 min-h-[120px]' : 'max-h-[300px] min-h-[180px]'}`}>
           
-          {/* Standard Input Box (Cleanly integrated into the terminal area) */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800 bg-zinc-900/50">
             <Keyboard className="w-3 h-3 text-zinc-500" />
             <span className="text-[10px] text-zinc-400 font-mono uppercase">Stdin:</span>
@@ -318,7 +337,6 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
             />
           </div>
 
-          {/* Terminal Output */}
           <div
             ref={termRef}
             className="text-emerald-300 font-mono text-[11px] leading-relaxed p-3 overflow-y-auto flex-1"
