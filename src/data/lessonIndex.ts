@@ -48,7 +48,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   'intermediate-ai': ids(INTERMEDIATE_AI_LESSONS),
   three3d: ids(THREE3D_LESSONS),
   java: ids(JAVA_LESSONS),
-  cpp: ids(CPP_LESSONS.filter(l => !('type' in l))),
+  cpp: ids(CPP_LESSONS),
 };
 
 export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
