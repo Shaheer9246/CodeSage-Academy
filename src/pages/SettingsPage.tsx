@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
+import { StreakModal } from "@/components/StreakModal";
 import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
@@ -107,6 +108,7 @@ const SettingsPage = () => {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
   const [showAllBadges, setShowAllBadges] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   // Force re-render when enrollment state changes (pause/resume/end)
   const [, setEnrollTick] = useState(0);
@@ -122,7 +124,7 @@ const SettingsPage = () => {
       console.warn('Failed to persist autoRun setting', error);
     }
   }, [autoRun]);
-  useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
+  useEffect(() => onEnrollmentChange(() => setEnfrollTick(t => t + 1)), []);
 
   const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
 
@@ -297,21 +299,35 @@ const SettingsPage = () => {
 
         {/* Streak Section */}
         <div className="glass-card rounded-2xl p-5">
-          <h3 className="text-sm font-bold font-display flex items-center gap-2 mb-3">
-            <Flame className="w-4 h-4 text-primary" /> Coding Streak
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold font-display flex items-center gap-2">
+              <Flame className="w-4 h-4 text-orange-500 fill-orange-500" /> Coding Streak
+            </h3>
+            <button
+              onClick={() => setShowStreakModal(true)}
+              className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+            >
+              Show Streak Card
+            </button>
+          </div>
+
           <div className="flex items-end gap-2 mb-3">
             <span className="text-4xl font-bold text-primary font-display neon-text">{user.streakCount}</span>
             <span className="text-sm text-muted-foreground mb-1">days</span>
           </div>
+
           <div className="flex gap-2 justify-center">
             {streakDays.map((d, i) => (
               <div key={i} className="flex flex-col items-center gap-1">
                 <span className="text-[9px] text-muted-foreground">{d.day}</span>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs ${
-                  d.active ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary/30 text-muted-foreground border border-border/20'
-                }`}>
-                  {d.active ? <Check className="w-3.5 h-3.5" /> : ''}
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-all ${
+                    d.active
+                      ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30'
+                      : 'bg-secondary/30 text-muted-foreground/30 border border-border/20'
+                  }`}
+                >
+                  <Flame className={`w-3.5 h-3.5 ${d.active ? 'fill-orange-500 text-orange-500' : 'text-muted-foreground/30'}`} />
                 </div>
               </div>
             ))}
