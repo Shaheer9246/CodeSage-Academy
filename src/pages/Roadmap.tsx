@@ -502,7 +502,8 @@ const Roadmap = () => {
       <div className="pointer-events-none absolute -top-32 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/5 blur-[140px]" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-primary/5 blur-[100px]" />
 
-<div className="relative z-10 mx-auto max-w-4xl px-3 py-6 sm:px-6 sm:py-8 overflow-x-hidden">
+
+<div className="relative z-10 mx-auto max-w-4xl lg:max-w-6xl px-3 py-6 sm:px-6 sm:py-8 overflow-x-hidden">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
