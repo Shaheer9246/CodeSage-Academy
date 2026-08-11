@@ -142,7 +142,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-orange-500/70 via-red-500/60 to-amber-500/70',
     tracks: [
       { id: 'java', path: '/java?from=dashboard', title: 'Java Development', emoji: '☕',
-        tour: 'java', lessons: 20, accent: 'orange-500',
+        tour: 'java', lessons: 30, accent: 'orange-500',
         tags: ['Syntax', 'OOP', 'Collections', 'Streams'], desc: 'Core Java → OOP → Backend Basics',
         trackId: 'java' as TrackId },
     ],
