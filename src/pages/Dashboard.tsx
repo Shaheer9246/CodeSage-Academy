@@ -25,7 +25,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
   { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
-  { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Expert.' },
+  { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Advance.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
   { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
