@@ -65,7 +65,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-sky-400/70 via-cyan-400/60 to-blue-500/70',
     tracks: [
       { id: 'networking', path: '/networking?from=dashboard', title: 'Computer & Networking', emoji: '🌐',
-        tour: 'networking', lessons: 13, accent: 'accent-blue',
+        tour: 'networking', lessons: 30, accent: 'accent-blue',
         tags: ['Hardware', 'OS', 'DNS', 'HTTP'], desc: 'Hardware → OS → Networking → Security',
         trackId: 'networking' },
     ],
@@ -125,7 +125,7 @@ const SECTIONS: SectionDef[] = [
         title: 'Intermediate AI', 
         emoji: '🤖',
         tour: 'intermediate-ai', 
-        lessons: 10,
+        lessons: 30,
         accent: 'primary',
         tags: ['PEFT', 'LoRA', 'RAG', 'Fine-Tuning'], 
         desc: 'Deepen knowledge in fine-tuning, RAG, vector DBs & production AI', 
@@ -186,7 +186,7 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-emerald-400/70 via-teal-400/60 to-cyan-500/70',
     tracks: [
       { id: 'sql', path: '/sql?from=dashboard', title: 'SQL & PostgreSQL: Backend Database Engineering', emoji: '🛢️',
-        tour: 'sql', lessons: 18, accent: 'emerald-500',
+        tour: 'sql', lessons: 30, accent: 'emerald-500',
         tags: ['Queries', 'Joins', 'Schemas'], desc: 'Queries → Joins → DB Design',
         trackId: 'sql' as TrackId },
     ],
@@ -199,12 +199,12 @@ const SECTIONS: SectionDef[] = [
     gradient: 'from-yellow-300/70 via-yellow-500/60 to-orange-400/70',
     tracks: [
       { id: 'freelance', path: '/freelance?from=dashboard', title: 'Freelance & Clients (Understanding)', emoji: '💼',
-        tour: 'freelance', lessons: 12, accent: 'yellow-500',
+        tour: 'freelance', lessons: 30, accent: 'yellow-500',
         tags: ['Niche', 'Pitch', 'Price', 'Deliver'], desc: 'Find → Pitch → Deliver',
         trackId: 'freelance' },
 
       { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing (methods)', emoji: '🌍',
-        tour: 'real-freelance', lessons: 10, accent: 'primary',
+        tour: 'real-freelance', lessons: 30, accent: 'primary',
         tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'Master platforms & win clients',
         trackId: 'real-freelance' as TrackId },
     ],
