@@ -694,6 +694,8 @@ const SettingsPage = () => {
               </button>
             </div>
 
+            
+
             <div className="space-y-3">
               <div>
                 <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Name</label>
@@ -750,6 +752,15 @@ const SettingsPage = () => {
             </button>
           </div>
         </div>
+      )}
+
+    {/* Streak Modal Popup */}
+      {user && (
+        <StreakModal
+          isOpen={showStreakModal}
+          onClose={() => setShowStreakModal(false)}
+          user={user}
+        />
       )}
 
     </div>
