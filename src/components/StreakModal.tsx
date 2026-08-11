@@ -60,12 +60,18 @@ function useStreakMonitor(): UseStreakMonitorReturn {
  */
 interface StreakModalProps {
   streakCount: number;
+  /** Force the modal open (e.g. from a "view streak" button). */
+  forceOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function StreakModal({ streakCount }: StreakModalProps) {
+export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProps) {
   const { isOpen, quote, todayIdx, daysOfWeek, closeModal } = useStreakMonitor();
 
-  if (!isOpen) return null;
+  const open = isOpen || !!forceOpen;
+  const close = () => { closeModal(); onClose?.(); };
+
+  if (!open) return null;
 
   // Soft spring animation for a premium feel
   const modalVariants = {
@@ -95,7 +101,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
 
           {/* Close Button */}
           <button
-            onClick={closeModal}
+            onClick={close}
             className="absolute top-3 right-3 text-muted-foreground/60 hover:text-foreground p-1.5 rounded-full hover:bg-secondary/80 transition-colors z-10"
           >
             <X className="w-3.5 h-3.5" />
@@ -170,7 +176,7 @@ export function StreakModal({ streakCount }: StreakModalProps) {
 
             {/* CTA Button */}
             <button
-              onClick={closeModal}
+              onClick={close}
               className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-3 hover:opacity-90 active:scale-[0.98] transition-all text-sm shadow-lg shadow-primary/10 flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4" />

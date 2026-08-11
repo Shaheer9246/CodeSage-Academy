@@ -756,7 +756,7 @@ const SettingsPage = () => {
 
     {/* Streak Modal Popup */}
       {user && (
-        <StreakModal streakCount={user.streakCount} />
+        <StreakModal streakCount={user.streakCount} forceOpen={showStreakModal} onClose={() => setShowStreakModal(false)} />
       )}
 
     </div>
