@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { toast } from '@/hooks/use-toast';
 
 export interface UserProfile {
   id: string;
