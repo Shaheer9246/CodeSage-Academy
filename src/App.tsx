@@ -10,6 +10,8 @@ import Welcome from "./pages/Welcome";
 import Trip from "./pages/Trip";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Admin from "./pages/Admin";
 import ResetPassword from "./pages/ResetPassword";
 
 import Onboarding from "./pages/Onboarding";
@@ -162,6 +164,7 @@ const App = () => (
               <Route path="/suggestions" element={<ProtectedRoute><Suggestions /></ProtectedRoute>} />
               <Route path="/games/crawler" element={<ProtectedRoute><CodeCrawler /></ProtectedRoute>} />
               <Route path="/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="/pythonexpert" element={<ProtectedRoute><PythonExpertLearn /></ProtectedRoute>} />
               <Route path="/pyx-lesson/:id" element={<ProtectedRoute><PythonExpertLessonPage /></ProtectedRoute>} />
               <Route path="/ai-fundamentals" element={<ProtectedRoute><AiFundamentalsLearn /></ProtectedRoute>} />
@@ -175,7 +178,7 @@ const App = () => (
               <Route path="/" element={<Welcome />} />
               <Route path="/trip" element={<Trip />} />
               <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
 
               <Route path="*" element={<NotFound />} />
