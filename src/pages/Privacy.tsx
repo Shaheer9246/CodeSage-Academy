@@ -1,11 +1,22 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Eye, Server, Award, UserCheck, AlertCircle } from 'lucide-react';
 import { useEffect } from 'react';
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="mb-7">
-    <h2 className="font-display text-base font-semibold text-foreground mb-2">{title}</h2>
-    <div className="text-sm text-muted-foreground leading-relaxed space-y-2">{children}</div>
+const Section = ({ 
+  title, 
+  icon: Icon, 
+  children 
+}: { 
+  title: string; 
+  icon?: React.ElementType; 
+  children: React.ReactNode 
+}) => (
+  <section className="mb-8 bg-secondary/20 border border-border/50 rounded-2xl p-5 transition-all hover:border-border/80">
+    <div className="flex items-center gap-2 mb-3">
+      {Icon && <Icon className="w-4 h-4 text-primary" />}
+      <h2 className="font-display text-base font-bold text-foreground">{title}</h2>
+    </div>
+    <div className="text-sm text-muted-foreground leading-relaxed space-y-2.5">{children}</div>
   </section>
 );
 
@@ -17,118 +28,122 @@ const Privacy = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-5 py-8">
+    <div className="min-h-screen bg-background text-foreground py-10 px-4 sm:px-6">
+      <div className="max-w-2xl mx-auto">
+        
+        {/* Navigation Back */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-primary transition-colors mb-6"
+          className="flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </button>
 
-        <div className="flex items-center gap-2 mb-1">
-          <Shield className="w-5 h-5 text-primary" />
-          <h1 className="font-display text-2xl font-bold">Privacy Policy &amp; Terms</h1>
+        {/* Page Header */}
+        <div className="border-b border-border/60 pb-6 mb-8">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary">
+              <Shield className="w-6 h-6" />
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">Privacy Policy & Terms</h1>
+          </div>
+          <p className="text-xs font-mono text-muted-foreground">
+            Maintained by the CodeSage team • Last updated August 2026
+          </p>
         </div>
-        <p className="text-xs font-mono text-muted-foreground mb-8">
-          Maintained by the CodeSage team · Last updated 2 August 2026
-        </p>
 
-        <Section title="Who we are">
+        {/* Section 1: Platform Overview */}
+        <Section title="1. Who We Are" icon={Shield}>
           <p>
-            CodeSage is a free coding learning platform for students. All lessons, challenges and exams
-            on this platform are original content written by the CodeSage team.
+            CodeSage is an interactive educational platform designed for students and developers to learn programming. All curriculum, code challenges, streak structures, and exams hosted on CodeSage are proprietary, original content created by our team.
           </p>
         </Section>
 
-        <Section title="What we collect">
-          <p>When you create an account, we store:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Your email address and username (used for sign-in and your profile).</li>
-            <li>Onboarding answers you choose to give (goal, experience level, study status).</li>
-            <li>Learning progress: completed lessons, tests, XP, level, streak, badges and enrolled tracks.</li>
-            <li>Anything you post yourself, such as suggestions and votes.</li>
+        {/* Section 2: Data Collection */}
+        <Section title="2. Information We Collect" icon={Eye}>
+          <p>To provide personal progress tracking and account authorization, we collect:</p>
+          <ul className="list-disc pl-5 space-y-1.5 marker:text-primary">
+            <li><strong className="text-foreground">Identity Data:</strong> Email address, name, and username provided during sign-up.</li>
+            <li><strong className="text-foreground">Onboarding Preferences:</strong> Educational status, experience level, and learning goals.</li>
+            <li><strong className="text-foreground">Activity & Progress:</strong> Completed lessons, test scores, XP, level status, streak logs, badges, and enrolled tracks.</li>
+            <li><strong className="text-foreground">User Contributions:</strong> Suggestions, votes, and community feedback submitted to the platform.</li>
+          </ul>
+          <p className="pt-1 text-xs text-muted-foreground/80 font-mono">
+            We do not collect sensitive payment financial details directly, nor do we sell personal data to third parties.
+          </p>
+        </Section>
+
+        {/* Section 3: Data Usage */}
+        <Section title="3. How We Use Your Data" icon={Award}>
+          <p>
+            Collected information is strictly used to run and safeguard CodeSage:
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5 marker:text-primary">
+            <li>Syncing learning progress across your devices and calculating daily streaks.</li>
+            <li>Unlocking curriculum sections based on completed prerequisites.</li>
+            <li>Ranking community feedback and delivering in-app announcements.</li>
           </ul>
           <p>
-            We do not collect payment details, we do not sell your data, and we never post anything on your
-            behalf.
+            Aggregated, non-identifiable statistics (such as overall enrollment counts per track) may be displayed publicly.
           </p>
         </Section>
 
-        <Section title="How we use it">
+        {/* Section 4: Security & Storage */}
+        <Section title="4. Storage & Infrastructure Security" icon={Server}>
           <p>
-            Your data is used only to run the platform: to show your progress, unlock the next lesson, keep
-            your streak, rank community suggestions, and send you in-app announcements. Aggregated,
-            non-identifying counts (for example how many students joined a track) may be shown publicly.
+            Your account and progress records are stored in a managed cloud database enforced by strict <strong className="text-foreground">Row-Level Security (RLS)</strong> policies, ensuring your private data can only be accessed or modified by your authenticated session.
           </p>
-        </Section>
-
-        <Section title="Where it is stored">
           <p>
-            Accounts and progress are stored in our managed cloud database and protected by row-level access
-            rules, so each account can read and write only its own records. Passwords are handled by the
-            authentication provider and are never visible to us. Some preferences (theme, playground code,
-            editor settings) stay in your browser's local storage only.
+            Passwords are encrypted and processed by our authentication provider and are never stored in plaintext or readable by platform administrators. Client-side preferences (such as dark mode toggles or playground drafts) remain stored locally in your browser’s <code className="text-xs bg-secondary px-1.5 py-0.5 rounded font-mono">localStorage</code>.
           </p>
         </Section>
 
-        <Section title="Advertising and analytics">
-          <p>
-            CodeSage is free to use. We may display advertising to cover hosting costs. Ad providers can set
-            their own cookies or device identifiers to measure and serve ads. We do not share your email,
-            username or learning progress with advertisers. You can control cookies through your browser
-            settings.
-          </p>
-        </Section>
-
-        <Section title="Your rights">
-          <p>
-            You can edit your profile at any time from Settings, and you can delete your account from
-            Settings — deleting removes your profile, progress and enrolments. If you need help, contact us
-            using the contact page.
-          </p>
-        </Section>
-
-        <Section title="Children">
-          <p>
-            CodeSage is intended for students aged 13 and above. If you believe a younger child has created an
-            account, contact us and we will remove it.
-          </p>
-        </Section>
-
-        <Section title="Terms of use">
-          <ul className="list-disc pl-5 space-y-1">
-            <li>One account per person. Do not share accounts or attempt to farm XP through automation.</li>
+        {/* Section 5: Account Integrity & Anti-Sharing Terms */}
+        <Section title="5. Account Rules & Single-User License" icon={Lock}>
+          <ul className="list-disc pl-5 space-y-2 marker:text-primary">
             <li>
-              Lessons, challenges, exams and artwork on CodeSage are our original work. You may use them to
-              learn; you may not republish, resell or redistribute them.
-            </li>
-            <li>Code you write in the playground stays yours.</li>
-            <li>
-              Keep community suggestions respectful. Abusive, spam or illegal content may be removed and the
-              account suspended.
+              <strong className="text-foreground">Single-User Access:</strong> Each account is assigned to an individual user. Sharing credentials, selling accounts, or attempting simultaneous concurrent access across multiple users is strictly prohibited.
             </li>
             <li>
-              The platform is provided "as is". We work hard to keep it accurate and online, but we cannot
-              guarantee uninterrupted service or specific career outcomes.
+              <strong className="text-foreground">Automated Abuse:</strong> Using bots, automated scripts, or exploits to auto-complete lessons, bypass timers, or artificially farm XP/streaks will result in immediate account termination.
+            </li>
+            <li>
+              <strong className="text-foreground">Content Ownership:</strong> Lessons, challenges, graphics, and curriculum architecture are protected intellectual property. You may use them for personal learning, but you may NOT scrape, record, republish, resell, or redistribute them outside CodeSage.
+            </li>
+            <li>
+              <strong className="text-foreground">User Code:</strong> Any original source code you write inside the CodeSage playground remains your intellectual property.
             </li>
           </ul>
         </Section>
 
-        <Section title="Changes">
+        {/* Section 6: User Rights & Account Deletion */}
+        <Section title="6. Your Data Rights" icon={UserCheck}>
           <p>
-            If this policy changes in a meaningful way, we will post an announcement in your inbox. Continued
-            use after a change means you accept the updated terms.
+            You retain full control over your personal data. You can edit your user preferences at any time in <strong className="text-foreground">Settings</strong>. 
+          </p>
+          <p>
+            If you wish to leave the platform, you can initiate a complete account deletion from your Settings page. Deleting your account permanently wipes your profile, progress history, streak counts, and enrollments from our cloud database.
           </p>
         </Section>
 
-        <p className="text-xs text-muted-foreground/70 font-mono border-t border-border/50 pt-5">
-          Questions about this policy? Use the{' '}
-          <button onClick={() => navigate('/contact')} className="text-primary hover:underline">
-            contact page
+        {/* Section 7: Age Requirement */}
+        <Section title="7. Age Limit" icon={AlertCircle}>
+          <p>
+            CodeSage is intended for learners aged 13 and older. If you believe a child under 13 has created an account without parental consent, please reach out to us, and we will delete the account and associated records immediately.
+          </p>
+        </Section>
+
+        {/* Footer Link */}
+        <div className="pt-6 mt-10 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-muted-foreground">
+          <p>Have questions or privacy concerns?</p>
+          <button
+            onClick={() => navigate('/contact')}
+            className="text-primary hover:underline font-semibold"
+          >
+            Contact CodeSage Support →
           </button>
-          .
-        </p>
+        </div>
+
       </div>
     </div>
   );
