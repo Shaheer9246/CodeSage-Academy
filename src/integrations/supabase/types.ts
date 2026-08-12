@@ -339,6 +339,10 @@ export type Database = {
         Args: { _id: string; _password: string }
         Returns: boolean
       }
+      admin_delete_user: {
+        Args: { _password: string; _user_id: string }
+        Returns: undefined
+      }
       admin_edit_suggestion: {
         Args: { _id: string; _password: string; _text: string }
         Returns: {
