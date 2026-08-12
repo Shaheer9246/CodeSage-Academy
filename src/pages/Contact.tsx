@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, MessageSquare, Bug, Copy, Check, Shield } from 'lucide-react';
 
-const SUPPORT_EMAIL = 'support@codesage.app';
+const SUPPORT_EMAIL = 'shahzain4805@gmail.com';
 
 const Contact = () => {
   const navigate = useNavigate();
