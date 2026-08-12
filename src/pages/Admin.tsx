@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ShieldAlert, Search, RefreshCw, Users, Flame, Zap,
-  GraduationCap, ChevronDown, ChevronRight, Mail, Calendar, Database,
+  GraduationCap, ChevronDown, ChevronRight, Mail, Calendar, Database, Trash2,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { TRACK_META, type TrackId } from '@/lib/enrollment';
@@ -102,6 +102,28 @@ export default function Admin() {
     xp: rows.reduce((a, r) => a + (r.xp || 0), 0),
     active: rows.filter(r => r.enrollments.some(e => e.status === 'active')).length,
   }), [rows]);
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteUser = async (userId: string, userIdentifier: string) => {
+    const confirmed = window.confirm(`Are you sure you want to delete user "${userIdentifier}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeletingId(userId);
+    const { error: err } = await supabase.rpc('admin_delete_user', {
+      _password: pw,
+      _user_id: userId,
+    });
+    setDeletingId(null);
+
+    if (err) {
+      alert(`Failed to delete user: ${err.message}`);
+      return;
+    }
+
+    setRows(prev => prev.filter(u => u.id !== userId));
+    if (openId === userId) setOpenId(null);
+  };
 
   /* ---------------------------- Password gate ---------------------------- */
   if (!authed) {
@@ -293,9 +315,23 @@ export default function Admin() {
                       </p>
                     </Block>
 
-                    <p className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
-                      <Database className="w-3 h-3" /> user id: {u.id}
-                    </p>
+                    <div className="flex items-center justify-between pt-2 border-t border-border/20">
+                      <p className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
+                        <Database className="w-3 h-3" /> user id: {u.id}
+                      </p>
+                      <button
+                        type="button"
+                        disabled={deletingId === u.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteUser(u.id, u.name || u.email || u.id);
+                        }}
+                        className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-md transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        {deletingId === u.id ? 'deleting...' : 'delete user'}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
