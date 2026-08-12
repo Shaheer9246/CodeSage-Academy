@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, X, Sparkles, Check } from 'lucide-react';
-
+import { Flame, X, Sparkles, Zap, Rocket } from 'lucide-react';
 
 const DEV_QUOTES = [
   "Consistency compiles success.",
@@ -55,7 +54,7 @@ function useStreakMonitor(): UseStreakMonitorReturn {
 
 /**
  * ==============================================================================
- * StreakModal: Modern, compact, developer-friendly UI
+ * StreakModal: Exciting, Dynamic UI
  * ==============================================================================
  */
 interface StreakModalProps {
@@ -69,122 +68,156 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
   const { isOpen, quote, todayIdx, daysOfWeek, closeModal } = useStreakMonitor();
 
   const open = isOpen || !!forceOpen;
-  const close = () => { closeModal(); onClose?.(); };
+  const displayQuote = quote || DEV_QUOTES[0];
 
-  if (!open) return null;
+  const close = () => { 
+    closeModal(); 
+    onClose?.(); 
+  };
+
+  // Determine visual theme based on streak tier
+  let statusText = "Warming Up!";
+  let StatusIcon = Zap;
+  let bgGlow = "bg-cyan-500/20";
+  let iconColor = "text-cyan-400";
+  let gradientLine = "from-blue-500 via-cyan-400 to-teal-400";
+  let shadowColor = "shadow-[0_0_15px_rgba(34,211,238,0.4)]";
+
+  if (streakCount >= 3) {
+    statusText = "Heating Up!";
+    StatusIcon = Flame;
+    bgGlow = "bg-orange-500/20";
+    iconColor = "text-orange-500";
+    gradientLine = "from-red-500 via-orange-500 to-yellow-500";
+    shadowColor = "shadow-[0_0_15px_rgba(249,115,22,0.4)]";
+  }
+  if (streakCount >= 7) {
+    statusText = "Unstoppable!";
+    StatusIcon = Rocket;
+    bgGlow = "bg-purple-500/20";
+    iconColor = "text-purple-400";
+    gradientLine = "from-pink-500 via-purple-500 to-indigo-500";
+    shadowColor = "shadow-[0_0_15px_rgba(168,85,247,0.4)]";
+  }
 
   // Soft spring animation for a premium feel
   const modalVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    hidden: { opacity: 0, y: 30, scale: 0.9 },
     visible: { 
       opacity: 1, 
       y: 0, 
       scale: 1,
-      transition: { type: 'spring' as const, stiffness: 300, damping: 25 }
+      transition: { type: 'spring' as const, stiffness: 350, damping: 25 }
     },
-    exit: { opacity: 0, y: 10, scale: 0.95, transition: { duration: 0.15 } }
+    exit: { opacity: 0, y: 15, scale: 0.95, transition: { duration: 0.2 } }
   };
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-        <motion.div
-          variants={modalVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          // Compact mobile sizing
-          className="relative w-full max-w-[340px] bg-background border border-border/60 shadow-2xl rounded-2xl overflow-hidden"
-        >
-          {/* Subtle Top Gradient Accent */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500" />
-
-          {/* Close Button */}
-          <button
-            onClick={close}
-            className="absolute top-3 right-3 text-muted-foreground/60 hover:text-foreground p-1.5 rounded-full hover:bg-secondary/80 transition-colors z-10"
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <motion.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative w-full max-w-[340px] bg-background/95 border border-border shadow-2xl rounded-3xl overflow-hidden"
           >
-            <X className="w-3.5 h-3.5" />
-          </button>
+            {/* Dynamic Top Gradient Accent */}
+            <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${gradientLine}`} />
 
-          <div className="px-6 pt-8 pb-6 text-center">
-            {/* Animated Icon Container */}
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, type: 'spring' as const, stiffness: 200 }}
-              className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/10 border border-orange-500/20 flex items-center justify-center relative"
-            >
-              <Flame className="w-8 h-8 text-orange-500" fill="currentColor" />
-              <motion.div
-                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                className="absolute inset-0 bg-orange-500/20 rounded-2xl blur-md -z-10"
-              />
-            </motion.div>
-
-            {/* Heading & Git Commit Metaphor */}
-            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-1">
-              Day <span className="text-orange-500">{streakCount}</span>
-            </h2>
-            <p className="text-xs text-muted-foreground font-mono mb-5">
-              git commit -m "Kept the streak alive 🔥"
-            </p>
-
-            {/* Quote Box (Syntax Highlighting Style) */}
-            <div className="bg-secondary/40 border-l-2 border-primary/50 rounded-r-lg p-3 mb-6 text-left">
-              <p className="text-[13px] text-foreground/90 leading-relaxed italic">
-                "{quote}"
-              </p>
-            </div>
-
-            {/* 7-Day Tracker */}
-            <div className="mb-6">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 font-semibold text-left px-1">
-                Weekly Uptime
-              </p>
-              <div className="flex justify-between gap-1.5">
-                {daysOfWeek.map((day, i) => {
-                  const isActive = i <= todayIdx && i >= todayIdx - Math.min(streakCount - 1, todayIdx);
-                  const isToday = i === todayIdx;
-
-                  return (
-                    <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
-                      <span className={`text-[9px] font-medium ${isToday ? 'text-foreground' : 'text-muted-foreground/60'}`}>
-                        {day}
-                      </span>
-                      <div
-                        className={`w-full aspect-square rounded-lg flex items-center justify-center transition-all ${
-                          isToday
-                            ? 'bg-orange-500 text-white shadow-[0_0_12px_rgba(249,115,22,0.4)]'
-                            : isActive
-                            ? 'bg-primary/15 text-primary border border-primary/30'
-                            : 'bg-secondary/50 text-muted-foreground/40 border border-border/40'
-                        }`}
-                      >
-                        {isActive ? (
-                          <Flame className={`w-3.5 h-3.5 ${isToday ? 'fill-current' : ''}`} />
-                        ) : (
-                          <div className="w-1 h-1 rounded-full bg-current opacity-30" />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* CTA Button */}
+            {/* Close Button */}
             <button
               onClick={close}
-              className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-3 hover:opacity-90 active:scale-[0.98] transition-all text-sm shadow-lg shadow-primary/10 flex items-center justify-center gap-2"
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground p-1.5 rounded-full hover:bg-secondary transition-colors z-20"
             >
-              <Sparkles className="w-4 h-4" />
-              Keep Coding
+              <X className="w-4 h-4" />
             </button>
-          </div>
-        </motion.div>
-      </div>
+
+            <div className="px-6 pt-10 pb-6 text-center relative z-10">
+              
+              {/* Background ambient glow */}
+              <div className={`absolute top-10 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full ${bgGlow} blur-3xl -z-10`} />
+
+              {/* Animated Icon Container */}
+              <motion.div 
+                initial={{ scale: 0.5, rotate: -15, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: 'spring' as const, stiffness: 200, damping: 15 }}
+                className={`w-20 h-20 mx-auto mb-5 rounded-2xl bg-secondary/50 border border-border/50 flex items-center justify-center relative ${shadowColor}`}
+              >
+                <StatusIcon className={`w-10 h-10 ${iconColor}`} fill="currentColor" />
+                
+                {/* Breathing pulse effect behind icon */}
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  className={`absolute inset-0 rounded-2xl ${bgGlow} blur-md -z-10`}
+                />
+              </motion.div>
+
+              {/* Heading & Status Text */}
+              <h2 className="text-3xl font-display font-black tracking-tight text-foreground mb-1">
+                Day <span className={iconColor}>{streakCount}</span>
+              </h2>
+              <p className={`text-sm font-bold uppercase tracking-widest mb-5 ${iconColor}`}>
+                {statusText}
+              </p>
+
+              {/* Quote Box */}
+              <div className="bg-secondary/30 border border-border/50 rounded-xl p-3.5 mb-6 text-center shadow-inner">
+                <p className="text-[13px] text-foreground/90 font-medium leading-relaxed italic">
+                  "{displayQuote}"
+                </p>
+              </div>
+
+              {/* 7-Day Tracker */}
+              <div className="mb-8">
+                <div className="flex justify-between gap-2">
+                  {daysOfWeek.map((day, i) => {
+                    const isActive = i <= todayIdx && i >= todayIdx - Math.min(streakCount - 1, todayIdx);
+                    const isToday = i === todayIdx;
+
+                    return (
+                      <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
+                        <span className={`text-[10px] font-bold ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {day}
+                        </span>
+                        <div
+                          className={`w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
+                            isToday
+                              ? `bg-primary text-primary-foreground ${shadowColor} scale-110`
+                              : isActive
+                              ? 'bg-secondary text-foreground border border-border/60'
+                              : 'bg-secondary/30 text-muted-foreground/30'
+                          }`}
+                        >
+                          {isActive ? (
+                            <StatusIcon className={`w-3.5 h-3.5 ${isToday ? 'fill-current' : 'opacity-60'}`} />
+                          ) : (
+                            <div className="w-1.5 h-1.5 rounded-full bg-current opacity-30" />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={close}
+                className="w-full bg-foreground text-background font-bold rounded-xl py-3.5 transition-all text-sm shadow-lg flex items-center justify-center gap-2 hover:bg-foreground/90"
+              >
+                <Sparkles className="w-4 h-4" />
+                Keep Building
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </AnimatePresence>
   );
 }
