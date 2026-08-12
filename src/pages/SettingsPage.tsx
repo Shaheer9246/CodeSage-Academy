@@ -579,11 +579,11 @@ const SettingsPage = () => {
 
         <div className="text-center pt-4 pb-2 space-y-2">
           <div className="flex items-center justify-center gap-3 text-[10px] font-mono text-muted-foreground">
-            <button onClick={() => navigate('/terms')} className="hover:text-primary">Terms</button>
+            <button onClick={() => navigate('/terms')} className="hover:text-primary">Terms & Policy</button>
             <span>·</span>
             <button onClick={() => navigate('/privacy')} className="hover:text-primary">Privacy</button>
             <span>·</span>
-            <button onClick={() => navigate('/admin')} className="hover:text-primary">Admin</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-primary">Contact Admin</button>
           </div>
           <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v2.0.0</p>
         </div>
