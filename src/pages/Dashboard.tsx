@@ -672,7 +672,7 @@ const Dashboard = () => {
         <div className="glass-card p-4 rounded-2xl">
           <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">promo_code</h3>
           <div className="flex gap-2">
-            <input value={promoInput} onChange={e => setPromoInput(e.target.value)} placeholder="ENTER_CODE"
+            <input value={promoInput} onChange={e => setPromoInput(e.target.value)} placeholder="Future_Update_If_You_Lose_Your_Progress_By_Any_Chance"
               className="flex-1 min-w-0 bg-secondary/40 border border-border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-primary/50 font-mono" />
             <button onClick={handlePromo} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold font-display hover:neon-glow">
               Apply
