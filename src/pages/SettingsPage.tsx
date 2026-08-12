@@ -585,7 +585,7 @@ const SettingsPage = () => {
             <span>·</span>
             <button onClick={() => navigate('/admin')} className="hover:text-primary">Admin</button>
           </div>
-          <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v1.1.10</p>
+          <p className="text-[10px] text-muted-foreground font-mono tracking-wider">CodeSage · v2.0.0</p>
         </div>
       </motion.div>
 
