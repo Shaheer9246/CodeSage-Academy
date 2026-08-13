@@ -125,44 +125,36 @@ export default function Admin() {
     if (openId === userId) setOpenId(null);
   };
 
-  /* ---------------------------- Password gate ---------------------------- */
+  /* ---------------------------- Access gate ---------------------------- */
   if (!authed) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-5">
-        <form
-          onSubmit={e => { e.preventDefault(); load(pw); }}
-          className="w-full max-w-sm bg-card/40 border border-border/50 rounded-2xl p-6 space-y-4"
-        >
+        <div className="w-full max-w-sm bg-card/40 border border-border/50 rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-5 h-5 text-primary" />
             <h1 className="font-display text-lg font-bold">Admin Console</h1>
           </div>
           <p className="text-xs text-muted-foreground font-mono">
-            Enter the admin password to view student records.
+            This console is restricted to accounts with the admin role.
           </p>
-          <input
-            type="password"
-            value={pw}
-            onChange={e => setPw(e.target.value)}
-            placeholder="admin password"
-            className="w-full bg-black/30 border border-border/60 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-primary/60"
-          />
           {error && <p className="text-xs text-destructive">{error}</p>}
           <button
-            type="submit"
-            disabled={loading || !pw}
+            type="button"
+            onClick={() => load()}
+            disabled={loading}
             className="w-full bg-primary text-primary-foreground rounded-lg py-2.5 text-sm font-bold disabled:opacity-50"
           >
-            {loading ? 'checking...' : 'unlock()'}
+            {loading ? 'checking...' : 'retry()'}
           </button>
           <button type="button" onClick={() => navigate('/dashboard')}
             className="w-full text-xs text-muted-foreground hover:text-primary">
             back to dashboard
           </button>
-        </form>
+        </div>
       </div>
     );
   }
+
 
   /* ------------------------------- Console ------------------------------- */
   return (
