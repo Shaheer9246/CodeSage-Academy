@@ -108,7 +108,7 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
     const isFrontend = selected.language === 'frontend';
 
     return (
-      <div className="h-screen w-screen max-w-[100vw] flex flex-col bg-background overflow-hidden">
+      <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
         {/* Editor Header */}
         <header className="flex items-center justify-between gap-2 px-2 py-2 glass-card border-b border-border shrink-0 w-full max-w-full min-w-0 overflow-hidden">
           <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
@@ -133,9 +133,9 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col sm:flex-row overflow-hidden w-full max-w-full min-w-0">
+        <div className="flex-1 flex flex-col sm:flex-row min-h-0 overflow-hidden w-full min-w-0">
           {/* Instructions Box */}
-          <div className="w-full sm:w-56 shrink-0 border-b sm:border-b-0 sm:border-r border-border p-2.5 overflow-y-auto glass-card max-h-[18vh] sm:max-h-full min-w-0">
+          <div className="w-full sm:w-56 shrink-0 max-h-[25%] sm:max-h-full border-b sm:border-b-0 sm:border-r border-border p-2.5 overflow-y-auto glass-card min-w-0">
             <p className="text-xs text-muted-foreground mb-2 break-words">{selected.description}</p>
             <button onClick={() => setShowHint(!showHint)} className="flex items-center gap-1.5 text-xs text-warning hover:text-warning/80">
               <Lightbulb className="w-3.5 h-3.5" /> {showHint ? 'Hide Hint' : 'Show Hint'}
@@ -208,7 +208,7 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
 
           {/* Desktop Preview (Only for Frontend) */}
           {isFrontend && (
-            <div className="hidden sm:flex flex-1 flex-col min-w-0 border-l border-border w-full overflow-hidden">
+            <div className="hidden sm:flex sm:w-1/2 flex-col min-w-0 border-l border-border overflow-hidden">
               <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono glass-card flex items-center gap-2 shrink-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Preview
               </div>
