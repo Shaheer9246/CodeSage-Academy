@@ -109,4 +109,23 @@ function injectTerminalTheme(): void {
 [data-theme="light"] button[class*="from-emerald"],
 [data-theme="light"] .from-emerald-500 {
   background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%) !important;
-  color
+  color: #001410 !important;
+}
+`;
+  document.head.appendChild(style);
+}
+
+export function getTheme(): ThemeName {
+  if (typeof localStorage === 'undefined') return 'dark';
+  const t = localStorage.getItem(KEY) as ThemeName | null;
+  return t && THEMES.some(x => x.id === t) ? t : 'dark';
+}
+
+export function applyTheme(theme: ThemeName): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem(KEY, theme); } catch { /* ignore */ }
+  if (theme === 'light') injectTerminalTheme();
+  else document.getElementById(STYLE_ID)?.remove();
+}
+
