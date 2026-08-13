@@ -36,12 +36,9 @@ const Suggestions = () => {
   const [editText, setEditText] = useState('');
   const [replyOpenId, setReplyOpenId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
-  const [replyPw, setReplyPw] = useState('');
   const [adminEditOpenId, setAdminEditOpenId] = useState<string | null>(null);
   const [adminEditText, setAdminEditText] = useState('');
-  const [adminEditPw, setAdminEditPw] = useState('');
   const [adminDeleteId, setAdminDeleteId] = useState<string | null>(null);
-  const [adminDeletePw, setAdminDeletePw] = useState('');
   const [postedToday, setPostedToday] = useState(false);
 
   const sb = supabase as unknown as {
@@ -140,34 +137,33 @@ const Suggestions = () => {
   };
 
   const submitReply = async (id: string) => {
-    if (!replyText.trim() || !replyPw) return;
+    if (!replyText.trim()) return;
     const { error } = await supabase.rpc('reply_suggestion', {
-      _id: id, _reply: replyText.trim(), _password: replyPw,
+      _id: id, _reply: replyText.trim(),
     });
-    if (error) { toast.error('Wrong password or invalid reply'); return; }
+    if (error) { toast.error('Admin access required'); return; }
     toast.success('Reply posted');
-    setReplyOpenId(null); setReplyText(''); setReplyPw('');
+    setReplyOpenId(null); setReplyText(''); 
   };
 
   const submitAdminEdit = async (id: string) => {
-    if (!adminEditText.trim() || !adminEditPw) return;
+    if (!adminEditText.trim()) return;
     const { error } = await supabase.rpc('admin_edit_suggestion', {
-      _id: id, _text: adminEditText.trim(), _password: adminEditPw,
+      _id: id, _text: adminEditText.trim(),
     });
-    if (error) { toast.error('Wrong password or invalid edit'); return; }
+    if (error) { toast.error('Admin access required'); return; }
     toast.success('Suggestion edited');
-    setAdminEditOpenId(null); setAdminEditText(''); setAdminEditPw('');
+    setAdminEditOpenId(null); setAdminEditText(''); 
   };
 
   const submitAdminDelete = async (id: string) => {
-    if (!adminDeletePw) return;
     const { data, error } = await supabase.rpc('admin_delete_suggestion', {
-      _id: id, _password: adminDeletePw,
+      _id: id,
     });
-    if (error) { toast.error('Wrong password'); return; }
+    if (error) { toast.error('Admin access required'); return; }
     if (data === false) { toast.error('Delete failed'); return; }
     toast.success('Suggestion deleted');
-    setAdminDeleteId(null); setAdminDeletePw('');
+    setAdminDeleteId(null); 
     // Optimistic + refresh — realtime may lag
     setItems(prev => prev.filter(s => s.id !== id));
     refresh();
@@ -410,9 +406,6 @@ const Suggestions = () => {
 
                 {isReplying && (
                   <div className="space-y-2 pt-1">
-                    <input type="password" value={replyPw} onChange={e => setReplyPw(e.target.value)}
-                      placeholder="Admin password"
-                      className="w-full bg-secondary/40 border border-border/30 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary/50 font-mono" />
                     <textarea value={replyText} onChange={e => setReplyText(e.target.value.slice(0, 1000))}
                       placeholder="Write a reply..." rows={2}
                       className="w-full bg-secondary/40 border border-border/30 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none" />
@@ -421,7 +414,7 @@ const Suggestions = () => {
                         className="bg-primary text-primary-foreground px-3 py-1 rounded-lg text-[11px] font-semibold hover:opacity-90">
                         Send Reply
                       </button>
-                      <button onClick={() => { setReplyOpenId(null); setReplyPw(''); setReplyText(''); }}
+                      <button onClick={() => { setReplyOpenId(null); setReplyText(''); }}
                         className="bg-secondary text-foreground px-3 py-1 rounded-lg text-[11px]">Cancel</button>
                     </div>
                   </div>
@@ -430,9 +423,6 @@ const Suggestions = () => {
                 {isAdminEditing && (
                   <div className="space-y-2 pt-1 border-t border-amber-500/20 mt-2">
                     <p className="text-[10px] text-amber-400 font-semibold">Admin edit — overrides user content</p>
-                    <input type="password" value={adminEditPw} onChange={e => setAdminEditPw(e.target.value)}
-                      placeholder="Admin password"
-                      className="w-full bg-secondary/40 border border-border/30 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-amber-500/50 font-mono" />
                     <textarea value={adminEditText} onChange={e => setAdminEditText(e.target.value.slice(0, 500))}
                       placeholder="New text" rows={3} maxLength={500}
                       className="w-full bg-secondary/40 border border-border/30 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-amber-500/50 resize-none" />
@@ -441,7 +431,7 @@ const Suggestions = () => {
                         className="bg-amber-500 text-background px-3 py-1 rounded-lg text-[11px] font-semibold hover:opacity-90">
                         Save Admin Edit
                       </button>
-                      <button onClick={() => { setAdminEditOpenId(null); setAdminEditPw(''); setAdminEditText(''); }}
+                      <button onClick={() => { setAdminEditOpenId(null); setAdminEditText(''); }}
                         className="bg-secondary text-foreground px-3 py-1 rounded-lg text-[11px]">Cancel</button>
                     </div>
                   </div>
@@ -450,15 +440,12 @@ const Suggestions = () => {
                 {isAdminDeleting && (
                   <div className="space-y-2 pt-1 border-t border-destructive/20 mt-2">
                     <p className="text-[10px] text-destructive font-semibold">Confirm delete — this is permanent.</p>
-                    <input type="password" value={adminDeletePw} onChange={e => setAdminDeletePw(e.target.value)}
-                      placeholder="Admin password"
-                      className="w-full bg-secondary/40 border border-border/30 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-destructive/50 font-mono" />
                     <div className="flex gap-2">
                       <button onClick={() => submitAdminDelete(s.id)}
                         className="bg-destructive text-destructive-foreground px-3 py-1 rounded-lg text-[11px] font-semibold hover:opacity-90">
                         Delete Permanently
                       </button>
-                      <button onClick={() => { setAdminDeleteId(null); setAdminDeletePw(''); }}
+                      <button onClick={() => { setAdminDeleteId(null); }}
                         className="bg-secondary text-foreground px-3 py-1 rounded-lg text-[11px]">Cancel</button>
                     </div>
                   </div>

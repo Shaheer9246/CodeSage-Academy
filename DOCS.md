@@ -165,3 +165,31 @@ The "raw lesson IDs" block is the ground truth: if a lesson is missing there, th
 
 - `src/pages/Terms.tsx` (`/terms`) and `src/pages/Privacy.tsx` (`/privacy`). Both are plain text inside `<Section>` blocks — edit the text directly, no database involved.
 - Sign-up now requires ticking the acceptance box in `src/pages/Auth.tsx`; without it the form refuses to submit.
+
+## 15. Admin access (role-based — replaces the old admin password)
+
+The shared admin password is **gone**. Admin powers are now tied to your account via the
+`user_roles` table (`user_id`, `role` where role is `admin` | `moderator` | `user`).
+
+- All admin RPCs (`admin_list_users`, `admin_delete_user`, `post_announcement`,
+  `reply_suggestion`, `admin_edit_suggestion`, `admin_delete_suggestion`) check
+  `public.is_admin()` server-side. No password argument anymore.
+- The `app_secrets` table (which stored `admin_password`) has been dropped.
+
+**Grant admin to another account** (run in the backend SQL editor):
+
+```sql
+insert into public.user_roles (user_id, role)
+select id, 'admin' from auth.users where email = 'someone@example.com'
+on conflict do nothing;
+```
+
+**Revoke:**
+
+```sql
+delete from public.user_roles where role = 'admin'
+  and user_id = (select id from auth.users where email = 'someone@example.com');
+```
+
+The `/admin` console, the Inbox compose box and the Suggestions admin actions all just work
+when your signed-in account holds the `admin` role, and fail with "Admin access required" otherwise.

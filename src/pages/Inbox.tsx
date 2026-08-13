@@ -18,7 +18,6 @@ const InboxPage = () => {
   const { user } = useUser();
   const [items, setItems] = useState<Announcement[]>([]);
   const [showCompose, setShowCompose] = useState(false);
-  const [pw, setPw] = useState('');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [posting, setPosting] = useState(false);
@@ -49,18 +48,17 @@ const InboxPage = () => {
   }, [refresh]);
 
   const post = async () => {
-    if (!title.trim() || !body.trim() || !pw) { toast.error('Fill all fields'); return; }
+    if (!title.trim() || !body.trim()) { toast.error('Fill all fields'); return; }
     setPosting(true);
     const { error } = await supabase.rpc('post_announcement', {
       _title: title.trim().slice(0, 120),
       _body: body.trim().slice(0, 2000),
-      _password: pw,
     });
     setPosting(false);
-    if (error) { toast.error('Wrong password or invalid post'); return; }
+    if (error) { toast.error('Admin access required'); return; }
     toast.success('Announcement posted');
     setShowCompose(false);
-    setTitle(''); setBody(''); setPw('');
+    setTitle(''); setBody('');
     refresh();
   };
 
@@ -125,8 +123,6 @@ const InboxPage = () => {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <input value={pw} onChange={e => setPw(e.target.value)} type="password" placeholder="Admin password"
-              className="w-full bg-secondary/30 border border-border/40 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50" />
             <input value={title} onChange={e => setTitle(e.target.value.slice(0, 120))} placeholder="Title"
               className="w-full bg-secondary/30 border border-border/40 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50" />
             <textarea value={body} onChange={e => setBody(e.target.value.slice(0, 2000))} rows={5} placeholder="Body (markdown-free plain text)"

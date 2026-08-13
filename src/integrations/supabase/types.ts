@@ -61,24 +61,6 @@ export type Database = {
         }
         Relationships: []
       }
-      app_secrets: {
-        Row: {
-          key: string
-          updated_at: string
-          value: string
-        }
-        Insert: {
-          key: string
-          updated_at?: string
-          value: string
-        }
-        Update: {
-          key?: string
-          updated_at?: string
-          value?: string
-        }
-        Relationships: []
-      }
       enrollments: {
         Row: {
           enrolled_at: string
@@ -330,21 +312,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      admin_delete_suggestion: {
-        Args: { _id: string; _password: string }
-        Returns: boolean
-      }
-      admin_delete_user: {
-        Args: { _password: string; _user_id: string }
-        Returns: undefined
-      }
+      admin_delete_suggestion: { Args: { _id: string }; Returns: boolean }
+      admin_delete_user: { Args: { _user_id: string }; Returns: undefined }
       admin_edit_suggestion: {
-        Args: { _id: string; _password: string; _text: string }
+        Args: { _id: string; _text: string }
         Returns: {
           created_at: string
           downvotes: number
@@ -364,7 +361,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      admin_list_users: { Args: { _password: string }; Returns: Json }
+      admin_list_users: { Args: never; Returns: Json }
       award_lesson: {
         Args: { _lesson_id: string }
         Returns: {
@@ -486,10 +483,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
       mark_announcement_read: { Args: { _id: string }; Returns: undefined }
       mark_suggestions_read: { Args: never; Returns: undefined }
       post_announcement: {
-        Args: { _body: string; _password: string; _title: string }
+        Args: { _body: string; _title: string }
         Returns: {
           body: string
           created_at: string
@@ -539,7 +544,7 @@ export type Database = {
         }
       }
       reply_suggestion: {
-        Args: { _id: string; _password: string; _reply: string }
+        Args: { _id: string; _reply: string }
         Returns: {
           created_at: string
           downvotes: number
@@ -612,7 +617,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -739,6 +744,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
