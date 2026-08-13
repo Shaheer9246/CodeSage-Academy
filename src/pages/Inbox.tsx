@@ -22,6 +22,42 @@ const InboxPage = () => {
   const [body, setBody] = useState('');
   const [posting, setPosting] = useState(false);
 
+  // Edit state
+  const [editingItem, setEditingItem] = useState<Announcement | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editBody, setEditBody] = useState('');
+  const [updating, setUpdating] = useState(false);
+
+  const startEdit = (item: Announcement) => {
+    setEditingItem(item);
+    setEditTitle(item.title);
+    setEditBody(item.body);
+  };
+
+  const saveEdit = async () => {
+    if (!editingItem || !editTitle.trim() || !editBody.trim()) {
+      toast.error('Fill all fields');
+      return;
+    }
+    setUpdating(true);
+    const { error } = await supabase
+      .from('announcements')
+      .update({
+        title: editTitle.trim().slice(0, 120),
+        body: editBody.trim().slice(0, 2000),
+      })
+      .eq('id', editingItem.id);
+
+    setUpdating(false);
+    if (error) {
+      toast.error('Failed to update announcement');
+      return;
+    }
+    toast.success('Announcement updated');
+    setEditingItem(null);
+    refresh();
+  };
+
   // Admin password gate state
   const ADMIN_PASSWORD = 'YOUR_SECRET_PASSWORD_HERE'; // Change to your password
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -123,12 +159,22 @@ const InboxPage = () => {
             {items.map(a => (
               <div key={a.id} className="glass-card p-4 rounded-2xl space-y-2 border border-primary/10">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                  <p className="text-[10px] font-mono text-primary uppercase tracking-wider">CodeSage Admin</p>
-                  <p className="text-[10px] text-muted-foreground ml-auto">
-                    {new Date(a.created_at).toLocaleString()}
-                  </p>
-                </div>
+  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+  <p className="text-[10px] font-mono text-primary uppercase tracking-wider">CodeSage Admin</p>
+  <div className="ml-auto flex items-center gap-2">
+    {isAdminVerified && (
+      <button
+        onClick={() => startEdit(a)}
+        className="text-[10px] text-primary hover:underline font-mono"
+      >
+        Edit
+      </button>
+    )}
+    <p className="text-[10px] text-muted-foreground">
+      {new Date(a.created_at).toLocaleString()}
+    </p>
+  </div>
+</div>
                 <h3 className="font-display font-bold text-sm text-foreground">{a.title}</h3>
                 <p className="text-xs text-foreground/90 whitespace-pre-wrap break-words leading-relaxed">
                   {a.body}
@@ -138,6 +184,42 @@ const InboxPage = () => {
           </div>
         )}
       </motion.div>
+
+     {/* Edit Announcement Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-card rounded-2xl p-5 w-full max-w-md border border-primary/30 neon-glow space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-sm flex items-center gap-2">
+                <Shield className="w-4 h-4 text-primary" /> Edit Announcement
+              </h3>
+              <button onClick={() => setEditingItem(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <input
+              value={editTitle}
+              onChange={e => setEditTitle(e.target.value.slice(0, 120))}
+              placeholder="Title"
+              className="w-full bg-secondary/30 border border-border/40 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+            />
+            <textarea
+              value={editBody}
+              onChange={e => setEditBody(e.target.value.slice(0, 2000))}
+              rows={5}
+              placeholder="Body"
+              className="w-full bg-secondary/30 border border-border/40 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50 resize-none"
+            />
+            <button
+              onClick={saveEdit}
+              disabled={updating}
+              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-display font-semibold disabled:opacity-50 hover:neon-glow"
+            >
+              {updating ? 'Saving…' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      )} 
 
       {/* Password Gate Modal */}
       {showPasswordModal && (
