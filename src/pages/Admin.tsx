@@ -66,7 +66,6 @@ const trackLabel = (t: string) => TRACK_META[t as TrackId]?.label ?? t;
 
 export default function Admin() {
   const navigate = useNavigate();
-  const [pw, setPw] = useState(() => sessionStorage.getItem(PW_KEY) || '');
   const [authed, setAuthed] = useState(false);
   const [rows, setRows] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(false);
@@ -76,17 +75,17 @@ export default function Admin() {
 
   useEffect(() => { document.title = 'Admin Console · CodeSage'; }, []);
 
-  const load = async (password: string) => {
+  const load = async () => {
     setLoading(true); setError('');
-    const { data, error: err } = await supabase.rpc('admin_list_users', { _password: password });
+    const { data, error: err } = await supabase.rpc('admin_list_users');
     setLoading(false);
-    if (err) { setError(err.message.replace('Invalid admin password', 'Wrong admin password')); setAuthed(false); return; }
+    if (err) { setError('Admin access required for this account.'); setAuthed(false); return; }
     setRows((data as unknown as AdminUser[]) || []);
     setAuthed(true);
-    sessionStorage.setItem(PW_KEY, password);
   };
 
-  useEffect(() => { if (pw) load(pw); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
