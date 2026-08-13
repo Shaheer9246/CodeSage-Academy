@@ -91,7 +91,7 @@ export function getTheme(): ThemeName {
   } catch {
     // Ignore localStorage failures during SSR or privacy mode.
   }
-  return 'dark';
+  return 'light'; // ✅ Terminal is now the default theme
 }
 
 export function applyTheme(theme: ThemeName) {
