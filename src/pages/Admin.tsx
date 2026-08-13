@@ -104,23 +104,35 @@ export default function Admin() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDeleteUser = async (userId: string, userIdentifier: string) => {
-    const confirmed = window.confirm(`Are you sure you want to delete user "${userIdentifier}"? This cannot be undone.`);
-    if (!confirmed) return;
+  const confirmed = window.confirm(`Are you sure you want to delete user "${userIdentifier}"? This cannot be undone.`);
+  if (!confirmed) return;
 
-    setDeletingId(userId);
-    const { error: err } = await supabase.rpc('admin_delete_user', {
-      _user_id: userId,
-    });
-    setDeletingId(null);
+  setDeletingId(userId);
 
-    if (err) {
-      alert(`Failed to delete user: ${err.message}`);
-      return;
-    }
+  // Get current logged-in user session
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-    setRows(prev => prev.filter(u => u.id !== userId));
-    if (openId === userId) setOpenId(null);
-  };
+  const { error: err } = await supabase.rpc('admin_delete_user', {
+    _user_id: userId,
+  });
+  setDeletingId(null);
+
+  if (err) {
+    alert(`Failed to delete user: ${err.message}`);
+    return;
+  }
+
+  // IF THE DELETED USER IS THE CURRENT LOGGED-IN ADMIN
+  if (currentUser && currentUser.id === userId) {
+    await supabase.auth.signOut();
+    localStorage.clear(); // Clear local state/cache
+    navigate('/auth');
+    return;
+  }
+
+  setRows(prev => prev.filter(u => u.id !== userId));
+  if (openId === userId) setOpenId(null);
+};
 
   /* ---------------------------- Access gate ---------------------------- */
   if (!authed) {
