@@ -47,11 +47,11 @@ const Suggestions = () => {
   };
 
   const refresh = useCallback(async () => {
-    const { data: suggestionsData, error: suggestionsError } = await supabase
-      .from('suggestions')
+    const { data: suggestionsData, error: suggestionsError } = await sb
+      .from('suggestions_public')
       .select('*')
       .order('created_at', { ascending: false });
-      
+
     if (suggestionsError) { console.error(suggestionsError); return; }
 
     let userVotes: Record<string, 'up' | 'down'> = {};
@@ -74,6 +74,7 @@ const Suggestions = () => {
       ...s,
       upvotes: s.upvotes || 0,
       downvotes: s.downvotes || 0,
+      is_mine: !!s.is_mine,
       user_vote: userVotes[s.id] || null,
     })) as Suggestion[];
 
@@ -82,11 +83,12 @@ const Suggestions = () => {
     if (user) {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const mine = itemsWithVotes.some(s =>
-        s.user_id === user.id && new Date(s.created_at) >= today
+        s.is_mine && new Date(s.created_at) >= today
       );
       setPostedToday(mine);
     }
   }, [user]);
+
 
   useEffect(() => {
     refresh();
