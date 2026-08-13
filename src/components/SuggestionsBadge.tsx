@@ -23,16 +23,17 @@ export default function SuggestionsBadge() {
         
       const since = (read as { last_seen_at: string } | null)?.last_seen_at || '1970-01-01';
       
-      const { data: rows } = await supabase
-        .from('suggestions')
-        .select('id, user_id, updated_at, reply_at')
+      const { data: rows } = await (supabase as any)
+        .from('suggestions_public')
+        .select('id, is_mine, updated_at, reply_at')
         .gt('updated_at', since);
 
       // Count other people's new/edited posts, plus admin replies on your own posts.
-      const list = (rows || []) as { id: string; user_id: string; updated_at: string; reply_at: string | null }[];
+      const list = (rows || []) as { id: string; is_mine: boolean; updated_at: string; reply_at: string | null }[];
       const count = list.filter(r =>
-        r.user_id !== user.id || (r.reply_at ? r.reply_at > since : false),
+        !r.is_mine || (r.reply_at ? r.reply_at > since : false),
       ).length;
+
 
       if (isActive) setUnread(count);
     };

@@ -241,6 +241,13 @@ export type Database = {
             referencedRelation: "suggestions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "suggestion_votes_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       suggestions: {
@@ -335,7 +342,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      suggestions_public: {
+        Row: {
+          created_at: string | null
+          downvotes: number | null
+          id: string | null
+          is_mine: boolean | null
+          reply: string | null
+          reply_at: string | null
+          text: string | null
+          updated_at: string | null
+          upvotes: number | null
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          downvotes?: number | null
+          id?: string | null
+          is_mine?: never
+          reply?: string | null
+          reply_at?: string | null
+          text?: string | null
+          updated_at?: string | null
+          upvotes?: number | null
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          downvotes?: number | null
+          id?: string | null
+          is_mine?: never
+          reply?: string | null
+          reply_at?: string | null
+          text?: string | null
+          updated_at?: string | null
+          upvotes?: number | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_delete_suggestion: { Args: { _id: string }; Returns: boolean }

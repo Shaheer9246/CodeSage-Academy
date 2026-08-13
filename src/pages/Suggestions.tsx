@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Suggestion {
   id: string;
-  user_id: string;
   username: string;
   text: string;
   reply: string | null;
@@ -17,8 +16,10 @@ interface Suggestion {
   updated_at: string;
   upvotes: number;
   downvotes: number;
+  is_mine: boolean;
   user_vote?: 'up' | 'down' | null;
 }
+
 
 const PROMPTS = [
   "What feature do you wish CodeSage had?",
@@ -46,11 +47,11 @@ const Suggestions = () => {
   };
 
   const refresh = useCallback(async () => {
-    const { data: suggestionsData, error: suggestionsError } = await supabase
-      .from('suggestions')
+    const { data: suggestionsData, error: suggestionsError } = await sb
+      .from('suggestions_public')
       .select('*')
       .order('created_at', { ascending: false });
-      
+
     if (suggestionsError) { console.error(suggestionsError); return; }
 
     let userVotes: Record<string, 'up' | 'down'> = {};
@@ -73,6 +74,7 @@ const Suggestions = () => {
       ...s,
       upvotes: s.upvotes || 0,
       downvotes: s.downvotes || 0,
+      is_mine: !!s.is_mine,
       user_vote: userVotes[s.id] || null,
     })) as Suggestion[];
 
@@ -81,11 +83,12 @@ const Suggestions = () => {
     if (user) {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const mine = itemsWithVotes.some(s =>
-        s.user_id === user.id && new Date(s.created_at) >= today
+        s.is_mine && new Date(s.created_at) >= today
       );
       setPostedToday(mine);
     }
   }, [user]);
+
 
   useEffect(() => {
     refresh();
@@ -291,7 +294,7 @@ const Suggestions = () => {
             </div>
           )}
           {items.map(s => {
-            const isMine = user?.id === s.user_id;
+            const isMine = s.is_mine;
             const isEditing = editingId === s.id;
             const isReplying = replyOpenId === s.id;
             const isAdminEditing = adminEditOpenId === s.id;
