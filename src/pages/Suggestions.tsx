@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Suggestion {
   id: string;
-  user_id: string;
   username: string;
   text: string;
   reply: string | null;
@@ -17,8 +16,10 @@ interface Suggestion {
   updated_at: string;
   upvotes: number;
   downvotes: number;
+  is_mine: boolean;
   user_vote?: 'up' | 'down' | null;
 }
+
 
 const PROMPTS = [
   "What feature do you wish CodeSage had?",
