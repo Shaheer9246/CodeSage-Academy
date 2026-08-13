@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, CheckCircle2, ArrowUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, CheckCircle2, ArrowUp } from 'lucide-react';
 
 const steps = [
   { key: 'name', question: 'What is your name?', placeholder: 'Enter your full name', type: 'text' },
@@ -46,17 +46,9 @@ const Onboarding = () => {
     }, 400); // Match CSS transition duration
   };
 
-  const handleAnswer = (key: string, val: string, autoAdvance = false) => {
-    setAnswers(prev => ({ ...prev, [key]: val }));
-
-    if (autoAdvance && val.trim()) {
-      // Debounce text/date inputs so users can finish typing
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-        goToStep(currentIndex + 1);
-      }, 800);
-    }
-  };
+ const handleAnswer = (key: string, val: string) => {
+  setAnswers(prev => ({ ...prev, [key]: val }));
+};
 
   const handleChoiceSelect = (key: string, val: string) => {
     setAnswers(prev => ({ ...prev, [key]: val }));
@@ -87,15 +79,13 @@ const Onboarding = () => {
   const getCardAnimationClass = () => {
     if (!isTransitioning) return 'translate-y-0 opacity-100 scale-100';
     return direction === 'up'
-      ? '-translate-y-[120%] opacity-0 scale-95'
-      : 'translate-y-[120%] opacity-0 scale-95';
+      ? '-translate-y-8 opacity-0 scale-95'
+      : 'translate-y-8 opacity-0 scale-95';
   };
 
   const getNextCardPreviewClass = () => {
-    if (!isTransitioning) return 'translate-y-[120%] opacity-0 scale-95';
-    return direction === 'up'
-      ? 'translate-y-0 opacity-100 scale-100'
-      : '-translate-y-0 opacity-100 scale-100';
+    if (!isTransitioning) return 'translate-y-8 opacity-0 scale-95';
+    return 'translate-y-0 opacity-100 scale-100';
   };
 
   const renderInput = () => {
@@ -132,7 +122,7 @@ const Onboarding = () => {
 
       case 'choice':
         return (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 max-h-[250px] overflow-y-auto pr-1">
             {currentStep.options?.map(opt => (
               <button
                 key={opt}
@@ -228,7 +218,7 @@ const Onboarding = () => {
         </div>
 
         {/* Card Viewport - Fixed height container for smooth transitions */}
-        <div className="relative h-[420px] perspective-1000">
+        <div className="relative min-h-[460px] perspective-1000 flex flex-col">
           {/* Current / Exiting Card */}
           <div
             className={`absolute inset-0 glass-card rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] ${getCardAnimationClass()}`}
@@ -241,10 +231,20 @@ const Onboarding = () => {
               />
             </div>
 
-            {/* Question Counter */}
-            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-mono mb-3">
-              Step {currentIndex + 1} / {steps.length}
-            </p>
+            {/* Question Counter & Back Button */}
+            <div className="flex items-center justify-between mb-3">
+              <button
+                type="button"
+                onClick={() => goToStep(currentIndex - 1)}
+                disabled={currentIndex === 0 || isTransitioning}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary disabled:opacity-0 transition-opacity font-mono cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4" /> Back
+              </button>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-mono">
+                Step {currentIndex + 1} / {steps.length}
+              </p>
+            </div>
 
             {/* Question Title */}
             <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight">
