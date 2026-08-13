@@ -52,7 +52,6 @@ interface AdminUser {
   suggestions_count: number;
 }
 
-const PW_KEY = 'codesage_admin_pw';
 
 const fmt = (d?: string | null) =>
   d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
@@ -110,7 +109,6 @@ export default function Admin() {
 
     setDeletingId(userId);
     const { error: err } = await supabase.rpc('admin_delete_user', {
-      _password: pw,
       _user_id: userId,
     });
     setDeletingId(null);
@@ -169,7 +167,7 @@ export default function Admin() {
             <ShieldAlert className="w-5 h-5 text-primary flex-shrink-0" />
             <h1 className="font-display text-xl font-bold truncate">Admin Console</h1>
           </div>
-          <button onClick={() => load(pw)} disabled={loading}
+          <button onClick={() => load()} disabled={loading}
             className="flex items-center gap-1.5 text-xs bg-secondary/50 border border-border/40 rounded-lg px-3 py-2 hover:border-primary/40">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
