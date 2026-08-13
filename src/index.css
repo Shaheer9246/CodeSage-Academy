@@ -62,40 +62,51 @@
     --neon-glow-strong: 0 0 10px hsl(145 90% 55% / 0.5), 0 0 40px hsl(145 90% 55% / 0.2), 0 0 80px hsl(145 90% 55% / 0.08);
   }
 
-  /* THEME: Light */
-  [data-theme="light"] {
-    --background: 0 0% 98%;
-    --foreground: 160 30% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 160 30% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 30% 10%;
-    --primary: 145 70% 38%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 145 80% 50%;
-    --secondary: 160 10% 94%;
-    --secondary-foreground: 160 30% 15%;
-    --muted: 160 10% 94%;
-    --muted-foreground: 160 8% 40%;
-    --accent: 145 70% 38%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 160 10% 88%;
-    --input: 160 10% 88%;
-    --ring: 145 70% 38%;
-    --glass: 0 0% 100%;
-    --glass-border: 145 50% 45%;
-    --sidebar-background: 0 0% 96%;
-    --sidebar-foreground: 160 10% 30%;
-    --sidebar-primary: 145 70% 38%;
-    --sidebar-accent: 160 10% 90%;
-    --sidebar-accent-foreground: 160 30% 15%;
-    --sidebar-border: 160 10% 85%;
-    --neon: 145 70% 38%;
-    --neon-glow: 0 0 6px hsl(145 70% 38% / 0.3), 0 0 16px hsl(145 70% 38% / 0.1);
-    --neon-glow-strong: 0 0 10px hsl(145 70% 38% / 0.4), 0 0 30px hsl(145 70% 38% / 0.15);
-  }
+  /* THEME: Light — Soft Sage */
+[data-theme="light"] {
+  --background: 140 25% 96%;
+  --foreground: 150 30% 12%;
+
+  --card: 140 20% 98%;
+  --card-foreground: 150 30% 12%;
+
+  --popover: 140 20% 99%;
+  --popover-foreground: 150 30% 12%;
+
+  --primary: 145 70% 38%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 145 80% 50%;
+
+  --secondary: 140 18% 93%;
+  --secondary-foreground: 150 30% 18%;
+
+  --muted: 140 15% 93%;
+  --muted-foreground: 150 10% 42%;
+
+  --accent: 145 70% 38%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 140 18% 87%;
+  --input: 140 18% 87%;
+  --ring: 145 70% 38%;
+
+  --glass: 140 25% 97%;
+  --glass-border: 145 50% 45%;
+
+  --sidebar-background: 140 22% 94%;
+  --sidebar-foreground: 150 12% 32%;
+  --sidebar-primary: 145 70% 38%;
+  --sidebar-accent: 140 18% 90%;
+  --sidebar-accent-foreground: 150 30% 15%;
+  --sidebar-border: 140 15% 84%;
+
+  --neon: 145 70% 38%;
+  --neon-glow: 0 0 6px hsl(145 70% 38% / 0.25), 0 0 16px hsl(145 70% 38% / 0.08);
+  --neon-glow-strong: 0 0 10px hsl(145 70% 38% / 0.35), 0 0 30px hsl(145 70% 38% / 0.12);
+}
 
   /* THEME: Blue (dark variant w/ blue primary) */
   [data-theme="blue"] {
