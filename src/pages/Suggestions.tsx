@@ -294,7 +294,7 @@ const Suggestions = () => {
             </div>
           )}
           {items.map(s => {
-            const isMine = user?.id === s.user_id;
+            const isMine = s.is_mine;
             const isEditing = editingId === s.id;
             const isReplying = replyOpenId === s.id;
             const isAdminEditing = adminEditOpenId === s.id;
