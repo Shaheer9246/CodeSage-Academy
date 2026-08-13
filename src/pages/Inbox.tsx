@@ -22,6 +22,33 @@ const InboxPage = () => {
   const [body, setBody] = useState('');
   const [posting, setPosting] = useState(false);
 
+  // Admin password gate state
+  const ADMIN_PASSWORD = 'YOUR_SECRET_PASSWORD_HERE'; // Change to your password
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [isAdminVerified, setIsAdminVerified] = useState(false);
+
+  const handleShieldClick = () => {
+    if (isAdminVerified) {
+      setShowCompose(true);
+    } else {
+      setShowPasswordModal(true);
+    }
+  };
+
+  const handleVerifyPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminPasswordInput === ADMIN_PASSWORD) {
+      setIsAdminVerified(true);
+      setShowPasswordModal(false);
+      setAdminPasswordInput('');
+      setShowCompose(true);
+      toast.success('Admin verified');
+    } else {
+      toast.error('Incorrect admin password');
+    }
+  };
+
   const refresh = useCallback(async () => {
     const { data, error } = await supabase
       .from('announcements')
@@ -76,8 +103,8 @@ const InboxPage = () => {
           </h1>
           <button
             title="Admin: post announcement"
-            onClick={() => setShowCompose(true)}
-            className="text-muted-foreground hover:text-primary p-2 rounded-lg hover:bg-primary/10"
+            onClick={handleShieldClick}
+            className="text-muted-foreground hover:text-primary p-2 rounded-lg hover:bg-primary/10 transition-colors"
           >
             <Shield className="w-4 h-4" />
           </button>
@@ -111,6 +138,43 @@ const InboxPage = () => {
           </div>
         )}
       </motion.div>
+
+      {/* Password Gate Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-card rounded-2xl p-5 w-full max-w-sm border border-primary/30 neon-glow space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-sm flex items-center gap-2 text-foreground">
+                <Shield className="w-4 h-4 text-primary" /> Admin Verification
+              </h3>
+              <button 
+                onClick={() => { setShowPasswordModal(false); setAdminPasswordInput(''); }} 
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">Enter admin key to compose announcements.</p>
+            
+            <form onSubmit={handleVerifyPassword} className="space-y-3">
+              <input
+                type="password"
+                value={adminPasswordInput}
+                onChange={e => setAdminPasswordInput(e.target.value)}
+                placeholder="Enter password"
+                autoFocus
+                className="w-full bg-secondary/30 border border-border/40 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+              />
+              <button
+                type="submit"
+                className="w-full bg-primary text-primary-foreground py-2 rounded-lg text-sm font-display font-semibold hover:neon-glow transition-all"
+              >
+                Verify
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {showCompose && (
         <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
