@@ -129,3 +129,7 @@ export function applyTheme(theme: ThemeName): void {
   else document.getElementById(STYLE_ID)?.remove();
 }
 
+
+export function initTheme(): void {
+  applyTheme(getTheme());
+}
