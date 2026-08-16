@@ -216,10 +216,10 @@ const SettingsPage = () => {
     isToday: i === todayIdx,
   }));
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-      deleteAccount();
-      navigate('/auth');
+      const deleted = await deleteAccount();
+      if (deleted) navigate('/auth', { replace: true });
     }
   };
 
