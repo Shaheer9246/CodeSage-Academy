@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ChevronLeft, ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, CheckCircle2, ArrowUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, CheckCircle2, ArrowRight } from 'lucide-react';
 
 const steps = [
   { key: 'name', question: 'What is your name?', placeholder: 'Enter your full name', type: 'text' },
   { key: 'studying', question: 'What are you currently studying?', placeholder: 'e.g., Computer Science, High School', type: 'text' },
   { key: 'hasJob', question: 'Do you have any job or work?', type: 'choice', options: ['Student only', 'Part-time job', 'Full-time job', 'Freelancer', 'Unemployed'] },
-  { key: 'dob', question: 'What is your date of birth?', type: 'date' },
+  { key: 'dob', question: 'What is your date of birth?', placeholder: 'Select your birth date', type: 'date' },
   { key: 'goal', question: 'What is your primary goal?', type: 'goalCards' },
   { key: 'experienceLevel', question: 'What is your experience level?', type: 'expCards' },
 ];
@@ -34,7 +34,6 @@ const Onboarding = () => {
 
   const currentStep = steps[currentIndex];
   const currentValue = answers[currentStep.key] || '';
-  const progress = ((currentIndex + (currentValue.trim() ? 1 : 0)) / steps.length) * 100;
 
   const goToStep = (nextIndex: number) => {
     if (nextIndex < 0 || nextIndex >= steps.length || isTransitioning) return;
@@ -46,14 +45,14 @@ const Onboarding = () => {
     }, 400); // Match CSS transition duration
   };
 
- const handleAnswer = (key: string, val: string) => {
-  setAnswers(prev => ({ ...prev, [key]: val }));
-};
+  const handleAnswer = (key: string, val: string) => {
+    setAnswers(prev => ({ ...prev, [key]: val }));
+  };
 
   const handleChoiceSelect = (key: string, val: string) => {
     setAnswers(prev => ({ ...prev, [key]: val }));
-    // Instant advance for choices/cards
-    setTimeout(() => goToStep(currentIndex + 1), 150);
+    // Instant advance for choices/cards (slightly delayed for visual feedback)
+    setTimeout(() => goToStep(currentIndex + 1), 250);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -88,41 +87,53 @@ const Onboarding = () => {
     return 'translate-y-0 opacity-100 scale-100';
   };
 
-  const renderInput = () => {
-    const commonInputClass =
-      'w-full bg-background/50 border border-border/60 rounded-2xl px-5 py-4 text-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:bg-secondary/20 focus:shadow-[0_0_20px_hsl(153,100%,50%,0.06)] transition-all font-mono';
+  const commonInputClass =
+    'w-full bg-background/40 border border-border/60 rounded-2xl px-5 py-4 text-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:bg-secondary/20 focus:shadow-[0_0_20px_hsl(153,100%,50%,0.08)] transition-all font-mono';
 
+  const renderInput = () => {
     switch (currentStep.type) {
       case 'text':
-        return (
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder={currentStep.placeholder}
-            value={currentValue}
-            onChange={e => handleAnswer(currentStep.key, e.target.value, true)}
-            onKeyDown={handleKeyDown}
-            className={commonInputClass}
-            autoFocus
-          />
-        );
-
       case 'date':
+        const isNextDisabled = !currentValue.trim();
         return (
-          <input
-            ref={inputRef as any}
-            type="date"
-            value={currentValue}
-            onChange={e => handleAnswer(currentStep.key, e.target.value, true)}
-            onKeyDown={handleKeyDown}
-            className={`${commonInputClass} cursor-pointer`}
-            autoFocus
-          />
+          <div className="space-y-6">
+            <input
+              ref={inputRef as any}
+              type={currentStep.type}
+              placeholder={currentStep.placeholder}
+              value={currentValue}
+              onChange={e => handleAnswer(currentStep.key, e.target.value)}
+              onKeyDown={handleKeyDown}
+              className={`${commonInputClass} ${currentStep.type === 'date' ? 'cursor-pointer' : ''}`}
+              autoFocus
+            />
+            
+            {/* Explicit Next Button for Text/Date */}
+            <button
+              type="button"
+              onClick={() => goToStep(currentIndex + 1)}
+              disabled={isNextDisabled || isTransitioning}
+              className={`w-full py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 text-sm font-mono uppercase tracking-widest ${
+                isNextDisabled
+                  ? 'bg-secondary/50 text-muted-foreground cursor-not-allowed'
+                  : 'bg-primary text-primary-foreground hover:shadow-[0_0_25px_hsl(153,100%,50%,0.3)] hover:scale-[1.01]'
+              }`}
+            >
+              Continue
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            {!isNextDisabled && (
+              <p className="text-center text-xs text-muted-foreground font-mono animate-fade-in">
+                Or press Enter ↵
+              </p>
+            )}
+          </div>
         );
 
       case 'choice':
         return (
-          <div className="space-y-2.5 max-h-[250px] overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-primary/20 [&::-webkit-scrollbar-thumb]:rounded-full">
             {currentStep.options?.map(opt => (
               <button
                 key={opt}
@@ -135,7 +146,7 @@ const Onboarding = () => {
               >
                 <span className="flex items-center justify-between">
                   {opt}
-                  {currentValue === opt && <CheckCircle2 className="w-4 h-4" />}
+                  {currentValue === opt && <CheckCircle2 className="w-4 h-4 text-primary" />}
                 </span>
               </button>
             ))}
@@ -144,7 +155,7 @@ const Onboarding = () => {
 
       case 'goalCards':
         return (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {[
               { val: 'Learn Code', icon: <Code2 className="w-8 h-8" /> },
               { val: 'Edit Code Live', icon: <Pen className="w-8 h-8" /> },
@@ -171,7 +182,7 @@ const Onboarding = () => {
 
       case 'expCards':
         return (
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {[
               { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5" /> },
               { val: 'Experienced', icon: <Rocket className="w-5 h-5" /> },
@@ -206,44 +217,55 @@ const Onboarding = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden ambient-grid">
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Logo Header */}
-        <div className="flex items-center justify-center gap-2 mb-10 animate-fade-in">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 neon-glow">
-            <Terminal className="w-5 h-5 text-primary" />
+        {/* Header & Progress */}
+        <div className="mb-8 animate-fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 neon-glow">
+                <Terminal className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-lg font-bold text-primary font-mono neon-text">CodeSage</span>
+            </div>
+            <span className="text-xs text-muted-foreground font-mono tracking-wider">
+              {currentIndex + 1} / {steps.length}
+            </span>
           </div>
-          <span className="text-xl font-bold text-primary font-mono neon-text">CodeSage</span>
+          
+          {/* Segmented Progress Bar */}
+          <div className="flex gap-1.5">
+            {steps.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1 flex-1 rounded-full transition-all duration-500 ease-out ${
+                  i <= currentIndex ? 'bg-primary neon-glow' : 'bg-secondary/30'
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Card Viewport - Fixed height container for smooth transitions */}
-        <div className="relative min-h-[460px] perspective-1000 flex flex-col">
+        {/* Card Viewport */}
+        <div className="relative min-h-[480px] perspective-1000 flex flex-col">
           {/* Current / Exiting Card */}
           <div
-            className={`absolute inset-0 glass-card rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] ${getCardAnimationClass()}`}
+            className={`absolute inset-0 bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] ${getCardAnimationClass()}`}
           >
-            {/* Integrated Progress Bar */}
-            <div className="w-full h-1 bg-secondary/30 rounded-full mb-6 overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-500 ease-out neon-glow"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-
             {/* Question Counter & Back Button */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-6">
               <button
                 type="button"
                 onClick={() => goToStep(currentIndex - 1)}
                 disabled={currentIndex === 0 || isTransitioning}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary disabled:opacity-0 transition-opacity font-mono cursor-pointer"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary disabled:opacity-0 disabled:pointer-events-none transition-all font-mono cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" /> Back
               </button>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-mono">
-                Step {currentIndex + 1} / {steps.length}
-              </p>
+              <div className={`px-2 py-0.5 rounded-md bg-secondary/30 text-[10px] text-muted-foreground uppercase tracking-widest font-mono`}>
+                {currentStep.type === 'text' || currentStep.type === 'date' ? 'Input' : 'Select'}
+              </div>
             </div>
 
             {/* Question Title */}
@@ -256,31 +278,20 @@ const Onboarding = () => {
             <div className="flex-1 flex flex-col justify-center">
               {renderInput()}
             </div>
-
-            {/* Manual Next Hint for text/date */}
-            {(currentStep.type === 'text' || currentStep.type === 'date') && currentValue.trim() && !isTransitioning && (
-              <div className="mt-4 flex items-center justify-end gap-1.5 text-xs text-muted-foreground font-mono animate-fade-in">
-                Press Enter or wait
-                <ArrowUp className="w-3 h-3 rotate-90" />
-              </div>
-            )}
           </div>
 
-          {/* Incoming Card Preview (only visible during transition) */}
+          {/* Incoming Card Preview */}
           {isTransitioning && currentIndex + 1 < steps.length && (
             <div
-              className={`absolute inset-0 glass-card rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] ${getNextCardPreviewClass()}`}
+              className={`absolute inset-0 bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] ${getNextCardPreviewClass()}`}
             >
-              <div className="w-full h-1 bg-secondary/30 rounded-full mb-6 overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${((currentIndex + 1) / steps.length) * 100}%` }}
-                />
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-12 h-4 bg-secondary/20 rounded animate-pulse" />
+                <div className={`px-2 py-0.5 rounded-md bg-secondary/30 text-[10px] text-muted-foreground uppercase tracking-widest font-mono`}>
+                  {steps[currentIndex + 1].type === 'text' || steps[currentIndex + 1].type === 'date' ? 'Input' : 'Select'}
+                </div>
               </div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-mono mb-3">
-                Step {currentIndex + 2} / {steps.length}
-              </p>
-              <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight">
+              <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight animate-pulse">
                 {steps[currentIndex + 1].question}
               </h2>
             </div>
@@ -288,14 +299,14 @@ const Onboarding = () => {
         </div>
 
         {/* Submit Button - Only shows on last step when answered */}
-        <div className={`mt-6 transition-all duration-300 ${canSubmit ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+        <div className={`mt-8 transition-all duration-300 ${canSubmit ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden mt-0'}`}>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:neon-glow disabled:opacity-50 transition-all text-sm font-mono uppercase tracking-widest shadow-[0_4px_30px_hsl(153,100%,50%,0.2)]"
+            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_30px_hsl(153,100%,50%,0.3)] hover:scale-[1.01] disabled:opacity-50 transition-all text-sm font-mono uppercase tracking-widest"
           >
             {submitting ? 'Initializing...' : 'start()'}
-            <ChevronRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
