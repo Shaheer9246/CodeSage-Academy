@@ -46,7 +46,7 @@ interface UserContextType {
   applyPromoCode: (code: string) => Promise<boolean>;
   updateUser: (data: Partial<UserProfile>) => void;
   logout: () => Promise<void>;
-  deleteAccount: () => Promise<void>;
+  deleteAccount: () => Promise<boolean>;
   addXp: (amount: number) => void;
   addCoins: (amount: number) => void;
   toggleDarkMode: () => void;
@@ -459,15 +459,52 @@ useEffect(() => {
 
 
   const deleteAccount = async () => {
-    if (!user) return;
-    localStorage.removeItem(`codesage_onboarded_${user.id}`);
-    try {
-      await supabase.functions.invoke('delete-account');
-    } catch (err: unknown) {
-      console.error(err);
+    if (!user) return false;
+
+    const clearLocalAccount = async () => {
+      localStorage.removeItem(`codesage_onboarded_${user.id}`);
+      await supabase.auth.signOut({ scope: 'local' });
+      setUser(null);
+    };
+
+    // Validate the server-backed user first. The profile context can briefly
+    // outlive a deleted/expired auth session after a refresh or a double click.
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) {
+      await clearLocalAccount();
+      toast({
+        title: 'Account session cleared',
+        description: 'This account was already deleted or the session had expired.',
+      });
+      return true;
     }
-    await supabase.auth.signOut();
-    setUser(null);
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (sessionError || !accessToken) {
+      toast({
+        title: 'Could not delete account',
+        description: 'Please sign in again and retry.',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    const { error } = await supabase.functions.invoke('delete-account', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (error) {
+      console.error('delete-account failed', error.message);
+      toast({
+        title: 'Could not delete account',
+        description: 'Your account was not changed. Please retry.',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    await clearLocalAccount();
+    return true;
   };
 
   const toggleDarkMode = () => {
