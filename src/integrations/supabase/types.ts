@@ -609,6 +609,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      suggestion_is_mine: { Args: { _id: string }; Returns: boolean }
       update_enrollment_status: {
         Args: { _status: string; _track: string }
         Returns: {
