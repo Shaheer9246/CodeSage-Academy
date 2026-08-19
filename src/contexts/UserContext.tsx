@@ -416,13 +416,13 @@ useEffect(() => {
   const spendCoins = async (amount: number, reason = 'spend'): Promise<boolean> => {
     if (!user || user.sageCoins < amount) return false;
     setUser(prev => (prev ? { ...prev, sageCoins: prev.sageCoins - amount } : prev));
-    const { data, error } = await supabase.rpc('spend_coins', { _amount: amount, _reason: reason });
+    const { data, error } = await (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>)('spend_coins', { _amount: amount, _reason: reason });
     if (error) {
       console.error('spend_coins failed:', error.message);
       setUser(prev => (prev ? { ...prev, sageCoins: prev.sageCoins + amount } : prev));
       return false;
     }
-    if (data) applyServerProfile(data);
+    if (data && typeof data === 'object') applyServerProfile(data as Parameters<typeof applyServerProfile>[0]);
     return true;
   };
 
@@ -472,9 +472,9 @@ useEffect(() => {
     // accounting; if it isn't deployed yet we fall back to award_lesson.
     let lastError: string | null = null;
     for (let attempt = 0; attempt < 3; attempt++) {
-      const { data, error } = await supabase.rpc('award_lesson_v2', { _lesson_id: lessonId });
+      const { data, error } = await (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>)('award_lesson_v2', { _lesson_id: lessonId });
       if (!error) {
-        if (data) applyServerProfile(data);
+        if (data && typeof data === 'object') applyServerProfile(data as Parameters<typeof applyServerProfile>[0]);
         return;
       }
       lastError = error.message;

@@ -99,7 +99,8 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
       else if (selected.tier === 'Hard') coinReward = 6;
       else if (selected.tier === 'Complex') coinReward = 10;
       
-      completeLesson(`challenge-${selected.id}`, coinReward);
+      void coinReward;
+      completeLesson(`challenge-${selected.id}`);
     }
   };
 

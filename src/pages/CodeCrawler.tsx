@@ -1,3 +1,6 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ArrowUp, RotateCcw, Lock, Trophy,
   ChevronLeft, ChevronRight, KeyRound, Sparkles,
@@ -15,7 +18,7 @@ import {
   loadSave, writeSave, clearSave, type CrawlerSave, type GameMode,
 } from '@/lib/crawlerStorage';
 import { useUser } from '@/contexts/UserContext';
-import { CRAWLER_REVIVE_COST } from '@/lib/gamification';
+import { CRAWLER_RESCUE_COST as CRAWLER_REVIVE_COST } from '@/lib/gamification';
 
 type Phase = 'setup' | 'maze' | 'puzzle' | 'review' | 'finish';
 
