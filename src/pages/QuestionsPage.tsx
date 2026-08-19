@@ -369,7 +369,7 @@ const QuestionsPage = () => {
         {/* Action Controls */}
         <div className="flex flex-col sm:flex-row gap-4 pt-4">
           <button 
-            onClick={() => setMode('select')} 
+            onClick={() => setMode('menu')} 
             className="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 text-white py-4 rounded-xl text-sm font-bold tracking-widest flex items-center justify-center gap-2 transition-all font-mono"
           >
             <RotateCcw className="w-4 h-4" /> REBOOT_EXAM
