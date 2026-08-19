@@ -157,7 +157,7 @@ export default function CodeCrawler() {
   };
 
   // ── Puzzle ──
-  const tryOpenGate = () => {
+ const tryOpenGate = () => {
     if (!gateAhead) return;
     const pool = PUZZLES.filter(p => (track === 'all' || p.track === track) && p.difficulty === difficulty);
     const p = pool[Math.floor(Math.random() * pool.length)] ?? pickPuzzles(track, difficulty, 1)[0];
@@ -166,6 +166,7 @@ export default function CodeCrawler() {
     setTimeLeft(p.timeLimit);
     setTypedAnswer('');
     setPuzzleAttempts(0);
+    setIsPuzzleFailed(false); // <-- ADDED: Reset failure state on new attempt
     setPhase('puzzle');
   };
 
@@ -220,8 +221,9 @@ export default function CodeCrawler() {
     }
   };
 
-  const quitToMenu = () => {
+   const quitToMenu = () => {
     clearSave();
+    setIsPuzzleFailed(false); // <-- ADDED: Clean slate on quit
     setPhase('setup');
     setGrid(null);
   };
@@ -297,7 +299,7 @@ export default function CodeCrawler() {
             isReviving={isReviving}
             userCoins={user?.sageCoins ?? 0}
             onSubmit={submitAnswer}
-            onFlee={() => { setActivePuzzle(null); setPhase('maze'); }}
+            onFlee={() => { setActivePuzzle(null); setPhase('maze'); setIsPuzzleFailed(false); }}
           />
         )}
       </AnimatePresence>
