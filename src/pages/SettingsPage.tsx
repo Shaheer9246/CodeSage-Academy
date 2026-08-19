@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
 import { StreakModal } from "@/components/StreakModal";
-import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle, Coins } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   ALL_LESSON_IDS,
@@ -334,8 +334,8 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* Stats (click for breakdown) */}
-        <div className="grid grid-cols-3 gap-3">
+                {/* Stats (click for breakdown) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <button onClick={() => setDetailModal('lessons')} className="glass-card rounded-xl p-4 text-center hover:neon-border transition-all">
             <p className="text-2xl font-bold text-primary font-mono">{completedCount}</p>
             <p className="text-[10px] text-muted-foreground">Lessons</p>
@@ -346,7 +346,11 @@ const SettingsPage = () => {
           </button>
           <button onClick={() => setDetailModal('xp')} className="glass-card rounded-xl p-4 text-center hover:neon-border transition-all">
             <p className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</p>
-            <p className="text-[10px] text-muted-foreground">XP</p>
+            <p className="text-[10px] text-muted-foreground">Lifetime XP</p>
+          </button>
+          <button onClick={() => setDetailModal('xp')} className="glass-card rounded-xl p-4 text-center hover:neon-border transition-all border-yellow-500/20">
+            <p className="text-2xl font-bold text-yellow-400 font-mono">{user.sageCoins || 0}</p>
+            <p className="text-[10px] text-muted-foreground">Sage Coins</p>
           </button>
         </div>
 
@@ -656,32 +660,40 @@ const SettingsPage = () => {
               </div>
             )}
 
-            {detailModal === 'xp' && (
+                        {detailModal === 'xp' && (
               <div className="space-y-2">
-                <div className="flex items-baseline gap-2 bg-secondary/20 rounded-lg p-3">
-                  <span className="text-3xl font-bold text-primary font-mono">{user.xp || 0}</span>
-                  <span className="text-xs text-muted-foreground">total XP · level {user.level || 1}</span>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <div className="flex items-baseline gap-2 bg-secondary/20 rounded-lg p-3">
+                    <span className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</span>
+                    <span className="text-[10px] text-muted-foreground">Lifetime XP</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20">
+                    <span className="text-2xl font-bold text-yellow-400 font-mono">{user.sageCoins || 0}</span>
+                    <span className="text-[10px] text-muted-foreground">Sage Coins</span>
+                  </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground">XP sources:</p>
+                <p className="text-[11px] text-muted-foreground font-semibold">How you earn rewards:</p>
                  <ul className="space-y-1 text-[11px]">
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
                     <span className="min-w-0 flex-1 mr-2 break-words">Lessons completed</span>
-                    <span className="font-mono text-primary flex-shrink-0">{completedCount} × 5 XP</span>
+                    <span className="font-mono text-primary flex-shrink-0">+1 XP & +2 Coins</span>
                   </li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
-                    <span className="min-w-0 flex-1 mr-2 break-words">Exams passed</span>
-                    <span className="font-mono text-primary flex-shrink-0">{user.completedTests?.length || 0} entries</span>
+                    <span className="min-w-0 flex-1 mr-2 break-words">Exams passed (≥70%)</span>
+                    <span className="font-mono text-primary flex-shrink-0">+3 Coins</span>
                   </li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
                     <span className="min-w-0 flex-1 mr-2 break-words">Challenges solved</span>
-                    <span className="font-mono text-primary flex-shrink-0">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</span>
+                    <span className="font-mono text-primary flex-shrink-0">+2 to +10 Coins (by tier)</span>
                   </li>
                   <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5">
-                    <span className="min-w-0 flex-1 mr-2 break-words">Crawler runs</span>
-                    <span className="font-mono text-primary flex-shrink-0">{lessonGroups.find(g => g.key === 'crawler')?.count || 0} × 10 XP</span>
+                    <span className="min-w-0 flex-1 mr-2 break-words">Code Crawler</span>
+                    <span className="font-mono text-primary flex-shrink-0">Variable based on score</span>
                   </li>
                 </ul>
-                <p className="text-[10px] text-muted-foreground text-center pt-2">Earn 10 XP for a Streak Freeze from the Dashboard XP Shop ❄️</p>
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 mt-2">
+                  <p className="text-[10px] text-primary text-center font-semibold">💡 Spend 5 Coins for extra lessons or 2 Coins to revive in Crawler!</p>
+                </div>
               </div>
             )}
           </div>
