@@ -41,7 +41,7 @@ const EXAM_SECONDS_PER_Q = 30;
 const QUESTIONS_PER_EXAM = 10; // Number of questions to draw from the bank
 
 const QuestionsPage = () => {
-  const { user } = useUser();
+  const { user, completeTest } = useUser();
   const navigate = useNavigate();
   
   // App State
@@ -55,10 +55,21 @@ const QuestionsPage = () => {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const timerRef = useRef<number | null>(null);
 
-  const finishExam = useCallback(() => {
+    const finishExam = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
+    
+    // Calculate if the user passed (>= 70%)
+    const total = questions.length;
+    const correctCount = total > 0 ? questions.reduce((acc, q, i) => acc + (examState[i]?.chosen === q.answer ? 1 : 0), 0) : 0;
+    const passed = total > 0 && Math.round((correctCount / total) * 100) >= 70;
+
+    // If passed, securely record the test completion (awards XP/Coins via UserContext)
+    if (passed && selectedTrack) {
+      completeTest(selectedTrack.id);
+    }
+    
     setMode('result');
-  }, []);
+  }, [questions, examState, selectedTrack, completeTest]);
 
   useEffect(() => {
     if (mode !== 'exam') return;
