@@ -55,7 +55,7 @@ const QuestionsPage = () => {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const timerRef = useRef<number | null>(null);
 
-    const finishExam = useCallback(() => {
+      const finishExam = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     
     // Calculate if the user passed (>= 70%)
@@ -63,31 +63,13 @@ const QuestionsPage = () => {
     const correctCount = total > 0 ? questions.reduce((acc, q, i) => acc + (examState[i]?.chosen === q.answer ? 1 : 0), 0) : 0;
     const passed = total > 0 && Math.round((correctCount / total) * 100) >= 70;
 
-    // If passed, securely record the test completion (awards XP/Coins via UserContext)
+    // If passed, securely record the test completion and award 3 coins
     if (passed && selectedTrack) {
-      completeTest(selectedTrack.id);
+      completeTest(selectedTrack.id, 3);
     }
     
     setMode('result');
   }, [questions, examState, selectedTrack, completeTest]);
-
-  useEffect(() => {
-    if (mode !== 'exam') return;
-    timerRef.current = window.setInterval(() => {
-      setSecondsLeft(s => {
-        if (s <= 1) { finishExam(); return 0; }
-        return s - 1;
-      });
-    }, 1000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [mode, finishExam]);
-
-  const restart = () => { 
-    setMode('menu'); 
-    setExamState({}); 
-    setCurrentQ(0); 
-    setSelectedTrack(null);
-  };
 
   const startExam = (track: ExamTrack) => {
     // Shuffle and pick a subset for the exam instance
