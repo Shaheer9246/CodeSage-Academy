@@ -4,7 +4,7 @@ import { StreakModal } from '@/components/StreakModal';
 import {
   Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus,
   HelpCircle, Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown,
-  Cpu, Layout, Terminal, Database, Briefcase, Sparkles,
+  Cpu, Layout, Terminal, Database, Briefcase, Sparkles, Coins,
 } from 'lucide-react';
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect, useMemo } from 'react';
@@ -335,6 +335,7 @@ const Dashboard = () => {
 
   const displayName = user?.name || 'Explorer';
   const xp = user?.xp || 0;
+  const sageCoins = user?.sageCoins ?? 0;
   const streak = user?.streakCount ?? 0;
 
   /* Total tracks / enrolled for HUD */
@@ -407,12 +408,16 @@ const Dashboard = () => {
                 {isGuest ? 'Tap any tile for a preview.' : `${enrolledCount} track${enrolledCount === 1 ? '' : 's'} active · keep the streak alive.`}
               </p>
             </div>
-            <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
+                <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
               <button onClick={() => isGuest ? navigate('/auth') : setShowShop(true)}
                 className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
                 <Zap className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-bold text-primary">{xp}</span>
+                <span className="text-xs font-bold text-primary">{xp} XP</span>
               </button>
+              <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full">
+                <Coins className="w-3.5 h-3.5 text-yellow-400" />
+                <span className="text-xs font-bold text-yellow-400">{sageCoins}</span>
+              </div>
               <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
                 <Flame className="w-3.5 h-3.5 text-orange-400" />
                 <span className="text-xs font-bold text-orange-400">{streak}d</span>
