@@ -16,6 +16,7 @@ import { JAVA_LESSONS } from '@/data/javaLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
+import { badgeForLessons } from '@/lib/gamification';
 
 type Track = { 
   prefix: string; 
@@ -135,7 +136,11 @@ const LessonComplete = () => {
     'You completed the practice challenge',
     'You earned XP and Sage Coins',
   ];
-  const isLeveledUp = (user.xp - 5) > 0 && Math.floor((user.xp - 5) / 200) < Math.floor(user.xp / 200);
+  // New badge-based level up logic
+  const completedCount = user.completedLessons.length;
+  const currentLevel = user.level;
+  const prevLevel = completedCount > 0 ? badgeForLessons(completedCount - 1).level : 1;
+  const isLeveledUp = currentLevel > prevLevel;
 
   return (
     <div className="min-h-screen bg-background grid-bg relative overflow-hidden flex items-center justify-center p-4">
@@ -173,8 +178,8 @@ const LessonComplete = () => {
 
         <div className="grid grid-cols-3 gap-2 mb-5">
           <div className="glass-card rounded-xl p-3 text-center">
-            <Zap className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-            <p className="text-lg font-bold font-display text-foreground">+5</p>
+            <Zap className="w-4 h-4 text-primary mx-auto mb-1" />
+            <p className="text-lg font-bold font-display text-foreground">+1</p>
             <p className="text-[9px] text-muted-foreground uppercase tracking-wider">XP</p>
           </div>
           <div className="glass-card rounded-xl p-3 text-center">
