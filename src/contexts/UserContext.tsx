@@ -431,30 +431,36 @@ useEffect(() => {
 
     const alreadyDone = user.completedLessons.includes(lessonId);
 
-    // Charge for a brand-new lesson: daily energy first, then coins.
-    if (!alreadyDone && nextLessonCharge === 'blocked') {
+       if (!alreadyDone && nextLessonCharge === 'blocked') {
       toast({
-        title: 'Out of daily XP',
-        description: `You've used today's ${DAILY_XP} XP. Come back tomorrow, or earn ${LESSON_COIN_COST} Sage Coins to unlock another lesson.`,
+        title: 'Out of daily XP & Coins',
+        description: `You've used today's ${DAILY_XP} XP and don't have enough Sage Coins (${LESSON_COIN_COST} required). Come back tomorrow!`,
         variant: 'destructive',
       });
       return;
     }
 
-    // Optimistic UI so the checkmark, coins and energy update instantly.
+        // Optimistic UI so the checkmark, coins and energy update instantly.
     if (!alreadyDone) {
       setUser(prev => {
         if (!prev) return prev;
         const spendEnergy = nextLessonCharge === 'energy';
+        
+        // Safely deduct XP, ensuring it never drops below 0
+        const newDailyXp = spendEnergy 
+          ? Math.max(0, Math.round((energy - LESSON_XP_COST) * 10) / 10) 
+          : energy;
+
+        // Add 2 coins for completion, but subtract 5 coins IF we had to pay with coins
+        const newCoins = prev.sageCoins + LESSON_COIN_REWARD - (spendEnergy ? 0 : LESSON_COIN_COST);
+
         const updatedUser: UserProfile = {
           ...prev,
           completedLessons: [...prev.completedLessons, lessonId],
-          xp: prev.xp + 1,
-          dailyXp: spendEnergy
-            ? Math.round((energy - LESSON_XP_COST) * 10) / 10
-            : energy,
+          xp: prev.xp + 1, // Base XP gain per lesson. (Adjust this number later if games should award more)
+          dailyXp: newDailyXp,
           dailyXpDate: todayKey(),
-          sageCoins: prev.sageCoins + LESSON_COIN_REWARD - (spendEnergy ? 0 : LESSON_COIN_COST),
+          sageCoins: newCoins,
           level: badgeForLessons(prev.completedLessons.length + 1).level,
         };
         localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
@@ -585,11 +591,14 @@ useEffect(() => {
     updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
-  const addXp = (_amount: number) => {
-    // no-op placeholder for future experience gain logic
+   const addXp = (amount: number) => {
+    if (!user) return;
+    setUser(prev => prev ? { ...prev, xp: prev.xp + amount } : prev);
   };
-  const addCoins = (_amount: number) => {
-    // no-op placeholder for future coin gain logic
+
+  const addCoins = (amount: number) => {
+    if (!user) return;
+    setUser(prev => prev ? { ...prev, sageCoins: prev.sageCoins + amount } : prev);
   };
 
   const buyFreezeStreak = async (): Promise<boolean> => {
