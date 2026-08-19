@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, X, Sparkles, Zap, Rocket } from 'lucide-react';
+import { Flame, X, Sparkles, Zap, Rocket, ShieldCheck, Coins } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
+import { toast } from 'sonner';
 
 const DEV_QUOTES = [
   "Consistency compiles success.",
@@ -66,6 +68,7 @@ interface StreakModalProps {
 
 export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProps) {
   const { isOpen, quote, todayIdx, daysOfWeek, closeModal } = useStreakMonitor();
+  const { user, spendCoins } = useUser();
 
   const open = isOpen || !!forceOpen;
   const displayQuote = quote || DEV_QUOTES[0];
@@ -73,6 +76,19 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
   const close = () => { 
     closeModal(); 
     onClose?.(); 
+  };
+
+  const handleBuyFreeze = async () => {
+    if ((user?.sageCoins || 0) < 10) { 
+      toast.error('Need 10 Sage Coins to buy a Streak Freeze ❄️'); 
+      return; 
+    }
+    const spent = await spendCoins(10, 'streak_freeze_modal');
+    if (spent) { 
+      toast.success('❄️ Streak Freeze purchased! Your streak is protected.'); 
+    } else {
+      toast.error('Could not purchase freeze');
+    }
   };
 
   // Determine visual theme based on streak tier
@@ -204,7 +220,21 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                 </div>
               </div>
 
-              {/* CTA Button */}
+                            {/* Streak Freeze Upsell */}
+              {!user ? null : (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleBuyFreeze}
+                  disabled={(user.sageCoins || 0) < 10}
+                  className="w-full mb-2 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-semibold rounded-xl py-3 transition-all text-xs flex items-center justify-center gap-2 hover:bg-yellow-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  Protect Streak (10 Coins)
+                </motion.button>
+              )}
+
+              {/* Primary CTA Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
