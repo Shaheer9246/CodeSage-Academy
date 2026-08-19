@@ -3,6 +3,10 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef, Re
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { toast } from '@/hooks/use-toast';
+import {
+  DAILY_XP, LESSON_XP_COST, LESSON_COIN_COST, LESSON_COIN_REWARD,
+  badgeForLessons, energyToday, lessonCharge, todayKey, type LessonCharge,
+} from '@/lib/gamification';
 
 export interface UserProfile {
   id: string;
@@ -29,6 +33,10 @@ export interface UserProfile {
   sageCoins: number;
   hasSeenTour: boolean;
   streakFreezeUntil: string | null;
+  /** Learning energy left for today (refills to DAILY_XP each day). */
+  dailyXp: number;
+  /** ISO date (YYYY-MM-DD) the daily energy was last refilled. */
+  dailyXpDate: string | null;
 }
 
 interface UserContextType {
@@ -53,6 +61,16 @@ interface UserContextType {
   buyFreezeStreak: () => Promise<boolean>;
   markTourSeen: () => Promise<void>;
   resetTour: () => Promise<void>;
+  /** XP energy left today (refills to 10 daily, no carry-over). */
+  energy: number;
+  /** How the next lesson gets paid for: energy, coins, or blocked. */
+  nextLessonCharge: LessonCharge;
+  /** False when both today's energy and coins are too low for a lesson. */
+  canLearn: boolean;
+  /** Current rank badge, derived from lifetime lessons completed. */
+  rank: ReturnType<typeof badgeForLessons>;
+  /** Spend Sage Coins (Crawler rescue, extras). Returns false if too poor. */
+  spendCoins: (amount: number, reason?: string) => Promise<boolean>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -86,6 +104,8 @@ type DbProfileRow = {
   sage_coins?: number | null;
   streak_freeze_until?: string | null;
   has_seen_tour?: boolean | null;
+  daily_xp?: number | null;
+  daily_xp_date?: string | null;
 };
 
 type DbProfileUpdate = Partial<{
@@ -137,6 +157,8 @@ function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
     level: row.level || 1,
     sageCoins: row.sage_coins || 0,
     streakFreezeUntil: row.streak_freeze_until || null,
+    dailyXp: row.daily_xp ?? DAILY_XP,
+    dailyXpDate: row.daily_xp_date || null,
   };
 }
 
@@ -223,6 +245,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       hasSeenTour: false,
       isOnboarded: localOnboarded,
       streakFreezeUntil: null,
+      dailyXp: DAILY_XP,
+      dailyXpDate: todayKey(),
     });
 
     try {
@@ -381,37 +405,85 @@ useEffect(() => {
     setUser(dbRowToProfile(singleRow, user.email));
   };
 
+  // ── Gamification helpers ───────────────────────────────────
+  const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
+  const coins = user?.sageCoins ?? 0;
+  const nextLessonCharge: LessonCharge = user ? lessonCharge(energy, coins) : 'energy';
+  const canLearn = nextLessonCharge !== 'blocked';
+  const rank = badgeForLessons(user?.completedLessons.length ?? 0);
+
+  /** Spend coins on anything (Crawler rescue, extras). Server-authoritative. */
+  const spendCoins = async (amount: number, reason = 'spend'): Promise<boolean> => {
+    if (!user || user.sageCoins < amount) return false;
+    setUser(prev => (prev ? { ...prev, sageCoins: prev.sageCoins - amount } : prev));
+    const { data, error } = await supabase.rpc('spend_coins', { _amount: amount, _reason: reason });
+    if (error) {
+      console.error('spend_coins failed:', error.message);
+      setUser(prev => (prev ? { ...prev, sageCoins: prev.sageCoins + amount } : prev));
+      return false;
+    }
+    if (data) applyServerProfile(data);
+    return true;
+  };
+
   const completeLesson = async (lessonId: string) => {
     if (!user) return;
 
-    // Optimistic UI so the checkmark appears instantly.
-    setUser(prev => {
-      if (!prev || prev.completedLessons.includes(lessonId)) return prev;
-      const updatedUser = {
-        ...prev,
-        completedLessons: [...prev.completedLessons, lessonId],
-        xp: prev.xp + 5,
-        sageCoins: prev.sageCoins + 2,
-      };
-      localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
-      return updatedUser;
-    });
+    const alreadyDone = user.completedLessons.includes(lessonId);
 
-    // Server-authoritative write via the idempotent award_lesson RPC.
-    // Retry a couple of times before parking it in the pending queue, so a
-    // flaky connection or a just-expired token can never silently drop XP.
+    // Charge for a brand-new lesson: daily energy first, then coins.
+    if (!alreadyDone && nextLessonCharge === 'blocked') {
+      toast({
+        title: 'Out of daily XP',
+        description: `You've used today's ${DAILY_XP} XP. Come back tomorrow, or earn ${LESSON_COIN_COST} Sage Coins to unlock another lesson.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Optimistic UI so the checkmark, coins and energy update instantly.
+    if (!alreadyDone) {
+      setUser(prev => {
+        if (!prev) return prev;
+        const spendEnergy = nextLessonCharge === 'energy';
+        const updatedUser: UserProfile = {
+          ...prev,
+          completedLessons: [...prev.completedLessons, lessonId],
+          xp: prev.xp + 1,
+          dailyXp: spendEnergy
+            ? Math.round((energy - LESSON_XP_COST) * 10) / 10
+            : energy,
+          dailyXpDate: todayKey(),
+          sageCoins: prev.sageCoins + LESSON_COIN_REWARD - (spendEnergy ? 0 : LESSON_COIN_COST),
+          level: badgeForLessons(prev.completedLessons.length + 1).level,
+        };
+        localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
+        return updatedUser;
+      });
+    }
+
+    // Server-authoritative write. award_lesson_v2 does the energy/coin
+    // accounting; if it isn't deployed yet we fall back to award_lesson.
     let lastError: string | null = null;
     for (let attempt = 0; attempt < 3; attempt++) {
-      const { data, error } = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
+      const { data, error } = await supabase.rpc('award_lesson_v2', { _lesson_id: lessonId });
       if (!error) {
         if (data) applyServerProfile(data);
         return;
       }
       lastError = error.message;
+      if (/function .*award_lesson_v2/i.test(error.message)) {
+        const legacy = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
+        if (!legacy.error) {
+          if (legacy.data) applyServerProfile(legacy.data);
+          return;
+        }
+        lastError = legacy.error.message;
+      }
       await new Promise(r => setTimeout(r, 600 * (attempt + 1)));
     }
 
-    console.error('award_lesson failed:', lastError);
+    console.error('award_lesson_v2 failed:', lastError);
     queuePending(lessonId);
     toast({
       title: 'Progress saved locally',
@@ -419,6 +491,7 @@ useEffect(() => {
       variant: 'destructive',
     });
   };
+
 
   const completeTest = async (testId: string) => {
     if (!user) return;
@@ -560,6 +633,7 @@ useEffect(() => {
       completeLesson, completeTest, addBadge, updateStreak, applyPromoCode,
       updateUser, logout, deleteAccount, toggleDarkMode, addXp, addCoins,
       buyFreezeStreak, markTourSeen, resetTour,
+      energy, nextLessonCharge, canLearn, rank, spendCoins,
     }}>
       {children}
     </UserContext.Provider>
