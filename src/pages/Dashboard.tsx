@@ -224,7 +224,7 @@ function loadCollapsed(): Record<string, boolean> {
 }
 
 const Dashboard = () => {
-  const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak, markTourSeen } = useUser();
+   const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak, markTourSeen, spendCoins } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuest = searchParams.get('guest') === '1';
@@ -285,10 +285,18 @@ const Dashboard = () => {
     setTimeout(() => setPromoMsg(''), 3000);
   };
   const handleBuyFreeze = async () => {
-    if ((user?.xp || 0) < 10) { toast.error('Need 10 XP to buy a Streak Freeze'); return; }
-    const ok = await buyFreezeStreak();
-    if (ok) { toast.success('❄️ Streak Freeze active'); setShowShop(false); }
-    else toast.error('Could not purchase freeze');
+    if ((user?.sageCoins || 0) < 10) { 
+      toast.error('Need 10 Sage Coins to buy a Streak Freeze ❄️'); 
+      return; 
+    }
+    // Deduct the coins securely using the spendCoins function
+    const spent = await spendCoins(10, 'streak_freeze');
+    if (spent) { 
+      toast.success('❄️ Streak Freeze purchased!'); 
+      setShowShop(false); 
+    } else {
+      toast.error('Could not purchase freeze');
+    }
   };
 
  const GUEST_ALLOWED = new Set<string>([
@@ -452,9 +460,9 @@ const Dashboard = () => {
                 <p className="text-sm font-semibold">Streak Freeze ❄️</p>
                 <p className="text-[10px] text-muted-foreground">Forgive one missed day.</p>
               </div>
-              <button onClick={handleBuyFreeze} disabled={(user.xp || 0) < 10}
-                className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-2 rounded-xl disabled:opacity-30 hover:neon-glow whitespace-nowrap">
-                10 XP
+                <button onClick={handleBuyFreeze} disabled={(user.sageCoins || 0) < 10}
+                className="flex items-center gap-1 bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 text-xs font-semibold px-3 py-2 rounded-xl disabled:opacity-30 hover:bg-yellow-500/30 transition-all whitespace-nowrap">
+                <Coins className="w-3.5 h-3.5" /> 10
               </button>
             </div>
           </div>
