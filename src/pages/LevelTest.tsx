@@ -62,7 +62,7 @@ const LevelTest = () => {
     } else {
       setShowResults(true);
       const correct = newAnswers.filter((a, i) => a === test.questions[i].correct).length;
-      if (correct >= test.questions.length * 0.7) completeTest(`test-${level}`);
+      if (correct >= test.questions.length * 0.7) completeTest(`test-${level}`, 3);
     }
   };
 
