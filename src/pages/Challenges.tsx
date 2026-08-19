@@ -78,7 +78,7 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
     }
   };
 
-  const check = () => {
+    const check = () => {
     if (!selected) return;
 
     let codeToCheck = '';
@@ -92,7 +92,15 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
     const passed = selected.validationKeywords.every(k => all.includes(normalize(k)));
 
     setResult(passed ? 'pass' : 'fail');
-    if (passed) completeLesson(`challenge-${selected.id}`);
+    if (passed) {
+      // Award coins based on challenge tier (Easy=2, Medium=4, Hard=6, Complex=10)
+      let coinReward = 2;
+      if (selected.tier === 'Medium') coinReward = 4;
+      else if (selected.tier === 'Hard') coinReward = 6;
+      else if (selected.tier === 'Complex') coinReward = 10;
+      
+      completeLesson(`challenge-${selected.id}`, coinReward);
+    }
   };
 
   // Determine current code for frontend tabs
@@ -129,7 +137,11 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
         {result && (
           <div className={`px-3 py-1.5 text-xs flex items-center gap-2 shrink-0 w-full max-w-full min-w-0 overflow-hidden ${result === 'pass' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
             {result === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> : <XCircle className="w-3.5 h-3.5 shrink-0" />}
-            <span className="truncate flex-1 min-w-0">{result === 'pass' ? `Complete! +${selected.xp} XP 🎉` : 'Not quite — try the hint.'}</span>
+           <span className="truncate flex-1 min-w-0">
+              {result === 'pass' 
+                ? `Complete! +${selected.xp} XP & +${selected.tier === 'Easy' ? 2 : selected.tier === 'Medium' ? 4 : selected.tier === 'Hard' ? 6 : 10} Coins 🎉` 
+                : 'Not quite — try the hint.'}
+            </span>
           </div>
         )}
 
