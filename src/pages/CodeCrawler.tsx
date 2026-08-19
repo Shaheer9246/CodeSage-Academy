@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ArrowUp, RotateCcw, Lock, Trophy,
   ChevronLeft, ChevronRight, KeyRound, Sparkles,
   Zap, Leaf, Brain, X
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   PUZZLES, pickPuzzles, normalize, type Track, type Difficulty, type Puzzle,
 } from '@/data/crawlerPuzzles';
@@ -16,6 +14,8 @@ import {
 import {
   loadSave, writeSave, clearSave, type CrawlerSave, type GameMode,
 } from '@/lib/crawlerStorage';
+import { useUser } from '@/contexts/UserContext';
+import { CRAWLER_REVIVE_COST } from '@/lib/gamification';
 
 type Phase = 'setup' | 'maze' | 'puzzle' | 'review' | 'finish';
 
@@ -36,9 +36,12 @@ const RATINGS = [
 
 export default function CodeCrawler() {
   const navigate = useNavigate();
+  const { user, spendCoins } = useUser();
 
   // ── Run state ──
   const [phase, setPhase] = useState<Phase>('setup');
+  const [isPuzzleFailed, setIsPuzzleFailed] = useState(false);
+  const [isReviving, setIsReviving] = useState(false);
   const [track, setTrack] = useState<Track>('html');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [mode, setMode] = useState<GameMode>('core');
@@ -73,19 +76,18 @@ export default function CodeCrawler() {
     writeSave({ version: 2, track, difficulty, mode, grid, pos, facing, score, flowStreak, solved, startedAt });
   }, [phase, grid, pos, facing, score, flowStreak, solved, track, difficulty, mode, startedAt]);
 
-  // ── Timer for puzzle (Core Mode Only) ──
+    // ── Timer for puzzle (Core Mode Only) ──
   useEffect(() => {
-    if (phase !== 'puzzle' || !activePuzzle || mode === 'zen') return;
+    if (phase !== 'puzzle' || !activePuzzle || mode === 'zen' || isPuzzleFailed) return;
     if (timeLeft <= 0) { 
-      // Time's up: break streak, close puzzle, gate stays locked
+      // Time's up: break streak, mark as failed (allows revive)
       setFlowStreak(0);
-      setActivePuzzle(null);
-      setPhase('maze');
+      setIsPuzzleFailed(true);
       return; 
     }
     const t = setTimeout(() => setTimeLeft(s => s - 1), 1000);
     return () => clearTimeout(t);
-  }, [phase, timeLeft, activePuzzle, mode]);
+  }, [phase, timeLeft, activePuzzle, mode, isPuzzleFailed]);
 
   // ── Keyboard controls ──
   useEffect(() => {
@@ -115,6 +117,7 @@ export default function CodeCrawler() {
     setFlowStreak(0);
     setSolved([]);
     setPuzzlesAnswered(0);
+    setIsPuzzleFailed(false);
     setStartedAt(Date.now());
     clearSave();
     setPhase('maze');
@@ -166,8 +169,8 @@ export default function CodeCrawler() {
     setPhase('puzzle');
   };
 
-  const submitAnswer = (answer: string) => {
-    if (!activePuzzle) return;
+    const submitAnswer = (answer: string) => {
+    if (!activePuzzle || isPuzzleFailed) return;
     const right = normalize(answer) === normalize(activePuzzle.expectedFix);
     setPuzzlesAnswered(n => n + 1);
     
@@ -192,10 +195,28 @@ export default function CodeCrawler() {
         setPuzzleAttempts(next);
         if (next >= 2) {
           setFlowStreak(0); // Break the streak
-          setActivePuzzle(null);
-          setPhase('maze'); // Gate stays locked
+          setIsPuzzleFailed(true); // Show revive/flee options instead of instantly closing
         }
       }
+    }
+  };
+
+  const handleRevive = async () => {
+    if (!user) return;
+    if (user.sageCoins < CRAWLER_REVIVE_COST) {
+      toast.error("Not enough Sage Coins to revive!");
+      return;
+    }
+    setIsReviving(true);
+    const success = await spendCoins(CRAWLER_REVIVE_COST, 'crawler_revive');
+    setIsReviving(false);
+    if (success) {
+      setIsPuzzleFailed(false);
+      setPuzzleAttempts(0);
+      if (activePuzzle) setTimeLeft(activePuzzle.timeLimit);
+      setTypedAnswer('');
+      setShake(false);
+      toast.success("Revived! Try again.");
     }
   };
 
@@ -271,6 +292,10 @@ export default function CodeCrawler() {
             setTyped={setTypedAnswer}
             attempts={puzzleAttempts}
             shake={shake}
+            isFailed={isPuzzleFailed}
+            onRevive={handleRevive}
+            isReviving={isReviving}
+            userCoins={user?.sageCoins ?? 0}
             onSubmit={submitAnswer}
             onFlee={() => { setActivePuzzle(null); setPhase('maze'); }}
           />
@@ -598,10 +623,11 @@ function Minimap({ grid, pos, facing, solved }: { grid: Grid; pos: { x: number; 
 // Puzzle overlay
 // ════════════════════════════════════════════════════════════════
 function PuzzleOverlay({
-  puzzle, timeLeft, mode, typed, setTyped, attempts, shake, onSubmit, onFlee,
+  puzzle, timeLeft, mode, typed, setTyped, attempts, shake, isFailed, onRevive, isReviving, userCoins, onSubmit, onFlee,
 }: {
   puzzle: Puzzle; timeLeft: number; mode: GameMode;
   typed: string; setTyped: (s: string) => void; attempts: number; shake: boolean;
+  isFailed: boolean; onRevive: () => void; isReviving: boolean; userCoins: number;
   onSubmit: (s: string) => void; onFlee: () => void;
 }) {
   const useText = puzzle.difficulty === 'hard';
@@ -662,17 +688,37 @@ function PuzzleOverlay({
           </div>
         )}
 
-        <div className="flex items-center justify-between text-[10px] pt-2 border-t border-border/20">
-          <span className="text-muted-foreground">
-            {mode === 'zen' ? (
-              <>💡 {puzzle.hint}</>
-            ) : (
-              <><span className="text-warning">{attempts}/2</span> attempts · 💡 {puzzle.hint}</>
-            )}
-          </span>
-          <button onClick={onFlee} className="text-muted-foreground hover:text-red-400 flex items-center gap-1">
-            <X className="w-3 h-3" /> Flee
-          </button>
+                <div className="flex items-center justify-between text-[10px] pt-2 border-t border-border/20">
+          {isFailed ? (
+            <div className="flex items-center gap-2 w-full justify-between">
+              <span className="text-red-400 font-bold">Failed! Gate remains locked.</span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={onRevive} 
+                  disabled={isReviving || userCoins < CRAWLER_REVIVE_COST}
+                  className="flex items-center gap-1 bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded hover:bg-yellow-500/30 disabled:opacity-50 transition-all"
+                >
+                  <Sparkles className="w-3 h-3" /> {isReviving ? 'Reviving...' : `Revive (${CRAWLER_REVIVE_COST} Coins)`}
+                </button>
+                <button onClick={onFlee} className="text-muted-foreground hover:text-red-400 flex items-center gap-1">
+                  <X className="w-3 h-3" /> Flee
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <span className="text-muted-foreground">
+                {mode === 'zen' ? (
+                  <>💡 {puzzle.hint}</>
+                ) : (
+                  <><span className={attempts >= 1 ? 'text-red-400 font-bold' : 'text-warning'}>{attempts}/2</span> attempts · 💡 {puzzle.hint}</>
+                )}
+              </span>
+              <button onClick={onFlee} className="text-muted-foreground hover:text-red-400 flex items-center gap-1">
+                <X className="w-3 h-3" /> Flee
+              </button>
+            </>
+          )}
         </div>
       </motion.div>
     </motion.div>
