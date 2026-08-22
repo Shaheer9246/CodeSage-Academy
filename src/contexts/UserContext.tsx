@@ -409,8 +409,7 @@ useEffect(() => {
  const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
   const xp = user?.xp || 0;
   const coins = user?.sageCoins ?? 0;
-  
-  const totalXp = energy + xp;
+
 
   const nextLessonCharge: LessonCharge = user ? lessonCharge(energy, coins) : 'energy';
 
