@@ -58,32 +58,27 @@ const InboxPage = () => {
     refresh();
   };
 
-  // Admin password gate state
-  const ADMIN_PASSWORD = 'YOUR_SECRET_PASSWORD_HERE'; // Change to your password
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  // Real admin check (server-side role via is_admin())
   const [isAdminVerified, setIsAdminVerified] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      if (!user) { setIsAdminVerified(false); return; }
+      const { data, error } = await supabase.rpc('is_admin');
+      if (active) setIsAdminVerified(!error && data === true);
+    })();
+    return () => { active = false; };
+  }, [user]);
 
   const handleShieldClick = () => {
     if (isAdminVerified) {
       setShowCompose(true);
     } else {
-      setShowPasswordModal(true);
+      toast.error('Admin access required');
     }
   };
 
-  const handleVerifyPassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminPasswordInput === ADMIN_PASSWORD) {
-      setIsAdminVerified(true);
-      setShowPasswordModal(false);
-      setAdminPasswordInput('');
-      setShowCompose(true);
-      toast.success('Admin verified');
-    } else {
-      toast.error('Incorrect admin password');
-    }
-  };
 
   const refresh = useCallback(async () => {
     const { data, error } = await supabase
