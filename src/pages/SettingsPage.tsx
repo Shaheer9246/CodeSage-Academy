@@ -426,42 +426,50 @@ const SettingsPage = () => {
           )}
         </div>
 
-                {/* Badges */}
-        <div className="glass-card rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-3">
+               {/* NEW: Current Rank / Level Card */}
+        <div className="glass-card rounded-2xl p-5 border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold font-display flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-primary" /> Badges ({user.badges.length})
+              <Trophy className="w-4 h-4 text-primary" /> Current Rank
             </h3>
-            {/* Changed from 6 to 4 as requested */}
-            {user.badges.length > 4 && (
-              <button 
-                onClick={() => setShowAllBadges(!showAllBadges)} 
-                className="text-xs text-primary font-semibold hover:underline"
-              >
-                {showAllBadges ? 'Show Less' : `Show All (${user.badges.length})`}
-              </button>
-            )}
+            <span className="text-[10px] font-mono text-muted-foreground bg-secondary/50 px-2 py-1 rounded-full">
+              {user.completedLessons.length} Lessons Completed
+            </span>
           </div>
 
-          {user.badges.length === 0 ? (
-            <p className="text-xs text-muted-foreground">No badges yet. Start learning to earn badges!</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {/* Changed from slice(0, 6) to slice(0, 4) */}
-              {(showAllBadges ? user.badges : user.badges.slice(0, 4)).map(b => {
-                // Fallback to the badge ID string if not found in the map
-                const badgeData = BADGE_MAP[b] || { icon: '🏅', label: b };
-                return (
-                  <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 max-w-full">
-                    <span className="text-sm flex-shrink-0">{badgeData.icon}</span>
-                    <span className="text-xs font-medium text-foreground truncate">{badgeData.label}</span>
-                  </div>
-                );
-              })}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(var(--primary),0.2)]">
+              {/* You can map level to an emoji/icon here later, for now use a generic trophy or level number */}
+              🏆
             </div>
-          )}
-        </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">You are</p>
+              <h2 className="text-xl font-black font-display text-primary truncate">
+                Level {user.level}
+              </h2>
+              <p className="text-xs text-foreground/70 truncate">
+                {/* Optional: Show the badge name from badges.ts if you want */}
+                Keep learning to unlock the next rank!
+              </p>
+            </div>
+          </div>
 
+          {/* Next Level Progress Bar */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
+              <span>Progress to Level {user.level + 1}</span>
+              {/* Calculate progress based on lessons needed for next level vs current */}
+              <span>{Math.min(100, Math.round((user.completedLessons.length / ((user.level * 15) + 10)) * 100))}%</span>
+            </div>
+            <div className="h-2 bg-secondary/40 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary rounded-full transition-all duration-500" 
+                style={{ width: `${Math.min(100, (user.completedLessons.length / ((user.level * 15) + 10)) * 100)}%` }} 
+              />
+            </div>
+          </div>
+        </div>
+      
         {/* Achievements */}
         <div className="glass-card rounded-2xl p-5">
           <div className="flex items-center justify-between mb-3">
