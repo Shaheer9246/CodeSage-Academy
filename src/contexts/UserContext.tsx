@@ -239,7 +239,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       unlockedSections: ['frontend'],
       promoCodes: [],
       darkMode: true,
-      xp: 0,
+      xp: 10,
       level: 1,
       sageCoins: 0,
       hasSeenTour: false,
