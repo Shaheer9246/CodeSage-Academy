@@ -410,13 +410,10 @@ useEffect(() => {
   const xp = user?.xp || 0;
   const coins = user?.sageCoins ?? 0;
   
-  // Total XP available = Daily Allowance + Lifetime Winning XP
   const totalXp = energy + xp;
-  
-  // Charge is 'energy' if total XP >= 3.3, 'coins' if total XP < 3.3 but coins >= 6, else 'blocked'
-  const nextLessonCharge: LessonCharge = totalXp >= LESSON_XP_COST ? '
-  const coins = user?.sageCoins ?? 0;
+
   const nextLessonCharge: LessonCharge = user ? lessonCharge(energy, coins) : 'energy';
+
   const canLearn = nextLessonCharge !== 'blocked';
   const rank = badgeForLessons(user?.completedLessons.length ?? 0);
 
