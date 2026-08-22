@@ -455,7 +455,7 @@ const SettingsPage = () => {
                       id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                     
                     return nextBadge 
-                      ? `Next: ${formatBadgeName(nextBadge.badge_id || nextBadge.id || `Level ${user.level + 1}`)}`
+                      ? `Next: ${formatBadgeName(nextBadge.id || `Level ${user.level + 1}`)}`
                       : 'Max Level Reached! 🏆';
                   })()}
                 </p>
@@ -471,8 +471,8 @@ const SettingsPage = () => {
               const currentLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level);
               const nextLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
               
-              const prevLevelReq = currentLevelData?.xp_required || 0;
-              const nextLevelReq = nextLevelData?.xp_required || 0;
+              const prevLevelReq = currentLevelData?.xpRequired || 0;
+              const nextLevelReq = nextLevelData?.xpRequired || 0;
               
               // Calculate progress safely
               let progressPct = 100;
