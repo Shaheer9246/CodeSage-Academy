@@ -7,6 +7,7 @@ import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
 import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Lightbulb, BookOpen, Code, Eye } from 'lucide-react';
+import { toast } from 'sonner';
 
 type FileTab = 'html' | 'css' | 'js';
 type MobileView = 'lesson' | 'code' | 'preview';
