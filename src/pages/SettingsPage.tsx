@@ -83,7 +83,7 @@ const SettingsPage = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
-  const [showAlls, setShowAlls] = useState(false);
+ const [showAllBadges, setShowAllBadges] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   // Force re-render when enrollment state changes (pause/resume/end)
@@ -139,7 +139,7 @@ const SettingsPage = () => {
       zip.file('playground-recents.json', playground);
       zip.file('profile.json', JSON.stringify({
         name: user?.name, xp: user?.xp, streak: user?.streakCount,
-        completedLessons: user?.completedLessons, s: user?.s,
+        completedLessons: user?.completedLessons, badges: user?.badges,
       }, null, 2));
       zip.file('README.txt', 'CodeSage workspace export — generated from Settings.');
       const blob = await zip.generateAsync({ type: 'blob' });
