@@ -13,6 +13,7 @@ import {
 
 import { motion } from 'framer-motion';
 import { applyTheme, getTheme, THEMES, ThemeName } from '@/lib/theme';
+import { BADGES } from '@/data/badges';
 import { Switch } from '@/components/ui/switch';
 import { resetGuestLessons } from '@/lib/guestGate';
 import JSZip from 'jszip';
@@ -36,35 +37,10 @@ type Achievement = {
   check: (u: UserProfile) => boolean;
 };
 
-const BADGE_INFO: Record<string, { icon: string; label: string }> = {
-  // Level & Profile Ranks
-  'lite': { icon: '🌱', label: 'Lite Coder' },
-  'silver': { icon: '🥈', label: 'Silver Coder' },
-  'gold': { icon: '🥇', label: 'Gold Coder' },
-  'premium': { icon: '💎', label: 'Premium Coder' },
-  'elite': { icon: '👑', label: 'Elite Coder' },
-
-  // Course & Track Completion
-  'html-hero': { icon: '📄', label: 'HTML Hero' },
-  'css-wizard': { icon: '🎨', label: 'CSS Wizard' },
-  'js-jedi': { icon: '⚡', label: 'JS Jedi' },
-  'frontend-arch': { icon: '🛡️', label: 'Frontend Architect' },
-  'fullstack-pro': { icon: '🌐', label: 'Full-Stack Engineer' },
-  'python-novice': { icon: '🐍', label: 'Python Novice' },
-  'python-elite': { icon: '🐉', label: 'Python Elite' },
-  'java-specialist': { icon: '☕', label: 'Java Specialist' },
-  'cpp-master': { icon: '⚙️', label: 'C++ Systems Master' },
-  'freelance-pro': { icon: '💼', label: 'Freelance Ready' },
-
-  // Milestones & Activities
-  'test-passer': { icon: '📜', label: 'Test Ace' },
-  'streak-3': { icon: '🔥', label: '3-Day Streak' },
-  'streak-7': { icon: '⚡', label: '7-Day Streak' },
-  'streak-30': { icon: '🏆', label: '30-Day Streak' },
-  'challenge-slayer': { icon: '🗡️', label: 'Challenge Slayer' },
-  'crawler-champ': { icon: '🕷️', label: 'Crawler Champ' },
-  'xp-hoarder': { icon: '✨', label: 'XP Master' },
-};
+// Dynamic badge lookup from src/data/badges.ts
+const BADGE_MAP = Object.fromEntries(
+  (BADGES || []).map((b: any) => [b.id || b.badge_id, { icon: b.icon, label: b.title || b.label || b.badge_id }])
+);
 
 const ACHIEVEMENTS: Achievement[] = [
   // --- Getting Started & Milestones ---
@@ -107,7 +83,7 @@ const SettingsPage = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
-  const [showAllBadges, setShowAllBadges] = useState(false);
+  const [showAlls, setShowAlls] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   // Force re-render when enrollment state changes (pause/resume/end)
@@ -163,7 +139,7 @@ const SettingsPage = () => {
       zip.file('playground-recents.json', playground);
       zip.file('profile.json', JSON.stringify({
         name: user?.name, xp: user?.xp, streak: user?.streakCount,
-        completedLessons: user?.completedLessons, badges: user?.badges,
+        completedLessons: user?.completedLessons, s: user?.s,
       }, null, 2));
       zip.file('README.txt', 'CodeSage workspace export — generated from Settings.');
       const blob = await zip.generateAsync({ type: 'blob' });
@@ -450,13 +426,14 @@ const SettingsPage = () => {
           )}
         </div>
 
-        {/* Badges */}
+                {/* Badges */}
         <div className="glass-card rounded-2xl p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold font-display flex items-center gap-2">
               <Trophy className="w-4 h-4 text-primary" /> Badges ({user.badges.length})
             </h3>
-            {user.badges.length > 6 && (
+            {/* Changed from 6 to 4 as requested */}
+            {user.badges.length > 4 && (
               <button 
                 onClick={() => setShowAllBadges(!showAllBadges)} 
                 className="text-xs text-primary font-semibold hover:underline"
@@ -470,12 +447,17 @@ const SettingsPage = () => {
             <p className="text-xs text-muted-foreground">No badges yet. Start learning to earn badges!</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {(showAllBadges ? user.badges : user.badges.slice(0, 6)).map(b => (
-                <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 max-w-full">
-                  <span className="text-sm flex-shrink-0">{BADGE_INFO[b]?.icon || '🏅'}</span>
-                  <span className="text-xs font-medium text-foreground truncate">{BADGE_INFO[b]?.label || b}</span>
-                </div>
-              ))}
+              {/* Changed from slice(0, 6) to slice(0, 4) */}
+              {(showAllBadges ? user.badges : user.badges.slice(0, 4)).map(b => {
+                // Fallback to the badge ID string if not found in the map
+                const badgeData = BADGE_MAP[b] || { icon: '🏅', label: b };
+                return (
+                  <div key={b} className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 max-w-full">
+                    <span className="text-sm flex-shrink-0">{badgeData.icon}</span>
+                    <span className="text-xs font-medium text-foreground truncate">{badgeData.label}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
