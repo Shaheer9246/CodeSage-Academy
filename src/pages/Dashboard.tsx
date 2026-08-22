@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { StreakModal } from '@/components/StreakModal';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
-        Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
+        Gamepad2, Trophy, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
         Layout, Terminal, Database, Briefcase, Sparkles } from 'lucide-react';
 import { energyToday } from '@/lib/gamification';
 
@@ -232,7 +232,7 @@ const Dashboard = () => {
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [showXpModal, setShowXpModal] = useState(false);
-  const [theme, setTheme] = useState<ThemeName>(() => getTheme());
+
   const [tourReady, setTourReady] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [enrollTick, setEnrollTick] = useState(0);
@@ -257,12 +257,7 @@ const Dashboard = () => {
     });
   };
 
-  const cycleTheme = () => {
-    const idx = THEMES.findIndex(t => t.id === theme);
-    const next = THEMES[(idx + 1) % THEMES.length].id;
-    applyTheme(next); setTheme(next);
-    toast.success(`Theme: ${THEMES.find(t => t.id === next)?.label}`);
-  };
+
 
   useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
   useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest, user, updateStreak]);
@@ -428,16 +423,18 @@ const Dashboard = () => {
                 <Flame className="w-3.5 h-3.5 text-orange-400" />
                 <span className="text-xs font-bold text-orange-400">{streak}d</span>
               </div>
-              {!isGuest && (
-                <>
-                
-                  <SuggestionsBadge />
-                  <button onClick={cycleTheme}
-                    className="grid place-items-center bg-secondary/40 border border-border/40 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
-                    <Palette className="w-3.5 h-3.5 text-primary" />
-                  </button>
-                </>
-              )}
+          {!isGuest && (
+            <>
+              {/* 1. The NEW Level Pill (stands alone) */}
+             <div className="flex items-center gap-1 bg-primary/20 border border-primary/40 px-2.5 py-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]">
+             <Trophy className="w-3.5 h-3.5 text-primary" />
+             <span className="text-xs font-bold text-primary">Lvl {user?.level || 1}</span>
+          </div>
+    
+             {/* 2. The Existing Suggestions Badge (stands alone next to it) */}
+         <SuggestionsBadge />
+                     </>
+                 )}
             </div>
           </div>
         </motion.div>
