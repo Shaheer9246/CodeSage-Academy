@@ -458,26 +458,30 @@ const SettingsPage = () => {
             </div>
           </div>
 
-                    {/* Next Level Progress Bar */}
+                              {/* Next Level Progress Bar */}
           <div className="space-y-1.5">
             {(() => {
-              // Find the exact lesson requirement for the NEXT level using BADGES data
-              const nextLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
-              const nextLevelReq = nextLevelData ? (nextLevelData.xp_required || nextLevelData.required_lessons || 0) : 0;
-              
-              // If we are at max level or next level req is missing, show 100%
               const currentLessons = user.completedLessons.length;
-              const prevLevelReq = (BADGES || []).find((b: any) => (b.level || 0) === user.level)?.xp_required || 0;
-              const lessonsInThisLevel = Math.max(1, nextLevelReq - prevLevelReq);
-              const progressPct = nextLevelReq > 0 
-                ? Math.min(100, Math.round(((currentLessons - prevLevelReq) / lessonsInThisLevel) * 100))
-                : 100;
+              
+              // Find current and next level data safely
+              const currentLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level);
+              const nextLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
+              
+              const prevLevelReq = currentLevelData?.xp_required || 0;
+              const nextLevelReq = nextLevelData?.xp_required || 0;
+              
+              // Calculate progress safely
+              let progressPct = 100;
+              if (nextLevelReq > prevLevelReq && nextLevelReq > 0) {
+                const lessonsInThisLevel = nextLevelReq - prevLevelReq;
+                progressPct = Math.min(100, Math.round(((currentLessons - prevLevelReq) / lessonsInThisLevel) * 100));
+              }
 
               return (
                 <>
                   <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
                     <span>Progress to Level {user.level + 1}</span>
-                    <span>{progressPct}% ({currentLessons} / {nextLevelReq})</span>
+                    <span>{progressPct}% ({currentLessons} / {nextLevelReq || 'MAX'})</span>
                   </div>
                   <div className="h-2 bg-secondary/40 rounded-full overflow-hidden">
                     <div 
@@ -489,7 +493,6 @@ const SettingsPage = () => {
               );
             })()}
           </div>
-        </div>
       
         {/* Achievements */}
         <div className="glass-card rounded-2xl p-5">
