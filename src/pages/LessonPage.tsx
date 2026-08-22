@@ -22,7 +22,7 @@ function normalizeCode(code: string): string {
 const LessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, completeLesson } = useUser();
+  const { user, completeLesson, canLearn } = useUser();
 
   const lesson = id ? getLessonById(id) : undefined;
 
@@ -67,7 +67,11 @@ const LessonPage = () => {
 
   const lang = fileTab === 'html' ? 'html' : fileTab === 'css' ? 'css' : 'javascript';
 
-  const handleStartChallenge = () => {
+   const handleStartChallenge = () => {
+    if (!canLearn) {
+      toast.error('You are out of XP! Come back tomorrow or buy more with coins.');
+      return;
+    }
     if (lesson.challenge) {
       setHtmlCode(lesson.challenge.initialCode);
       setCssCode(lesson.challenge.initialCss || cssCode);
@@ -254,9 +258,15 @@ const LessonPage = () => {
         <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge</h3>
           <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
-          <button onClick={handleStartChallenge}
-            className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-            Start Challenge
+                    <button 
+            onClick={handleStartChallenge}
+            disabled={!canLearn}
+            className={`w-full py-2 rounded-lg font-semibold text-xs transition-opacity shadow-lg ${
+              !canLearn 
+                ? 'bg-secondary/50 text-muted-foreground cursor-not-allowed opacity-50' 
+                : 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 shadow-primary/20'
+            }`}>
+            {!canLearn ? 'Out of XP - Buy More' : 'Start Challenge'}
           </button>
         </div>
       );
