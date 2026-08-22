@@ -447,26 +447,47 @@ const SettingsPage = () => {
               <h2 className="text-xl font-black font-display text-primary truncate">
                 Level {user.level}
               </h2>
-              <p className="text-xs text-foreground/70 truncate">
-                {/* Optional: Show the badge name from badges.ts if you want */}
-                Keep learning to unlock the next rank!
-              </p>
+                              <p className="text-xs text-foreground/70 truncate">
+                  {(() => {
+                    const nextBadge = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
+                    return nextBadge 
+                      ? `Next: ${nextBadge.title || nextBadge.label || `Level ${user.level + 1}`}`
+                      : 'Max Level Reached! ';
+                  })()}
+                </p>
             </div>
           </div>
 
-          {/* Next Level Progress Bar */}
+                    {/* Next Level Progress Bar */}
           <div className="space-y-1.5">
-            <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
-              <span>Progress to Level {user.level + 1}</span>
-              {/* Calculate progress based on lessons needed for next level vs current */}
-              <span>{Math.min(100, Math.round((user.completedLessons.length / ((user.level * 15) + 10)) * 100))}%</span>
-            </div>
-            <div className="h-2 bg-secondary/40 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary rounded-full transition-all duration-500" 
-                style={{ width: `${Math.min(100, (user.completedLessons.length / ((user.level * 15) + 10)) * 100)}%` }} 
-              />
-            </div>
+            {(() => {
+              // Find the exact lesson requirement for the NEXT level using BADGES data
+              const nextLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
+              const nextLevelReq = nextLevelData ? (nextLevelData.xp_required || nextLevelData.required_lessons || 0) : 0;
+              
+              // If we are at max level or next level req is missing, show 100%
+              const currentLessons = user.completedLessons.length;
+              const prevLevelReq = (BADGES || []).find((b: any) => (b.level || 0) === user.level)?.xp_required || 0;
+              const lessonsInThisLevel = Math.max(1, nextLevelReq - prevLevelReq);
+              const progressPct = nextLevelReq > 0 
+                ? Math.min(100, Math.round(((currentLessons - prevLevelReq) / lessonsInThisLevel) * 100))
+                : 100;
+
+              return (
+                <>
+                  <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
+                    <span>Progress to Level {user.level + 1}</span>
+                    <span>{progressPct}% ({currentLessons} / {nextLevelReq})</span>
+                  </div>
+                  <div className="h-2 bg-secondary/40 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all duration-500" 
+                      style={{ width: `${progressPct}%` }} 
+                    />
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       
