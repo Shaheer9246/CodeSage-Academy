@@ -497,6 +497,7 @@ const SettingsPage = () => {
               );
             })()}
           </div>
+          </div>
       
         {/* Achievements */}
         <div className="glass-card rounded-2xl p-5">
