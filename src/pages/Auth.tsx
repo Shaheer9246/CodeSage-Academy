@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Loader2, , ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
 import {
   getLockRemaining, getAttemptsLeft, registerFailure, clearFailures, formatRemaining, MAX_ATTEMPTS,
 } from '@/lib/loginGuard';
@@ -253,7 +253,7 @@ const Auth = () => {
               {/* Mobile logo */}
               <div className="md:hidden flex items-center gap-2.5 mb-4">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/30 grid place-items-center neon-glow-strong">
-                  < className="w-4 h-4 text-primary" />
+                  <Terminal className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <h1 className="cs-logo text-lg font-bold text-primary neon-text tracking-tight">CodeSage</h1>
