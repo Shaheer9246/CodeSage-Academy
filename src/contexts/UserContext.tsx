@@ -503,16 +503,7 @@ useEffect(() => {
         return;
       }
       lastError = error.message;
-      if (/function .*award_lesson_v2/i.test(error.message)) {
-        const legacy = await supabase.rpc('award_lesson', { _lesson_id: lessonId });
-        if (!legacy.error) {
-          if (legacy.data) applyServerProfile(legacy.data);
-          return;
-        }
-        lastError = legacy.error.message;
-      }
       await new Promise(r => setTimeout(r, 600 * (attempt + 1)));
-    }
 
     console.error('award_lesson_v2 failed:', lastError);
     queuePending(lessonId);
