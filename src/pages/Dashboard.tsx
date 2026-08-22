@@ -1,11 +1,9 @@
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { StreakModal } from '@/components/StreakModal';
-import {
-  Code, Zap, ChevronRight, Flame, MessageSquare, Snowflake, X, UserPlus,
-  HelpCircle, Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown,
-  Cpu, Layout, Terminal, Database, Briefcase, Sparkles, Coins,
-} from 'lucide-react';
+import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
+        Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown, Cpu,
+        Layout, Terminal, Database, Briefcase, Sparkles } from 'lucide-react';
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -224,14 +222,14 @@ function loadCollapsed(): Record<string, boolean> {
 }
 
 const Dashboard = () => {
-   const { user, loading, updateStreak, applyPromoCode, buyFreezeStreak, markTourSeen, spendCoins } = useUser();
+ const { user, loading, updateStreak, applyPromoCode, markTourSeen } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuest = searchParams.get('guest') === '1';
 
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
-  const [showShop, setShowShop] = useState(false);
+  const [showXpModal, setShowXpModal] = useState(false);
   const [theme, setTheme] = useState<ThemeName>(() => getTheme());
   const [tourReady, setTourReady] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
@@ -284,20 +282,7 @@ const Dashboard = () => {
     if (ok) setPromoInput('');
     setTimeout(() => setPromoMsg(''), 3000);
   };
-  const handleBuyFreeze = async () => {
-    if ((user?.sageCoins || 0) < 10) { 
-      toast.error('Need 10 Sage Coins to buy a Streak Freeze ❄️'); 
-      return; 
-    }
-    // Deduct the coins securely using the spendCoins function
-    const spent = await spendCoins(10, 'streak_freeze');
-    if (spent) { 
-      toast.success('❄️ Streak Freeze purchased!'); 
-      setShowShop(false); 
-    } else {
-      toast.error('Could not purchase freeze');
-    }
-  };
+  
 
  const GUEST_ALLOWED = new Set<string>([
     '/learn',       // Frontend Development
@@ -367,6 +352,13 @@ const Dashboard = () => {
     allTracks.find(t => t.trackId && !isGuest && isEnrolled(t.trackId)),
   [allTracks, isGuest, enrollTick]);
 
+    // Calculate today's winnings based on daily XP spent
+  const todayWinnings = useMemo(() => {
+    if (!user) return 0;
+    const spent = Math.max(0, 10 - energy);
+    return Math.floor(spent / 3.3); 
+  }, [user, energy]);
+  
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
       {/* 1. Daily Streak Modal - Hidden if the Tour is currently active */}
@@ -417,10 +409,10 @@ const Dashboard = () => {
               </p>
             </div>
                 <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
-              <button onClick={() => isGuest ? navigate('/auth') : setShowShop(true)}
-                className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all">
+              <button onClick={() => isGuest ? navigate('/auth') : setShowXpModal(true)}
+                className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all cursor-pointer">
                 <Zap className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-bold text-primary">{xp} XP</span>
+                <span className="text-xs font-bold text-primary">{energy} / 10 XP</span>
               </button>
               <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full">
                 <Coins className="w-3.5 h-3.5 text-yellow-400" />
@@ -444,29 +436,7 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Shop */}
-        {showShop && user && (
-          <div className="glass-card rounded-2xl p-4 border border-primary/30 neon-glow space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-display font-bold flex items-center gap-2">
-                <Snowflake className="w-4 h-4 text-primary" /> XP Shop
-              </h3>
-              <button onClick={() => setShowShop(false)} className="text-muted-foreground hover:text-foreground">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex items-center justify-between gap-3 bg-secondary/30 rounded-xl p-3">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold">Streak Freeze ❄️</p>
-                <p className="text-[10px] text-muted-foreground">Forgive one missed day.</p>
-              </div>
-                <button onClick={handleBuyFreeze} disabled={(user.sageCoins || 0) < 10}
-                className="flex items-center gap-1 bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 text-xs font-semibold px-3 py-2 rounded-xl disabled:opacity-30 hover:bg-yellow-500/30 transition-all whitespace-nowrap">
-                <Coins className="w-3.5 h-3.5" /> 10
-              </button>
-            </div>
-          </div>
-        )}
+        
 
         {/* ============ QUICK LAUNCH — 3 chips ============ */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -694,6 +664,58 @@ const Dashboard = () => {
           {promoMsg && <p className="text-xs mt-2 font-mono">{promoMsg}</p>}
         </div>
       </motion.div>
+
+            {/* XP Breakdown Modal */}
+      {showXpModal && user && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setShowXpModal(false)}>
+          <div className="glass-card w-full max-w-sm rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" /> XP Breakdown
+              </h3>
+              <button onClick={() => setShowXpModal(false)} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {/* Daily Allowance */}
+              <div className="bg-secondary/20 rounded-xl p-3 border border-border/30">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Daily Allowance</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-primary font-mono">{energy}</span>
+                  <span className="text-xs text-muted-foreground">/ 10 XP remaining today</span>
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1">Resets at midnight · 3.3 XP per lesson</p>
+              </div>
+
+              {/* Today's Winnings */}
+              <div className="bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20">
+                <p className="text-[10px] text-emerald-400 uppercase tracking-wider mb-1">Today's Winnings</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-emerald-400 font-mono">+{todayLessons}</span>
+                  <span className="text-xs text-emerald-400/70">victory XP earned today</span>
+                </div>
+                <p className="text-[9px] text-emerald-400/60 mt-1">+1 XP per completed lesson</p>
+              </div>
+
+              {/* Lifetime XP */}
+              <div className="bg-yellow-500/10 rounded-xl p-3 border border-yellow-500/20">
+                <p className="text-[10px] text-yellow-400 uppercase tracking-wider mb-1">Lifetime XP</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-yellow-400 font-mono">{user.xp || 0}</span>
+                  <span className="text-xs text-yellow-400/70">total accumulated</span>
+                </div>
+                <p className="text-[9px] text-yellow-400/60 mt-1">Never resets · shows total progress</p>
+              </div>
+            </div>
+
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-2">
+              <p className="text-[10px] text-primary text-center font-semibold">💡 Daily XP is an allowance. Lifetime XP is your permanent score!</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showTour && tourReady && (
         <DashboardTour steps={TOUR_STEPS} onFinish={() => { markTourSeen(); }} />
