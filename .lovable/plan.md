@@ -67,6 +67,19 @@ The "delete my account" feature uses a server function that lives on the OLD bac
 - The old Lovable Cloud backend stays **untouched and running**. If the new one fails, switching back = restoring 3 lines in `.env`. Nothing is deleted.
 - The repair script is idempotent — running it twice breaks nothing.
 
+## Also fixed after approval: current build errors
+
+The app currently has 4 TypeScript errors blocking a clean build (unrelated to the backend switch — from recent edits):
+
+- `src/pages/LessonPage.tsx:72` — `toast` used without import
+- `src/pages/SettingsPage.tsx:458,474,475` — wrong badge field names (`badge_id`/`xp_required` instead of the `Badge` type's actual fields like `xpRequired`)
+
+I'll fix these in the same pass.
+
 ## After approval
 
-I create `supabase/fix-new-backend.sql` (full script + commented instructions) and update `DOCS.md` with the new-backend admin/runbook section. Then you run Steps 1–3 and we go through the checklist.
+1. Fix the 4 build errors above
+2. Create `supabase/fix-new-backend.sql` (full script + commented instructions)
+3. Update `DOCS.md` with the new-backend admin/runbook section
+
+Then you run Steps 1–3 and we go through the checklist together.
