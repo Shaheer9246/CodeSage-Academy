@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Loader2, Terminal, ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, , ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
 import {
   getLockRemaining, getAttemptsLeft, registerFailure, clearFailures, formatRemaining, MAX_ATTEMPTS,
 } from '@/lib/loginGuard';
@@ -195,18 +195,6 @@ const Auth = () => {
       <div className="pointer-events-none absolute left-0 right-0 h-24 bg-gradient-to-b from-transparent via-primary/5 to-transparent" style={{ animation: 'cs-scan 7s linear infinite' }} />
       <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%)' }} />
 
-     {/* ===== Top Yellow Notice Banner ===== */}
-      {isLogin && (
-        <div className="w-full max-w-3xl mb-4 relative z-10 animate-fade-in bg-amber-500/10 border border-amber-500/40 rounded-xl p-4 text-xs font-mono text-amber-200 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
-          <p className="font-bold text-amber-400 flex items-center gap-2 mb-1 text-sm">
-            <span>🔒</span> System Upgrade Complete!
-          </p>
-          <p className="leading-relaxed opacity-90">
-            To ensure your account security and verify your email address, please click <span className="text-amber-300 font-bold underline">'Forgot Password?'</span> below. You will receive a link to set a new password and instantly access all your saved progress, XP, and badges.
-          </p>
-        </div>
-      )}
-
       {/* ===== Terminal Window ===== */}
       <div className="w-full max-w-3xl relative z-10 animate-fade-in">
         <div className="glass-card rounded-2xl border border-primary/20 overflow-hidden shadow-[0_0_60px_hsl(153,100%,50%,0.08)]">
@@ -265,7 +253,7 @@ const Auth = () => {
               {/* Mobile logo */}
               <div className="md:hidden flex items-center gap-2.5 mb-4">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/30 grid place-items-center neon-glow-strong">
-                  <Terminal className="w-4 h-4 text-primary" />
+                  < className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <h1 className="cs-logo text-lg font-bold text-primary neon-text tracking-tight">CodeSage</h1>
