@@ -61,6 +61,24 @@ export type Database = {
         }
         Relationships: []
       }
+      badge_levels: {
+        Row: {
+          badge_id: string
+          level: number
+          xp_required: number
+        }
+        Insert: {
+          badge_id: string
+          level: number
+          xp_required: number
+        }
+        Update: {
+          badge_id?: string
+          level?: number
+          xp_required?: number
+        }
+        Relationships: []
+      }
       enrollments: {
         Row: {
           enrolled_at: string
@@ -103,6 +121,8 @@ export type Database = {
           completed_lessons: string[] | null
           completed_tests: string[] | null
           created_at: string
+          daily_xp: number
+          daily_xp_date: string
           dark_mode: boolean | null
           dob: string | null
           experience_level: string | null
@@ -129,6 +149,8 @@ export type Database = {
           completed_lessons?: string[] | null
           completed_tests?: string[] | null
           created_at?: string
+          daily_xp?: number
+          daily_xp_date?: string
           dark_mode?: boolean | null
           dob?: string | null
           experience_level?: string | null
@@ -155,6 +177,8 @@ export type Database = {
           completed_lessons?: string[] | null
           completed_tests?: string[] | null
           created_at?: string
+          daily_xp?: number
+          daily_xp_date?: string
           dark_mode?: boolean | null
           dob?: string | null
           experience_level?: string | null
@@ -414,6 +438,8 @@ export type Database = {
           completed_lessons: string[] | null
           completed_tests: string[] | null
           created_at: string
+          daily_xp: number
+          daily_xp_date: string
           dark_mode: boolean | null
           dob: string | null
           experience_level: string | null
@@ -440,6 +466,43 @@ export type Database = {
           to: "profiles"
           isOneToOne: true
           isSetofReturn: false
+        }
+      }
+      award_lesson_v2: {
+        Args: { _coin_reward?: number; _lesson_id: string }
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          daily_xp: number
+          daily_xp_date: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          has_seen_tour: boolean | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          streak_freeze_until: string | null
+          student_id: string | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
         }
       }
       buy_freeze_streak: {
@@ -449,6 +512,8 @@ export type Database = {
           completed_lessons: string[] | null
           completed_tests: string[] | null
           created_at: string
+          daily_xp: number
+          daily_xp_date: string
           dark_mode: boolean | null
           dob: string | null
           experience_level: string | null
@@ -477,41 +542,81 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      complete_test: {
-        Args: { _test_id: string }
-        Returns: {
-          badges: string[] | null
-          completed_lessons: string[] | null
-          completed_tests: string[] | null
-          created_at: string
-          dark_mode: boolean | null
-          dob: string | null
-          experience_level: string | null
-          goal: string | null
-          has_job: string | null
-          has_seen_tour: boolean | null
-          id: string
-          last_active_date: string | null
-          level: number | null
-          name: string | null
-          promo_codes: string[] | null
-          sage_coins: number | null
-          streak_count: number | null
-          streak_freeze_until: string | null
-          student_id: string | null
-          studying: string | null
-          unlocked_sections: string[] | null
-          updated_at: string
-          username: string | null
-          xp: number | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      complete_test:
+        | {
+            Args: { _test_id: string }
+            Returns: {
+              badges: string[] | null
+              completed_lessons: string[] | null
+              completed_tests: string[] | null
+              created_at: string
+              daily_xp: number
+              daily_xp_date: string
+              dark_mode: boolean | null
+              dob: string | null
+              experience_level: string | null
+              goal: string | null
+              has_job: string | null
+              has_seen_tour: boolean | null
+              id: string
+              last_active_date: string | null
+              level: number | null
+              name: string | null
+              promo_codes: string[] | null
+              sage_coins: number | null
+              streak_count: number | null
+              streak_freeze_until: string | null
+              student_id: string | null
+              studying: string | null
+              unlocked_sections: string[] | null
+              updated_at: string
+              username: string | null
+              xp: number | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "profiles"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { _coin_reward?: number; _test_id: string }
+            Returns: {
+              badges: string[] | null
+              completed_lessons: string[] | null
+              completed_tests: string[] | null
+              created_at: string
+              daily_xp: number
+              daily_xp_date: string
+              dark_mode: boolean | null
+              dob: string | null
+              experience_level: string | null
+              goal: string | null
+              has_job: string | null
+              has_seen_tour: boolean | null
+              id: string
+              last_active_date: string | null
+              level: number | null
+              name: string | null
+              promo_codes: string[] | null
+              sage_coins: number | null
+              streak_count: number | null
+              streak_freeze_until: string | null
+              student_id: string | null
+              studying: string | null
+              unlocked_sections: string[] | null
+              updated_at: string
+              username: string | null
+              xp: number | null
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "profiles"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
       enroll_track: {
         Args: { _track: string }
         Returns: {
@@ -536,6 +641,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      level_for_lessons: { Args: { _lessons: number }; Returns: number }
       mark_announcement_read: { Args: { _id: string }; Returns: undefined }
       mark_suggestions_read: { Args: never; Returns: undefined }
       post_announcement: {
@@ -560,6 +666,8 @@ export type Database = {
           completed_lessons: string[] | null
           completed_tests: string[] | null
           created_at: string
+          daily_xp: number
+          daily_xp_date: string
           dark_mode: boolean | null
           dob: string | null
           experience_level: string | null
@@ -588,6 +696,43 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      refresh_daily_xp: {
+        Args: never
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          daily_xp: number
+          daily_xp_date: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          has_seen_tour: boolean | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          streak_freeze_until: string | null
+          student_id: string | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       reply_suggestion: {
         Args: { _id: string; _reply: string }
         Returns: {
@@ -607,6 +752,43 @@ export type Database = {
           to: "suggestions"
           isOneToOne: true
           isSetofReturn: false
+        }
+      }
+      spend_coins: {
+        Args: { _amount: number; _reason?: string }
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          daily_xp: number
+          daily_xp_date: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          has_seen_tour: boolean | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          streak_freeze_until: string | null
+          student_id: string | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
         }
       }
       suggestion_is_mine: { Args: { _id: string }; Returns: boolean }
@@ -633,6 +815,8 @@ export type Database = {
           completed_lessons: string[] | null
           completed_tests: string[] | null
           created_at: string
+          daily_xp: number
+          daily_xp_date: string
           dark_mode: boolean | null
           dob: string | null
           experience_level: string | null
