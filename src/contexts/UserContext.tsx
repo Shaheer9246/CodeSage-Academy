@@ -406,7 +406,15 @@ useEffect(() => {
   };
 
   // ── Gamification helpers ───────────────────────────────────
-  const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
+ const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
+  const xp = user?.xp || 0;
+  const coins = user?.sageCoins ?? 0;
+  
+  // Total XP available = Daily Allowance + Lifetime Winning XP
+  const totalXp = energy + xp;
+  
+  // Charge is 'energy' if total XP >= 3.3, 'coins' if total XP < 3.3 but coins >= 6, else 'blocked'
+  const nextLessonCharge: LessonCharge = totalXp >= LESSON_XP_COST ? '
   const coins = user?.sageCoins ?? 0;
   const nextLessonCharge: LessonCharge = user ? lessonCharge(energy, coins) : 'energy';
   const canLearn = nextLessonCharge !== 'blocked';
@@ -426,38 +434,59 @@ useEffect(() => {
     return true;
   };
 
-  const completeLesson = async (lessonId: string) => {
+    const completeLesson = async (lessonId: string) => {
     if (!user) return;
 
     const alreadyDone = user.completedLessons.includes(lessonId);
 
-       if (!alreadyDone && nextLessonCharge === 'blocked') {
+    // 1. If completely blocked (no XP and no coins), show toast and stop
+    if (!alreadyDone && nextLessonCharge === 'blocked') {
       toast({
-        title: 'Out of daily XP & Coins',
-        description: `You've used today's ${DAILY_XP} XP and don't have enough Sage Coins (${LESSON_COIN_COST} required). Come back tomorrow!`,
+        title: 'Out of XP & Coins',
+        description: `You've run out of XP. Come back tomorrow for your daily allowance, or buy this lesson for ${LESSON_COIN_COST} coins.`,
         variant: 'destructive',
       });
       return;
     }
 
-        // Optimistic UI so the checkmark, coins and energy update instantly.
+    // 2. If out of XP but has coins, ask for explicit permission to buy
+    if (!alreadyDone && nextLessonCharge === 'coins') {
+      const confirmed = window.confirm(
+        `You are run out of XPs (daily and winning).\n\nCome tomorrow for your next lesson when you get your daily XP, or revise what you learned today.\n\nClick OK to buy this lesson for ${LESSON_COIN_COST} coins, or Cancel to stop.`
+      );
+      if (!confirmed) return; // User cancelled, do nothing
+
+      // User confirmed: call the new purchase function
+      const { data, error } = await supabase.rpc('purchase_extra_lesson', { _lesson_id: lessonId });
+      if (error) {
+        console.error('purchase_extra_lesson failed:', error.message);
+        toast({ title: 'Purchase Failed', description: error.message, variant: 'destructive' });
+        return;
+      }
+      if (data && typeof data === 'object') {
+        applyServerProfile(data as Parameters<typeof applyServerProfile>[0]);
+      }
+      toast({ title: 'Lesson Unlocked!', description: `+1 XP, +${LESSON_COIN_REWARD} Coins` });
+      return;
+    }
+
+    // 3. Normal flow: User has enough Total XP. Deduct from daily first, then lifetime.
     if (!alreadyDone) {
       setUser(prev => {
         if (!prev) return prev;
-        const spendEnergy = nextLessonCharge === 'energy';
         
-        // Safely deduct XP, ensuring it never drops below 0
-        const newDailyXp = spendEnergy 
-          ? Math.max(0, Math.round((energy - LESSON_XP_COST) * 10) / 10) 
-          : energy;
-
-        // Add 2 coins for completion, but subtract 5 coins IF we had to pay with coins
-        const newCoins = prev.sageCoins + LESSON_COIN_REWARD - (spendEnergy ? 0 : LESSON_COIN_COST);
+        // Calculate how much to deduct from daily vs lifetime XP
+        const xpNeededFromLifetime = Math.max(0, LESSON_XP_COST - energy);
+        const newDailyXp = Math.max(0, Math.round((energy - LESSON_XP_COST) * 10) / 10);
+        
+        // Deduct from lifetime XP, then add +1 winning XP
+        const newXp = Math.max(0, prev.xp - xpNeededFromLifetime) + 1; 
+        const newCoins = prev.sageCoins + LESSON_COIN_REWARD;
 
         const updatedUser: UserProfile = {
           ...prev,
           completedLessons: [...prev.completedLessons, lessonId],
-          xp: prev.xp + 1, // Base XP gain per lesson. (Adjust this number later if games should award more)
+          xp: newXp,
           dailyXp: newDailyXp,
           dailyXpDate: todayKey(),
           sageCoins: newCoins,
@@ -468,8 +497,7 @@ useEffect(() => {
       });
     }
 
-    // Server-authoritative write. award_lesson_v2 does the energy/coin
-    // accounting; if it isn't deployed yet we fall back to award_lesson.
+    // 4. Server-authoritative write (retry logic preserved)
     let lastError: string | null = null;
     for (let attempt = 0; attempt < 3; attempt++) {
       const { data, error } = await (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>)('award_lesson_v2', { _lesson_id: lessonId });
@@ -493,11 +521,10 @@ useEffect(() => {
     queuePending(lessonId);
     toast({
       title: 'Progress saved locally',
-      description: "We couldn't reach the server. Your lesson will sync automatically next time you open CodeSage.",
+      description: "We couldn't reach the server. Your lesson will sync automatically next time.",
       variant: 'destructive',
     });
   };
-
 
   const completeTest = async (testId: string) => {
     if (!user) return;
