@@ -2,8 +2,10 @@ import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { StreakModal } from '@/components/StreakModal';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
-        Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown, Cpu,
+        Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
         Layout, Terminal, Database, Briefcase, Sparkles } from 'lucide-react';
+import { energyToday } from '@/lib/gamification';
+
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
