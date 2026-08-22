@@ -352,12 +352,16 @@ const Dashboard = () => {
     allTracks.find(t => t.trackId && !isGuest && isEnrolled(t.trackId)),
   [allTracks, isGuest, enrollTick]);
 
+  // Remaining daily XP energy
+  const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
+
     // Calculate today's winnings based on daily XP spent
-  const todayWinnings = useMemo(() => {
+  const todayLessons = useMemo(() => {
     if (!user) return 0;
     const spent = Math.max(0, 10 - energy);
     return Math.floor(spent / 3.3); 
   }, [user, energy]);
+
   
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
