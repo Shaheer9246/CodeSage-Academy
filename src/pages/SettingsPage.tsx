@@ -447,12 +447,16 @@ const SettingsPage = () => {
               <h2 className="text-xl font-black font-display text-primary truncate">
                 Level {user.level}
               </h2>
-                              <p className="text-xs text-foreground/70 truncate">
+                   <p className="text-xs text-foreground/70 truncate">
                   {(() => {
                     const nextBadge = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
+                    // Format the badge_id (e.g., "object-crafter") into a readable title
+                    const formatBadgeName = (id: string) => 
+                      id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    
                     return nextBadge 
-                      ? `Next: ${nextBadge.title || nextBadge.label || `Level ${user.level + 1}`}`
-                      : 'Max Level Reached! ';
+                      ? `Next: ${formatBadgeName(nextBadge.badge_id || nextBadge.id || `Level ${user.level + 1}`)}`
+                      : 'Max Level Reached! 🏆';
                   })()}
                 </p>
             </div>
