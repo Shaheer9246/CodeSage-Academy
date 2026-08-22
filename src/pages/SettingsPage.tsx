@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser, type UserProfile } from '@/contexts/UserContext';
 import { StreakModal } from "@/components/StreakModal";
-import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle, Coins } from 'lucide-react';
+import { User, Flame, Trophy, Trash2, LogOut, Moon, Sun, Check, Lock, Target, Zap, Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, StopCircle, Coins, ShieldCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   ALL_LESSON_IDS,
@@ -99,7 +99,7 @@ const ACHIEVEMENTS: Achievement[] = [
 
 const SettingsPage = () => {
   const navigate = useNavigate();
- const { user, logout, deleteAccount, resetTour, updateUser } = useUser();
+  const { user, logout, deleteAccount, resetTour, updateUser, spendCoins } = useUser();
   const [theme, setTheme] = useState<ThemeName>('dark');
   const [autoRun, setAutoRun] = useState<boolean>(() => {
     try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
@@ -173,6 +173,16 @@ const SettingsPage = () => {
       URL.revokeObjectURL(url);
       toast.success('Workspace exported.');
     } catch { toast.error('Export failed.'); }
+  };
+
+   const handleBuyFreeze = async () => {
+    if ((user?.sageCoins || 0) < 10) { 
+      toast.error('Need 10 Sage Coins to buy a Streak Freeze ❄️'); 
+      return; 
+    }
+    const spent = await spendCoins(10, 'streak_freeze_settings');
+    if (spent) toast.success('❄️ Streak Freeze purchased! Your streak is protected.');
+    else toast.error('Could not purchase freeze');
   };
 
   if (!user) { navigate('/auth'); return null; }
@@ -332,6 +342,15 @@ const SettingsPage = () => {
               </div>
             ))}
           </div>
+
+          {/* NEW: Streak Freeze Purchase */}
+          <button
+            onClick={handleBuyFreeze}
+            disabled={(user?.sageCoins || 0) < 10}
+            className="w-full mt-4 flex items-center justify-center gap-2 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-xl px-3 py-2.5 hover:bg-yellow-500/20 transition-colors text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" /> Buy Streak Freeze (10 Coins)
+          </button>
         </div>
 
                 {/* Stats (click for breakdown) */}
