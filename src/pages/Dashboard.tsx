@@ -18,7 +18,7 @@ import { completedCountFor, lessonCountFor, type LessonTrackKey } from '@/data/l
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
-  { target: 'frontend',   title: 'Frontend Development', body: 'HTML, CSS, JS from zero. Learn to How to build a website (coding only).' },
+  { target: 'frontend',   title: 'Frontend Development', body: 'HTML, CSS, JS from zero. Learn to How to build a website (Learn coding only).' },
   { target: 'networking', title: 'Computer & Networking', body: 'How machines & the internet work.' },
   { target: 'ai-fundamentals', title: 'AI Fundamentals', body: 'Concepts, LLMs & Agents.' },
   { target: 'fullstack',  title: 'Full Stack Frontend', body: 'React, hooks, deployment. Learn How to make website live and deploy, in real world.' },
