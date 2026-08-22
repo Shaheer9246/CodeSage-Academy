@@ -2,8 +2,10 @@ import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { StreakModal } from '@/components/StreakModal';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
-        Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown, Cpu,
+        Gamepad2, Palette, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
         Layout, Terminal, Database, Briefcase, Sparkles } from 'lucide-react';
+import { energyToday } from '@/lib/gamification';
+
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -352,12 +354,16 @@ const Dashboard = () => {
     allTracks.find(t => t.trackId && !isGuest && isEnrolled(t.trackId)),
   [allTracks, isGuest, enrollTick]);
 
+  // Remaining daily XP energy
+  const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
+
     // Calculate today's winnings based on daily XP spent
-  const todayWinnings = useMemo(() => {
+  const todayLessons = useMemo(() => {
     if (!user) return 0;
     const spent = Math.max(0, 10 - energy);
     return Math.floor(spent / 3.3); 
   }, [user, energy]);
+
   
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
