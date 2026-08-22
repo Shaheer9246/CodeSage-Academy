@@ -11,7 +11,7 @@ export const LESSON_XP_COST = 3.3;
 /** Coins earned for finishing a lesson. */
 export const LESSON_COIN_REWARD = 2;
 /** Coins charged for a lesson once the daily energy is gone. */
-export const LESSON_COIN_COST = 5;
+export const LESSON_COIN_COST = 6;
 /** Coins charged to rescue a broken flow streak in Code Crawler. */
 export const CRAWLER_RESCUE_COST = 2;
 
