@@ -504,6 +504,7 @@ useEffect(() => {
       }
       lastError = error.message;
       await new Promise(r => setTimeout(r, 600 * (attempt + 1)));
+    }
 
     console.error('award_lesson_v2 failed:', lastError);
     queuePending(lessonId);
