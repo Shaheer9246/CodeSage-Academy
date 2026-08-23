@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Loader2, ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Terminal, ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
 import {
   getLockRemaining, getAttemptsLeft, registerFailure, clearFailures, formatRemaining, MAX_ATTEMPTS,
 } from '@/lib/loginGuard';
