@@ -325,11 +325,29 @@ useEffect(() => {
       }
     });
 
+    // Explicit bootstrap: onAuthStateChange can miss INITIAL_SESSION if the
+    // network is slow or the backend is unreachable. Never leave the app stuck
+    // on the "Initializing CodeSage Environment..." screen.
+    void supabase.auth.getSession()
+      .then(({ data }) => {
+        if (!mounted) return;
+        if (data.session?.user) return fetchProfile(data.session.user);
+        setLoading(false);
+      })
+      .catch(() => { if (mounted) setLoading(false); });
+
+    // Hard watchdog — if anything above hangs, show the app anyway.
+    const watchdog = window.setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 6000);
+
     return () => {
       mounted = false;
+      clearTimeout(watchdog);
       subscription.unsubscribe();
     };
   }, [fetchProfile]);
+
 
 
   const isLoggedIn = !!user;
