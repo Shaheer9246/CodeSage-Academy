@@ -362,6 +362,25 @@ export default function Admin() {
             <p className="text-center text-xs text-muted-foreground py-10">no students match that search</p>
           )}
         </div>
+
+        {/* Pagination */}
+        {total > PAGE_SIZE && (
+          <div className="flex items-center justify-between gap-3 mt-4">
+            <button
+              disabled={page === 0 || loading}
+              onClick={() => { const p = page - 1; setPage(p); void load({ page: p }); }}
+              className="text-xs font-mono bg-secondary/50 border border-border/40 rounded-lg px-3 py-2 disabled:opacity-40"
+            >← prev</button>
+            <p className="text-[11px] font-mono text-muted-foreground">
+              page {page + 1} / {Math.max(1, Math.ceil(total / PAGE_SIZE))} · {total} students
+            </p>
+            <button
+              disabled={(page + 1) * PAGE_SIZE >= total || loading}
+              onClick={() => { const p = page + 1; setPage(p); void load({ page: p }); }}
+              className="text-xs font-mono bg-secondary/50 border border-border/40 rounded-lg px-3 py-2 disabled:opacity-40"
+            >next →</button>
+          </div>
+        )}
       </div>
     </div>
   );
