@@ -74,32 +74,52 @@ export default function Admin() {
 
   useEffect(() => { document.title = 'Admin Console · CodeSage'; }, []);
 
-  const load = async () => {
+  const PAGE_SIZE = 50;
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState('');
+
+  const load = async (opts?: { search?: string; page?: number }) => {
+    const s = opts?.search ?? search;
+    const p = opts?.page ?? page;
     setLoading(true); setError('');
-    const { data, error: err } = await supabase.rpc('admin_list_users');
+    const [{ data, error: err }, countRes] = await Promise.all([
+      supabase.rpc('admin_list_users', { _search: s || null, _limit: PAGE_SIZE, _offset: p * PAGE_SIZE }),
+      supabase.rpc('admin_user_count', { _search: s || null }),
+    ]);
     setLoading(false);
-    if (err) { setError('Admin access required for this account.'); setAuthed(false); return; }
+    if (err) {
+      setError(err.message?.includes('Admin') ? 'Admin access required for this account.' : err.message);
+      setAuthed(false);
+      return;
+    }
     setRows((data as unknown as AdminUser[]) || []);
+    if (!countRes.error) setTotal(Number(countRes.data) || 0);
     setAuthed(true);
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
 
+  // Debounced server-side search
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      if (query.trim() === search) return;
+      setSearch(query.trim());
+      setPage(0);
+      void load({ search: query.trim(), page: 0 });
+    }, 400);
+    return () => clearTimeout(t);
+    /* eslint-disable-next-line */
+  }, [query]);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(r =>
-      [r.email, r.username, r.name, r.student_id].some(v => (v || '').toLowerCase().includes(q)),
-    );
-  }, [rows, query]);
+  const filtered = rows;
 
   const totals = useMemo(() => ({
-    users: rows.length,
+    users: total,
     lessons: rows.reduce((a, r) => a + (r.lessons_done || 0), 0),
     xp: rows.reduce((a, r) => a + (r.xp || 0), 0),
     active: rows.filter(r => r.enrollments.some(e => e.status === 'active')).length,
-  }), [rows]);
+  }), [rows, total]);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
