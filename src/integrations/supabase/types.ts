@@ -430,7 +430,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      admin_list_users: { Args: never; Returns: Json }
+      admin_list_users: {
+        Args: { _limit?: number; _offset?: number; _search?: string }
+        Returns: Json
+      }
+      admin_user_count: { Args: { _search?: string }; Returns: number }
       award_lesson: {
         Args: { _lesson_id: string }
         Returns: {
