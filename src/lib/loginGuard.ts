@@ -1,7 +1,8 @@
-// Client-side brute-force guard: 3 failed logins per email → 24h lockout.
-const KEY = 'cs_login_guard_v1';
-export const MAX_ATTEMPTS = 3;
-export const LOCK_MS = 24 * 60 * 60 * 1000;
+// Client-side brute-force guard: 5 failed logins per email → 15 min cooldown.
+// (v2 key resets any 24h lockouts users are stuck in from the old rule.)
+const KEY = 'cs_login_guard_v2';
+export const MAX_ATTEMPTS = 5;
+export const LOCK_MS = 15 * 60 * 1000;
 
 type Entry = { fails: number; lockedUntil: number };
 type Store = Record<string, Entry>;

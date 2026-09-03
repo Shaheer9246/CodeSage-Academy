@@ -137,7 +137,7 @@ const Auth = () => {
           setLockLeft(locked);
           const remaining = getAttemptsLeft(email);
           setError(locked > 0
-            ? `Account locked on this device for 24h. Try again in ${formatRemaining(locked)}`
+            ? `Too many attempts on this device. Try again in ${formatRemaining(locked)} (or use forgot_password)`
             : `${err} — ${remaining} attempt${remaining === 1 ? '' : 's'} left`);
           setSubmitting(false);
         } else {
@@ -149,7 +149,12 @@ const Auth = () => {
         if (passed < CHECKS.length) { setError('Password too weak — complete all requirements below'); setSubmitting(false); return; }
         if (!acceptedTerms) { setError('You must accept the Terms of Service and Privacy Policy'); setSubmitting(false); return; }
         const err = await signup(username, email, password);
-        if (err) { setError(err); setSubmitting(false); }
+        if (err) {
+          setError(/weak|pwned|known to be weak/i.test(err)
+            ? 'That password appears in known data breaches — pick a more unique one (mix words, numbers and symbols).'
+            : err);
+          setSubmitting(false);
+        }
       }
     } catch {
       setError('Something went wrong');
