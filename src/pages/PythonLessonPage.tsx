@@ -1,198 +1,445 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
+import {
+  ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, ChevronLeft,
+  GraduationCap, Lightbulb, Circle, CheckCircle2, Sparkles, type LucideIcon,
+} from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-type Section = 'concept' | 'practical' | 'quiz';
+type Stage = 'concept' | 'practical' | 'quiz';
+
+const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = [
+  { key: 'concept', icon: BookOpen, label: 'Brief', hint: 'Understand it' },
+  { key: 'practical', icon: FlaskConical, label: 'Lab', hint: 'Build it' },
+  { key: 'quiz', icon: ClipboardCheck, label: 'Proof', hint: 'Prove it' },
+];
 
 const PythonLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
+  const isMobile = useIsMobile();
+  const [sp] = useSearchParams();
+  const from = sp.get('from');
+  const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/python?from=dashboard' : '/python';
 
   const lesson = id ? getPythonLessonById(id) : undefined;
-  const [section, setSection] = useState<Section>('concept');
+
+  const [stage, setStage] = useState<Stage>('concept');
   const [conceptView, setConceptView] = useState<'beginner' | 'advanced'>('beginner');
+  const [openConcept, setOpenConcept] = useState<number>(0);
+  const [doneSteps, setDoneSteps] = useState<Record<number, boolean>>({});
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [qIndex, setQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('python', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
-  if (!lesson) return <Navigate to="/python" replace />;
-  if (!isPythonLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/python" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('python', id);
 
-  const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correctIndex).length;
+  const quiz = lesson?.quiz ?? [];
+  const correctCount = useMemo(
+    () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
+    [quiz, answers]
+  );
+
+  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  if (!lesson) return <Navigate to="/python" replace />;
+  if (!isPythonLessonUnlocked(lesson.id, user?.completedLessons || [])) return <Navigate to="/python" replace />;
+
   const passed = correctCount >= 3;
-  const allAnswered = lesson.quiz.every((_, i) => answers[i] !== undefined);
+  const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
+  const stageIndex = STAGES.findIndex(s => s.key === stage);
+  const stepsDone = Object.values(doneSteps).filter(Boolean).length;
+  const journey = Math.round(
+    ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
+  );
 
   const handleSubmit = async () => {
     setSubmitted(true);
     if (correctCount >= 3) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
-      navigate('/complete/' + lesson.id);
+      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
 
-  const SECTIONS: { key: Section; icon: LucideIcon; label: string }[] = [
-    { key: 'concept', icon: BookOpen, label: 'Lesson' },
-    { key: 'practical', icon: FlaskConical, label: 'Practical' },
-    { key: 'quiz', icon: ClipboardCheck, label: 'Test' },
-  ];
-
   return (
     <div className="min-h-screen bg-background grid-bg">
-      <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/80 border-b border-border/30 px-3 py-2.5 flex items-center gap-3">
-        <button onClick={() => navigate('/python')} className="text-muted-foreground hover:text-foreground p-1">
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider truncate">{lesson.module}</p>
-          <h1 className="font-display font-bold text-sm text-foreground truncate flex items-center gap-1.5">
-            <span>{lesson.icon}</span> {lesson.title}
-          </h1>
+      {/* ── Command bar ─────────────────────────────── */}
+      <header className="sticky top-0 z-30 backdrop-blur-xl bg-background/85 border-b border-border/30">
+        <div className="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-3">
+          <button
+            onClick={() => navigate(backTo)}
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-secondary/50 transition-colors"
+            aria-label="Back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-[0.18em] truncate">
+              {lesson.module}
+            </p>
+            <h1 className="font-display font-bold text-sm text-foreground truncate flex items-center gap-1.5">
+              <span>{lesson.icon}</span> {lesson.title}
+            </h1>
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
+            <Sparkles className="w-3 h-3" /> +5 XP · +2 ◈
+          </div>
+        </div>
+        <div className="h-0.5 bg-secondary/40">
+          <div
+            className="h-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-500"
+            style={{ width: `${Math.max(journey, 6)}%` }}
+          />
         </div>
       </header>
 
-      <div className="sticky top-[57px] z-10 bg-background/80 backdrop-blur-xl border-b border-border/30 flex">
-        {SECTIONS.map(s => (
-          <button key={s.key} onClick={() => setSection(s.key)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-all border-b-2 ${
-              section === s.key ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-            }`}>
-            <s.icon className="w-3.5 h-3.5" />{s.label}
-            {s.key === 'quiz' && submitted && passed && <Check className="w-3 h-3 text-emerald-400" />}
-          </button>
-        ))}
-      </div>
-
-      <div className="max-w-2xl mx-auto px-4 py-5 pb-24">
-        {section === 'concept' && (
-          <div className="space-y-5 animate-fade-in">
-            <div className="glass-card rounded-2xl p-4 border border-primary/20">
-              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2">I. Core Philosophy</p>
-              <p className="text-sm text-foreground leading-relaxed">{lesson.philosophy}</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 px-1">II. Detailed Breakdown</p>
-              <div className="flex gap-1 mb-3 p-1 glass-card rounded-xl w-full">
-                {(['beginner', 'advanced'] as const).map(v => (
-                  <button key={v} onClick={() => setConceptView(v)}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-display font-semibold capitalize transition-all ${
-                      conceptView === v ? 'bg-primary/20 text-primary' : 'text-muted-foreground'
-                    }`}>{v} View</button>
-                ))}
-              </div>
-              <div className="space-y-3">
-                {lesson.concepts.map((c, i) => (
-                  <div key={i} className="glass-card rounded-xl p-4">
-                    <h3 className="font-display font-bold text-sm text-foreground mb-2">{c.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {conceptView === 'beginner' ? c.beginner : c.advanced}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button onClick={() => setSection('practical')}
-              className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
-              Try the Practical Lab <ChevronRight className="w-4 h-4" />
-            </button>
+      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-28 md:flex md:gap-6">
+        {/* ── Stage rail ────────────────────────────── */}
+        <nav className="md:w-52 md:shrink-0 mb-4 md:mb-0">
+          <div className="md:sticky md:top-24 flex md:flex-col gap-2">
+            {STAGES.map((s, i) => {
+              const active = stage === s.key;
+              const done = i < stageIndex || (s.key === 'quiz' && submitted && passed);
+              return (
+                <button
+                  key={s.key}
+                  onClick={() => setStage(s.key)}
+                  className={`flex-1 md:flex-none flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all ${
+                    active
+                      ? 'border-primary/50 bg-primary/10 text-primary shadow-[0_0_20px_-8px_hsl(var(--primary))]'
+                      : 'border-border/30 bg-card/40 text-muted-foreground hover:border-primary/25 hover:text-foreground'
+                  }`}
+                >
+                  <span
+                    className={`w-6 h-6 rounded-lg grid place-items-center shrink-0 border text-[10px] font-mono ${
+                      done ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400' : 'border-current/30 bg-background/40'
+                    }`}
+                  >
+                    {done ? <Check className="w-3 h-3" /> : <s.icon className="w-3 h-3" />}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-display font-semibold leading-tight">{s.label}</span>
+                    <span className="hidden md:block text-[10px] opacity-70 leading-tight">{s.hint}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        )}
+        </nav>
 
-        {section === 'practical' && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
-              <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                <FlaskConical className="w-3 h-3" /> III. Practical Lab
-              </p>
-              <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
-              <p className="text-xs text-muted-foreground">{lesson.practical.intro}</p>
-            </div>
-            <div className="glass-card rounded-2xl p-4">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">Steps</p>
-              <ol className="space-y-3">
-                {lesson.practical.steps.map((step, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-primary font-mono">{i + 1}</span>
-                    <p className="text-xs text-foreground leading-relaxed pt-0.5" dangerouslySetInnerHTML={{
-                      __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
-                    }} />
-                  </li>
-                ))}
-              </ol>
-            </div>
-            <div className="glass-card rounded-2xl p-4 border border-primary/20 bg-primary/5">
-              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Lightbulb className="w-3 h-3" /> The Goal
-              </p>
-              <p className="text-xs text-foreground">{lesson.practical.goal}</p>
-            </div>
-            <button onClick={() => setSection('quiz')}
-              className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
-              Take the Mastery Test <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        {/* ── Stage content ─────────────────────────── */}
+        <main className="flex-1 min-w-0">
+          {stage === 'concept' && (
+            <div className="space-y-5 animate-fade-in">
+              <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
+                <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">Mission brief</p>
+                <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
+                <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl" />
+              </section>
 
-        {section === 'quiz' && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="glass-card rounded-2xl p-4 border border-primary/20">
-              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
-                <GraduationCap className="w-3 h-3" /> IV. Mastery Test
-              </p>
-              <p className="text-xs text-muted-foreground">Score 3/4 to complete this lesson and earn XP.</p>
-            </div>
-            {lesson.quiz.map((q, qi) => (
-              <div key={qi} className="glass-card rounded-2xl p-4">
-                <p className="text-[10px] font-mono text-muted-foreground mb-2">Question {qi + 1} of {lesson.quiz.length}</p>
-                <p className="text-sm font-display font-semibold text-foreground mb-3">{q.question}</p>
-                <div className="space-y-2">
-                  {q.options.map((opt, oi) => {
-                    const selected = answers[qi] === oi;
-                    const isCorrect = oi === q.correctIndex;
-                    let cls = 'border-border/30 hover:border-primary/30 text-foreground';
-                    if (submitted && selected && isCorrect) cls = 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300';
-                    else if (submitted && selected && !isCorrect) cls = 'border-red-500/50 bg-red-500/10 text-red-300';
-                    else if (submitted && isCorrect) cls = 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300';
-                    else if (selected) cls = 'border-primary/40 bg-primary/10 text-primary';
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">
+                  Breakdown · {lesson.concepts.length} ideas
+                </p>
+                <div className="flex p-0.5 rounded-full border border-border/40 bg-card/60">
+                  {(['beginner', 'advanced'] as const).map(v => (
+                    <button
+                      key={v}
+                      onClick={() => setConceptView(v)}
+                      className={`px-3 py-1 rounded-full text-[10px] font-display font-semibold capitalize transition-all ${
+                        conceptView === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Accordion spine */}
+              <div className="relative pl-5">
+                <span className="absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/50 via-border/40 to-transparent" />
+                <div className="space-y-2.5">
+                  {lesson.concepts.map((c, i) => {
+                    const open = openConcept === i;
                     return (
-                      <button key={oi} disabled={submitted} onClick={() => setAnswers(p => ({ ...p, [qi]: oi }))}
-                        className={`w-full text-left text-xs px-3 py-2.5 rounded-xl border-2 transition-all flex items-center justify-between gap-2 ${cls}`}>
-                        <span>{opt}</span>
-                        {submitted && selected && (isCorrect ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />)}
-                        {submitted && !selected && isCorrect && <Check className="w-3.5 h-3.5 opacity-60" />}
-                      </button>
+                      <div key={i} className="relative">
+                        <span
+                          className={`absolute -left-5 top-4 w-[11px] h-[11px] rounded-full border-2 transition-colors ${
+                            open ? 'bg-primary border-primary' : 'bg-background border-border'
+                          }`}
+                        />
+                        <button
+                          onClick={() => setOpenConcept(open ? -1 : i)}
+                          className={`w-full text-left glass-card rounded-2xl px-4 py-3 border transition-all ${
+                            open ? 'border-primary/35' : 'border-border/25 hover:border-primary/20'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className="text-[10px] font-mono text-primary">{String(i + 1).padStart(2, '0')}</span>
+                            <span className="flex-1 font-display font-bold text-sm text-foreground">{c.title}</span>
+                            <ChevronRight
+                              className={`w-4 h-4 text-muted-foreground transition-transform ${open ? 'rotate-90' : ''}`}
+                            />
+                          </span>
+                          {open && (
+                            <p className="text-xs text-muted-foreground leading-relaxed mt-2.5 animate-fade-in">
+                              {conceptView === 'beginner' ? c.beginner : c.advanced}
+                            </p>
+                          )}
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
-                {submitted && q.explanation && (
-                  <p className="text-[11px] text-muted-foreground mt-3 italic border-l-2 border-primary/30 pl-3">💡 {q.explanation}</p>
-                )}
               </div>
-            ))}
-            {!submitted ? (
-              <button disabled={!allAnswered} onClick={handleSubmit}
-                className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-                {allAnswered ? 'Submit Test' : `Answer all questions (${Object.keys(answers).length}/${lesson.quiz.length})`}
-              </button>
-            ) : (
-              <div className="glass-card rounded-2xl p-5 text-center">
-                <p className="text-2xl font-display font-bold text-foreground mb-1">{correctCount} / {lesson.quiz.length}</p>
-                <p className={`text-sm font-display font-semibold mb-3 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
-                  {passed ? '🎉 Lesson Passed!' : 'Almost there — try again'}
+            </div>
+          )}
+
+          {stage === 'practical' && (
+            <div className="space-y-4 animate-fade-in">
+              <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
+                <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
+                  <FlaskConical className="w-3 h-3" /> Practical lab
                 </p>
-                {!passed && (
-                  <button onClick={() => { setAnswers({}); setSubmitted(false); }}
-                    className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-xl">Retry Test</button>
-                )}
+                <h2 className="font-display font-bold text-base md:text-lg text-foreground mb-1">{lesson.practical.title}</h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
+              </section>
+
+              <div className="glass-card rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">Steps</p>
+                  <span className="text-[10px] font-mono text-primary">
+                    {stepsDone}/{lesson.practical.steps.length}
+                  </span>
+                </div>
+                <ol className="space-y-1.5">
+                  {lesson.practical.steps.map((step, i) => {
+                    const done = !!doneSteps[i];
+                    return (
+                      <li key={i}>
+                        <button
+                          onClick={() => setDoneSteps(p => ({ ...p, [i]: !p[i] }))}
+                          className={`w-full flex gap-2.5 text-left rounded-xl px-2.5 py-2 border transition-all ${
+                            done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-transparent hover:bg-secondary/40'
+                          }`}
+                        >
+                          {done ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                          )}
+                          <span
+                            className={`text-xs leading-relaxed ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
+                            dangerouslySetInnerHTML={{
+                              __html: step.replace(
+                                /`([^`]+)`/g,
+                                '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>'
+                              ),
+                            }}
+                          />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+
+                <div className="mt-4 rounded-xl border border-primary/25 bg-primary/5 p-3">
+                  <p className="text-[10px] font-mono text-primary uppercase tracking-[0.18em] mb-1 flex items-center gap-1">
+                    <Lightbulb className="w-3 h-3" /> Goal
+                  </p>
+                  <p className="text-xs text-foreground leading-relaxed">{lesson.practical.goal}</p>
+                </div>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+
+          {stage === 'quiz' && (
+            <div className="space-y-4 animate-fade-in">
+              {!submitted ? (
+                <>
+                  <section className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 to-transparent p-5 flex items-center gap-3">
+                    <GraduationCap className="w-5 h-5 text-primary shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
+                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                    </div>
+                    <div className="flex gap-1.5">
+                      {quiz.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setQIndex(i)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            i === qIndex
+                              ? 'bg-primary scale-125'
+                              : answers[i] !== undefined
+                              ? 'bg-primary/50'
+                              : 'bg-secondary'
+                          }`}
+                          aria-label={`Question ${i + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </section>
+
+                  {quiz[qIndex] && (
+                    <div className="glass-card rounded-2xl p-5" key={qIndex}>
+                      <p className="text-[10px] font-mono text-muted-foreground mb-2 uppercase tracking-[0.18em]">
+                        Question {qIndex + 1} of {quiz.length}
+                      </p>
+                      <p className="text-sm md:text-base font-display font-semibold text-foreground mb-4">
+                        {quiz[qIndex].question}
+                      </p>
+                      <div className="space-y-2">
+                        {quiz[qIndex].options.map((opt, oi) => {
+                          const selected = answers[qIndex] === oi;
+                          return (
+                            <button
+                              key={oi}
+                              onClick={() => {
+                                setAnswers(p => ({ ...p, [qIndex]: oi }));
+                                if (qIndex < quiz.length - 1) setTimeout(() => setQIndex(qIndex + 1), 220);
+                              }}
+                              className={`w-full text-left text-xs md:text-sm px-3.5 py-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
+                                selected
+                                  ? 'border-primary/50 bg-primary/10 text-primary'
+                                  : 'border-border/30 text-foreground hover:border-primary/30'
+                              }`}
+                            >
+                              <span
+                                className={`w-5 h-5 rounded-md grid place-items-center text-[10px] font-mono shrink-0 border ${
+                                  selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border/50'
+                                }`}
+                              >
+                                {String.fromCharCode(65 + oi)}
+                              </span>
+                              <span className="flex-1">{opt}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4">
+                        <button
+                          disabled={qIndex === 0}
+                          onClick={() => setQIndex(q => q - 1)}
+                          className="text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 flex items-center gap-1"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" /> Back
+                        </button>
+                        <button
+                          disabled={qIndex >= quiz.length - 1}
+                          onClick={() => setQIndex(q => q + 1)}
+                          className="text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 flex items-center gap-1"
+                        >
+                          Skip <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="glass-card rounded-3xl p-6 text-center">
+                    <p className="text-3xl font-display font-bold text-foreground">
+                      {correctCount}
+                      <span className="text-muted-foreground text-lg"> / {quiz.length}</span>
+                    </p>
+                    <p className={`text-sm font-display font-semibold mt-1 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {passed ? '🎉 Lesson passed!' : 'Almost there — review and retry'}
+                    </p>
+                    {!passed && (
+                      <button
+                        onClick={() => { setAnswers({}); setSubmitted(false); setQIndex(0); }}
+                        className="mt-4 bg-primary text-primary-foreground text-xs font-semibold px-5 py-2 rounded-xl"
+                      >
+                        Retry test
+                      </button>
+                    )}
+                  </div>
+
+                  {quiz.map((q, qi) => {
+                    const sel = answers[qi];
+                    const ok = sel === q.correctIndex;
+                    return (
+                      <div key={qi} className={`glass-card rounded-2xl p-4 border ${ok ? 'border-emerald-500/25' : 'border-red-500/25'}`}>
+                        <p className="text-sm font-display font-semibold text-foreground mb-2 flex items-start gap-2">
+                          {ok ? (
+                            <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                          ) : (
+                            <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                          )}
+                          {q.question}
+                        </p>
+                        <div className="space-y-1.5">
+                          {q.options.map((opt, oi) => {
+                            const isCorrect = oi === q.correctIndex;
+                            const chosen = sel === oi;
+                            let cls = 'border-border/20 text-muted-foreground';
+                            if (isCorrect) cls = 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300';
+                            else if (chosen) cls = 'border-red-500/40 bg-red-500/10 text-red-300';
+                            return (
+                              <div key={oi} className={`text-xs px-3 py-2 rounded-lg border ${cls}`}>
+                                {opt}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {q.explanation && (
+                          <p className="text-[11px] text-muted-foreground mt-3 italic border-l-2 border-primary/30 pl-3">
+                            💡 {q.explanation}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* ── Sticky action dock ──────────────────────── */}
+      <div className="fixed bottom-0 inset-x-0 z-30 border-t border-border/30 bg-background/90 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-3">
+          <button
+            disabled={stageIndex === 0}
+            onClick={() => setStage(STAGES[stageIndex - 1].key)}
+            className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-30 flex items-center gap-1 px-2 py-2"
+          >
+            <ChevronLeft className="w-4 h-4" /> Prev
+          </button>
+
+          {stage !== 'quiz' ? (
+            <button
+              onClick={() => setStage(STAGES[stageIndex + 1].key)}
+              className="flex-1 bg-primary text-primary-foreground font-display font-semibold text-sm py-2.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+            >
+              {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : !submitted ? (
+            <button
+              disabled={!allAnswered}
+              onClick={handleSubmit}
+              className="flex-1 bg-primary text-primary-foreground font-display font-semibold text-sm py-2.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate(backTo)}
+              className="flex-1 bg-secondary text-foreground font-display font-semibold text-sm py-2.5 rounded-2xl hover:opacity-90"
+            >
+              Back to track
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
