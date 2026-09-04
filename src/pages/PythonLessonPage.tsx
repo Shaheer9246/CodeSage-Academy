@@ -265,7 +265,7 @@ const PythonLessonPage = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
               </section>
 
-              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
+              <div className="space-y-6">
                 {/* Checklist */}
                 <div className="glass-card rounded-2xl p-4 max-h-[60vh] overflow-auto">
   <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10">
@@ -314,7 +314,7 @@ const PythonLessonPage = () => {
                 </div>
 
                                 {/* Workbench (Editor & Terminal) - ALWAYS VISIBLE */}
-                <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-[50vh] md:h-[45vh] border border-border/40 shadow-2xl">
+                <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-[50vh] md:h-[70vh] border border-border/40 shadow-2xl">
                   {isMobile ? (
                     <>
                       <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
@@ -348,13 +348,11 @@ const PythonLessonPage = () => {
                 </div>
               </div>
 
-              {/* Mobile Only Button (Hidden on Desktop to avoid duplicates) */}
-              <button
-                onClick={() => setStage('quiz')}
-                className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
-              >
-                Take the Mastery Test <ChevronRight className="w-4 h-4" />
-              </button>
+              
+              {/* Hidden to avoid duplicate with global mobile action bar */}
+<div className="hidden">
+  <button onClick={() => setStage('quiz')}>Take the Mastery Test</button>
+</div>
             </div>
           )}
 
