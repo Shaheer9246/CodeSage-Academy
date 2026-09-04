@@ -1,6 +1,3 @@
-fixes you have to do. you have to tell me change this with htis. don't rewriet the whoel file
-first on the mobile preview the terminal isn't here . so kindly add that. just on the mobile preview no on computer. desktop view
-
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
