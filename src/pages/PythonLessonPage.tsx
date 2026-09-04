@@ -5,14 +5,13 @@ import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
 import {
-  ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, ChevronLeft,
-  GraduationCap, Lightbulb, Code2, Terminal, Play, Circle, CheckCircle2, Sparkles, type LucideIcon,
+  ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, 
+  Check, X, ChevronRight, GraduationCap, type LucideIcon,
 } from 'lucide-react';
-import CodeEditor from '@/components/CodeEditor';
+import PythonWorkspace from '@/components/PythonWorkspace';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 type Stage = 'concept' | 'practical' | 'quiz';
-type MobileLab = 'code' | 'terminal';
 
 const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = [
   { key: 'concept', icon: BookOpen, label: 'Brief', hint: 'Understand it' },
@@ -39,85 +38,7 @@ const PythonLessonPage = () => {
   const [qIndex, setQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   
-  // Python specific state
-  const [pythonCode, setPythonCode] = useState(lesson?.practical.code?.python || '');
-  const [output, setOutput] = useState<string>('');
-  const [isRunning, setIsRunning] = useState(false);
-  const [mobileLab, setMobileLab] = useState<MobileLab>('code');
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('python', id);
-
-  const quiz = lesson?.quiz ?? [];
-  const correctCount = useMemo(
-    () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
-    [quiz, answers]
-  );
-
-  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
-  if (!lesson) return <Navigate to="/python" replace />;
-  if (!isPythonLessonUnlocked(lesson.id, user?.completedLessons || [])) return <Navigate to="/python" replace />;
-
-  const code = lesson.practical.code;
-  const passed = correctCount >= 3;
-  const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
-  const stageIndex = STAGES.findIndex(s => s.key === stage);
-  const stepsDone = Object.values(doneSteps).filter(Boolean).length;
-  const journey = Math.round(
-    ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
-  );
-
-  const handleSubmit = async () => {
-    setSubmitted(true);
-    if (passed) {
-      if (user) await completeLesson(lesson.id);
-      toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
-      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
-    }
-  };
-
-  const handleRunCode = () => {
-    setIsRunning(true);
-    setOutput('Executing python script...\n');
-    
-    // Simulate execution time. Replace this block with your actual execution logic (e.g. Pyodide or a backend API call)
-    setTimeout(() => {
-      setOutput('Hello, World!\n> Program exited successfully.');
-      setIsRunning(false);
-      // Auto-switch to terminal view on mobile so the user sees the output
-      if (isMobile) setMobileLab('terminal');
-    }, 800);
-  };
-
-  const EditorPane = (
-    <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center justify-between border-b border-border/40 bg-card/60 shrink-0 px-3 py-1.5">
-        <span className="text-[11px] font-mono uppercase tracking-wide text-primary flex items-center gap-1.5">
-          <Code2 className="w-3.5 h-3.5" /> main.py
-        </span>
-        <button
-          onClick={handleRunCode}
-          disabled={isRunning}
-          className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-[11px] font-display font-semibold rounded-md transition-colors disabled:opacity-50"
-        >
-          <Play className="w-3 h-3 fill-current" /> {isRunning ? 'Running...' : 'Run Code'}
-        </button>
-      </div>
-      <div className="flex-1 min-h-0">
-        <CodeEditor code={pythonCode} onChange={setPythonCode} language="python" />
-      </div>
-    </div>
-  );
-
-  const TerminalPane = (
-    <div className="flex flex-col h-full min-h-0 bg-[#0D0D0D]">
-      <div className="px-3 py-1.5 border-b border-border/20 bg-black/40 text-[10px] font-mono uppercase tracking-wide text-muted-foreground flex items-center gap-1.5 shrink-0">
-        <Terminal className="w-3 h-3" /> Terminal Output
-      </div>
-      <div className="flex-1 min-h-0 overflow-auto p-3 font-mono text-[13px] text-zinc-300 whitespace-pre-wrap">
-        {output || <span className="text-zinc-600 italic">Code output will appear here...</span>}
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -254,7 +175,7 @@ const PythonLessonPage = () => {
             </div>
           )}
 
-                    {stage === 'practical' && (
+                                          {stage === 'practical' && (
             <div className="space-y-6 animate-fade-in">
               {/* Header Card */}
               <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
@@ -265,94 +186,18 @@ const PythonLessonPage = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
               </section>
 
-              <div className="space-y-6">
-                {/* Checklist */}
-                <div className="glass-card rounded-2xl p-4 max-h-[60vh] overflow-auto">
-  <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10">
-    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">Steps</p>
-    <span className="text-[10px] font-mono text-primary">
-      {stepsDone}/{lesson.practical?.steps?.length ?? 0}
-    </span>
-  </div>
-  <ol className="space-y-1.5">
-    {(lesson.practical?.steps ?? []).map((step, i) => {
-                      const done = !!doneSteps[i];
-                      return (
-                        <li key={i}>
-                          <button
-                            onClick={() => setDoneSteps(p => ({ ...p, [i]: !p[i] }))}
-                            className={`w-full flex gap-2.5 text-left rounded-xl px-2.5 py-2 border transition-all ${
-                              done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-transparent hover:bg-secondary/40'
-                            }`}
-                          >
-                            {done ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                            ) : (
-                              <Circle className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                            )}
-                            <span
-                              className={`text-xs leading-relaxed ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
-                              dangerouslySetInnerHTML={{
-                                __html: step.replace(
-                                  /`([^`]+)`/g,
-                                  '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>'
-                                ),
-                              }}
-                            />
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ol>
-
-                  <div className="mt-4 rounded-xl border border-primary/25 bg-primary/5 p-3">
-                    <p className="text-[10px] font-mono text-primary uppercase tracking-[0.18em] mb-1 flex items-center gap-1">
-                      <Lightbulb className="w-3 h-3" /> Goal
-                    </p>
-                    <p className="text-xs text-foreground leading-relaxed">{lesson.practical?.goal ?? ''}</p>
-                  </div>
-                </div>
-
-                                {/* Workbench (Editor & Terminal) - ALWAYS VISIBLE */}
-                <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-[50vh] md:h-[85vh] border border-border/40 shadow-2xl">
-                  {isMobile ? (
-                    <>
-                      <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
-                        {(['code', 'terminal'] as const).map(t => (
-                          <button
-                            key={t}
-                            onClick={() => setMobileLab(t)}
-                            className={`flex-1 py-1.5 rounded-lg text-[11px] font-display font-semibold capitalize transition-all flex items-center justify-center gap-1.5 ${
-                              mobileLab === t ? 'bg-primary/15 text-primary' : 'text-muted-foreground'
-                            }`}
-                          >
-                            {t === 'code' ? <Code2 className="w-3 h-3" /> : <Terminal className="w-3 h-3" />}
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex-1 min-h-0 bg-[#0D0D0D]">
-                        {mobileLab === 'code' ? EditorPane : TerminalPane}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex-1 flex flex-col h-full">
-                      <div className="h-1/2 min-h-0 border-b border-border/40 relative">
-                        {EditorPane}
-                      </div>
-                      <div className="h-1/2 min-h-0 relative">
-                        {TerminalPane}
-                      </div>
-                    </div>
-                  )}
-                </div>
+              {/* Tall Workspace Container - Stacked under header */}
+              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[50vh] md:h-[70vh]">
+                <PythonWorkspace practical={lesson.practical} />
               </div>
 
-              
-              {/* Hidden to avoid duplicate with global mobile action bar */}
-<div className="hidden">
-  <button onClick={() => setStage('quiz')}>Take the Mastery Test</button>
-</div>
+              {/* Mobile-only button (hidden on desktop to avoid duplicate with floating bar) */}
+              <button 
+                onClick={() => setStage('quiz')}
+                className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+              >
+                Take the Mastery Test <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           )}
 
