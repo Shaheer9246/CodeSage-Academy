@@ -3,7 +3,7 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
-import { getRealFreelanceLessonById, isRealFreelanceLessonUnlocked } from '@/data/realfreelanceLesson';
+import { REAL_FREELANCE_LESSONS, getRealFreelanceLessonById, isRealFreelanceLessonUnlocked } from '@/data/realfreelanceLesson';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
