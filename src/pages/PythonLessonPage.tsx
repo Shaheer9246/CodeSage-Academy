@@ -314,7 +314,7 @@ const PythonLessonPage = () => {
 
                 {/* Workbench (Editor & Terminal) */}
                 {code && (
-                  <div className="glass-card rounded-2xl overflow-hidden h-[75vh] flex flex-col">
+                  <div className="glass-card rounded-2xl overflow-hidden h-[45vh] md:h-[50vh] flex flex-col">
                     {isMobile ? (
                       <>
                         <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
