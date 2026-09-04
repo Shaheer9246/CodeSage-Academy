@@ -151,7 +151,7 @@ const PythonLessonPage = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-40 md:pb-6 md:flex md:gap-6">
+      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-8 md:pb-24 md:flex md:gap-6">
         {/* ── Stage rail ────────────────────────────── */}
         <nav className="md:w-52 md:shrink-0 mb-4 md:mb-0">
           <div className="md:sticky md:top-24 flex md:flex-col gap-2">
@@ -501,8 +501,8 @@ const PythonLessonPage = () => {
       </div>
 
       {/* ── Sticky action dock ──────────────────────── */}
-      <div className="fixed bottom-0 inset-x-0 z-30 border-t border-border/30 bg-background/90 backdrop-blur-xl mb-20 md:mb-0">
-        <div className="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-3">
+      <div className="fixed md:bottom-8 inset-x-0 z-30 flex justify-center pointer-events-none md:pointer-events-auto mt-8 mb-8 md:mt-0 md:mb-0">
+      <div className="px-3 py-2.5 flex items-center gap-3 w-full md:w-auto">
           <button
             disabled={stageIndex === 0}
             onClick={() => setStage(STAGES[stageIndex - 1].key)}
@@ -514,7 +514,7 @@ const PythonLessonPage = () => {
           {stage !== 'quiz' ? (
             <button
               onClick={() => setStage(STAGES[stageIndex + 1].key)}
-              className="flex-1 bg-primary text-primary-foreground font-display font-semibold text-sm py-2.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+              className="flex-1 md:flex-none md:min-w-[200px] bg-primary text-primary-foreground font-display font-semibold text-sm py-2.5 px-8 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
             >
               {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
             </button>
