@@ -1,10 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Inbox as InboxIcon, Shield, X, Send, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Inbox as InboxIcon, Shield, X, Send, ShieldCheck, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/contexts/UserContext';
+
+// NOTE: Change this to your desired password. Keep it consistent with your Suggestions page.
+const ADMIN_PASSWORD = "sage_admin_2024";
 
 interface Announcement {
   id: string;
@@ -27,6 +30,11 @@ const InboxPage = () => {
   const [editTitle, setEditTitle] = useState('');
   const [editBody, setEditBody] = useState('');
   const [updating, setUpdating] = useState(false);
+
+  // Admin password protection states
+  const [isAdminVerified, setIsAdminVerified] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
 
   const startEdit = (item: Announcement) => {
     setEditingItem(item);
@@ -58,27 +66,26 @@ const InboxPage = () => {
     refresh();
   };
 
-  // Real admin check (server-side role via is_admin())
-  const [isAdminVerified, setIsAdminVerified] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      if (!user) { setIsAdminVerified(false); return; }
-      const { data, error } = await supabase.rpc('is_admin');
-      if (active) setIsAdminVerified(!error && data === true);
-    })();
-    return () => { active = false; };
-  }, [user]);
-
   const handleShieldClick = () => {
     if (isAdminVerified) {
       setShowCompose(true);
     } else {
-      toast.error('Admin access required');
+      setShowPasswordModal(true);
+      setAdminPassword('');
     }
   };
 
+  const confirmAdminPassword = () => {
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAdminVerified(true);
+      setShowPasswordModal(false);
+      setAdminPassword('');
+      setShowCompose(true);
+      toast.success('Admin access granted');
+    } else {
+      toast.error('Incorrect admin password');
+    }
+  };
 
   const refresh = useCallback(async () => {
     const { data, error } = await supabase
@@ -87,6 +94,7 @@ const InboxPage = () => {
       .order('created_at', { ascending: false });
     if (error) { console.error(error); return; }
     setItems((data || []) as Announcement[]);
+    
     // Mark all seen ids as read
     if (user) {
       for (const a of (data || []) as Announcement[]) {
@@ -133,9 +141,13 @@ const InboxPage = () => {
             <span className="text-primary neon-text">Inbox</span>
           </h1>
           <button
-            title="Admin: post announcement"
+            title={isAdminVerified ? "Post announcement" : "Admin access"}
             onClick={handleShieldClick}
-            className="text-muted-foreground hover:text-primary p-2 rounded-lg hover:bg-primary/10 transition-colors"
+            className={`p-2 rounded-lg transition-colors ${
+              isAdminVerified 
+                ? 'text-primary bg-primary/10 hover:bg-primary/20' 
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
+            }`}
           >
             <Shield className="w-4 h-4" />
           </button>
@@ -154,22 +166,22 @@ const InboxPage = () => {
             {items.map(a => (
               <div key={a.id} className="glass-card p-4 rounded-2xl space-y-2 border border-primary/10">
                 <div className="flex items-center gap-2">
-  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-  <p className="text-[10px] font-mono text-primary uppercase tracking-wider">CodeSage Admin</p>
-  <div className="ml-auto flex items-center gap-2">
-    {isAdminVerified && (
-      <button
-        onClick={() => startEdit(a)}
-        className="text-[10px] text-primary hover:underline font-mono"
-      >
-        Edit
-      </button>
-    )}
-    <p className="text-[10px] text-muted-foreground">
-      {new Date(a.created_at).toLocaleString()}
-    </p>
-  </div>
-</div>
+                  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                  <p className="text-[10px] font-mono text-primary uppercase tracking-wider">CodeSage Admin</p>
+                  <div className="ml-auto flex items-center gap-2">
+                    {isAdminVerified && (
+                      <button
+                        onClick={() => startEdit(a)}
+                        className="text-[10px] text-primary hover:underline font-mono"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <p className="text-[10px] text-muted-foreground">
+                      {new Date(a.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
                 <h3 className="font-display font-bold text-sm text-foreground">{a.title}</h3>
                 <p className="text-xs text-foreground/90 whitespace-pre-wrap break-words leading-relaxed">
                   {a.body}
@@ -180,7 +192,7 @@ const InboxPage = () => {
         )}
       </motion.div>
 
-     {/* Edit Announcement Modal */}
+      {/* Edit Announcement Modal */}
       {editingItem && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="glass-card rounded-2xl p-5 w-full max-w-md border border-primary/30 neon-glow space-y-3">
@@ -216,11 +228,9 @@ const InboxPage = () => {
         </div>
       )} 
 
-
-
-
+      {/* Compose Announcement Modal */}
       {showCompose && (
-        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="glass-card rounded-2xl p-5 w-full max-w-md border border-primary/30 neon-glow space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-display font-bold text-sm flex items-center gap-2">
@@ -239,6 +249,47 @@ const InboxPage = () => {
               <Send className="w-4 h-4" /> {posting ? 'Posting…' : 'Post to all users'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Admin Password Verification Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass-card p-6 rounded-2xl w-full max-w-sm space-y-4 border border-primary/20"
+          >
+            <h3 className="text-lg font-bold font-display flex items-center gap-2">
+              <Lock className="w-5 h-5 text-primary" /> Admin Access
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Please enter the admin password to manage announcements.
+            </p>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="w-full bg-secondary/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary/50"
+              onKeyDown={(e) => e.key === 'Enter' && confirmAdminPassword()}
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={confirmAdminPassword}
+                className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Verify
+              </button>
+              <button
+                onClick={() => { setShowPasswordModal(false); setAdminPassword(''); }}
+                className="flex-1 bg-secondary text-foreground px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>
