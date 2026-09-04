@@ -6,14 +6,14 @@ import { useUser } from '@/contexts/UserContext';
 import { getFullstackLessonById, isFullstackLessonUnlocked } from '@/data/fullstackLessons';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, ChevronLeft,
-  GraduationCap, Lightbulb, Code2, Eye, Circle, CheckCircle2, Sparkles, type LucideIcon,
+  GraduationCap, Lightbulb, Code2, Eye, Circle, CheckCircle2, Sparkles, Terminal, type LucideIcon,
 } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 type Stage = 'concept' | 'practical' | 'quiz';
-type MobileLab = 'code' | 'preview';
+type MobileLab = 'code' | 'preview' | 'terminal';
 
 const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = [
   { key: 'concept', icon: BookOpen, label: 'Brief', hint: 'Understand it' },
@@ -44,6 +44,7 @@ const FullstackLessonPage = () => {
   const [js, setJs] = useState(lesson?.practical.code?.js || '');
   const [activeFile, setActiveFile] = useState<'html' | 'css' | 'js'>('html');
   const [mobileLab, setMobileLab] = useState<MobileLab>('code');
+  const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
 
   const { isGuest: __pgGuest } = useGuestLessonGate('fullstack', id);
 
@@ -103,13 +104,38 @@ const FullstackLessonPage = () => {
     </div>
   );
 
-  const PreviewPane = (
+    const PreviewPane = (
     <div className="flex flex-col h-full min-h-0">
       <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase tracking-wide text-muted-foreground flex items-center gap-1.5 shrink-0">
         <Eye className="w-3 h-3" /> Preview
       </div>
       <div className="flex-1 min-h-0 overflow-hidden bg-white/5">
         <LivePreview html={html} css={css} js={js} />
+      </div>
+    </div>
+  );
+
+  const TerminalPane = (
+    <div className="flex flex-col h-full min-h-0">
+      <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase tracking-wide text-muted-foreground flex items-center justify-between shrink-0">
+        <span className="flex items-center gap-1.5"><Terminal className="w-3 h-3" /> Console</span>
+        <button
+          onClick={() => setConsoleLogs([])}
+          className="text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Clear
+        </button>
+      </div>
+      <div className="flex-1 min-h-0 overflow-auto bg-black/80 p-3 font-mono text-[11px] leading-relaxed">
+        {consoleLogs.length === 0 ? (
+          <p className="text-muted-foreground/50 italic">No output yet. Use console.log() in your JS.</p>
+        ) : (
+          consoleLogs.map((log, i) => (
+            <p key={i} className="text-emerald-400/90 border-b border-white/5 py-0.5">
+              <span className="text-muted-foreground/40 mr-2">&gt;</span>{log}
+            </p>
+          ))
+        )}
       </div>
     </div>
   );
@@ -310,10 +336,10 @@ const FullstackLessonPage = () => {
                 {/* Workbench */}
                 {code && (
                   <div className="glass-card rounded-2xl overflow-hidden md:sticky md:top-24 self-start w-full">
-                    {isMobile ? (
+                                        {isMobile ? (
                       <>
                         <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
-                          {(['code', 'preview'] as const).map(t => (
+                          {(['code', 'preview', 'terminal'] as const).map(t => (
                             <button
                               key={t}
                               onClick={() => setMobileLab(t)}
@@ -321,13 +347,13 @@ const FullstackLessonPage = () => {
                                 mobileLab === t ? 'bg-primary/15 text-primary' : 'text-muted-foreground'
                               }`}
                             >
-                              {t === 'code' ? <Code2 className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              {t === 'code' ? <Code2 className="w-3 h-3" /> : t === 'preview' ? <Eye className="w-3 h-3" /> : <Terminal className="w-3 h-3" />}
                               {t}
                             </button>
                           ))}
                         </div>
                         <div style={{ height: '68vh' }} className="min-h-0">
-                          {mobileLab === 'code' ? EditorPane : PreviewPane}
+                          {mobileLab === 'code' ? EditorPane : mobileLab === 'preview' ? PreviewPane : TerminalPane}
                         </div>
                       </>
                     ) : (
