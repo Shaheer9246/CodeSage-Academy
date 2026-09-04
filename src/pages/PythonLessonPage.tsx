@@ -205,7 +205,7 @@ const PythonLessonPage = () => {
 
          {stage === 'practical' && (
   <div className="space-y-6 animate-fade-in">
-    {/* Assignment Header */}
+    {/* Header Card */}
     <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
       <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
         <FlaskConical className="w-3 h-3" /> Practical lab
@@ -214,8 +214,9 @@ const PythonLessonPage = () => {
       <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
     </section>
 
-    {/* Assignment Display: Goal + Steps (Rendered directly here, NOT in workspace) */}
+    {/* Assignment Display: Goal + Steps (Rendered directly here) */}
     <div className="glass-card rounded-2xl p-4 border border-border/30">
+      {/* Goal Section */}
       <div className="mb-4">
         <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
           <Check className="w-3 h-3" /> Goal
@@ -223,27 +224,37 @@ const PythonLessonPage = () => {
         <p className="text-sm text-foreground leading-relaxed">{lesson.practical.goal}</p>
       </div>
       
+      {/* Steps Checklist */}
       <div>
         <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">Steps</p>
-        <ol className="space-y-2">
-          {lesson.practical.steps.map((step, i) => {
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-mono text-primary">
+            {stepsDone}/{lesson.practical?.steps?.length ?? 0}
+          </span>
+        </div>
+        <ol className="space-y-1.5">
+          {(lesson.practical?.steps ?? []).map((step, i) => {
             const done = !!doneSteps[i];
             return (
               <li key={i}>
                 <button
                   onClick={() => setDoneSteps(p => ({ ...p, [i]: !p[i] }))}
-                  className={`w-full flex gap-3 text-left rounded-xl px-3 py-2.5 border transition-all ${
-                    done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/20 hover:border-primary/20'
+                  className={`w-full flex gap-2.5 text-left rounded-xl px-2.5 py-2 border transition-all ${
+                    done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-transparent hover:bg-secondary/40'
                   }`}
                 >
-                  <span className={`w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-mono border ${
-                    done ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400' : 'border-border/50 text-muted-foreground'
-                  }`}>
-                    {done ? <Check className="w-3 h-3" /> : i + 1}
-                  </span>
-                  <span className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
+                  {done ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                  )}
+                  <span
+                    className={`text-xs leading-relaxed ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
                     dangerouslySetInnerHTML={{
-                      __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
+                      __html: step.replace(
+                        /`([^`]+)`/g,
+                        '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>'
+                      ),
                     }}
                   />
                 </button>
@@ -254,13 +265,13 @@ const PythonLessonPage = () => {
       </div>
     </div>
 
-    {/* Code Editor + Terminal ONLY (No assignment tabs inside) */}
+    {/* Real Terminal: Code Editor + Terminal ONLY */}
     <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[50vh] md:h-[70vh]">
       <PythonWorkspace practical={lesson.practical} />
     </div>
 
-    {/* Mobile-only button */}
-    <button 
+    {/* Mobile-only button (hidden on desktop) */}
+    <button
       onClick={() => setStage('quiz')}
       className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
     >
