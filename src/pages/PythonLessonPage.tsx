@@ -6,7 +6,7 @@ import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, 
-  Check, X, ChevronRight, GraduationCap, type LucideIcon,
+  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, type LucideIcon,
 } from 'lucide-react';
 import PythonWorkspace from '@/components/PythonWorkspace';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -37,8 +37,36 @@ const PythonLessonPage = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [qIndex, setQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  
 
+  const { isGuest: __pgGuest } = useGuestLessonGate('python', id);
+
+  // ✅ ADDED BACK: Missing state calculations
+  const quiz = lesson?.quiz ?? [];
+  const correctCount = useMemo(
+    () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
+    [quiz, answers]
+  );
+  const passed = correctCount >= 3;
+  const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
+  const stageIndex = STAGES.findIndex(s => s.key === stage);
+  const stepsDone = Object.values(doneSteps).filter(Boolean).length;
+  const journey = Math.round(
+    ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
+  );
+
+  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  if (!lesson) return <Navigate to="/python" replace />;
+  if (!isPythonLessonUnlocked(lesson.id, user?.completedLessons || [])) return <Navigate to="/python" replace />;
+
+  // ✅ ADDED BACK: Missing handleSubmit function
+  const handleSubmit = async () => {
+    setSubmitted(true);
+    if (passed) {
+      if (user) await completeLesson(lesson.id);
+      toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
+      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -61,7 +89,7 @@ const PythonLessonPage = () => {
             </h1>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
-            <Sparkles className="w-3 h-3" /> +5 XP · +2 ◈
+            <Sparkles className="w-3 h-3" /> +5 XP · +2 
           </div>
         </div>
         <div className="h-0.5 bg-secondary/40">
@@ -175,7 +203,7 @@ const PythonLessonPage = () => {
             </div>
           )}
 
-                                          {stage === 'practical' && (
+          {stage === 'practical' && (
             <div className="space-y-6 animate-fade-in">
               {/* Header Card */}
               <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
@@ -186,7 +214,7 @@ const PythonLessonPage = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
               </section>
 
-              {/* Tall Workspace Container - Stacked under header */}
+              {/* ✅ REAL TERMINAL: Tall Workspace Container */}
               <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[50vh] md:h-[70vh]">
                 <PythonWorkspace practical={lesson.practical} />
               </div>
@@ -349,78 +377,78 @@ const PythonLessonPage = () => {
 
       {/* ── Sticky action dock ──────────────────────── */}
       {/* Mobile: inline button at end of content */}
-<div className="md:hidden mt-6 mb-4 space-y-3">
-  {stageIndex > 0 && (
-    <button
-      onClick={() => setStage(STAGES[stageIndex - 1].key)}
-      className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 py-2"
-    >
-      <ChevronLeft className="w-4 h-4" /> Previous stage
-    </button>
-  )}
+      <div className="md:hidden mt-6 mb-4 space-y-3">
+        {stageIndex > 0 && (
+          <button
+            onClick={() => setStage(STAGES[stageIndex - 1].key)}
+            className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 py-2"
+          >
+            <ChevronLeft className="w-4 h-4" /> Previous stage
+          </button>
+        )}
 
-  {stage !== 'quiz' ? (
-    <button
-      onClick={() => setStage(STAGES[stageIndex + 1].key)}
-      className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
-    >
-      {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
-    </button>
-  ) : !submitted ? (
-    <button
-      disabled={!allAnswered}
-      onClick={handleSubmit}
-      className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-    >
-      {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
-    </button>
-  ) : (
-    <button
-      onClick={() => navigate(backTo)}
-      className="w-full bg-secondary text-foreground font-display font-semibold text-sm py-3.5 rounded-2xl hover:opacity-90"
-    >
-      Back to track
-    </button>
-  )}
-</div>
+        {stage !== 'quiz' ? (
+          <button
+            onClick={() => setStage(STAGES[stageIndex + 1].key)}
+            className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+          >
+            {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
+          </button>
+        ) : !submitted ? (
+          <button
+            disabled={!allAnswered}
+            onClick={handleSubmit}
+            className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate(backTo)}
+            className="w-full bg-secondary text-foreground font-display font-semibold text-sm py-3.5 rounded-2xl hover:opacity-90"
+          >
+            Back to track
+          </button>
+        )}
+      </div>
 
-{/* Desktop: floating pill button */}
-<div className="hidden md:flex fixed bottom-8 inset-x-0 z-30 justify-center pointer-events-none">
-  <div className="flex items-center gap-3 pointer-events-auto bg-background/80 backdrop-blur-xl border border-border/30 rounded-full px-4 py-2 shadow-lg">
-    {stageIndex > 0 && (
-      <button
-        onClick={() => setStage(STAGES[stageIndex - 1].key)}
-        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1.5"
-      >
-        <ChevronLeft className="w-4 h-4" /> Prev
-      </button>
-    )}
+      {/* Desktop: floating pill button */}
+      <div className="hidden md:flex fixed bottom-8 inset-x-0 z-30 justify-center pointer-events-none">
+        <div className="flex items-center gap-3 pointer-events-auto bg-background/80 backdrop-blur-xl border border-border/30 rounded-full px-4 py-2 shadow-lg">
+          {stageIndex > 0 && (
+            <button
+              onClick={() => setStage(STAGES[stageIndex - 1].key)}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1.5"
+            >
+              <ChevronLeft className="w-4 h-4" /> Prev
+            </button>
+          )}
 
-    {stage !== 'quiz' ? (
-      <button
-        onClick={() => setStage(STAGES[stageIndex + 1].key)}
-        className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
-      >
-        {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
-      </button>
-    ) : !submitted ? (
-      <button
-        disabled={!allAnswered}
-        onClick={handleSubmit}
-        className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
-      </button>
-    ) : (
-      <button
-        onClick={() => navigate(backTo)}
-        className="bg-secondary text-foreground font-display font-semibold text-sm py-2 px-6 rounded-full hover:opacity-90"
-      >
-        Back to track
-      </button>
-    )}
-  </div>
-</div>
+          {stage !== 'quiz' ? (
+            <button
+              onClick={() => setStage(STAGES[stageIndex + 1].key)}
+              className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+            >
+              {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : !submitted ? (
+            <button
+              disabled={!allAnswered}
+              onClick={handleSubmit}
+              className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate(backTo)}
+              className="bg-secondary text-foreground font-display font-semibold text-sm py-2 px-6 rounded-full hover:opacity-90"
+            >
+              Back to track
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
