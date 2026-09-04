@@ -331,7 +331,7 @@ const FullstackLessonPage = () => {
                         </div>
                       </>
                     ) : (
-                      <div className="flex flex-col" style={{ height: '72vh' }}>
+                      <div className="flex flex-col" style={{ height: '85vh' }}>
                         <div className="h-1/2 min-h-0 border-b border-border/40">{EditorPane}</div>
                         <div className="h-1/2 min-h-0">{PreviewPane}</div>
                       </div>
