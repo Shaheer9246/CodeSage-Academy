@@ -336,7 +336,7 @@ const PythonLessonPage = () => {
                         </div>
                       </>
                     ) : (
-                      <div className="flex flex-col" style={{ height: '85vh' }}>
+                        <div className="flex-1 flex flex-col">
                         <div className="h-1/2 min-h-0 border-b border-border/40">{EditorPane}</div>
                         <div className="h-1/2 min-h-0">{TerminalPane}</div>
                       </div>
@@ -344,15 +344,15 @@ const PythonLessonPage = () => {
                   </div>
                 )}
               </div>
+
+              <button
+                onClick={() => setStage('quiz')}
+                className="w-full mt-6 bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+              >
+                Take the Mastery Test <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           )}
-
-          <button
-            onClick={() => setStage('quiz')}
-            className="w-full mt-6 bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
-          >
-            Take the Mastery Test <ChevronRight className="w-4 h-4" />
-          </button>
 
           {stage === 'quiz' && (
             <div className="space-y-4 animate-fade-in">
