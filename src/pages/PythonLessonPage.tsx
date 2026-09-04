@@ -263,14 +263,6 @@ const PythonLessonPage = () => {
               <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[70vh]">
                 <PythonWorkspace practical={lesson.practical} embedded={true} />
               </div>
-
-              {/* Mobile-only button */}
-              <button 
-                onClick={() => setStage('quiz')}
-                className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
-              >
-                Take the Mastery Test <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
           )}
 
