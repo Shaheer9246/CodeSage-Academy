@@ -205,7 +205,7 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
       </div>
 
       {/* Code Editor - ALWAYS VISIBLE */}
-      <div className={`${embedded ? 'flex-1 min-h-0' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
+      <div className={`${embedded ? 'flex-1 min-h-[220px]' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
         <CodeEditor code={code} onChange={handleCodeChange} language="python" showShortcuts={false} />
       </div>
 
