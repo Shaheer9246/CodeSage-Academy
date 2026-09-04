@@ -6,6 +6,10 @@ import { motion } from 'framer-motion';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
 
+// NOTE: Change this to your desired password. 
+// This is a frontend gate. Later, ensure your Supabase RPCs/RLS also validate admin roles.
+const ADMIN_PASSWORD = "sage_admin_2024";
+
 interface Suggestion {
   id: string;
   username: string;
@@ -19,7 +23,6 @@ interface Suggestion {
   is_mine: boolean;
   user_vote?: 'up' | 'down' | null;
 }
-
 
 const PROMPTS = [
   "What feature do you wish CodeSage had?",
@@ -41,6 +44,10 @@ const Suggestions = () => {
   const [adminEditText, setAdminEditText] = useState('');
   const [adminDeleteId, setAdminDeleteId] = useState<string | null>(null);
   const [postedToday, setPostedToday] = useState(false);
+
+  // Password protection states
+  const [showPasswordModal, setShowPasswordModal] = useState<{ type: 'reply' | 'edit' | 'delete', id: string } | null>(null);
+  const [adminPassword, setAdminPassword] = useState('');
 
   const sb = supabase as unknown as {
     from: (t: string) => any;
@@ -89,7 +96,6 @@ const Suggestions = () => {
     }
   }, [user]);
 
-
   useEffect(() => {
     refresh();
     const ch = supabase
@@ -100,8 +106,6 @@ const Suggestions = () => {
     return () => { supabase.removeChannel(ch); };
   }, [refresh]);
 
-
-  // Mark suggestions as read when the user opens the page
   useEffect(() => {
     if (user) {
       const markAsRead = async () => {
@@ -110,10 +114,8 @@ const Suggestions = () => {
           console.error('Failed to mark suggestions as read:', error);
           return;
         }
-        // Tell the dashboard badge to clear itself immediately.
         window.dispatchEvent(new Event('suggestions:read'));
       };
-      
       markAsRead();
     }
   }, [user]);
@@ -167,7 +169,6 @@ const Suggestions = () => {
     if (data === false) { toast.error('Delete failed'); return; }
     toast.success('Suggestion deleted');
     setAdminDeleteId(null); 
-    // Optimistic + refresh — realtime may lag
     setItems(prev => prev.filter(s => s.id !== id));
     refresh();
   };
@@ -191,19 +192,15 @@ const Suggestions = () => {
     if (!currentSuggestion) return;
 
     const existingVote = currentSuggestion.user_vote;
-
-    // Optimistic UI updates
     let newUpvotes = currentSuggestion.upvotes;
     let newDownvotes = currentSuggestion.downvotes;
     let newVoteState: 'up' | 'down' | null = type;
 
     if (existingVote === type) {
-      // Undo existing vote
       if (type === 'up') newUpvotes = Math.max(0, newUpvotes - 1);
       else newDownvotes = Math.max(0, newDownvotes - 1);
       newVoteState = null;
     } else {
-      // Add new vote or switch vote
       if (type === 'up') {
         newUpvotes += 1;
         if (existingVote === 'down') newDownvotes = Math.max(0, newDownvotes - 1);
@@ -213,7 +210,6 @@ const Suggestions = () => {
       }
     }
 
-    // Instantly update UI locally
     setItems(prev => prev.map(s => s.id === suggestionId ? {
       ...s,
       upvotes: newUpvotes,
@@ -223,24 +219,48 @@ const Suggestions = () => {
 
     try {
       if (newVoteState === null) {
-        // Delete vote from DB
         await sb.from('suggestion_votes').delete().eq('suggestion_id', suggestionId).eq('user_id', user.id);
       } else {
-        // Upsert vote in DB
         await sb.from('suggestion_votes').upsert({
           suggestion_id: suggestionId,
           user_id: user.id,
           vote_type: type
         }, { onConflict: 'suggestion_id,user_id' });
       }
-      // Counters are maintained server-side by a database trigger.
-
-
     } catch (error) {
       console.error(error);
       toast.error('Failed to register vote.');
-      refresh(); // Rollback UI to actual DB state on failure
+      refresh();
     }
+  };
+
+  // --- Password Protection Logic ---
+  const requestAdminAction = (type: 'reply' | 'edit' | 'delete', id: string) => {
+    setShowPasswordModal({ type, id });
+    setAdminPassword('');
+  };
+
+  const confirmAdminAction = async () => {
+    if (adminPassword !== ADMIN_PASSWORD) {
+      toast.error('Incorrect admin password');
+      return;
+    }
+
+    if (!showPasswordModal) return;
+    const { type, id } = showPasswordModal;
+
+    if (type === 'reply') {
+      setReplyOpenId(id);
+    } else if (type === 'edit') {
+      setAdminEditOpenId(id);
+      const item = items.find(s => s.id === id);
+      if (item) setAdminEditText(item.text);
+    } else if (type === 'delete') {
+      setAdminDeleteId(id);
+    }
+
+    setShowPasswordModal(null);
+    setAdminPassword('');
   };
 
   return (
@@ -315,7 +335,6 @@ const Suggestions = () => {
                       <p className="text-sm text-foreground whitespace-pre-wrap break-words">{s.text}</p>
                     )}
                     
-                    {/* Upvote & Downvote buttons */}
                     {!isEditing && (
                       <div className="flex items-center gap-2 mt-2">
                         <button
@@ -387,19 +406,19 @@ const Suggestions = () => {
                 {!isEditing && (
                   <div className="flex flex-wrap gap-2 pt-1">
                     {!s.reply && !isReplying && (
-                      <button onClick={() => setReplyOpenId(s.id)}
+                      <button onClick={() => requestAdminAction('reply', s.id)}
                         className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors">
                         <Reply className="w-3 h-3" /> Reply (admin)
                       </button>
                     )}
                     {!isAdminEditing && (
-                      <button onClick={() => { setAdminEditOpenId(s.id); setAdminEditText(s.text); }}
+                      <button onClick={() => requestAdminAction('edit', s.id)}
                         className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-amber-400 transition-colors">
                         <ShieldAlert className="w-3 h-3" /> Edit (admin)
                       </button>
                     )}
                     {!isAdminDeleting && (
-                      <button onClick={() => setAdminDeleteId(s.id)}
+                      <button onClick={() => requestAdminAction('delete', s.id)}
                         className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-destructive transition-colors">
                         <Trash2 className="w-3 h-3" /> Delete (admin)
                       </button>
@@ -458,6 +477,47 @@ const Suggestions = () => {
           })}
         </div>
       </motion.div>
+
+      {/* Admin Password Verification Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass-card p-6 rounded-2xl w-full max-w-sm space-y-4 border border-primary/20"
+          >
+            <h3 className="text-lg font-bold font-display flex items-center gap-2">
+              <Lock className="w-5 h-5 text-primary" /> Admin Access
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Please enter the admin password to {showPasswordModal.type} this suggestion.
+            </p>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="w-full bg-secondary/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary/50"
+              onKeyDown={(e) => e.key === 'Enter' && confirmAdminAction()}
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={confirmAdminAction}
+                className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Verify
+              </button>
+              <button
+                onClick={() => { setShowPasswordModal(null); setAdminPassword(''); }}
+                className="flex-1 bg-secondary text-foreground px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
