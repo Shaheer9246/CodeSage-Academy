@@ -72,7 +72,7 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([{ kind: 'sys', text: '$ Python 3 (Skulpt in-browser runtime) — press ▶ Run Code to start.' }]);
   const [running, setRunning] = useState(false);
-  const [tab, setTab] = useState<'assign' | 'term'>(embedded ? 'term' : 'assign');
+  const [showTerminal, setShowTerminal] = useState(true);
   const [pendingInput, setPendingInput] = useState<{ resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
@@ -190,7 +190,15 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
         <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
           <FlaskConical className="w-3 h-3" /> {embedded ? 'Python Terminal' : 'Python Lab'}
         </div>
-        <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1">
+          <button
+            onClick={() => setShowTerminal(!showTerminal)}
+            className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors ${
+              showTerminal ? 'bg-primary/20 text-primary' : 'bg-secondary/60 text-muted-foreground hover:bg-secondary'
+            }`}
+          >
+            <Terminal className="w-3 h-3" /> Terminal
+          </button>
           <button
             onClick={runCode}
             disabled={!ready || running}
@@ -213,59 +221,11 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
         <CodeEditor code={code} onChange={handleCodeChange} language="python" showShortcuts={false} />
       </div>
 
-      {/* Tabs - Hide if embedded */}
-      {!embedded && (
-        <div className="flex border-b border-border/30 bg-secondary/20">
-          <button
-            onClick={() => setTab('assign')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
-              tab === 'assign' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-            }`}
-          >
-            <FlaskConical className="w-3 h-3" /> Assignment
-          </button>
-          <button
-            onClick={() => setTab('term')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold transition-all border-b-2 ${
-              tab === 'term' ? 'text-primary border-primary bg-primary/5' : 'text-muted-foreground border-transparent'
-            }`}
-          >
-            <Terminal className="w-3 h-3" /> Terminal
-            {pendingInput && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-          </button>
-        </div>
-      )}
-
-      {/* Panels */}
-      {(!embedded && tab === 'assign' && practical) ? (
-        <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto">
-          <div>
-            <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-1">Goal</p>
-            <p className="text-xs text-foreground font-semibold">{practical.title}</p>
-            <p className="text-[11px] text-muted-foreground mt-1">{practical.intro}</p>
-          </div>
-          <ol className="space-y-2">
-            {practical.steps.map((step, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[9px] font-bold text-primary font-mono">{i + 1}</span>
-                <p
-                  className="text-[11px] text-foreground leading-relaxed pt-0.5"
-                  dangerouslySetInnerHTML={{
-                    __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1 py-0.5 rounded text-[10px] font-mono">$1</code>'),
-                  }}
-                />
-              </li>
-            ))}
-          </ol>
-          <div className="rounded-lg p-2.5 border border-primary/20 bg-primary/5 flex gap-2">
-            <Lightbulb className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
-            <p className="text-[11px] text-foreground">{practical.goal}</p>
-          </div>
-        </div>
-      ) : (
+           {/* Terminal Panel (Toggleable) */}
+      {showTerminal && (
         <div
           ref={termRef}
-          className={`bg-zinc-950 text-emerald-300 font-mono text-[11px] leading-relaxed p-3 overflow-y-auto ${embedded ? 'flex-1 min-h-[120px]' : 'max-h-[300px] min-h-[180px]'}`}
+          className="bg-zinc-950 text-emerald-300 font-mono text-[11px] leading-relaxed p-3 overflow-y-auto border-t border-border/30 min-h-[180px] max-h-[40vh]"
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((l, i) => {
