@@ -254,8 +254,9 @@ const PythonLessonPage = () => {
             </div>
           )}
 
-          {stage === 'practical' && (
-            <div className="space-y-4 animate-fade-in">
+                    {stage === 'practical' && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Header Card */}
               <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
                 <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
                   <FlaskConical className="w-3 h-3" /> Practical lab
@@ -264,17 +265,17 @@ const PythonLessonPage = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
               </section>
 
-              <div className={code ? 'md:grid md:grid-cols-2 md:gap-4 space-y-4 md:space-y-0' : ''}>
+              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
                 {/* Checklist */}
-                <div className="glass-card rounded-2xl p-4 max-h-[75vh] overflow-auto">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">Steps</p>
-                    <span className="text-[10px] font-mono text-primary">
-                      {stepsDone}/{lesson.practical.steps.length}
-                    </span>
-                  </div>
-                  <ol className="space-y-1.5">
-                    {lesson.practical.steps.map((step, i) => {
+                <div className="glass-card rounded-2xl p-4 max-h-[60vh] overflow-auto">
+  <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10">
+    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">Steps</p>
+    <span className="text-[10px] font-mono text-primary">
+      {stepsDone}/{lesson.practical?.steps?.length ?? 0}
+    </span>
+  </div>
+  <ol className="space-y-1.5">
+    {(lesson.practical?.steps ?? []).map((step, i) => {
                       const done = !!doneSteps[i];
                       return (
                         <li key={i}>
@@ -308,46 +309,49 @@ const PythonLessonPage = () => {
                     <p className="text-[10px] font-mono text-primary uppercase tracking-[0.18em] mb-1 flex items-center gap-1">
                       <Lightbulb className="w-3 h-3" /> Goal
                     </p>
-                    <p className="text-xs text-foreground leading-relaxed">{lesson.practical.goal}</p>
+                    <p className="text-xs text-foreground leading-relaxed">{lesson.practical?.goal ?? ''}</p>
                   </div>
                 </div>
 
-                {/* Workbench (Editor & Terminal) */}
-                {code && (
-                  <div className="glass-card rounded-2xl overflow-hidden h-[45vh] md:h-[50vh] flex flex-col">
-                    {isMobile ? (
-                      <>
-                        <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
-                          {(['code', 'terminal'] as const).map(t => (
-                            <button
-                              key={t}
-                              onClick={() => setMobileLab(t)}
-                              className={`flex-1 py-1.5 rounded-lg text-[11px] font-display font-semibold capitalize transition-all flex items-center justify-center gap-1.5 ${
-                                mobileLab === t ? 'bg-primary/15 text-primary' : 'text-muted-foreground'
-                              }`}
-                            >
-                              {t === 'code' ? <Code2 className="w-3 h-3" /> : <Terminal className="w-3 h-3" />}
-                              {t}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="flex-1 min-h-0">
-                          {mobileLab === 'code' ? EditorPane : TerminalPane}
-                        </div>
-                      </>
-                    ) : (
-                        <div className="flex-1 flex flex-col">
-                        <div className="h-1/2 min-h-0 border-b border-border/40">{EditorPane}</div>
-                        <div className="h-1/2 min-h-0">{TerminalPane}</div>
+                                {/* Workbench (Editor & Terminal) - ALWAYS VISIBLE */}
+                <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-[50vh] md:h-[45vh] border border-border/40 shadow-2xl">
+                  {isMobile ? (
+                    <>
+                      <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
+                        {(['code', 'terminal'] as const).map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setMobileLab(t)}
+                            className={`flex-1 py-1.5 rounded-lg text-[11px] font-display font-semibold capitalize transition-all flex items-center justify-center gap-1.5 ${
+                              mobileLab === t ? 'bg-primary/15 text-primary' : 'text-muted-foreground'
+                            }`}
+                          >
+                            {t === 'code' ? <Code2 className="w-3 h-3" /> : <Terminal className="w-3 h-3" />}
+                            {t}
+                          </button>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                )}
+                      <div className="flex-1 min-h-0 bg-[#0D0D0D]">
+                        {mobileLab === 'code' ? EditorPane : TerminalPane}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex-1 flex flex-col h-full">
+                      <div className="h-1/2 min-h-0 border-b border-border/40 relative">
+                        {EditorPane}
+                      </div>
+                      <div className="h-1/2 min-h-0 relative">
+                        {TerminalPane}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
+              {/* Mobile Only Button (Hidden on Desktop to avoid duplicates) */}
               <button
                 onClick={() => setStage('quiz')}
-                className="w-full mt-6 bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+                className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
               >
                 Take the Mastery Test <ChevronRight className="w-4 h-4" />
               </button>
