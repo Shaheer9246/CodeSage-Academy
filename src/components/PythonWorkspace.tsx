@@ -1,6 +1,5 @@
-// src/components/PythonWorkspace.tsx
 import { useEffect, useRef, useState } from 'react';
-import { Play, RotateCcw, Trash2, FlaskConical, Terminal, Lightbulb, Loader2 } from 'lucide-react';
+import { Play, RotateCcw, Trash2, FlaskConical, Terminal, Loader2 } from 'lucide-react';
 import CodeEditor from './CodeEditor';
 
 declare global {
@@ -11,9 +10,9 @@ declare global {
 
 interface PythonWorkspaceProps {
   starterCode?: string;
-  initialCode?: string;       // Used by Challenges.tsx
-  onCodeChange?: (code: string) => void; // Used by Challenges.tsx
-  embedded?: boolean;         // Hides assignment tabs to save space
+  initialCode?: string;
+  onCodeChange?: (code: string) => void;
+  embedded?: boolean;
   practical?: {
     title: string;
     intro: string;
@@ -72,21 +71,17 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([{ kind: 'sys', text: '$ Python 3 (Skulpt in-browser runtime) — press ▶ Run Code to start.' }]);
   const [running, setRunning] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(true);
+  const [showTerminal, setShowTerminal] = useState(true); // Replaced 'tab' state
   const [pendingInput, setPendingInput] = useState<{ resolve: (v: string) => void } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const termRef = useRef<HTMLDivElement>(null);
   const [wantLoad] = useState<boolean>(true);
   const ready = useSkulpt(wantLoad);
 
-  // Sync code up to parent (Challenges.tsx) for validation
   useEffect(() => {
-    if (onCodeChange) {
-      onCodeChange(code);
-    }
+    if (onCodeChange) onCodeChange(code);
   }, [code, onCodeChange]);
 
-  // Reset workspace when switching challenges
   useEffect(() => {
     if (embedded && initialCode !== undefined) {
       setCode(initialCode);
@@ -106,9 +101,7 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
 
   useEffect(() => {
     return () => {
-      if (pendingInput) {
-        pendingInput.resolve('');
-      }
+      if (pendingInput) pendingInput.resolve('');
     };
   }, [pendingInput]);
 
@@ -124,7 +117,7 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
   };
 
   const promptInput = (): Promise<string> => {
-    if (!embedded) setTab('term');
+    if (!embedded) setShowTerminal(true); // FIXED: was setTab('term')
     return new Promise<string>((resolve) => {
       setPendingInput({
         resolve: (v: string) => {
@@ -132,10 +125,7 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
             if (prev.length > 0 && prev[prev.length - 1].kind === 'out') {
               const copy = [...prev];
               const last = copy[copy.length - 1];
-              copy[copy.length - 1] = {
-                ...last,
-                text: last.text + v + '\n',
-              };
+              copy[copy.length - 1] = { ...last, text: last.text + v + '\n' };
               return copy;
             }
             return [...prev, { kind: 'in', text: v + '\n' }];
@@ -149,7 +139,7 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
 
   const runCode = async () => {
     if (!ready || running) return;
-    if (!embedded) setTab('term');
+    if (!embedded) setShowTerminal(true); // FIXED: was setTab('term')
     setRunning(true);
     write('sys', '$ python main.py');
     try {
@@ -177,20 +167,18 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
     }
   };
 
-  const handleCodeChange = (newCode: string) => {
-    setCode(newCode);
-  };
-
+  const handleCodeChange = (newCode: string) => setCode(newCode);
   const resetCode = () => setCode(initial);
   const clearConsole = () => setLines([{ kind: 'sys', text: '$ console cleared' }]);
 
   return (
     <div className={`glass-card overflow-hidden border border-primary/20 ${embedded ? 'h-full flex flex-col rounded-none border-0 bg-background' : 'rounded-2xl'}`}>
+      {/* Toolbar */}
       <div className="flex items-center justify-between px-3 py-2 bg-secondary/40 border-b border-border/30">
         <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
           <FlaskConical className="w-3 h-3" /> {embedded ? 'Python Terminal' : 'Python Lab'}
         </div>
-                <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setShowTerminal(!showTerminal)}
             className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors ${
@@ -216,12 +204,12 @@ const PythonWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fa
         </div>
       </div>
 
-      {/* Editor */}
+      {/* Code Editor - ALWAYS VISIBLE */}
       <div className={`${embedded ? 'flex-1 min-h-0' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
         <CodeEditor code={code} onChange={handleCodeChange} language="python" showShortcuts={false} />
       </div>
 
-           {/* Terminal Panel (Toggleable) */}
+      {/* Terminal Panel - Toggleable */}
       {showTerminal && (
         <div
           ref={termRef}
