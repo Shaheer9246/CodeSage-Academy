@@ -260,7 +260,7 @@ const PythonLessonPage = () => {
               </div>
 
               {/* Code Editor + Terminal (Clean, no internal tabs) */}
-              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
+              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[70vh]">
                 <PythonWorkspace practical={lesson.practical} embedded={true} />
               </div>
 
