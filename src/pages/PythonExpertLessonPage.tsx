@@ -56,7 +56,7 @@ const PythonExpertLessonPage = () => {
     setSubmitted(true);
     if (passed) {
       await completeLesson(lesson.id);
-      toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
+      toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
