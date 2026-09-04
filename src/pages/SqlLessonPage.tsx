@@ -317,7 +317,7 @@ const SqlLessonPage = () => {
             </h1>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
-            <Sparkles className="w-3 h-3" /> +5 XP · +2 ◈
+            <Sparkles className="w-3 h-3" /> +1 XP · +2 ◈
           </div>
         </div>
         <div className="h-0.5 bg-secondary/40">
