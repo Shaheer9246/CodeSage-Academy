@@ -6,7 +6,7 @@ import { useUser } from '@/contexts/UserContext';
 import { getThree3dLessonById, isThree3dLessonUnlocked } from '@/data/three3dLessons';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
-  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
+  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Eye, Code2, type LucideIcon
 } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
@@ -39,6 +39,9 @@ const Three3dLessonPage = () => {
   const [css, setCss] = useState(lesson?.practical.code?.css || '');
   const [js, setJs] = useState(lesson?.practical.code?.js || '');
   const [activeFile, setActiveFile] = useState<'html' | 'css' | 'js'>('js');
+  
+  // Workspace View Toggle ('code' or 'preview')
+  const [workspaceView, setWorkspaceView] = useState<'code' | 'preview'>('code');
 
   const { isGuest: __pgGuest } = useGuestLessonGate('three3d', id);
 
@@ -73,27 +76,6 @@ const Three3dLessonPage = () => {
   const langMap = { html: 'html', css: 'css', js: 'javascript' } as const;
   const codeVal = { html, css, js }[activeFile];
   const codeSet = { html: setHtml, css: setCss, js: setJs }[activeFile];
-
-  const Editor = code && (
-    <div className="flex flex-col h-full min-h-0">
-      <div className="flex border-b border-border/40 bg-card/60 shrink-0">
-        {(['html', 'css', 'js'] as const).map(f => (
-          <button
-            key={f}
-            onClick={() => setActiveFile(f)}
-            className={`px-3 py-1.5 text-[11px] font-mono uppercase border-r border-border/30 transition-colors ${
-              activeFile === f ? 'bg-primary/10 text-primary font-bold' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-      <div className="flex-1 min-h-0">
-        <CodeEditor code={codeVal} onChange={codeSet} language={langMap[activeFile]} />
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -288,24 +270,57 @@ const Three3dLessonPage = () => {
                 </div>
               </div>
 
-              {/* 3D Web Workspace (Editor + Live Preview) */}
+              {/* 3D Web Workspace (Full Screen Toggle Layout) */}
               {code && (
-                <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 h-[60vh] lg:h-[70vh]">
-                    {/* Code Editor */}
-                    <div className="border-b lg:border-b-0 lg:border-r border-border/40 h-[30vh] lg:h-full min-h-0">
-                      {Editor}
+                <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl flex flex-col h-[60vh] md:h-[70vh]">
+                  
+                  {/* Top Toolbar with File Tabs & View Toggle */}
+                  <div className="flex items-center justify-between border-b border-border/40 bg-card/60 shrink-0 px-2">
+                    {/* File Tabs (Only visible in code view) */}
+                    <div className={`flex ${workspaceView === 'preview' ? 'opacity-50 pointer-events-none' : ''}`}>
+                      {(['html', 'css', 'js'] as const).map(f => (
+                        <button
+                          key={f}
+                          onClick={() => setActiveFile(f)}
+                          className={`px-3 py-2 text-[11px] font-mono uppercase border-r border-border/30 transition-colors ${
+                            activeFile === f ? 'bg-primary/10 text-primary font-bold' : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {f}
+                        </button>
+                      ))}
                     </div>
-                    {/* Live Preview */}
-                    <div className="h-[30vh] lg:h-full min-h-0 bg-white/5 flex flex-col">
-                      <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 shrink-0">
-                        <Eye className="w-3 h-3" /> Live 3D Preview
+
+                    {/* View Toggle Button */}
+                    <button
+                      onClick={() => setWorkspaceView(workspaceView === 'code' ? 'preview' : 'code')}
+                      className="flex items-center gap-1.5 px-3 py-1.5 my-1.5 text-[11px] font-semibold rounded-lg transition-all bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                    >
+                      {workspaceView === 'code' ? (
+                        <>
+                          <Eye className="w-3.5 h-3.5" /> Preview
+                        </>
+                      ) : (
+                        <>
+                          <Code2 className="w-3.5 h-3.5" /> Code Editor
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Main Content Area */}
+                  <div className="flex-1 min-h-0 relative">
+                    {workspaceView === 'code' ? (
+                      <div className="absolute inset-0 flex flex-col">
+                        <CodeEditor code={codeVal} onChange={codeSet} language={langMap[activeFile]} />
                       </div>
-                      <div className="flex-1 min-h-0">
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col bg-white">
                         <LivePreview html={html} css={css} js={js} />
                       </div>
-                    </div>
+                    )}
                   </div>
+
                 </div>
               )}
             </div>
