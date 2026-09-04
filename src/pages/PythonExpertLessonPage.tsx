@@ -255,9 +255,8 @@ const PythonExpertLessonPage = () => {
               </div>
 
               {/* Code Editor + Terminal (Clean, no internal tabs) */}
-              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
-                <PythonWorkspace practical={lesson.practical} embedded={true} />
-              </div>
+                            {/* Code Editor + Terminal */}
+              <PythonWorkspace practical={lesson.practical} />
             </div>
           )}
 
