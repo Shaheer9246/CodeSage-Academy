@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
-import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getPythonLessonById, isPythonLessonUnlocked } from '@/data/pythonLessons';
-import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, type LucideIcon } from 'lucide-react';
-import PythonWorkspace from '@/components/PythonWorkspace';
+import { ArrowLeft, BookOpen, FlaskConical, ClipboardCheck, Check, X, ChevronRight, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
 
 type Section = 'concept' | 'practical' | 'quiz';
 
@@ -13,9 +12,6 @@ const PythonLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
-  const [sp] = useSearchParams();
-  const from = sp.get('from');
-  const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/python?from=dashboard' : '/python';
 
   const lesson = id ? getPythonLessonById(id) : undefined;
   const [section, setSection] = useState<Section>('concept');
@@ -23,8 +19,7 @@ const PythonLessonPage = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('python', id); 
-  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('python', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/python" replace />;
   if (!isPythonLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/python" replace />;
 
@@ -37,9 +32,7 @@ const PythonLessonPage = () => {
     if (correctCount >= 3) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
-      
-      const fromQs = from ? `?from=${from}` : '';
-      navigate(`/complete/${lesson.id}${fromQs}`);
+      navigate('/complete/' + lesson.id);
     }
   };
 
@@ -52,7 +45,7 @@ const PythonLessonPage = () => {
   return (
     <div className="min-h-screen bg-background grid-bg">
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/80 border-b border-border/30 px-3 py-2.5 flex items-center gap-3">
-        <button onClick={() => navigate(backTo)} className="text-muted-foreground hover:text-foreground p-1">
+        <button onClick={() => navigate('/python')} className="text-muted-foreground hover:text-foreground p-1">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1 min-w-0">
@@ -110,18 +103,34 @@ const PythonLessonPage = () => {
           </div>
         )}
 
-       {section === 'practical' && (
+        {section === 'practical' && (
           <div className="space-y-4 animate-fade-in">
             <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
               <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                 <FlaskConical className="w-3 h-3" /> III. Practical Lab
               </p>
               <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
-              <p className="text-xs text-muted-foreground">Write, run, and iterate Python entirely in your browser — no setup required.</p>
+              <p className="text-xs text-muted-foreground">{lesson.practical.intro}</p>
             </div>
-
-            <PythonWorkspace practical={lesson.practical} />
-
+            <div className="glass-card rounded-2xl p-4">
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">Steps</p>
+              <ol className="space-y-3">
+                {lesson.practical.steps.map((step, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-primary font-mono">{i + 1}</span>
+                    <p className="text-xs text-foreground leading-relaxed pt-0.5" dangerouslySetInnerHTML={{
+                      __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
+                    }} />
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="glass-card rounded-2xl p-4 border border-primary/20 bg-primary/5">
+              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
+                <Lightbulb className="w-3 h-3" /> The Goal
+              </p>
+              <p className="text-xs text-foreground">{lesson.practical.goal}</p>
+            </div>
             <button onClick={() => setSection('quiz')}
               className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2">
               Take the Mastery Test <ChevronRight className="w-4 h-4" />
