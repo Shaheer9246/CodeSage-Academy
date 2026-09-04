@@ -151,7 +151,7 @@ const PythonLessonPage = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-8 md:pb-24 md:flex md:gap-6">
+      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-6 md:pb-24 md:flex md:gap-6">
         {/* ── Stage rail ────────────────────────────── */}
         <nav className="md:w-52 md:shrink-0 mb-4 md:mb-0">
           <div className="md:sticky md:top-24 flex md:flex-col gap-2">
@@ -501,41 +501,79 @@ const PythonLessonPage = () => {
       </div>
 
       {/* ── Sticky action dock ──────────────────────── */}
-      <div className="fixed md:bottom-8 inset-x-0 z-30 flex justify-center pointer-events-none md:pointer-events-auto mt-8 mb-8 md:mt-0 md:mb-0">
-      <div className="px-3 py-2.5 flex items-center gap-3 w-full md:w-auto">
-          <button
-            disabled={stageIndex === 0}
-            onClick={() => setStage(STAGES[stageIndex - 1].key)}
-            className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-30 flex items-center gap-1 px-2 py-2"
-          >
-            <ChevronLeft className="w-4 h-4" /> Prev
-          </button>
+      {/* Mobile: inline button at end of content */}
+<div className="md:hidden mt-6 mb-4 space-y-3">
+  {stageIndex > 0 && (
+    <button
+      onClick={() => setStage(STAGES[stageIndex - 1].key)}
+      className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 py-2"
+    >
+      <ChevronLeft className="w-4 h-4" /> Previous stage
+    </button>
+  )}
 
-          {stage !== 'quiz' ? (
-            <button
-              onClick={() => setStage(STAGES[stageIndex + 1].key)}
-              className="flex-1 md:flex-none md:min-w-[200px] bg-primary text-primary-foreground font-display font-semibold text-sm py-2.5 px-8 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
-            >
-              {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
-            </button>
-          ) : !submitted ? (
-            <button
-              disabled={!allAnswered}
-              onClick={handleSubmit}
-              className="flex-1 bg-primary text-primary-foreground font-display font-semibold text-sm py-2.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
-            </button>
-          ) : (
-            <button
-              onClick={() => navigate(backTo)}
-              className="flex-1 bg-secondary text-foreground font-display font-semibold text-sm py-2.5 rounded-2xl hover:opacity-90"
-            >
-              Back to track
-            </button>
-          )}
-        </div>
-      </div>
+  {stage !== 'quiz' ? (
+    <button
+      onClick={() => setStage(STAGES[stageIndex + 1].key)}
+      className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+    >
+      {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
+    </button>
+  ) : !submitted ? (
+    <button
+      disabled={!allAnswered}
+      onClick={handleSubmit}
+      className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+    </button>
+  ) : (
+    <button
+      onClick={() => navigate(backTo)}
+      className="w-full bg-secondary text-foreground font-display font-semibold text-sm py-3.5 rounded-2xl hover:opacity-90"
+    >
+      Back to track
+    </button>
+  )}
+</div>
+
+{/* Desktop: floating pill button */}
+<div className="hidden md:flex fixed bottom-8 inset-x-0 z-30 justify-center pointer-events-none">
+  <div className="flex items-center gap-3 pointer-events-auto bg-background/80 backdrop-blur-xl border border-border/30 rounded-full px-4 py-2 shadow-lg">
+    {stageIndex > 0 && (
+      <button
+        onClick={() => setStage(STAGES[stageIndex - 1].key)}
+        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1.5"
+      >
+        <ChevronLeft className="w-4 h-4" /> Prev
+      </button>
+    )}
+
+    {stage !== 'quiz' ? (
+      <button
+        onClick={() => setStage(STAGES[stageIndex + 1].key)}
+        className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+      >
+        {stage === 'concept' ? 'Enter the lab' : 'Take the test'} <ChevronRight className="w-4 h-4" />
+      </button>
+    ) : !submitted ? (
+      <button
+        disabled={!allAnswered}
+        onClick={handleSubmit}
+        className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {allAnswered ? 'Submit test' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+      </button>
+    ) : (
+      <button
+        onClick={() => navigate(backTo)}
+        className="bg-secondary text-foreground font-display font-semibold text-sm py-2 px-6 rounded-full hover:opacity-90"
+      >
+        Back to track
+      </button>
+    )}
+  </div>
+</div>
     </div>
   );
 };
