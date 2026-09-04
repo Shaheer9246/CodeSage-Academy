@@ -151,7 +151,7 @@ const PythonLessonPage = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-28 md:flex md:gap-6">
+      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-36 md:flex md:gap-6">
         {/* ── Stage rail ────────────────────────────── */}
         <nav className="md:w-52 md:shrink-0 mb-4 md:mb-0">
           <div className="md:sticky md:top-24 flex md:flex-col gap-2">
@@ -264,9 +264,9 @@ const PythonLessonPage = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
               </section>
 
-              <div className={code ? 'md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-4 space-y-4 md:space-y-0' : ''}>
+              <div className={code ? 'md:grid md:grid-cols-2 md:gap-4 space-y-4 md:space-y-0' : ''}>
                 {/* Checklist */}
-                <div className="glass-card rounded-2xl p-4">
+                <div className="glass-card rounded-2xl p-4 max-h-[75vh] overflow-auto">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">Steps</p>
                     <span className="text-[10px] font-mono text-primary">
@@ -314,7 +314,7 @@ const PythonLessonPage = () => {
 
                 {/* Workbench (Editor & Terminal) */}
                 {code && (
-                  <div className="glass-card rounded-2xl overflow-hidden md:sticky md:top-24 self-start w-full border-border/40">
+                  <div className="glass-card rounded-2xl overflow-hidden h-[75vh] flex flex-col">
                     {isMobile ? (
                       <>
                         <div className="flex p-1 gap-1 bg-card/60 border-b border-border/40">
@@ -331,7 +331,7 @@ const PythonLessonPage = () => {
                             </button>
                           ))}
                         </div>
-                        <div style={{ height: '68vh' }} className="min-h-0">
+                        <div className="flex-1 min-h-0">
                           {mobileLab === 'code' ? EditorPane : TerminalPane}
                         </div>
                       </>
@@ -346,6 +346,13 @@ const PythonLessonPage = () => {
               </div>
             </div>
           )}
+
+          <button
+            onClick={() => setStage('quiz')}
+            className="w-full mt-6 bg-primary text-primary-foreground font-display font-semibold text-sm py-3 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+          >
+            Take the Mastery Test <ChevronRight className="w-4 h-4" />
+          </button>
 
           {stage === 'quiz' && (
             <div className="space-y-4 animate-fade-in">
