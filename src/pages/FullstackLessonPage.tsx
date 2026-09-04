@@ -103,30 +103,34 @@ const FullstackLessonPage = () => {
       <div className="max-w-3xl mx-auto px-4 py-5 pb-24">
         {section === 'concept' && (
           <div className="space-y-5 animate-fade-in">
-            <div className="glass-card rounded-2xl p-4 border border-primary/20">
-              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2">I. Core Philosophy</p>
-              <p className="text-sm text-foreground leading-relaxed">{lesson.philosophy}</p>
-            </div>
-
-            <div>
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 px-1">II. Detailed Breakdown</p>
-              <div className="flex gap-1 mb-3 p-1 glass-card rounded-xl w-full">
-                {(['beginner', 'advanced'] as const).map(v => (
-                  <button key={v} onClick={() => setConceptView(v)}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-display font-semibold capitalize transition-all ${
-                      conceptView === v ? 'bg-primary/20 text-primary' : 'text-muted-foreground'
-                    }`}>{v} View</button>
-                ))}
+            {/* Desktop: Philosophy left, Concepts right */}
+            <div className="flex flex-col md:flex-row gap-5">
+              <div className="md:w-1/3">
+                <div className="glass-card rounded-2xl p-4 border border-primary/20 h-full">
+                  <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2">I. Core Philosophy</p>
+                  <p className="text-sm text-foreground leading-relaxed">{lesson.philosophy}</p>
+                </div>
               </div>
-              <div className="space-y-3">
-                {lesson.concepts.map((c, i) => (
-                  <div key={i} className="glass-card rounded-xl p-4">
-                    <h3 className="font-display font-bold text-sm text-foreground mb-2">{c.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {conceptView === 'beginner' ? c.beginner : c.advanced}
-                    </p>
-                  </div>
-                ))}
+              <div className="md:w-2/3 space-y-4">
+                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 px-1">II. Detailed Breakdown</p>
+                <div className="flex gap-1 mb-3 p-1 glass-card rounded-xl w-full">
+                  {(['beginner', 'advanced'] as const).map(v => (
+                    <button key={v} onClick={() => setConceptView(v)}
+                      className={`flex-1 py-1.5 rounded-lg text-[11px] font-display font-semibold capitalize transition-all ${
+                        conceptView === v ? 'bg-primary/20 text-primary' : 'text-muted-foreground'
+                      }`}>{v} View</button>
+                  ))}
+                </div>
+                <div className="space-y-3">
+                  {lesson.concepts.map((c, i) => (
+                    <div key={i} className="glass-card rounded-xl p-4">
+                      <h3 className="font-display font-bold text-sm text-foreground mb-2">{c.title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {conceptView === 'beginner' ? c.beginner : c.advanced}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -139,54 +143,60 @@ const FullstackLessonPage = () => {
 
         {section === 'practical' && (
           <div className="space-y-4 animate-fade-in">
-            <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
-              <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                <FlaskConical className="w-3 h-3" /> III. Practical Lab
-              </p>
-              <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
-              <p className="text-xs text-muted-foreground">{lesson.practical.intro}</p>
-            </div>
-
-            <div className="glass-card rounded-2xl p-4">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">Steps</p>
-              <ol className="space-y-3">
-                {lesson.practical.steps.map((step, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-primary font-mono">
-                      {i + 1}
-                    </span>
-                    <p className="text-xs text-foreground leading-relaxed pt-0.5" dangerouslySetInnerHTML={{
-                      __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
-                    }} />
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-                        {code && (
-              <div className="glass-card rounded-2xl overflow-hidden max-w-5xl mx-auto w-full">
-                {/* Mobile: editor on top, preview below. Desktop (md+): editor left, preview right. */}
-                <div className="flex flex-col md:flex-row" style={{ height: isMobile ? '92vh' : '85vh' }}>
-                  <div className="h-[60%] md:h-full md:w-1/2 min-h-0 border-b border-border/40 md:border-b-0 md:border-r overflow-hidden">
-                    {Editor}
-                  </div>
-                  <div className="h-[45%] md:h-full md:w-1/2 min-h-0 flex flex-col">
-                    <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 shrink-0">
-                      <Eye className="w-3 h-3" /> Preview
-                    </div>
-                    <div className="flex-1 min-h-0 overflow-hidden">
-                      <LivePreview html={html} css={css} js={js} />
+            {/* Desktop: Editor left, Assignment right */}
+            <div className="flex flex-col md:flex-row gap-5">
+              <div className="md:w-1/2">
+                {code && (
+                  <div className="glass-card rounded-2xl overflow-hidden max-w-5xl mx-auto w-full">
+                    <div className="flex flex-col md:flex-row" style={{ height: isMobile ? '92vh' : '85vh' }}>
+                      <div className="h-[60%] md:h-full md:w-full min-h-0 border-b border-border/40 md:border-b-0 md:border-r overflow-hidden">
+                        {Editor}
+                      </div>
+                      <div className="h-[45%] md:h-full md:w-full min-h-0 flex flex-col">
+                        <div className="px-3 py-1.5 border-b border-border/40 bg-card/60 text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 shrink-0">
+                          <Eye className="w-3 h-3" /> Preview
+                        </div>
+                        <div className="flex-1 min-h-0 overflow-hidden">
+                          <LivePreview html={html} css={css} js={js} />
+                        </div>
+                      </div>
                     </div>
                   </div>
+                )}
+              </div>
+
+              <div className="md:w-1/2 space-y-4">
+                <div className="glass-card rounded-2xl p-4 border border-amber-500/20">
+                  <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                    <FlaskConical className="w-3 h-3" /> III. Practical Lab
+                  </p>
+                  <h2 className="font-display font-bold text-base text-foreground mb-1">{lesson.practical.title}</h2>
+                  <p className="text-xs text-muted-foreground">{lesson.practical.intro}</p>
+                </div>
+
+                <div className="glass-card rounded-2xl p-4">
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">Steps</p>
+                  <ol className="space-y-3">
+                    {lesson.practical.steps.map((step, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-primary font-mono">
+                          {i + 1}
+                        </span>
+                        <p className="text-xs text-foreground leading-relaxed pt-0.5" dangerouslySetInnerHTML={{
+                          __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
+                        }} />
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div className="glass-card rounded-2xl p-4 border border-primary/20 bg-primary/5">
+                  <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
+                    <Lightbulb className="w-3 h-3" /> The Goal
+                  </p>
+                  <p className="text-xs text-foreground">{lesson.practical.goal}</p>
                 </div>
               </div>
-            )}
-
-            <div className="glass-card rounded-2xl p-4 border border-primary/20 bg-primary/5">
-              <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Lightbulb className="w-3 h-3" /> The Goal
-              </p>
-              <p className="text-xs text-foreground">{lesson.practical.goal}</p>
             </div>
 
             <button onClick={() => setSection('quiz')}
