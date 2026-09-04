@@ -202,80 +202,77 @@ const PythonLessonPage = () => {
           )}
 
           {/* ── PRACTICAL STAGE ─────────────────────── */}
-         {stage === 'practical' && (
-  <div className="space-y-6 animate-fade-in">
-    {/* Header Card */}
-    <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
-      <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
-        <FlaskConical className="w-3 h-3" /> Practical lab
-      </p>
-      <h2 className="font-display font-bold text-base md:text-lg text-foreground mb-1">{lesson.practical.title}</h2>
-      <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
-    </section>
+          {stage === 'practical' && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Header Card */}
+              <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
+                <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
+                  <FlaskConical className="w-3 h-3" /> Practical lab
+                </p>
+                <h2 className="font-display font-bold text-base md:text-lg text-foreground mb-1">{lesson.practical.title}</h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
+              </section>
 
-    {/* Assignment Box: Goal + Steps (Scrollable) */}
-    <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[40vh] overflow-y-auto">
-      <div className="mb-4">
-        <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
-          <Check className="w-3 h-3" /> Goal
-        </p>
-        <p className="text-sm text-foreground leading-relaxed">{lesson.practical.goal}</p>
-      </div>
-      
-      <div>
-        <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10 pb-2 border-b border-border/10">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Steps</p>
-          <span className="text-[10px] font-mono text-primary">
-            {stepsDone}/{lesson.practical?.steps?.length ?? 0}
-          </span>
-        </div>
-        <ol className="space-y-2">
-          {(lesson.practical?.steps ?? []).map((step, i) => {
-            const done = !!doneSteps[i];
-            return (
-              <li key={i}>
-                <button
-                  onClick={() => setDoneSteps(p => ({ ...p, [i]: !p[i] }))}
-                  className={`w-full flex gap-3 text-left rounded-xl px-3 py-2.5 border transition-all ${
-                    done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/20 hover:border-primary/20'
-                  }`}
-                >
-                  <span className={`w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-mono border ${
-                    done ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400' : 'border-border/50 text-muted-foreground'
-                  }`}>
-                    {done ? <Check className="w-3 h-3" /> : i + 1}
-                  </span>
-                  <span className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
-                    dangerouslySetInnerHTML={{
-                      __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
-                    }}
-                  />
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
-    </div>
+              {/* Assignment Box: Goal + Steps (Scrollable) */}
+              <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[40vh] overflow-y-auto">
+                <div className="mb-4">
+                  <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Goal
+                  </p>
+                  <p className="text-sm text-foreground leading-relaxed">{lesson.practical.goal}</p>
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10 pb-2 border-b border-border/10">
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Steps</p>
+                    <span className="text-[10px] font-mono text-primary">
+                      {stepsDone}/{lesson.practical?.steps?.length ?? 0}
+                    </span>
+                  </div>
+                  <ol className="space-y-2">
+                    {(lesson.practical?.steps ?? []).map((step, i) => {
+                      const done = !!doneSteps[i];
+                      return (
+                        <li key={i}>
+                          <button
+                            onClick={() => setDoneSteps(p => ({ ...p, [i]: !p[i] }))}
+                            className={`w-full flex gap-3 text-left rounded-xl px-3 py-2.5 border transition-all ${
+                              done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/20 hover:border-primary/20'
+                            }`}
+                          >
+                            <span className={`w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-mono border ${
+                              done ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400' : 'border-border/50 text-muted-foreground'
+                            }`}>
+                              {done ? <Check className="w-3 h-3" /> : i + 1}
+                            </span>
+                            <span 
+                              className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
+                              dangerouslySetInnerHTML={{
+                                __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
+                              }}
+                            />
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              </div>
 
-    {/* Code Editor + Terminal with Custom Controls */}
-    <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
-      <PythonWorkspace 
-        practical={lesson.practical} 
-        showTabs={false}  // ← Hide internal tabs
-        embedded={true}   // ← Use embedded mode for better layout
-      />
-    </div>
+              {/* Code Editor + Terminal (Clean, no internal tabs) */}
+              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
+                <PythonWorkspace practical={lesson.practical} embedded={true} />
+              </div>
 
-    {/* Mobile-only button */}
-    <button 
-      onClick={() => setStage('quiz')}
-      className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
-    >
-      Take the Mastery Test <ChevronRight className="w-4 h-4" />
-    </button>
-  </div>
-)}
+              {/* Mobile-only button */}
+              <button 
+                onClick={() => setStage('quiz')}
+                className="w-full md:hidden mt-4 bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
+              >
+                Take the Mastery Test <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           {stage === 'quiz' && (
             <div className="space-y-4 animate-fade-in">
