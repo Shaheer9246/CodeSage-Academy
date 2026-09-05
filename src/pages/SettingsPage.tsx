@@ -206,12 +206,16 @@ const SettingsPage = () => {
     endTrack(t); toast.success(`Ended ${TRACK_META[t]?.short || t}`);
   };
 
-  return (
+    return (
     <div className="min-h-screen bg-background relative overflow-x-hidden w-full max-w-full grid-bg">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-2xl mx-auto p-4 box-border min-w-0">
+      {/* Changed max-w-2xl to max-w-5xl to give desktop sidebar room */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-5xl mx-auto p-4 box-border min-w-0">
         
-        {/* Tab Navigation */}
-        <div className="flex gap-2 overflow-x-auto pb-3 [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden sticky top-0 bg-background/80 backdrop-blur-md z-10 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+        {/* Responsive Layout: Column on mobile, Row (Sidebar + Content) on Desktop (lg+) */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          
+          {/* Tab Navigation: Horizontal on mobile, Vertical sticky sidebar on desktop */}
+          <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden sticky top-0 bg-background/80 backdrop-blur-md z-10 pt-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:w-48 lg:flex-shrink-0 lg:sticky lg:top-4 lg:h-fit">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -372,26 +376,39 @@ const SettingsPage = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="space-y-1.5">
+                                    <div className="space-y-1.5">
                     {(() => {
                       const currentLessons = user.completedLessons.length;
                       const currentLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level);
                       const nextLevelData = (BADGES || []).find((b: any) => (b.level || 0) === user.level + 1);
+                      
+                      // Safe fallbacks if badge data is missing or undefined
                       const prevLevelReq = currentLevelData?.xpRequired || 0;
-                      const nextLevelReq = nextLevelData?.xpRequired || 0;
-                      let progressPct = 100;
-                      if (nextLevelReq > prevLevelReq && nextLevelReq > 0) {
+                      const nextLevelReq = nextLevelData?.xpRequired || (prevLevelReq + 10); 
+                      
+                      let progressPct = 0;
+                      if (nextLevelReq > prevLevelReq) {
                         const lessonsInThisLevel = nextLevelReq - prevLevelReq;
-                        progressPct = Math.min(100, Math.round(((currentLessons - prevLevelReq) / lessonsInThisLevel) * 100));
+                        const lessonsCompletedInThisLevel = Math.max(0, currentLessons - prevLevelReq);
+                        progressPct = Math.min(100, Math.round((lessonsCompletedInThisLevel / lessonsInThisLevel) * 100));
+                      } else {
+                        progressPct = 100; // Max level reached
                       }
+
+                      // Prevent NaN and ensure at least a tiny visible sliver (4%) if progress is > 0
+                      const safeProgressPct = isNaN(progressPct) ? 0 : Math.max(progressPct, progressPct > 0 ? 4 : 0);
+
                       return (
                         <>
                           <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
                             <span>Progress to Level {user.level + 1}</span>
-                            <span>{progressPct}% ({currentLessons} / {nextLevelReq || 'MAX'})</span>
+                            <span>{safeProgressPct}% ({currentLessons} / {nextLevelData ? nextLevelReq : 'MAX'})</span>
                           </div>
                           <div className="h-2 bg-secondary/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} />
+                            <div 
+                              className="h-full bg-primary rounded-full transition-all duration-500" 
+                              style={{ width: `${safeProgressPct}%` }} 
+                            />
                           </div>
                         </>
                       );
@@ -496,7 +513,7 @@ const SettingsPage = () => {
               </>
             )}
 
-            {/* ================= ACCOUNT TAB ================= */}
+                       {/* ================= ACCOUNT TAB ================= */}
             {activeTab === 'account' && (
               <div className="glass-card rounded-2xl p-5 border border-red-500/20 bg-red-500/5">
                 <div className="flex items-center gap-3 mb-4">
@@ -518,115 +535,116 @@ const SettingsPage = () => {
                 </div>
               </div>
             )}
+          </motion.div> {/* 1. Closes the Tab Content motion.div */}
+        </AnimatePresence> {/* 2. Closes AnimatePresence */}
+        </div> {/* 3. Closes the flex-col lg:flex-row layout wrapper */}
 
-            {/* ================= GLOBAL FOOTER ================= */}
-            <div className="text-center pt-6 pb-4 space-y-3 border-t border-border/20 mt-6">
-              <div className="flex items-center justify-center gap-3 text-[10px] font-mono text-muted-foreground flex-wrap">
-                <button onClick={() => navigate('/terms')} className="hover:text-primary transition-colors">Terms & Policy</button>
-                <span className="text-muted-foreground/50">·</span>
-                <button onClick={() => navigate('/privacy')} className="hover:text-primary transition-colors">Privacy</button>
-                <span className="text-muted-foreground/50">·</span>
-                <button onClick={() => navigate('/contact')} className="hover:text-primary transition-colors">Contact Admin</button>
+        {/* ================= GLOBAL FOOTER ================= */}
+        <div className="text-center pt-6 pb-4 space-y-3 border-t border-border/20 mt-6">
+          <div className="flex items-center justify-center gap-3 text-[10px] font-mono text-muted-foreground flex-wrap">
+            <button onClick={() => navigate('/terms')} className="hover:text-primary transition-colors">Terms & Policy</button>
+            <span className="text-muted-foreground/50">·</span>
+            <button onClick={() => navigate('/privacy')} className="hover:text-primary transition-colors">Privacy</button>
+            <span className="text-muted-foreground/50">·</span>
+            <button onClick={() => navigate('/contact')} className="hover:text-primary transition-colors">Contact Admin</button>
+          </div>
+          <p className="text-[10px] text-muted-foreground font-mono tracking-wider opacity-60">CodeSage · v2.0.0</p>
+        </div>
+
+        {/* ================= MODALS (MUST BE INSIDE THE RETURN BLOCK!) ================= */}
+        {showAvatarPicker && user && (
+          <AvatarPicker userId={user.id} initialSeed={user.username || user.id.slice(0, 8)} onClose={() => setShowAvatarPicker(false)} onSave={(url) => setAvatarUrl(url)} />
+        )}
+
+        {detailModal && user && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setDetailModal(null)}>
+            <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-3 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                  {detailModal === 'lessons' && <><BookOpen className="w-4 h-4 text-primary" /> Lessons by Track</>}
+                  {detailModal === 'progress' && <><BarChart3 className="w-4 h-4 text-primary" /> Progress by Track</>}
+                  {detailModal === 'xp' && <><Zap className="w-4 h-4 text-primary" /> XP Breakdown</>}
+                </h3>
+                <button onClick={() => setDetailModal(null)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono tracking-wider opacity-60">CodeSage · v2.0.0</p>
-            </div>
-
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
-
-      {/* ================= MODALS (Unchanged, rendered at root) ================= */}
-      {showAvatarPicker && user && (
-        <AvatarPicker userId={user.id} initialSeed={user.username || user.id.slice(0, 8)} onClose={() => setShowAvatarPicker(false)} onSave={(url) => setAvatarUrl(url)} />
-      )}
-
-      {detailModal && user && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setDetailModal(null)}>
-          <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-3 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
-                {detailModal === 'lessons' && <><BookOpen className="w-4 h-4 text-primary" /> Lessons by Track</>}
-                {detailModal === 'progress' && <><BarChart3 className="w-4 h-4 text-primary" /> Progress by Track</>}
-                {detailModal === 'xp' && <><Zap className="w-4 h-4 text-primary" /> XP Breakdown</>}
-              </h3>
-              <button onClick={() => setDetailModal(null)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
-            </div>
-            {detailModal === 'lessons' && (
-              <div className="space-y-1.5">
-                {lessonGroups.map(g => (
-                  <div key={g.key} className="flex items-center justify-between bg-secondary/20 rounded-lg px-3 py-2 border border-border/20">
-                    <span className="text-xs text-foreground min-w-0 flex-1 mr-2 break-words">{g.label}</span>
-                    <span className="text-xs text-primary font-mono font-bold flex-shrink-0">{g.count}</span>
-                  </div>
-                ))}
-                <p className="text-[10px] text-muted-foreground text-center pt-2">Total: {completedCount} lessons completed</p>
-              </div>
-            )}
-            {detailModal === 'progress' && (
-              <div className="space-y-2">
-                {lessonGroups.filter(g => g.total > 0).map(g => {
-                  const pct = Math.min(100, Math.round((g.count / g.total) * 100));
-                  return (
-                    <div key={g.key}>
-                      <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-foreground min-w-0 flex-1 mr-2 break-words">{g.label}</span>
-                        <span className="text-primary font-mono flex-shrink-0">{g.count}/{g.total} · {pct}%</span>
-                      </div>
-                      <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
-                      </div>
+              {detailModal === 'lessons' && (
+                <div className="space-y-1.5">
+                  {lessonGroups.map(g => (
+                    <div key={g.key} className="flex items-center justify-between bg-secondary/20 rounded-lg px-3 py-2 border border-border/20">
+                      <span className="text-xs text-foreground min-w-0 flex-1 mr-2 break-words">{g.label}</span>
+                      <span className="text-xs text-primary font-mono font-bold flex-shrink-0">{g.count}</span>
                     </div>
-                  );
-                })}
-                <div className="pt-3 border-t border-border/20 grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-secondary/20 rounded-lg p-2"><p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</p><p className="text-[9px] text-muted-foreground">Challenges</p></div>
-                  <div className="bg-secondary/20 rounded-lg p-2"><p className="text-sm font-bold text-primary font-mono">{user.completedTests?.length || 0}</p><p className="text-[9px] text-muted-foreground">Exams</p></div>
-                  <div className="bg-secondary/20 rounded-lg p-2"><p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'crawler')?.count || 0}</p><p className="text-[9px] text-muted-foreground">Crawler</p></div>
+                  ))}
+                  <p className="text-[10px] text-muted-foreground text-center pt-2">Total: {completedCount} lessons completed</p>
                 </div>
-              </div>
-            )}
-            {detailModal === 'xp' && (
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <div className="flex items-baseline gap-2 bg-secondary/20 rounded-lg p-3"><span className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</span><span className="text-[10px] text-muted-foreground">Lifetime XP</span></div>
-                  <div className="flex items-baseline gap-2 bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20"><span className="text-2xl font-bold text-yellow-400 font-mono">{user.sageCoins || 0}</span><span className="text-[10px] text-muted-foreground">Sage Coins</span></div>
+              )}
+              {detailModal === 'progress' && (
+                <div className="space-y-2">
+                  {lessonGroups.filter(g => g.total > 0).map(g => {
+                    const pct = Math.min(100, Math.round((g.count / g.total) * 100));
+                    return (
+                      <div key={g.key}>
+                        <div className="flex items-center justify-between text-[11px] mb-1">
+                          <span className="text-foreground min-w-0 flex-1 mr-2 break-words">{g.label}</span>
+                          <span className="text-primary font-mono flex-shrink-0">{g.count}/{g.total} · {pct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-secondary/40 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="pt-3 border-t border-border/20 grid grid-cols-3 gap-2 text-center">
+                    <div className="bg-secondary/20 rounded-lg p-2"><p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'challenges')?.count || 0}</p><p className="text-[9px] text-muted-foreground">Challenges</p></div>
+                    <div className="bg-secondary/20 rounded-lg p-2"><p className="text-sm font-bold text-primary font-mono">{user.completedTests?.length || 0}</p><p className="text-[9px] text-muted-foreground">Exams</p></div>
+                    <div className="bg-secondary/20 rounded-lg p-2"><p className="text-sm font-bold text-primary font-mono">{lessonGroups.find(g => g.key === 'crawler')?.count || 0}</p><p className="text-[9px] text-muted-foreground">Crawler</p></div>
+                  </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground font-semibold">How you earn rewards:</p>
-                <ul className="space-y-1 text-[11px]">
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Lessons completed</span><span className="font-mono text-primary flex-shrink-0">+1 XP & +2 Coins</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Exams passed (≥70%)</span><span className="font-mono text-primary flex-shrink-0">+3 Coins</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Challenges solved</span><span className="font-mono text-primary flex-shrink-0">+2 to +10 Coins (by tier)</span></li>
-                  <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Code Crawler</span><span className="font-mono text-primary flex-shrink-0">Variable based on score</span></li>
-                </ul>
-                <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 mt-2"><p className="text-[10px] text-primary text-center font-semibold">💡 Spend 5 Coins for extra lessons or 2 Coins to revive in Crawler!</p></div>
+              )}
+              {detailModal === 'xp' && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    <div className="flex items-baseline gap-2 bg-secondary/20 rounded-lg p-3"><span className="text-2xl font-bold text-primary font-mono">{user.xp || 0}</span><span className="text-[10px] text-muted-foreground">Lifetime XP</span></div>
+                    <div className="flex items-baseline gap-2 bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20"><span className="text-2xl font-bold text-yellow-400 font-mono">{user.sageCoins || 0}</span><span className="text-[10px] text-muted-foreground">Sage Coins</span></div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-semibold">How you earn rewards:</p>
+                  <ul className="space-y-1 text-[11px]">
+                    <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Lessons completed</span><span className="font-mono text-primary flex-shrink-0">+1 XP & +2 Coins</span></li>
+                    <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Exams passed (≥70%)</span><span className="font-mono text-primary flex-shrink-0">+3 Coins</span></li>
+                    <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Challenges solved</span><span className="font-mono text-primary flex-shrink-0">+2 to +10 Coins (by tier)</span></li>
+                    <li className="flex justify-between bg-secondary/15 rounded-lg px-3 py-1.5"><span className="min-w-0 flex-1 mr-2 break-words">Code Crawler</span><span className="font-mono text-primary flex-shrink-0">Variable based on score</span></li>
+                  </ul>
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 mt-2"><p className="text-[10px] text-primary text-center font-semibold">💡 Spend 5 Coins for extra lessons or 2 Coins to revive in Crawler!</p></div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {showEditModal && user && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setShowEditModal(false)}>
+            <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2"><Pencil className="w-4 h-4 text-primary" /> Edit Profile</h3>
+                <button onClick={() => setShowEditModal(false)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {showEditModal && user && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setShowEditModal(false)}>
-          <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2"><Pencil className="w-4 h-4 text-primary" /> Edit Profile</h3>
-              <button onClick={() => setShowEditModal(false)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
+              <div className="space-y-3">
+                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Name</label><input type="text" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
+                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Studying</label><input type="text" value={editData.studying} onChange={e => setEditData({...editData, studying: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
+                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label><input type="text" value={editData.goal} onChange={e => setEditData({...editData, goal: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
+                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label><select value={editData.experienceLevel} onChange={e => setEditData({...editData, experienceLevel: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option></select></div>
+              </div>
+              <button onClick={() => { if (user) { updateUser(editData); } toast.success('Profile updated successfully!'); setShowEditModal(false); }} className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm">Save Changes</button>
             </div>
-            <div className="space-y-3">
-              <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Name</label><input type="text" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
-              <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Studying</label><input type="text" value={editData.studying} onChange={e => setEditData({...editData, studying: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
-              <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label><input type="text" value={editData.goal} onChange={e => setEditData({...editData, goal: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
-              <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label><select value={editData.experienceLevel} onChange={e => setEditData({...editData, experienceLevel: e.target.value})} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option></select></div>
-            </div>
-            <button onClick={() => { if (user) { updateUser(editData); } toast.success('Profile updated successfully!'); setShowEditModal(false); }} className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm">Save Changes</button>
           </div>
-        </div>
-      )}
+        )}
 
-      {user && showStreakModal && (
-        <StreakModal key={Date.now()} streakCount={user.streakCount} forceOpen={true} onClose={() => setShowStreakModal(false)} />
-      )}
-    </div>
+        {user && showStreakModal && (
+          <StreakModal key={Date.now()} streakCount={user.streakCount} forceOpen={true} onClose={() => setShowStreakModal(false)} />
+        )}
+
+      </motion.div> {/* 4. Closes the Main Container motion.div */}
+    </div> {/* 5. Closes the outer div */}
   );
 };
 
