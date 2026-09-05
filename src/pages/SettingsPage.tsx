@@ -81,7 +81,7 @@ const SettingsPage = () => {
   const navigate = useNavigate();
   const { user, logout, deleteAccount, resetTour, updateUser, spendCoins } = useUser();
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'progress' | 'settings' | 'account'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'progress' | 'settings' | 'ai-teacher' | 'account'>('profile');
   const [theme, setTheme] = useState<ThemeName>('dark');
   const [autoRun, setAutoRun] = useState<boolean>(() => {
     try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
