@@ -644,7 +644,7 @@ const SettingsPage = () => {
         )}
 
       </motion.div> {/* 4. Closes the Main Container motion.div */}
-    </div> {/* 5. Closes the outer div */}
+    </div>
   );
 };
 
