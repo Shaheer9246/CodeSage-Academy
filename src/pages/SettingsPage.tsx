@@ -5,7 +5,7 @@ import {
   User, Flame, Trophy, Trash2, LogOut, Check, Lock, Target, Zap, 
   Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen, 
   BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon, 
-  StopCircle, ShieldCheck 
+  StopCircle, ShieldCheck, Sparkles 
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
@@ -73,6 +73,7 @@ const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'progress', label: 'Progress', icon: Trophy },
   { id: 'settings', label: 'Settings', icon: Wrench },
+  { id: 'ai-teacher', label: 'AI Teacher', icon: Sparkles, badge: 'Soon' },
   { id: 'account', label: 'Account', icon: ShieldCheck },
 ] as const;
 
@@ -216,27 +217,33 @@ const SettingsPage = () => {
         {/* Responsive Layout: Column on mobile, Row (Sidebar + Content) on Desktop */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           
-          {/* Tab Navigation: Horizontal on mobile, Vertical sticky sidebar on desktop */}
-          <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden sticky top-0 bg-background/80 backdrop-blur-md z-10 pt-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:w-56 lg:flex-shrink-0 lg:sticky lg:top-6 lg:h-fit">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border flex-shrink-0 ${
-                    isActive 
-                      ? 'bg-primary/15 text-primary border-primary/30 shadow-[0_0_12px_rgba(var(--primary),0.15)]' 
-                      : 'bg-secondary/10 text-muted-foreground border-border/30 hover:bg-secondary/20 hover:text-foreground'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+       {/* Tab Navigation: Horizontal on mobile, Vertical sticky sidebar on desktop */}
+        <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden sticky top-0 bg-background/80 backdrop-blur-md z-10 pt-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:w-56 lg:flex-shrink-0 lg:sticky lg:top-6 lg:h-fit">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border flex-shrink-0 ${
+                  isActive 
+                    ? 'bg-primary/15 text-primary border-primary/30 shadow-[0_0_12px_rgba(var(--primary),0.15)]' 
+                    : 'bg-secondary/10 text-muted-foreground border-border/30 hover:bg-secondary/20 hover:text-foreground'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+                {/* This safely adds the "Soon" badge if it exists in the TABS array */}
+                {'badge' in tab && (
+                  <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold rounded-md bg-gradient-to-r from-primary to-purple-500 text-white shadow-sm">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
           {/* Content Area */}
           <AnimatePresence mode="wait">
@@ -504,6 +511,75 @@ const SettingsPage = () => {
                     </div>
                   </div>
                 </>
+              )}
+
+               {/* ================= AI TEACHER TAB ================= */}
+              {activeTab === 'ai-teacher' && (
+                <div className="relative">
+                  {/* Blurred Background Card */}
+                  <div className="glass-card rounded-2xl p-5 lg:p-6 border border-primary/20 bg-gradient-to-br from-primary/10 to-purple-500/10">
+                    <div className="absolute inset-0 backdrop-blur-sm bg-background/30 rounded-2xl z-10" />
+                    
+                    {/* Coming Soon Content */}
+                    <div className="relative z-20 flex flex-col items-center justify-center py-12 lg:py-16 space-y-6">
+                      {/* Icon with Glow */}
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full animate-pulse" />
+                        <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-[0_0_40px_rgba(var(--primary),0.4)]">
+                          <Sparkles className="w-10 h-10 text-white" />
+                        </div>
+                      </div>
+
+                      {/* Text Content */}
+                      <div className="text-center space-y-2">
+                        <h3 className="text-2xl font-bold font-display text-foreground">
+                          AI Teacher
+                        </h3>
+                        <p className="text-sm text-muted-foreground max-w-md">
+                          Get personalized coding guidance, instant feedback, and 24/7 mentorship powered by advanced AI.
+                        </p>
+                      </div>
+
+                      {/* Coming Soon Badge */}
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
+                        <Lock className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-xs font-semibold text-primary">
+                          Coming on 22 of SEP
+                        </span>
+                      </div>
+
+                      {/* Feature Preview Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg mt-4">
+                        <div className="glass-card rounded-xl p-3 text-center opacity-60">
+                          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-2">
+                            <Target className="w-4 h-4 text-primary" />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">Personalized Learning</p>
+                        </div>
+                        <div className="glass-card rounded-xl p-3 text-center opacity-60">
+                          <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-2">
+                            <Zap className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">Instant Feedback</p>
+                        </div>
+                        <div className="glass-card rounded-xl p-3 text-center opacity-60">
+                          <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
+                            <BookOpen className="w-4 h-4 text-blue-400" />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">24/7 Mentorship</p>
+                        </div>
+                      </div>
+
+                      {/* Notify Me Button */}
+                      <button 
+                        onClick={() => toast.info('We\'ll notify you when AI Teacher launches! 🎉')}
+                        className="mt-4 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary to-purple-500 text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(var(--primary),0.3)]"
+                      >
+                        Notify Me
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* ================= ACCOUNT TAB ================= */}
