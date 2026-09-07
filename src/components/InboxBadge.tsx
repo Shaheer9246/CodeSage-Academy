@@ -12,31 +12,33 @@ export default function InboxBadge({ className }: { className?: string }) {
   const [unread, setUnread] = useState(0);
 
   const refresh = useCallback(async () => {
-    if (!user) return;
+    if (!user?.id) return;
     const [{ data: ann }, { data: reads }] = await Promise.all([
       supabase.from('announcements').select('id'),
-      supabase.from('announcement_reads').select('announcement_id').eq('user_id', user.id),
+      supabase.from('announcement_reads').select('announcement_id').eq('user_id', user!.id),
     ]);
     const seen = new Set(((reads || []) as { announcement_id: string }[]).map(r => r.announcement_id));
     const total = ((ann || []) as { id: string }[]).filter(a => !seen.has(a.id)).length;
     setUnread(total);
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
+    if (!user?.id) return;
     refresh();
     const onRead = () => refresh();
     window.addEventListener('inbox:read', onRead);
-    
+
     const ch = supabase
-      .channel(`announcements-badge-${Math.random()}`)
+      .channel(`announcements-badge-${user.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, refresh)
       .subscribe();
-      
+
     return () => {
       window.removeEventListener('inbox:read', onRead);
       supabase.removeChannel(ch);
     };
-  }, [refresh]);
+  }, [user?.id, refresh]);
+
 
   return (
     <div className={`relative flex items-center justify-center ${className}`}>

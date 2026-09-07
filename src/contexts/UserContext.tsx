@@ -216,6 +216,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(() => readCachedProfile());
   const [loading, setLoading] = useState<boolean>(() => !readCachedProfile());
   const syncTimer = useRef<number | undefined>(undefined);
+  const streakRef = useRef<string | null>(null);
 
   const fetchProfile = useCallback(async (authUser: User) => {
     const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
@@ -539,6 +540,12 @@ useEffect(() => {
 
   const updateStreak = async () => {
     if (!user) return;
+    // Guard: only one streak call per user per day (survives re-renders and reloads).
+    const key = `codesage_streak_ping_${user.id}`;
+    const today = new Date().toISOString().slice(0, 10);
+    if (streakRef.current === today || localStorage.getItem(key) === today) return;
+    streakRef.current = today;
+    try { localStorage.setItem(key, today); } catch { /* ignore */ }
     const { data, error } = await supabase.rpc('update_streak');
     if (error) { console.error('update_streak failed', error.message); return; }
     applyServerProfile(data);

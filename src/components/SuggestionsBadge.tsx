@@ -45,7 +45,7 @@ export default function SuggestionsBadge() {
 
     // FIX: Use a unique channel name. This prevents the "cannot add callbacks after subscribe" 
     // error that happens when React remounts the component faster than Supabase cleans up.
-    const channelName = `suggestions-badge-${user.id}-${Date.now()}`;
+    const channelName = `suggestions-badge-${user.id}`;
     
     const ch = supabase
       .channel(channelName)
@@ -53,7 +53,7 @@ export default function SuggestionsBadge() {
       .subscribe();
 
     // Safety net: if the realtime socket drops, still refresh every 60s.
-    const poll = setInterval(fetchUnread, 60_000);
+    const poll = setInterval(fetchUnread, 300_000);
     const onFocus = () => fetchUnread();
     window.addEventListener('focus', onFocus);
 
@@ -64,7 +64,7 @@ export default function SuggestionsBadge() {
       window.removeEventListener('suggestions:read', onRead);
       supabase.removeChannel(ch);
     };
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <button
