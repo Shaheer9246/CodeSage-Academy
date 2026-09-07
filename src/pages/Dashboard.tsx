@@ -83,7 +83,7 @@ const SECTIONS: SectionDef[] = [
         tags: ['HTML', 'CSS', 'JS'], desc: 'HTML → CSS → JS → React → Deploy',
         trackId: 'frontend' },
       
-      { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full Stack Frontend Dev (Live Web)', emoji: '',
+      { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full Stack Frontend Dev (Live Web)', emoji: '🚀',
         tour: 'fullstack', lessons: 28, accent: 'accent-orange',
         tags: ['React', 'Hooks', 'APIs', 'TS'], desc: 'React → APIs → Testing → Deploy',
         trackId: 'fullstack' },
@@ -93,7 +93,7 @@ const SECTIONS: SectionDef[] = [
         tags: ['DOM', 'localStorage', 'PWA'], desc: 'No backend, no server, no cost',
         trackId: 'local' },
 
-      { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Dev (Animated Web)', emoji: '',
+      { id: 'three3d', path: '/three3d?from=dashboard', title: '3D Web Dev (Animated Web)', emoji: '🧊',
         tour: 'three3d', lessons: 16, accent: 'accent-blue',
         tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Build immersive 3D web experiences',
         trackId: 'three3d' as TrackId },
@@ -169,7 +169,7 @@ const SECTIONS: SectionDef[] = [
     Icon: Terminal,
     gradient: 'from-yellow-400/70 via-amber-400/60 to-orange-500/70',
     tracks: [
-      { id: 'python', path: '/python?from=dashboard', title: 'Python Programming', emoji: '',
+      { id: 'python', path: '/python?from=dashboard', title: 'Python Programming', emoji: '🐍',
         tour: 'python', lessons: 32, accent: 'yellow-400',
         tags: ['Syntax', 'Functions', 'OOP', 'async'], desc: 'Beginner → Advanced → Capstone',
         trackId: 'python' },
@@ -204,7 +204,7 @@ const SECTIONS: SectionDef[] = [
         tags: ['Niche', 'Pitch', 'Price', 'Deliver'], desc: 'Find → Pitch → Deliver',
         trackId: 'freelance' },
 
-      { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing (methods)', emoji: '🌍',
+      { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Real-World Freelancing (methods)', emoji: '',
         tour: 'real-freelance', lessons: 12, accent: 'primary',
         tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'Master platforms & win clients',
         trackId: 'real-freelance' as TrackId },
@@ -242,8 +242,8 @@ const Dashboard = () => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
   });
 
-  const [previousIndex, setPreviousIndex] = useState<number>(0);
-  const filterButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number>(0);
+  const [glowDirection, setGlowDirection] = useState<'ltr' | 'rtl'>('ltr');
 
   useEffect(() => {
     localStorage.setItem('codesage_dashboard_category', selectedCategory);
@@ -326,12 +326,13 @@ const Dashboard = () => {
     navigate(path);
   };
 
-  const handleCategorySelect = (category: DashboardCategory, index: number, total: number) => {
-    if (previousIndex === total - 1 && index !== total - 1) {
-      setPreviousIndex(index);
+  const handleCategorySelect = (category: DashboardCategory, index: number) => {
+    if (index < lastSelectedIndex) {
+      setGlowDirection('rtl');
     } else {
-      setPreviousIndex(index);
+      setGlowDirection('ltr');
     }
+    setLastSelectedIndex(index);
     setSelectedCategory(category);
   };
 
@@ -395,131 +396,173 @@ const Dashboard = () => {
       <div className="absolute bottom-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-accent-blue/5 blur-[180px] pointer-events-none" />
 
       <div className="relative z-10 flex">
-        {/* Secondary Left Sidebar - Filters */}
-        <div className="w-64 shrink-0 p-4 space-y-3 border-r border-border/30">
+        {/* Secondary Left Sidebar - Desktop Only */}
+        <div className="hidden lg:block w-64 shrink-0 p-4 space-y-4 border-r border-border/30">
+          
           {/* Your Active Tracks */}
           {!isGuest && myTracks.length > 0 && (
-            <div className="glass-card rounded-xl p-3 border border-border/40">
-              <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground mb-2">Your tracks</p>
-              {myTracks.slice(0, 3).map(({ track, done, total, pct }) => (
-                <button 
-                  key={track.id} 
-                  onClick={go(track.path)}
-                  className="w-full text-left rounded-lg p-2 mb-2 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group last:mb-0"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm shrink-0">{track.emoji}</span>
-                    <p className="text-[10px] font-display font-semibold truncate flex-1">{track.title}</p>
-                  </div>
-                  <div className="mt-1.5 h-1 rounded-full bg-secondary overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
-                  </div>
-                </button>
-              ))}
+            <div>
+              <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground mb-3 pl-1">Your Tracks</p>
+              <div className="space-y-2">
+                {myTracks.slice(0, 3).map(({ track, done, total, pct }) => (
+                  <button 
+                    key={track.id} 
+                    onClick={go(track.path)}
+                    className="w-full text-left rounded-lg p-2.5 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg shrink-0">{track.emoji}</span>
+                      <p className="text-[10px] font-display font-semibold truncate flex-1">{track.title}</p>
+                    </div>
+                    <div className="mt-2 h-1 rounded-full bg-secondary overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Category Filters */}
-          <div className="glass-card rounded-xl p-3 border border-border/40 space-y-1.5">
-            <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground mb-2">Categories</p>
-            {filterOptions.map((option, index) => {
-              const Icon = option.icon;
-              const isSelected = selectedCategory === option.id;
-              const isLast = index === filterOptions.length - 1;
-              const isPreviousLast = previousIndex === filterOptions.length - 1;
-              
-              return (
-                <button
-                  key={option.id}
-                  ref={el => { filterButtonsRef.current[index] = el; }}
-                  onClick={() => handleCategorySelect(option.id as DashboardCategory, index, filterOptions.length)}
-                  className={`relative w-full text-left rounded-lg p-2.5 transition-all overflow-hidden group ${
-                    isSelected 
-                      ? 'bg-primary/20 border border-primary/40' 
-                      : 'bg-secondary/20 border border-border/40 hover:bg-secondary/40'
-                  }`}
-                >
-                  {/* Glow Animation */}
-                  <AnimatePresence mode="wait">
+          {/* Category Filters - Desktop */}
+          <div>
+            <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground mb-3 pl-1">Categories</p>
+            <div className="space-y-1">
+              {filterOptions.map((option, index) => {
+                const Icon = option.icon;
+                const isSelected = selectedCategory === option.id;
+                
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => handleCategorySelect(option.id as DashboardCategory, index)}
+                    className={`relative w-full text-left rounded-lg p-3 transition-all duration-300 group overflow-hidden ${
+                      isSelected 
+                        ? 'bg-primary/10' 
+                        : 'hover:bg-secondary/30'
+                    }`}
+                  >
+                    {/* Sweeping Glow Effect */}
+                    <AnimatePresence mode="wait">
+                      {isSelected && (
+                        <motion.div
+                          key={`glow-${glowDirection}`}
+                          initial={{ 
+                            x: glowDirection === 'ltr' ? '-100%' : '100%',
+                            opacity: 0 
+                          }}
+                          animate={{ 
+                            x: '0%',
+                            opacity: 0.6 
+                          }}
+                          exit={{ 
+                            opacity: 0,
+                            x: glowDirection === 'ltr' ? '100%' : '-100%'
+                          }}
+                          transition={{ 
+                            duration: 0.5,
+                            ease: [0.4, 0, 0.2, 1]
+                          }}
+                          className="absolute inset-0 bg-gradient-to-r from-primary/40 via-primary/20 to-transparent"
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    {/* Active glow border */}
                     {isSelected && (
                       <motion.div
-                        key="glow"
-                        initial={{ 
-                          x: isPreviousLast && !isLast ? '100%' : '-100%',
-                          opacity: 0 
-                        }}
+                        initial={false}
                         animate={{ 
-                          x: '0%',
-                          opacity: 1 
+                          boxShadow: '0 0 20px rgba(var(--primary), 0.4), inset 0 0 20px rgba(var(--primary), 0.1)'
                         }}
-                        exit={{ 
-                          opacity: 0,
-                          x: isLast && index !== previousIndex ? '100%' : '-100%'
-                        }}
-                        transition={{ 
-                          duration: 0.4,
-                          ease: "easeOut"
-                        }}
-                        className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/20 to-transparent"
+                        className="absolute inset-0 rounded-lg border border-primary/50"
                       />
                     )}
-                  </AnimatePresence>
-                  
-                  {/* Glow indicator circle */}
-                  <div className={`absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full transition-all ${
-                    isSelected ? 'bg-primary shadow-[0_0_8px_rgba(var(--primary),0.8)]' : 'bg-muted-foreground/40'
-                  }`} />
-                  
-                  <div className="relative flex items-center gap-2.5 pl-3">
-                    <Icon className={`w-4 h-4 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`text-xs font-semibold ${isSelected ? 'text-primary font-bold' : 'text-muted-foreground group-hover:text-foreground'}`}>
-                      {option.label}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
+
+                    {/* Content */}
+                    <div className="relative flex items-center gap-3">
+                      {/* Glowing circle indicator */}
+                      <div className={`relative w-2 h-2 rounded-full transition-all duration-300 ${
+                        isSelected 
+                          ? 'bg-primary shadow-[0_0_12px_rgba(var(--primary),1)]' 
+                          : 'bg-muted-foreground/30 group-hover:bg-muted-foreground/60'
+                      }`} />
+                      
+                      <Icon className={`w-4 h-4 transition-all duration-300 ${
+                        isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                      }`} />
+                      
+                      <span className={`text-xs font-semibold transition-all duration-300 ${
+                        isSelected ? 'text-primary font-bold' : 'text-muted-foreground group-hover:text-foreground'
+                      }`}>
+                        {option.label}
+                      </span>
+
+                      {isSelected && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="ml-auto"
+                        >
+                          <ChevronRight className="w-4 h-4 text-primary" />
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Subtle scanline for selected */}
+                    {isSelected && (
+                      <motion.div
+                        initial={{ top: '0%' }}
+                        animate={{ top: '100%' }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Suggestions & Game */}
-          <div className="space-y-2">
+          {/* Suggestions & Game - Desktop */}
+          <div className="space-y-2 pt-2">
             <button
               onClick={go('/suggestions')}
-              className={`w-full glass-card p-3 rounded-xl text-left flex items-center gap-2.5 transition-all border border-border/40 ${
-                isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:border-primary/40 hover:bg-secondary/30'
+              className={`w-full text-left rounded-lg p-3 transition-all border ${
+                isGuest 
+                  ? 'opacity-40 pointer-events-none grayscale border-border/20' 
+                  : 'bg-secondary/20 border-border/40 hover:border-accent-yellow/40 hover:bg-secondary/40'
               }`}
             >
-              <div className="w-8 h-8 rounded-lg bg-accent-yellow/15 grid place-items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-accent-yellow/60" />
                 <MessageSquare className="w-4 h-4 text-accent-yellow" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold font-display">Suggestions</p>
-                <p className="text-[9px] text-muted-foreground truncate">Feedback</p>
+                <span className="text-xs font-semibold text-foreground">Suggestions</span>
               </div>
             </button>
 
             <button
               onClick={go('/games/crawler')}
-              className={`w-full glass-card p-3 rounded-xl text-left flex items-center gap-2.5 transition-all border border-border/40 ${
-                isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:border-accent-orange/40 hover:bg-secondary/30'
+              className={`w-full text-left rounded-lg p-3 transition-all border ${
+                isGuest 
+                  ? 'opacity-40 pointer-events-none grayscale border-border/20' 
+                  : 'bg-secondary/20 border-border/40 hover:border-accent-orange/40 hover:bg-secondary/40'
               }`}
             >
-              <div className="w-8 h-8 rounded-lg bg-accent-orange/15 grid place-items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-accent-orange/60" />
                 <Gamepad2 className="w-4 h-4 text-accent-orange" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold font-display">Code Crawler</p>
-                <p className="text-[9px] text-muted-foreground truncate">Game</p>
+                <span className="text-xs font-semibold text-foreground">Code Crawler</span>
               </div>
             </button>
           </div>
         </div>
 
-        {/* Main Content Area - Full Width */}
+        {/* Main Content Area */}
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }}
-          className="flex-1 px-4 py-4 space-y-4 sm:space-y-5 overflow-x-hidden"
+          className="flex-1 px-4 sm:px-6 py-4 space-y-4 sm:space-y-5 overflow-x-hidden"
         >
           {isGuest && (
             <div className="glass-card rounded-2xl border border-primary/40 p-3 flex items-center gap-3 neon-glow">
@@ -527,7 +570,7 @@ const Dashboard = () => {
                 <UserPlus className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-display font-bold">You're touring as a guest 👋</p>
+                <p className="text-xs font-display font-bold">You're touring as a guest </p>
                 <p className="text-[10px] text-muted-foreground">Sign up to save progress and unlock everything.</p>
               </div>
               <button onClick={() => navigate('/auth')}
@@ -624,6 +667,56 @@ const Dashboard = () => {
             </motion.div>
           )}
 
+          {/* CATEGORY FILTER BAR - Mobile Only */}
+          <div className="lg:hidden w-full overflow-x-auto scrollbar-none py-1">
+            <div className="flex items-center gap-1.5 min-w-max pb-2">
+              {filterOptions.map((tab, index) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleCategorySelect(tab.id as DashboardCategory, index)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all ${
+                      selectedCategory === tab.id
+                        ? 'bg-primary text-primary-foreground shadow-sm neon-border'
+                        : 'bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground border border-border/40'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* YOUR TRACKS - Mobile Only */}
+          {!isGuest && myTracks.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              className="lg:hidden glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-display font-bold uppercase tracking-wider text-muted-foreground">Your tracks</p>
+                <span className="text-[9px] font-mono text-muted-foreground">{myTracks.length} active</span>
+              </div>
+              {myTracks.map(({ track, done, total, pct }) => (
+                <button key={track.id} onClick={go(track.path)}
+                  className="w-full text-left rounded-xl p-2.5 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-lg shrink-0">{track.emoji}</span>
+                    <p className="text-xs font-display font-semibold truncate flex-1">{track.title}</p>
+                    <span className="text-[10px] font-mono text-primary shrink-0">{done}/{total}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                  </div>
+                  <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          )}
+
           {/* SECTIONS */}
           <div className="space-y-3">
             {visibleSections.map((section, i) => {
@@ -695,6 +788,46 @@ const Dashboard = () => {
               );
             })}
           </div>
+
+          {/* Code Crawler featured */}
+          <motion.button
+            initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+            onClick={go('/games/crawler')}
+            className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden lg:hidden ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10" />
+            <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-xl bg-accent-orange/15 grid place-items-center border border-accent-orange/30 neon-glow shrink-0">
+                  <Gamepad2 className="w-5 h-5 text-accent-orange" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-bold font-display flex items-center gap-2 truncate">
+                    Code Crawler
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent-orange/15 text-accent-orange border border-accent-orange/30 font-mono">NEW</span>
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate">Maze runner · fix code at every gate</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-primary shrink-0" />
+            </div>
+          </motion.button>
+          
+          {/* Suggestions */}
+          <motion.button
+            initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+            onClick={go('/suggestions')}
+            className={`w-full glass-card p-4 rounded-2xl text-left flex items-center gap-3 transition-all lg:hidden ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+          >
+            <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 grid place-items-center shrink-0">
+              <MessageSquare className="w-5 h-5 text-accent-yellow" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold font-display">Suggestions & Feedback</p>
+              <p className="text-[10px] text-muted-foreground">Tell us what's missing — we read every one.</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          </motion.button>
 
           {/* Promo */}
           <div className="glass-card p-4 rounded-2xl">
