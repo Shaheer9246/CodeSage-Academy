@@ -243,15 +243,19 @@ const Welcome = () => {
           </motion.div>
         </div>
 
-        {/* Footer */}
+         {/* Footer */}
         <motion.footer variants={itemVariants} className="mt-12 pt-8 border-t border-border/30">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-muted-foreground/60">
             <p>No credit card · No subscriptions · Open for everyone</p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <button onClick={() => navigate('/privacy')} className="hover:text-primary transition-colors">
                 Privacy &amp; Terms
               </button>
-              <span className="text-border">|</span>
+              <span className="text-border/50">|</span>
+              <button onClick={() => navigate('/cookie-policy')} className="hover:text-primary transition-colors">
+                Cookie Policy
+              </button>
+              <span className="text-border/50">|</span>
               <button onClick={() => navigate('/contact')} className="hover:text-primary transition-colors">
                 Contact SysAdmin
               </button>
