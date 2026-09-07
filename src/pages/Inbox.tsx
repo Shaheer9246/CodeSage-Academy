@@ -101,14 +101,26 @@ const InboxPage = () => {
       const key = `codesage_inbox_seen_${user.id}`;
       let seen: string[] = [];
       try { seen = JSON.parse(localStorage.getItem(key) || '[]'); } catch { seen = []; }
-      const unseen = list.filter(a => !seen.includes(a.id));
-      if (unseen.length) {
-        for (const a of unseen) {
-          try { await supabase.rpc('mark_announcement_read', { _id: a.id }); } catch { /* noop */ }
-        }
-        try { localStorage.setItem(key, JSON.stringify(list.map(a => a.id))); } catch { /* ignore */ }
-        window.dispatchEvent(new Event('inbox:read'));
-      }
+      // AFTER
+  const unseen = list.filter(a => !seen.includes(a.id));
+  if (unseen.length) {
+    // FIX: Batch the reads into a SINGLE database operation instead of N separate RPC calls
+    const readsToInsert = unseen.map(a => ({
+      user_id: user.id,
+      announcement_id: a.id
+    }));
+    
+    const { error: batchError } = await supabase
+      .from('announcement_reads')
+      .upsert(readsToInsert, { onConflict: 'user_id,announcement_id' });
+      
+    if (batchError) {
+      console.error('Failed to batch mark announcements as read:', batchError);
+    }
+    
+    try { localStorage.setItem(key, JSON.stringify(list.map(a => a.id))); } catch { /* ignore */ }
+    window.dispatchEvent(new Event('inbox:read'));
+  }
     }
   }, [user?.id]);
 
