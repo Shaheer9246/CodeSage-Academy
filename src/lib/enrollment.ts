@@ -263,10 +263,31 @@ export async function hydrateEnrollments(
   }
 
   try {
-    const [{ data: enr }, { data: stats }] = await Promise.all([
+        // --- 24-hour cache for global track_stats (saves DB reads) ---
+    const statsCacheKey = 'codesage:track_stats_cache';
+    const statsTimeKey = 'codesage:track_stats_time';
+    const dayMs = 24 * 60 * 60 * 1000;
+    
+    let cachedStats: any[] | null = null;
+    const lastStatsTime = Number(localStorage.getItem(statsTimeKey) || 0);
+    if (Date.now() - lastStatsTime < dayMs) {
+      try { cachedStats = JSON.parse(localStorage.getItem(statsCacheKey) || '[]'); } catch { /* ignore */ }
+    }
+
+    const [{ data: enr }, { data: fetchedStats }] = await Promise.all([
       supabase.from('enrollments').select('*').eq('user_id', userId),
-      supabase.from('track_stats').select('*'),
+      cachedStats ? Promise.resolve({ data: cachedStats }) : supabase.from('track_stats').select('*'),
     ]);
+
+    const stats = fetchedStats || [];
+
+    // Save to cache if we just fetched fresh data
+    if (!cachedStats) {
+      try {
+        localStorage.setItem(statsCacheKey, JSON.stringify(stats));
+        localStorage.setItem(statsTimeKey, String(Date.now()));
+      } catch { /* ignore */ }
+    }
 
     mem = ((enr || []) as {
       track: string;
