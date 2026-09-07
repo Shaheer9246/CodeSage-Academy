@@ -65,7 +65,7 @@ export default function SuggestionsBadge() {
 
     const onRead = () => refresh(true);
     window.addEventListener('suggestions:read', onRead);
-    const onFocus = () => refresh(true);
+    const onFocus = () => refresh(false); // Respects the 60s cache throttle
     window.addEventListener('focus', onFocus);
 
     // Silent poll every 5 minutes instead of an always-on live channel
