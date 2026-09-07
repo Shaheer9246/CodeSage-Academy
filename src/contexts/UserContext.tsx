@@ -539,6 +539,12 @@ useEffect(() => {
 
   const updateStreak = async () => {
     if (!user) return;
+    // Guard: only one streak call per user per day (survives re-renders and reloads).
+    const key = `codesage_streak_ping_${user.id}`;
+    const today = new Date().toISOString().slice(0, 10);
+    if (streakRef.current === today || localStorage.getItem(key) === today) return;
+    streakRef.current = today;
+    try { localStorage.setItem(key, today); } catch { /* ignore */ }
     const { data, error } = await supabase.rpc('update_streak');
     if (error) { console.error('update_streak failed', error.message); return; }
     applyServerProfile(data);
