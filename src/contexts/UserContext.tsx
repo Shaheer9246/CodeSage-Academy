@@ -216,6 +216,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(() => readCachedProfile());
   const [loading, setLoading] = useState<boolean>(() => !readCachedProfile());
   const syncTimer = useRef<number | undefined>(undefined);
+  const streakRef = useRef<string | null>(null);
 
   const fetchProfile = useCallback(async (authUser: User) => {
     const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
