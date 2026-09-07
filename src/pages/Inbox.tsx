@@ -96,13 +96,21 @@ const InboxPage = () => {
     setItems((data || []) as Announcement[]);
     
     // Mark all seen ids as read
-    if (user) {
-      for (const a of (data || []) as Announcement[]) {
-        try { await supabase.rpc('mark_announcement_read', { _id: a.id }); } catch { /* noop */ }
+    if (user?.id) {
+      const list = (data || []) as Announcement[];
+      const key = `codesage_inbox_seen_${user.id}`;
+      let seen: string[] = [];
+      try { seen = JSON.parse(localStorage.getItem(key) || '[]'); } catch { seen = []; }
+      const unseen = list.filter(a => !seen.includes(a.id));
+      if (unseen.length) {
+        for (const a of unseen) {
+          try { await supabase.rpc('mark_announcement_read', { _id: a.id }); } catch { /* noop */ }
+        }
+        try { localStorage.setItem(key, JSON.stringify(list.map(a => a.id))); } catch { /* ignore */ }
+        window.dispatchEvent(new Event('inbox:read'));
       }
-      window.dispatchEvent(new Event('inbox:read'));
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     refresh();

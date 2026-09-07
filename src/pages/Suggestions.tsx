@@ -94,7 +94,7 @@ const Suggestions = () => {
       );
       setPostedToday(mine);
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     refresh();
@@ -118,7 +118,7 @@ const Suggestions = () => {
       };
       markAsRead();
     }
-  }, [user]);
+  }, [user?.id]);
 
   const submit = async () => {
     if (!user || !text.trim()) return;
