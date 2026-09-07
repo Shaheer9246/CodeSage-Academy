@@ -98,8 +98,9 @@ const Suggestions = () => {
 
   useEffect(() => {
     refresh();
+    // FIX 1: Unique channel name prevents the realtime crash on remount
     const ch = supabase
-      .channel('suggestions-feed')
+      .channel('suggestions-feed-' + Date.now())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestions' }, () => refresh())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestion_votes' }, () => refresh())
       .subscribe();
@@ -109,11 +110,17 @@ const Suggestions = () => {
   useEffect(() => {
     if (user) {
       const markAsRead = async () => {
+        // FIX 2: Throttle "mark as read" to once per day per user
+        const key = `codesage_suggestions_read_${user.id}`;
+        const today = new Date().toISOString().slice(0, 10);
+        if (localStorage.getItem(key) === today) return;
+
         const { error } = await supabase.rpc('mark_suggestions_read');
         if (error) {
           console.error('Failed to mark suggestions as read:', error);
           return;
         }
+        try { localStorage.setItem(key, today); } catch { /* ignore */ }
         window.dispatchEvent(new Event('suggestions:read'));
       };
       markAsRead();
