@@ -55,14 +55,12 @@ export default function InboxBadge({ className }: InboxBadgeProps) {
     // Unique channel name per mount: prevents the
     // "cannot add postgres_changes callbacks after subscribe()" crash
     // when React remounts this component quickly.
-    const ch = supabase
-      .channel(`announcements-badge-${user.id}-${Date.now()}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => refresh(true))
-      .subscribe();
+        // Silent check every 5 minutes instead of an always-on live channel
+    const timer = window.setInterval(() => refresh(true), 5 * 60 * 1000);
 
     return () => {
       window.removeEventListener('inbox:read', onRead);
-      supabase.removeChannel(ch);
+      window.clearInterval(timer);
     };
   }, [user?.id, refresh]);
 
