@@ -115,7 +115,7 @@ const InboxPage = () => {
   useEffect(() => {
     refresh();
     const ch = supabase
-      .channel('announcements-feed')
+      .channel('announcements-feed-' + Date.now())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => refresh())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
