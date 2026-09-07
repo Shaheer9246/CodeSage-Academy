@@ -605,12 +605,14 @@ const SettingsPage = () => {
                 </div>
               )}
 
-              {/* ================= GLOBAL FOOTER ================= */}
+                            {/* ================= GLOBAL FOOTER ================= */}
               <div className="text-center pt-6 pb-4 space-y-3 border-t border-border/20 mt-6">
                 <div className="flex items-center justify-center gap-3 text-[10px] font-mono text-muted-foreground flex-wrap">
                   <button onClick={() => navigate('/terms')} className="hover:text-primary transition-colors">Terms & Policy</button>
                   <span className="text-muted-foreground/50">·</span>
                   <button onClick={() => navigate('/privacy')} className="hover:text-primary transition-colors">Privacy</button>
+                  <span className="text-muted-foreground/50">·</span>
+                  <button onClick={() => navigate('/cookie-policy')} className="hover:text-primary transition-colors">Cookie Policy</button>
                   <span className="text-muted-foreground/50">·</span>
                   <button onClick={() => navigate('/contact')} className="hover:text-primary transition-colors">Contact Admin</button>
                 </div>
