@@ -23,20 +23,22 @@ export default function InboxBadge({ className }: { className?: string }) {
   }, [user?.id]);
 
   useEffect(() => {
+    if (!user?.id) return;
     refresh();
     const onRead = () => refresh();
     window.addEventListener('inbox:read', onRead);
-    
+
     const ch = supabase
-      .channel(`announcements-badge-${user!.id}`)
+      .channel(`announcements-badge-${user.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, refresh)
       .subscribe();
-      
+
     return () => {
       window.removeEventListener('inbox:read', onRead);
       supabase.removeChannel(ch);
     };
-  }, [refresh]);
+  }, [user?.id, refresh]);
+
 
   return (
     <div className={`relative flex items-center justify-center ${className}`}>
