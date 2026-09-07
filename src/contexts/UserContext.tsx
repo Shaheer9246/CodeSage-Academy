@@ -217,8 +217,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(() => !readCachedProfile());
   const syncTimer = useRef<number | undefined>(undefined);
   const streakRef = useRef<string | null>(null);
+  const fetchInflight = useRef<{ uid: string; p: Promise<void> } | null>(null);
+  const hydratedUid = useRef<string | null | undefined>(undefined);
 
-  const fetchProfile = useCallback(async (authUser: User) => {
+  const loadProfile = useCallback(async (authUser: User) => {
     const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
 
     const buildDefaultProfile = (): UserProfile => ({
@@ -288,6 +290,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+    const fetchProfile = useCallback((authUser: User) => {
+    if (fetchInflight.current?.uid === authUser.id) return fetchInflight.current.p;
+    const p = loadProfile(authUser).finally(() => {
+      fetchInflight.current = null;
+    });
+    fetchInflight.current = { uid: authUser.id, p };
+    return p;
+  }, [loadProfile]);
+
   const syncToDb = useCallback((profile: UserProfile) => {
     if (syncTimer.current) clearTimeout(syncTimer.current);
     syncTimer.current = window.setTimeout(async () => {
@@ -299,30 +310,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }, 500);
   }, []);
 
+    const hydrateFor = (uid: string | null) => {
+    if (hydratedUid.current === uid) return;
+    hydratedUid.current = uid;
+    import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
+      void hydrateEnrollments(uid);
+    }).catch(() => { /* noop */ });
+  };
+
 useEffect(() => {
     let mounted = true;
 
     // Lazy import to avoid a circular dep at module top-level.
-    import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
-      const uid = readCachedProfile()?.id ?? null;
-      void hydrateEnrollments(uid);
-    }).catch(() => { /* noop */ });
+    hydrateFor(readCachedProfile()?.id ?? null);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
+      if (event === 'TOKEN_REFRESHED') return;
 
       if (session?.user) {
         await fetchProfile(session.user);
-        import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
-          void hydrateEnrollments(session.user.id);
-        });
+        hydrateFor(session.user.id);
       } else {
         localStorage.removeItem('codesage_cached_profile');
         setUser(null);
         setLoading(false);
-        import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
-          void hydrateEnrollments(null);
-        });
+        hydrateFor(null);
       }
     });
 
