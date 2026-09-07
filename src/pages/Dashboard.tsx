@@ -260,7 +260,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => onEnrollmentChange(() => setEnrollTick(t => t + 1)), []);
-  useEffect(() => { if (user && !isGuest) updateStreak(); }, [isGuest, user, updateStreak]);
+  useEffect(() => { if (user?.id && !isGuest) updateStreak(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [isGuest, user?.id]);
 
   const showTour = !!user && !isGuest && user.isOnboarded === true && user.hasSeenTour === false;
   useEffect(() => {
