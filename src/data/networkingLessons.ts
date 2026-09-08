@@ -1,4 +1,4 @@
-// Computer & Networking Module 1 — 10 lessons
+// Computer & Networking Module 1 — 15 lessons
 // Sourced from the official CodeSage curriculum PDF (Module 1)
 
 export interface Concept {
