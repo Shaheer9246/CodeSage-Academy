@@ -19,6 +19,10 @@ const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = 
   { key: 'quiz', icon: ClipboardCheck, label: 'Proof', hint: 'Prove it' },
 ];
 
+// Mastery rule: 75% of questions, rounded up.
+// 4 questions → 3 · 5 questions → 4 · 8 questions → 6
+const PASS_THRESHOLD = 0.75;
+
 const LocalLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -49,11 +53,12 @@ const LocalLessonPage = () => {
   const { isGuest: __pgGuest } = useGuestLessonGate('local', id);
 
   const quiz = lesson?.quiz ?? [];
-  const correctCount = useMemo(
+    const correctCount = useMemo(
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
+  const requiredCorrect = Math.ceil(quiz.length * PASS_THRESHOLD);
+  const passed = correctCount >= requiredCorrect;
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
@@ -335,9 +340,9 @@ const LocalLessonPage = () => {
                 <>
                   <section className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 to-transparent p-5 flex items-center gap-3">
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
-                    <div className="flex-1">
+                   <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      <p className="text-[11px] text-muted-foreground">Score {requiredCorrect}/{quiz.length} to finish this lesson.</p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
@@ -420,8 +425,11 @@ const LocalLessonPage = () => {
                       {correctCount}
                       <span className="text-muted-foreground text-lg"> / {quiz.length}</span>
                     </p>
-                    <p className={`text-sm font-display font-semibold mt-1 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
+                   <p className={`text-sm font-display font-semibold mt-1 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
                       {passed ? '🎉 Lesson passed!' : 'Almost there — review and retry'}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-1 font-mono">
+                      pass mark · {requiredCorrect}/{quiz.length} ({Math.round(PASS_THRESHOLD * 100)}%)
                     </p>
                     {!passed && (
                       <button
