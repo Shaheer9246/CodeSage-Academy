@@ -777,7 +777,7 @@ The secret to professional 3D animation is "easing." Nothing in the real world m
       code: {
         html: `<!-- Load GSAP Animation Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<div id="canvas-container"></div>\`,
+<div id="canvas-container"></div>`,
         css: 'body { margin: 0; overflow: hidden; background: #0f172a; }',
         js: `const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -1322,7 +1322,7 @@ function animate() {
   starfield.rotation.x += 0.0005;
   renderer.render(scene, camera);
 }
-animate();\`
+animate();`
       }
     },
     [
@@ -1424,7 +1424,7 @@ function App() {
 }
 
 const root = createRoot(document.getElementById('root'));
-root.render(<App />);\`
+root.render(<App />);`
       }
     },
     [
@@ -1775,7 +1775,7 @@ function App() {
 }
 
 const root = createRoot(document.getElementById('root'));
-root.render(<App />);\`
+root.render(<App />);`
       }
     },
     [
