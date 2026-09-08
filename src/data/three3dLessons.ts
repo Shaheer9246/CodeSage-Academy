@@ -723,7 +723,7 @@ animate();`
     7,
     'Animating 3D Objects with GSAP',
     '🎬',
-    `Writing manual math inside a `requestAnimationFrame` loop (like `cube.rotation.y += 0.01`) is fine for a simple spinning box. But the moment you need an object to bounce with gravity, elastic overshoot, or follow a complex choreographed sequence, manual math becomes a nightmare of nested timeouts and trigonometry.
+    `Writing manual math inside a \`requestAnimationFrame\` loop (like \`cube.rotation.y += 0.01`) is fine for a simple spinning box. But the moment you need an object to bounce with gravity, elastic overshoot, or follow a complex choreographed sequence, manual math becomes a nightmare of nested timeouts and trigonometry.
 
 Enter GSAP (GreenSock Animation Platform). GSAP is the industry-standard animation library used by top-tier web agencies, Awwwards-winning sites, and AAA game UIs. It does not replace Three.js; it partners with it. GSAP handles the complex timing, easing curves, and sequencing, while Three.js handles the rendering.
 
@@ -732,50 +732,50 @@ The secret to professional 3D animation is "easing." Nothing in the real world m
       {
         title: '1. Why GSAP with Three.js?',
         beginner: 'GSAP handles the timing, speed curves, and smooth transitions automatically so you do not have to write scary math formulas. You just tell it "move this box to X=5 over 2 seconds with a bounce," and GSAP does the rest.',
-        advanced: 'GSAP mutates numeric object properties directly frame-by-frame. Because Three.js objects (like `mesh.position` or `mesh.rotation`) are just JavaScript objects with numeric properties (x, y, z), GSAP can interpolate them seamlessly. It is highly optimized, avoids garbage collection spikes, and works beautifully alongside the Three.js render loop without conflicting.'
+        advanced: 'GSAP mutates numeric object properties directly frame-by-frame. Because Three.js objects (like \`mesh.position\` or \`mesh.rotation`) are just JavaScript objects with numeric properties (x, y, z), GSAP can interpolate them seamlessly. It is highly optimized, avoids garbage collection spikes, and works beautifully alongside the Three.js render loop without conflicting.'
       },
       {
         title: '2. Animating 3D Coordinates',
         beginner: 'You can tell GSAP to target a specific property, like moving an object\'s position, or changing its scale, over a set amount of time. You just pass the object and the destination values.',
-        advanced: 'Example: `gsap.to(mesh.position, { x: 2, duration: 1.5 })`. Notice we target `mesh.position` (the Vector3 object), not `mesh` directly, because GSAP needs to mutate the `x` property inside it. GSAP automatically hooks into `requestAnimationFrame` under the hood, updating the values 60 times a second until the duration is complete.'
+        advanced: 'Example: `gsap.to(mesh.position, { x: 2, duration: 1.5 })\`. Notice we target \`mesh.position\` (the Vector3 object), not \`mesh\` directly, because GSAP needs to mutate the \`x\` property inside it. GSAP automatically hooks into \`requestAnimationFrame\` under the hood, updating the values 60 times a second until the duration is complete.'
       },
       {
         title: '3. Easing & Physics',
         beginner: 'Easing controls how an animation starts and stops. It can make an object glide smoothly, snap sharply, or even bounce like a rubber ball! Without easing, animations look robotic and lifeless.',
-        advanced: 'GSAP provides dozens of eases: `power1.inOut` for smooth mechanical movement, `bounce.out` for gravity, `elastic.out(1, 0.3)` for springy overshoot, and `expo.in` for dramatic cinematic snaps. Easing is applied via a mathematical curve that modifies the interpolation progress (0 to 1) over the duration, creating non-linear motion.'
+        advanced: 'GSAP provides dozens of eases: \`power1.inOut\` for smooth mechanical movement, \`bounce.out\` for gravity, \`elastic.out(1, 0.3)\` for springy overshoot, and \`expo.in\` for dramatic cinematic snaps. Easing is applied via a mathematical curve that modifies the interpolation progress (0 to 1) over the duration, creating non-linear motion.'
       },
       {
         title: '4. Animation Timelines',
         beginner: 'Timelines let you chain multiple animations together perfectly. For example: Box moves up, THEN spins, THEN scales down, all in one continuous sequence without messy code.',
-        advanced: '`gsap.timeline()` creates a master controller. You can append tweens with `.to()`, offset them with relative delays (e.g., `"+=0.5"` to start half a second after the previous one ends), and control the entire sequence with `.play()`, `.pause()`, `.reverse()`, or `.timeScale()`. This is essential for complex 3D intro sequences.'
+        advanced: '\`gsap.timeline()\` creates a master controller. You can append tweens with \`.to()`, offset them with relative delays (e.g., `"+=0.5"\` to start half a second after the previous one ends), and control the entire sequence with \`.play()`, `.pause()`, `.reverse()`, or `.timeScale()\`. This is essential for complex 3D intro sequences.'
       },
       {
         title: '5. The Render Loop Partnership',
-        beginner: 'GSAP changes the numbers (like position and rotation), but Three.js still needs to draw the picture. You must keep your standard `requestAnimationFrame` loop running so Three.js can render the changes GSAP is making.',
-        advanced: 'GSAP and Three.js run on separate loops that happen to sync at 60fps. GSAP updates the JavaScript object properties, and then Three.js reads those updated properties during its render pass. You can actually tell GSAP to use Three.js\'s clock via `gsap.ticker`, but for 99% of use cases, letting them run parallel is perfectly fine and highly performant.'
+        beginner: 'GSAP changes the numbers (like position and rotation), but Three.js still needs to draw the picture. You must keep your standard \`requestAnimationFrame\` loop running so Three.js can render the changes GSAP is making.',
+        advanced: 'GSAP and Three.js run on separate loops that happen to sync at 60fps. GSAP updates the JavaScript object properties, and then Three.js reads those updated properties during its render pass. You can actually tell GSAP to use Three.js\'s clock via \`gsap.ticker`, but for 99% of use cases, letting them run parallel is perfectly fine and highly performant.'
       },
       {
         title: '6. Killing & Overwriting Tweens',
         beginner: 'If you click a button to move a box, and click it again before it finishes, the animations might fight each other. GSAP lets you kill old animations so the new one takes over smoothly.',
-        advanced: 'Use `gsap.killTweensOf(mesh.position)` to instantly stop and clear any active animations targeting that specific object. Alternatively, use the `overwrite: "auto"` property inside your tween config, which tells GSAP to automatically find and kill conflicting tweens on the same properties, preventing animation buildup and jitter.'
+        advanced: 'Use `gsap.killTweensOf(mesh.position)\` to instantly stop and clear any active animations targeting that specific object. Alternatively, use the \`overwrite: "auto"\` property inside your tween config, which tells GSAP to automatically find and kill conflicting tweens on the same properties, preventing animation buildup and jitter.'
       }
     ],
     {
       title: 'Creating a Bouncing 3D Cube with GSAP',
       intro: 'We will use GSAP to animate a 3D box bouncing up and down while spinning. We just need to include the GSAP library via CDN, and then tell it which object properties to animate!',
       steps: [
-        'HTML Setup: Include the GSAP library via CDN script tag before your custom JS. Expect the global `gsap` object to be available.',
+        'HTML Setup: Include the GSAP library via CDN script tag before your custom JS. Expect the global \`gsap\` object to be available.',
         'Setup Three.js: Create the standard Scene, Camera, Renderer, and add a DirectionalLight and AmbientLight so the 3D shape is visible.',
         'Create the Subject: Build a BoxGeometry with a MeshStandardMaterial (color 0x6366f1, roughness 0.2). Add it to the scene.',
-        'Animate Y Position (Bounce): Use `gsap.to(mesh.position, { y: 1.5, duration: 1.2, repeat: -1, yoyo: true, ease: "bounce.out" })`. Expect the box to jump up and fall back down with realistic gravity.',
-        'Understand `repeat: -1`: This tells GSAP to loop the animation infinitely. Expect the bounce to never stop.',
-        'Understand `yoyo: true`: This tells GSAP to play the animation in reverse on every other loop (Up, then Down, then Up). Without this, the box would teleport back to the floor instantly.',
-        'Animate Rotation (Spin): Add a second `gsap.to(mesh.rotation, { y: Math.PI * 2, duration: 2.4, repeat: -1, ease: "none" })`. Expect the box to spin continuously on the Y-axis while bouncing.',
-        'Maintain Render Loop: Keep the standard `requestAnimationFrame` loop running `renderer.render()`. Expect the screen to update, showing GSAP\'s mathematical changes visually.'
+        'Animate Y Position (Bounce): Use \`gsap.to(mesh.position, { y: 1.5, duration: 1.2, repeat: -1, yoyo: true, ease: "bounce.out" })\`. Expect the box to jump up and fall back down with realistic gravity.',
+        'Understand \`repeat: -1\`: This tells GSAP to loop the animation infinitely. Expect the bounce to never stop.',
+        'Understand \`yoyo: true\`: This tells GSAP to play the animation in reverse on every other loop (Up, then Down, then Up). Without this, the box would teleport back to the floor instantly.',
+        'Animate Rotation (Spin): Add a second \`gsap.to(mesh.rotation, { y: Math.PI * 2, duration: 2.4, repeat: -1, ease: "none" })\`. Expect the box to spin continuously on the Y-axis while bouncing.',
+        'Maintain Render Loop: Keep the standard \`requestAnimationFrame\` loop running \`renderer.render()\`. Expect the screen to update, showing GSAP\'s mathematical changes visually.'
       ],
       goal: 'Understand how external animation libraries like GSAP can safely control Three.js objects for smooth, physics-based motion.',
       code: {
-        html: `<!-- Load GSAP Animation Library -->
+        html: \`<!-- Load GSAP Animation Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <div id="canvas-container"></div>`,
         css: 'body { margin: 0; overflow: hidden; background: #0f172a; }',
@@ -1221,41 +1221,41 @@ animate();`
     11,
     'Particle Systems & Performance',
     '✨',
-    `In 3D graphics, complexity is the enemy of performance. If you try to render a snowstorm by creating 10,000 individual `THREE.Mesh` spheres, your browser will instantly freeze. Every single mesh requires a "draw call" — a command sent from the CPU to the GPU. Sending 10,000 commands per frame creates a massive bottleneck, choking the processor before the graphics card even gets a chance to draw.
+    `In 3D graphics, complexity is the enemy of performance. If you try to render a snowstorm by creating 10,000 individual \`THREE.Mesh\` spheres, your browser will instantly freeze. Every single mesh requires a "draw call" — a command sent from the CPU to the GPU. Sending 10,000 commands per frame creates a massive bottleneck, choking the processor before the graphics card even gets a chance to draw.
 
-The solution is the Particle System. Instead of 10,000 separate objects, we create a single `THREE.Points` object that contains 10,000 vertices. The GPU renders all 10,000 points in a single, highly optimized draw call. This is the secret behind galaxies, rain, fire, dust motes, and magical spell effects in high-end web experiences.
+The solution is the Particle System. Instead of 10,000 separate objects, we create a single \`THREE.Points\` object that contains 10,000 vertices. The GPU renders all 10,000 points in a single, highly optimized draw call. This is the secret behind galaxies, rain, fire, dust motes, and magical spell effects in high-end web experiences.
 
-But particle systems require a shift in how you think about data. Instead of manipulating JavaScript objects, you must manipulate raw, contiguous blocks of memory called Typed Arrays (`Float32Array`). You are no longer just a JavaScript developer; you are feeding raw coordinates directly into the graphics card's pipeline. Mastering this bridge between CPU memory and GPU rendering is the hallmark of a senior WebGL engineer.`,
+But particle systems require a shift in how you think about data. Instead of manipulating JavaScript objects, you must manipulate raw, contiguous blocks of memory called Typed Arrays (\`Float32Array`). You are no longer just a JavaScript developer; you are feeding raw coordinates directly into the graphics card's pipeline. Mastering this bridge between CPU memory and GPU rendering is the hallmark of a senior WebGL engineer.`,
     [
       {
         title: '1. The Draw Call Bottleneck',
         beginner: 'Imagine asking a painter to paint 10,000 dots, but you make them pick up a new brush and dip it in paint for every single dot. That is what creating 10,000 meshes does to your computer. Particles tell the painter to use a single spray can for all 10,000 dots at once.',
-        advanced: 'The CPU-GPU bus is a severe bottleneck. Every `THREE.Mesh` triggers a state change and a draw call (`gl.drawElements`). 10,000 meshes mean 10,000 draw calls, which will drop framerates to single digits even on powerful GPUs. `THREE.Points` uses a single `gl.drawArrays(gl.POINTS, ...)` call, shifting the bottleneck from CPU draw calls to GPU fragment processing, which modern hardware handles effortlessly.'
+        advanced: 'The CPU-GPU bus is a severe bottleneck. Every `THREE.Mesh\` triggers a state change and a draw call (\`gl.drawElements`). 10,000 meshes mean 10,000 draw calls, which will drop framerates to single digits even on powerful GPUs. `THREE.Points\` uses a single \`gl.drawArrays(gl.POINTS, ...)\` call, shifting the bottleneck from CPU draw calls to GPU fragment processing, which modern hardware handles effortlessly.'
       },
       {
         title: '2. Float32Array & BufferGeometry',
         beginner: 'To handle thousands of particles, we cannot use standard JavaScript arrays. We use special "typed arrays" that store numbers in a continuous block of memory, exactly how the graphics card expects to receive them.',
-        advanced: '`THREE.BufferGeometry` relies on `Float32Array` to store vertex attributes. A particle system with 10,000 points requires a `Float32Array` of length 30,000 (x, y, z for each point). This contiguous memory layout allows the browser to upload the entire buffer to the GPU\'s VRAM in a single operation via `gl.bufferData`, bypassing the overhead of JavaScript object parsing.'
+        advanced: '\`THREE.BufferGeometry\` relies on \`Float32Array\` to store vertex attributes. A particle system with 10,000 points requires a \`Float32Array\` of length 30,000 (x, y, z for each point). This contiguous memory layout allows the browser to upload the entire buffer to the GPU\'s VRAM in a single operation via \`gl.bufferData`, bypassing the overhead of JavaScript object parsing.'
       },
       {
         title: '3. THREE.Points & PointsMaterial',
         beginner: 'THREE.Points is the special object that draws dots instead of solid shapes. PointsMaterial lets you control the size, color, and transparency of every single dot in the system at once.',
-        advanced: '`THREE.PointsMaterial` compiles to a specific shader that utilizes `gl_PointSize` and `gl_PointCoord` in the vertex and fragment shaders. It supports `sizeAttenuation` (particles shrink with distance from the camera) and `alphaMap` (using a texture to make square points look like soft, round glowing orbs or snowflakes).'
+        advanced: '`THREE.PointsMaterial\` compiles to a specific shader that utilizes \`gl_PointSize\` and \`gl_PointCoord\` in the vertex and fragment shaders. It supports \`sizeAttenuation\` (particles shrink with distance from the camera) and \`alphaMap\` (using a texture to make square points look like soft, round glowing orbs or snowflakes).'
       },
       {
         title: '4. Vertex Colors & Custom Attributes',
         beginner: 'What if you want every star in your galaxy to be a different color? You can pass a second array of colors to the geometry, telling the graphics card exactly what color to paint each individual dot.',
-        advanced: 'Beyond positions, `BufferGeometry` accepts custom attributes like `color` (Float32Array of RGB values) or `size` (Float32Array of individual point sizes). By setting `material.vertexColors = true`, the shader interpolates these attributes per-vertex. Advanced developers use custom `ShaderMaterial` to pass arbitrary data (like velocity or lifespan) as attributes for GPU-driven particle physics.'
+        advanced: 'Beyond positions, \`BufferGeometry\` accepts custom attributes like \`color\` (Float32Array of RGB values) or \`size\` (Float32Array of individual point sizes). By setting \`material.vertexColors = true`, the shader interpolates these attributes per-vertex. Advanced developers use custom `ShaderMaterial\` to pass arbitrary data (like velocity or lifespan) as attributes for GPU-driven particle physics.'
       },
       {
         title: '5. GPU-Driven Animation',
         beginner: 'Moving 10,000 particles using JavaScript math on every frame is slow. Professional developers write custom "shaders" (tiny programs that run directly on the graphics card) to move the particles at lightning speed.',
-        advanced: 'Updating a `Float32Array` on the CPU and re-uploading it to the GPU every frame destroys performance. The professional approach is to pass a `uTime` uniform to a custom `ShaderMaterial` and calculate sine waves, noise, or orbital math directly in the GLSL vertex shader. The CPU does zero math; the GPU parallelizes the movement of millions of particles instantly.'
+        advanced: 'Updating a \`Float32Array\` on the CPU and re-uploading it to the GPU every frame destroys performance. The professional approach is to pass a \`uTime\` uniform to a custom \`ShaderMaterial\` and calculate sine waves, noise, or orbital math directly in the GLSL vertex shader. The CPU does zero math; the GPU parallelizes the movement of millions of particles instantly.'
       },
       {
         title: '6. Memory Leaks & Disposal',
         beginner: 'When you delete a particle system, the graphics card does not automatically forget about it. If you do not explicitly tell the computer to "throw away" the geometry and materials, your website will slowly eat up all the memory and crash.',
-        advanced: 'JavaScript\'s Garbage Collector only cleans up CPU heap memory. WebGL buffers (VBOs, VAOs) and textures live in GPU VRAM. When unmounting a particle system, you must explicitly call `geometry.dispose()`, `material.dispose()`, and `material.map.dispose()`. In React Three Fiber, the reconciler handles basic disposal, but custom attributes and render targets require manual cleanup in `useEffect` return functions.')
+        advanced: 'JavaScript\'s Garbage Collector only cleans up CPU heap memory. WebGL buffers (VBOs, VAOs) and textures live in GPU VRAM. When unmounting a particle system, you must explicitly call \`geometry.dispose()`, `material.dispose()`, and `material.map.dispose()\`. In React Three Fiber, the reconciler handles basic disposal, but custom attributes and render targets require manual cleanup in \`useEffect\` return functions.')
       }
     ],
     {
@@ -1263,20 +1263,20 @@ But particle systems require a shift in how you think about data. Instead of man
       intro: 'We will generate 5,000 particles distributed in a spherical cloud, assigning each one a randomized color to create a vibrant, deep-space starfield.',
       steps: [
         'Setup the Scene: Create the standard Scene, Camera, and Renderer boilerplate with a pitch-black background (0x030712).',
-        'Define Particle Count: Set `const count = 5000`. Expect to manage 5,000 individual points.',
-        'Allocate Position Memory: Create `const positions = new Float32Array(count * 3)`. Expect a contiguous block of memory holding 15,000 empty floats.',
-        'Allocate Color Memory: Create `const colors = new Float32Array(count * 3)`. Expect a second block for RGB values.',
+        'Define Particle Count: Set \`const count = 5000\`. Expect to manage 5,000 individual points.',
+        'Allocate Position Memory: Create \`const positions = new Float32Array(count * 3)\`. Expect a contiguous block of memory holding 15,000 empty floats.',
+        'Allocate Color Memory: Create \`const colors = new Float32Array(count * 3)\`. Expect a second block for RGB values.',
         'Populate Data: Loop 5,000 times. For each particle, assign a random X, Y, Z position (spread out by multiplying Math.random() by 10) and a random RGB color. Expect the arrays to fill with spatial and color data.',
-        'Build BufferGeometry: Create `new THREE.BufferGeometry()`. Attach the positions via `setAttribute("position", ...)` and colors via `setAttribute("color", ...)`. Expect the geometry to map the raw arrays to GPU attributes.',
-        'Create Material: Use `new THREE.PointsMaterial({ size: 0.05, vertexColors: true })`. Expect the material to read the color attribute instead of a single flat color.',
-        'Create Points Object: Combine geometry and material into `new THREE.Points()`. Add it to the scene.',
+        'Build BufferGeometry: Create \`new THREE.BufferGeometry()\`. Attach the positions via \`setAttribute("position", ...)\` and colors via \`setAttribute("color", ...)\`. Expect the geometry to map the raw arrays to GPU attributes.',
+        'Create Material: Use \`new THREE.PointsMaterial({ size: 0.05, vertexColors: true })\`. Expect the material to read the color attribute instead of a single flat color.',
+        'Create Points Object: Combine geometry and material into \`new THREE.Points()\`. Add it to the scene.',
         'Animate: In the render loop, slowly rotate the entire Points object on the Y and X axes. Expect the entire galaxy to spin as a single cohesive unit, maintaining 60 FPS effortlessly.'
       ],
       goal: 'Build a high-performance, multi-colored 3D particle system using raw typed arrays.',
       code: {
         html: '',
         css: 'body { margin: 0; overflow: hidden; background: #030712; }',
-        js: `const scene = new THREE.Scene();
+        js: \`const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x030712);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1344,61 +1344,61 @@ animate();`
     12,
     'React Three Fiber (R3F) Basics',
     '⚛️',
-    `Writing imperative Three.js code is powerful, but it becomes incredibly difficult to manage as your application grows. Trying to synchronize React's state (like a shopping cart or a UI menu) with a separate, imperative Three.js scene graph leads to spaghetti code, memory leaks, and endless `useEffect` cleanup functions.
+    `Writing imperative Three.js code is powerful, but it becomes incredibly difficult to manage as your application grows. Trying to synchronize React's state (like a shopping cart or a UI menu) with a separate, imperative Three.js scene graph leads to spaghetti code, memory leaks, and endless \`useEffect\` cleanup functions.
 
-Enter React Three Fiber (R3F). R3F is not a "wrapper" around Three.js. It is a custom React Renderer, exactly like `react-dom` is for HTML and `react-native` is for iOS/Android. It allows you to write Three.js objects using declarative JSX tags. 
+Enter React Three Fiber (R3F). R3F is not a "wrapper" around Three.js. It is a custom React Renderer, exactly like \`react-dom\` is for HTML and \`react-native\` is for iOS/Android. It allows you to write Three.js objects using declarative JSX tags. 
 
-When you write `<mesh position={[0, 1, 0]}>`, R3F's reconciler intercepts that tag and executes `new THREE.Mesh()` under the hood. This means you get the full, uncompromised performance of raw WebGL, combined with the component reusability, state management, and ecosystem of React. It is the undisputed industry standard for building production 3D web applications.`,
+When you write \`<mesh position={[0, 1, 0]}>`, R3F's reconciler intercepts that tag and executes `new THREE.Mesh()` under the hood. This means you get the full, uncompromised performance of raw WebGL, combined with the component reusability, state management, and ecosystem of React. It is the undisputed industry standard for building production 3D web applications.`,
     [
       {
         title: '1. The React Renderer Architecture',
         beginner: 'R3F translates your React JSX tags directly into Three.js objects. It does not slow things down or add an extra layer of HTML. It speaks directly to the graphics card using React\'s language.',
-        advanced: 'R3F uses the `react-reconciler` package to create a custom host config. When React commits changes to the virtual DOM, R3F intercepts these mutations and maps them to Three.js scene graph operations (`scene.add()`, `mesh.position.set()`). This happens entirely outside the browser\'s HTML DOM, meaning R3F has zero DOM overhead and matches raw Three.js performance.'
+        advanced: 'R3F uses the `react-reconciler\` package to create a custom host config. When React commits changes to the virtual DOM, R3F intercepts these mutations and maps them to Three.js scene graph operations (\`scene.add()`, `mesh.position.set()`). This happens entirely outside the browser\'s HTML DOM, meaning R3F has zero DOM overhead and matches raw Three.js performance.'
       },
       {
         title: '2. The <Canvas> Component',
-        beginner: 'The `<Canvas>` tag is the portal to the 3D world. You put it in your HTML, and it automatically creates the scene, the camera, the renderer, and the animation loop for you.',
-        advanced: '`<Canvas>` mounts a WebGL context, instantiates a `THREE.WebGLRenderer`, and starts a `requestAnimationFrame` loop via an internal clock. It automatically handles window resize events, device pixel ratio matching, and context loss recovery. Everything placed inside `<Canvas>` is rendered into the WebGL context, not the HTML DOM.'
+        beginner: 'The `<Canvas>\` tag is the portal to the 3D world. You put it in your HTML, and it automatically creates the scene, the camera, the renderer, and the animation loop for you.',
+        advanced: '\`<Canvas>\` mounts a WebGL context, instantiates a \`THREE.WebGLRenderer`, and starts a `requestAnimationFrame\` loop via an internal clock. It automatically handles window resize events, device pixel ratio matching, and context loss recovery. Everything placed inside \`<Canvas>\` is rendered into the WebGL context, not the HTML DOM.'
       },
       {
         title: '3. Declarative Meshes & JSX',
-        beginner: 'Instead of writing `new THREE.Mesh(geometry, material)`, you simply write `<mesh>` and nest the geometry and material inside it like HTML children. React handles the creation and destruction automatically.',
-        advanced: 'In R3F, lowercase JSX tags map to Three.js classes. `<mesh>` becomes `THREE.Mesh`. R3F automatically attaches nested children to their parents. If a geometry is nested inside a mesh, R3F automatically assigns it to the mesh\'s `geometry` property. This declarative tree structure makes complex scene graphs readable and maintainable.'
+        beginner: 'Instead of writing \`new THREE.Mesh(geometry, material)`, you simply write `<mesh>\` and nest the geometry and material inside it like HTML children. React handles the creation and destruction automatically.',
+        advanced: 'In R3F, lowercase JSX tags map to Three.js classes. \`<mesh>\` becomes \`THREE.Mesh\`. R3F automatically attaches nested children to their parents. If a geometry is nested inside a mesh, R3F automatically assigns it to the mesh\'s \`geometry\` property. This declarative tree structure makes complex scene graphs readable and maintainable.'
       },
       {
-        title: '4. Props, Args, and the `attach` API',
-        beginner: 'You pass settings to 3D objects using React props. If a Three.js class needs arguments in its constructor (like the width and height of a box), you use the special `args` prop.',
-        advanced: 'Standard props map to setters (e.g., `position={[1,2,3]}` calls `mesh.position.set(1,2,3)`). However, constructor arguments cannot be changed via setters. R3F introduces the `args` prop to pass array values directly to the class constructor (e.g., `<boxGeometry args={[1, 1, 1]} />`). If a child needs to attach to a specific property other than the default, the `attach` prop is used (e.g., `<fog attach="fog" args={['#000', 10, 20]} />`).'
+        title: '4. Props, Args, and the \`attach\` API',
+        beginner: 'You pass settings to 3D objects using React props. If a Three.js class needs arguments in its constructor (like the width and height of a box), you use the special \`args\` prop.',
+        advanced: 'Standard props map to setters (e.g., \`position={[1,2,3]}\` calls \`mesh.position.set(1,2,3)`). However, constructor arguments cannot be changed via setters. R3F introduces the `args\` prop to pass array values directly to the class constructor (e.g., \`<boxGeometry args={[1, 1, 1]} />`). If a child needs to attach to a specific property other than the default, the `attach\` prop is used (e.g., \`<fog attach="fog" args={['#000', 10, 20]} />`).'
       },
       {
         title: '5. Auto-Disposal & Memory Management',
         beginner: 'In raw Three.js, you have to manually delete objects from memory when you are done with them. R3F does this for you automatically when a React component unmounts.',
-        advanced: 'R3F\'s reconciler tracks every geometry, material, and texture created via JSX. When a component unmounts, R3F automatically traverses the removed sub-tree and calls `.dispose()` on all disposable WebGL resources. This virtually eliminates the memory leaks that plague imperative Three.js applications, provided you do not manually create resources outside the JSX tree.'
+        advanced: 'R3F\'s reconciler tracks every geometry, material, and texture created via JSX. When a component unmounts, R3F automatically traverses the removed sub-tree and calls `.dispose()\` on all disposable WebGL resources. This virtually eliminates the memory leaks that plague imperative Three.js applications, provided you do not manually create resources outside the JSX tree.'
       },
       {
-        title: '6. The `extend` API',
+        title: '6. The \`extend\` API',
         beginner: 'R3F knows about all the standard Three.js objects out of the box. But if you install a special add-on (like OrbitControls), you have to tell R3F about it so you can use it as a JSX tag.',
-        advanced: 'The `extend()` function registers external Three.js classes with R3F\'s internal catalog. For example, `extend({ OrbitControls })` allows you to use `<orbitControls />` in JSX. R3F dynamically generates the reconciler mappings at runtime, allowing any custom class that extends `Object3D` to participate in the declarative scene graph.')
+        advanced: 'The \`extend()\` function registers external Three.js classes with R3F\'s internal catalog. For example, \`extend({ OrbitControls })\` allows you to use \`<orbitControls />\` in JSX. R3F dynamically generates the reconciler mappings at runtime, allowing any custom class that extends \`Object3D\` to participate in the declarative scene graph.')
     ],
     {
       title: 'First R3F Component Scene',
       intro: 'Let\'s build a 3D box using React Three Fiber\'s declarative JSX syntax, comparing it to the imperative code we wrote in previous lessons.',
       steps: [
-        'Import Canvas: Import `{ Canvas }` from `@react-three/fiber`. Expect the React renderer to be available.',
-        'Create the Box Component: Write a standard React function component named `Box`. Expect it to return JSX.',
-        'Declarative Mesh: Return `<mesh>` instead of `new THREE.Mesh()`. Expect R3F to instantiate the object.',
-        'Pass Constructor Args: Add `<boxGeometry args={[1.5, 1.5, 1.5]} />` as a child. Expect R3F to pass the array to the BoxGeometry constructor.',
-        'Declarative Material: Add `<meshStandardMaterial color="#6366f1" />` as a child. Expect R3F to attach it to the mesh automatically.',
-        'Setup the App Component: Create an `App` component that returns a full-screen `<div>` containing the `<Canvas>` tag.',
-        'Configure Camera: Pass `camera={{ position: [0, 0, 4] }}` as a prop to `<Canvas>`. Expect R3F to initialize the PerspectiveCamera with these settings.',
-        'Add Lighting: Nest `<ambientLight>` and `<directionalLight>` inside the Canvas. Expect R3F to add them to the scene graph.',
-        'Render to DOM: Use `createRoot` to render `<App />` into the HTML root. Expect the WebGL canvas to mount and display the purple box.'
+        'Import Canvas: Import \`{ Canvas }\` from \`@react-three/fiber\`. Expect the React renderer to be available.',
+        'Create the Box Component: Write a standard React function component named \`Box\`. Expect it to return JSX.',
+        'Declarative Mesh: Return \`<mesh>\` instead of \`new THREE.Mesh()\`. Expect R3F to instantiate the object.',
+        'Pass Constructor Args: Add \`<boxGeometry args={[1.5, 1.5, 1.5]} />\` as a child. Expect R3F to pass the array to the BoxGeometry constructor.',
+        'Declarative Material: Add \`<meshStandardMaterial color="#6366f1" />\` as a child. Expect R3F to attach it to the mesh automatically.',
+        'Setup the App Component: Create an \`App\` component that returns a full-screen \`<div>\` containing the \`<Canvas>\` tag.',
+        'Configure Camera: Pass \`camera={{ position: [0, 0, 4] }}\` as a prop to \`<Canvas>\`. Expect R3F to initialize the PerspectiveCamera with these settings.',
+        'Add Lighting: Nest \`<ambientLight>\` and \`<directionalLight>\` inside the Canvas. Expect R3F to add them to the scene graph.',
+        'Render to DOM: Use \`createRoot\` to render \`<App />\` into the HTML root. Expect the WebGL canvas to mount and display the purple box.'
       ],
       goal: 'Render a 3D mesh using clean, declarative React JSX components and understand the R3F architecture.',
       code: {
         html: '',
         css: 'body { margin: 0; background: #0f172a; height: 100vh; }',
-        js: `import React from 'react';
+        js: \`import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Canvas } from '@react-three/fiber';
 
@@ -1446,9 +1446,9 @@ root.render(<App />);`
     13,
     'R3F Hooks (useFrame & useThree)',
     '🪝',
-    `React is designed to re-render components when state changes. But 3D animation requires updating positions and rotations 60 times a second, regardless of React state. If you used `useState` to animate a spinning cube, React would rebuild the virtual DOM 60 times a second, destroying your application's performance.
+    `React is designed to re-render components when state changes. But 3D animation requires updating positions and rotations 60 times a second, regardless of React state. If you used \`useState\` to animate a spinning cube, React would rebuild the virtual DOM 60 times a second, destroying your application's performance.
 
-React Three Fiber solves this paradox with specialized hooks. `useFrame` allows you to tap directly into the native WebGL render loop, bypassing React's reconciliation entirely. `useThree` gives you instant access to the global renderer, camera, and viewport size.
+React Three Fiber solves this paradox with specialized hooks. \`useFrame\` allows you to tap directly into the native WebGL render loop, bypassing React's reconciliation entirely. \`useThree\` gives you instant access to the global renderer, camera, and viewport size.
 
 These hooks are the bridge between React's declarative UI paradigm and the imperative, high-performance reality of real-time 3D graphics. Mastering them is the key to building smooth, interactive, and highly optimized 3D experiences in React.`,
     [
@@ -1558,7 +1558,7 @@ root.render(<App />);`
     '🧰',
     `Building 3D experiences from scratch involves solving the same difficult problems over and over: parsing fonts for 3D text, setting up image-based lighting, handling camera orbit math, and projecting HTML onto 3D surfaces. 
 
-Enter `@react-three/drei` (German for "three"). Drei is the official, community-maintained standard library for React Three Fiber. It provides a massive collection of battle-tested, highly optimized helper components that reduce hundreds of lines of complex WebGL math into single, declarative JSX tags.
+Enter \`@react-three/drei\` (German for "three"). Drei is the official, community-maintained standard library for React Three Fiber. It provides a massive collection of battle-tested, highly optimized helper components that reduce hundreds of lines of complex WebGL math into single, declarative JSX tags.
 
 Drei is not just a convenience; it is the industry standard. Almost every Awwwards-winning 3D website and professional R3F application relies heavily on Drei. Knowing which components to reach for—and how they work under the hood—is what separates a junior developer struggling with math from a senior developer shipping polished experiences rapidly.`,
     [
@@ -1676,57 +1676,57 @@ root.render(<App />);`
 
 In raw Three.js, this requires setting up a "Raycaster"—shooting an invisible mathematical laser from the camera lens through the mouse cursor into the 3D world, calculating bounding box intersections, and manually wiring up event listeners. It is tedious, error-prone, and difficult to sync with React state.
 
-React Three Fiber completely revolutionizes this. It abstracts the complex raycasting math away, exposing standard React pointer events (`onClick`, `onPointerOver`) directly on 3D mesh tags. This allows you to build interactive 3D UIs with the exact same mental model you use for standard HTML buttons.`,
+React Three Fiber completely revolutionizes this. It abstracts the complex raycasting math away, exposing standard React pointer events (\`onClick`, `onPointerOver`) directly on 3D mesh tags. This allows you to build interactive 3D UIs with the exact same mental model you use for standard HTML buttons.`,
     [
       {
         title: '1. The Raycaster Abstraction',
-        beginner: 'R3F automatically shoots an invisible laser from your mouse into the 3D scene. When the laser hits a mesh, R3F triggers the `onClick` or `onPointerOver` event on that specific mesh, just like an HTML button.',
-        advanced: 'R3F runs an internal `THREE.Raycaster` on every pointer move. It unprojects the 2D Normalized Device Coordinates (NDC) from the `useThree().pointer` state into a 3D ray, and performs bounding-sphere and triangle intersection tests against all interactive meshes in the scene graph. It then bubbles the event up the React component tree.'
+        beginner: 'R3F automatically shoots an invisible laser from your mouse into the 3D scene. When the laser hits a mesh, R3F triggers the \`onClick\` or \`onPointerOver\` event on that specific mesh, just like an HTML button.',
+        advanced: 'R3F runs an internal \`THREE.Raycaster\` on every pointer move. It unprojects the 2D Normalized Device Coordinates (NDC) from the \`useThree().pointer\` state into a 3D ray, and performs bounding-sphere and triangle intersection tests against all interactive meshes in the scene graph. It then bubbles the event up the React component tree.'
       },
       {
         title: '2. Pointer Events API',
-        beginner: 'You can attach `onClick`, `onPointerOver` (hover), and `onPointerOut` (un-hover) directly to `<mesh>` tags. This makes 3D objects feel as interactive as standard web buttons.',
-        advanced: 'R3F implements the unified W3C Pointer Events API. This means `onPointerDown`, `onPointerMove`, and `onPointerUp` work identically across desktop mice, mobile touchscreens, and stylus pens. The event object contains rich data, including the exact 3D intersection point (`event.point`), the face normal (`event.face.normal`), and the distance from the camera.'
+        beginner: 'You can attach \`onClick`, `onPointerOver\` (hover), and \`onPointerOut\` (un-hover) directly to \`<mesh>\` tags. This makes 3D objects feel as interactive as standard web buttons.',
+        advanced: 'R3F implements the unified W3C Pointer Events API. This means \`onPointerDown`, `onPointerMove`, and `onPointerUp\` work identically across desktop mice, mobile touchscreens, and stylus pens. The event object contains rich data, including the exact 3D intersection point (\`event.point`), the face normal (`event.face.normal`), and the distance from the camera.'
       },
       {
         title: '3. Event Bubbling & stopPropagation',
-        beginner: 'If you click a 3D button that is sitting on top of a 3D table, the click might register on both. You can stop the click from passing through the button by using `event.stopPropagation()`.',
-        advanced: 'R3F events bubble up the scene graph hierarchy, mirroring DOM event bubbling. If a ray intersects multiple nested meshes, the event fires on the deepest child first, then propagates to parents. Calling `event.stopPropagation()` halts this propagation, which is critical for UI overlays, nested models, and preventing background objects from triggering clicks.'
+        beginner: 'If you click a 3D button that is sitting on top of a 3D table, the click might register on both. You can stop the click from passing through the button by using `event.stopPropagation()\`.',
+        advanced: 'R3F events bubble up the scene graph hierarchy, mirroring DOM event bubbling. If a ray intersects multiple nested meshes, the event fires on the deepest child first, then propagates to parents. Calling \`event.stopPropagation()\` halts this propagation, which is critical for UI overlays, nested models, and preventing background objects from triggering clicks.'
       },
       {
         title: '4. Hover States & DOM Cursor Syncing',
         beginner: 'When you hover over a 3D object, you usually want the mouse cursor to change to a "pointer" hand, and the object to highlight. R3F makes syncing the 3D hover state with the HTML cursor easy.',
-        advanced: 'By combining `onPointerOver`/`onPointerOut` with React `useState`, you can drive material color or mesh scale changes declaratively. To sync the DOM cursor, you use a side effect: `document.body.style.cursor = hovered ? "pointer" : "auto"`. R3F does not mutate the DOM cursor automatically to prevent conflicts with standard HTML UI overlays.'
+        advanced: 'By combining \`onPointerOver\`/\`onPointerOut\` with React \`useState`, you can drive material color or mesh scale changes declaratively. To sync the DOM cursor, you use a side effect: `document.body.style.cursor = hovered ? "pointer" : "auto"\`. R3F does not mutate the DOM cursor automatically to prevent conflicts with standard HTML UI overlays.'
       },
       {
         title: '5. Touch & Mobile Support',
         beginner: 'Because R3F uses the unified Pointer Events API, your 3D clicks and hovers automatically work on mobile touchscreens without writing any extra code.',
-        advanced: 'The W3C Pointer Events API abstracts mouse, touch, and pen inputs into a single event stream. R3F maps touch taps to `onClick` and touch drags to `onPointerMove`. However, developers must be mindful that `onPointerOver` (hover) does not exist on mobile touch devices, requiring fallback UI states for mobile users.'
+        advanced: 'The W3C Pointer Events API abstracts mouse, touch, and pen inputs into a single event stream. R3F maps touch taps to \`onClick\` and touch drags to \`onPointerMove\`. However, developers must be mindful that \`onPointerOver\` (hover) does not exist on mobile touch devices, requiring fallback UI states for mobile users.'
       },
       {
         title: '6. HTML Overlays & Tooltips',
-        beginner: 'Sometimes you want a standard HTML tooltip or info card to pop up when you hover over a 3D object. Drei\'s `<Html>` component lets you attach DOM elements directly to 3D meshes.',
-        advanced: 'By combining R3F pointer events with Drei\'s `<Html>` component, you can conditionally render React DOM components (like Tailwind-styled tooltips) that track the 3D intersection point (`event.point`) in real-time. This bridges the gap between high-performance WebGL rendering and the rich styling capabilities of the HTML/CSS DOM.')
+        beginner: 'Sometimes you want a standard HTML tooltip or info card to pop up when you hover over a 3D object. Drei\'s \`<Html>\` component lets you attach DOM elements directly to 3D meshes.',
+        advanced: 'By combining R3F pointer events with Drei\'s \`<Html>\` component, you can conditionally render React DOM components (like Tailwind-styled tooltips) that track the 3D intersection point (\`event.point`) in real-time. This bridges the gap between high-performance WebGL rendering and the rich styling capabilities of the HTML/CSS DOM.')
     ],
     {
       title: 'Interactive 3D Product Card',
       intro: 'Let\'s build a 3D product card that scales up and changes color when hovered, and toggles an "active" state when clicked, using standard React state.',
       steps: [
-        'Import Hooks: Import `{ useState }` from React and `{ Canvas }` from R3F.',
-        'Create Component: Define an `InteractiveCube` component that returns a `<mesh>` with a `<boxGeometry>` and `<meshStandardMaterial>`.',
-        'Setup State: Declare `const [active, setActive] = useState(false)` and `const [hovered, setHovered] = useState(false)`.',
-        'Attach Click: Add `onClick={() => setActive(!active)}` to the `<mesh>`. Expect the state to toggle on click.',
-        'Attach Hover: Add `onPointerOver={() => setHovered(true)}` and `onPointerOut={() => setHovered(false)}`. Expect the state to track the mouse.',
-        'Drive Scale: Set the mesh `scale` prop to `active ? 1.4 : 1`. Expect the box to grow when clicked.',
-        'Drive Color: Set the material `color` prop to `hovered ? "#ec4899" : "#38bdf8"`. Expect the box to turn pink on hover.',
-        'Sync DOM Cursor: Add a `useEffect` that sets `document.body.style.cursor = hovered ? "pointer" : "auto"`. Expect the mouse cursor to change to a hand when hovering the 3D object.',
-        'Render: Wrap the component in a `<Canvas>` with lighting and `<OrbitControls>`. Expect a fully interactive, state-driven 3D UI element.'
+        'Import Hooks: Import `{ useState }\` from React and \`{ Canvas }\` from R3F.',
+        'Create Component: Define an \`InteractiveCube\` component that returns a \`<mesh>\` with a \`<boxGeometry>\` and \`<meshStandardMaterial>\`.',
+        'Setup State: Declare \`const [active, setActive] = useState(false)\` and \`const [hovered, setHovered] = useState(false)\`.',
+        'Attach Click: Add \`onClick={() => setActive(!active)}\` to the \`<mesh>\`. Expect the state to toggle on click.',
+        'Attach Hover: Add \`onPointerOver={() => setHovered(true)}\` and \`onPointerOut={() => setHovered(false)}\`. Expect the state to track the mouse.',
+        'Drive Scale: Set the mesh \`scale\` prop to \`active ? 1.4 : 1\`. Expect the box to grow when clicked.',
+        'Drive Color: Set the material \`color\` prop to \`hovered ? "#ec4899" : "#38bdf8"\`. Expect the box to turn pink on hover.',
+        'Sync DOM Cursor: Add a \`useEffect\` that sets \`document.body.style.cursor = hovered ? "pointer" : "auto"\`. Expect the mouse cursor to change to a hand when hovering the 3D object.',
+        'Render: Wrap the component in a \`<Canvas>\` with lighting and \`<OrbitControls>\`. Expect a fully interactive, state-driven 3D UI element.'
       ],
       goal: 'Handle complex 3D raycasting interactions using standard React state and pointer events.',
       code: {
         html: '',
         css: 'body { margin: 0; background: #0f172a; height: 100vh; }',
-        js: `import React, { useState, useEffect } from 'react';
+        js: \`import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
