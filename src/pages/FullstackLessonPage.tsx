@@ -12,6 +12,9 @@ import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Mastery rule: 75% of questions, rounded up.
+// 4 questions → 3 · 5 questions → 4 · 6 questions → 5
+const PASS_THRESHOLD = 0.75;
 type Stage = 'concept' | 'practical' | 'quiz';
 type MobileLab = 'code' | 'preview';
 
@@ -58,7 +61,8 @@ const FullstackLessonPage = () => {
   if (!isFullstackLessonUnlocked(lesson.id, user?.completedLessons || [])) return <Navigate to="/fullstack" replace />;
 
   const code = lesson.practical.code;
-  const passed = correctCount >= 3;
+  const requiredCorrect = Math.ceil(quiz.length * PASS_THRESHOLD);
+  const passed = correctCount >= requiredCorrect;
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
@@ -68,7 +72,7 @@ const FullstackLessonPage = () => {
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    if (correctCount >= 3) {
+    if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
@@ -350,7 +354,9 @@ const FullstackLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                       <p className="text-[11px] text-muted-foreground">
+                        Score {requiredCorrect}/{quiz.length} to finish this lesson.
+                      </p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
@@ -435,6 +441,9 @@ const FullstackLessonPage = () => {
                     </p>
                     <p className={`text-sm font-display font-semibold mt-1 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
                       {passed ? '🎉 Lesson passed!' : 'Almost there — review and retry'}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-1 font-mono">
+                      pass mark · {requiredCorrect}/{quiz.length} ({Math.round(PASS_THRESHOLD * 100)}%)
                     </p>
                     {!passed && (
                       <button
