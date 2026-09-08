@@ -1370,7 +1370,7 @@ When you write \`<mesh position={[0, 1, 0]}>\`, R3F's reconciler intercepts that
       {
         title: '4. Props, Args, and the \`attach\` API',
         beginner: 'You pass settings to 3D objects using React props. If a Three.js class needs arguments in its constructor (like the width and height of a box), you use the special \`args\` prop.',
-        advanced: 'Standard props map to setters (e.g., \`position={[1,2,3]}\` calls \`mesh.position.set(1,2,3)`). However, constructor arguments cannot be changed via setters. R3F introduces the `args\` prop to pass array values directly to the class constructor (e.g., \`<boxGeometry args={[1, 1, 1]} />\`). If a child needs to attach to a specific property other than the default, the `attach\` prop is used (e.g., \`<fog attach="fog" args={['#000', 10, 20]} />\`).'
+        advanced: 'Standard props map to setters (e.g., \`position={[1,2,3]}\` calls \`mesh.position.set(1,2,3)`). However, constructor arguments cannot be changed via setters. R3F introduces the `args\` prop to pass array values directly to the class constructor (e.g., \`<boxGeometry args={[1, 1, 1]} />\`). If a child needs to attach to a specific property other than the default, the `attach\` prop is used (e.g., \`<fog attach="fog" args={[\'#000\', 10, 20]} />\`).'
       },
       {
         title: '5. Auto-Disposal & Memory Management',
