@@ -1257,7 +1257,7 @@ But particle systems require a shift in how you think about data. Instead of man
       {
         title: '6. Memory Leaks & Disposal',
         beginner: 'When you delete a particle system, the graphics card does not automatically forget about it. If you do not explicitly tell the computer to "throw away" the geometry and materials, your website will slowly eat up all the memory and crash.',
-        advanced: 'JavaScript\'s Garbage Collector only cleans up CPU heap memory. WebGL buffers (VBOs, VAOs) and textures live in GPU VRAM. When unmounting a particle system, you must explicitly call \`geometry.dispose()`, `material.dispose()`, and `material.map.dispose()\`. In React Three Fiber, the reconciler handles basic disposal, but custom attributes and render targets require manual cleanup in \`useEffect\` return functions.')
+        advanced: 'JavaScript\'s Garbage Collector only cleans up CPU heap memory. WebGL buffers (VBOs, VAOs) and textures live in GPU VRAM. When unmounting a particle system, you must explicitly call \`geometry.dispose()`, `material.dispose()`, and `material.map.dispose()\`. In React Three Fiber, the reconciler handles basic disposal, but custom attributes and render targets require manual cleanup in \`useEffect\` return functions.'
       }
     ],
     {
@@ -1380,7 +1380,8 @@ When you write \`<mesh position={[0, 1, 0]}>\`, R3F's reconciler intercepts that
       {
         title: '6. The \`extend\` API',
         beginner: 'R3F knows about all the standard Three.js objects out of the box. But if you install a special add-on (like OrbitControls), you have to tell R3F about it so you can use it as a JSX tag.',
-        advanced: 'The \`extend()\` function registers external Three.js classes with R3F\'s internal catalog. For example, \`extend({ OrbitControls })\` allows you to use \`<orbitControls />\` in JSX. R3F dynamically generates the reconciler mappings at runtime, allowing any custom class that extends \`Object3D\` to participate in the declarative scene graph.')
+        advanced: 'The \`extend()\` function registers external Three.js classes with R3F\'s internal catalog. For example, \`extend({ OrbitControls })\` allows you to use \`<orbitControls />\` in JSX. R3F dynamically generates the reconciler mappings at runtime, allowing any custom class that extends \`Object3D\` to participate in the declarative scene graph.'
+      },
     ],
     {
       title: 'First R3F Component Scene',
@@ -1482,7 +1483,8 @@ These hooks are the bridge between React's declarative UI paradigm and the imper
       {
         title: '6. Performance Pitfalls in useFrame',
         beginner: 'Because `useFrame` runs 60 times a second, creating new variables or objects inside it will quickly fill up the computer\'s memory and cause the app to stutter.',
-        advanced: 'Never allocate memory inside `useFrame`. Creating new `THREE.Vector3()` objects, arrays, or calling `Math.random()` inside the loop triggers the JavaScript Garbage Collector on every frame, causing micro-stutters (GC spikes). Always instantiate vectors outside the component or use `.set()` methods to mutate existing objects in place.')
+        advanced: 'Never allocate memory inside `useFrame`. Creating new `THREE.Vector3()` objects, arrays, or calling `Math.random()` inside the loop triggers the JavaScript Garbage Collector on every frame, causing micro-stutters (GC spikes). Always instantiate vectors outside the component or use `.set()` methods to mutate existing objects in place.'
+      },
     ],
     {
       title: 'Spinning Mesh with useFrame & Delta Time',
@@ -1592,7 +1594,8 @@ Drei is not just a convenience; it is the industry standard. Almost every Awwwar
       {
         title: '6. <Html> & DOM Overlays',
         beginner: 'Sometimes you need standard HTML (like a tooltip, a button, or a video) to exist inside the 3D world, moving with the 3D objects. `<Html>` projects standard React DOM elements onto 3D coordinates.',
-        advanced: '`<Html>` creates a portal that synchronizes a standard HTML `<div>` with a 3D `Vector3` position. It calculates the 2D screen projection of the 3D coordinate on every frame and applies CSS `transform: translate3d()` to the DOM element. This allows you to mix WebGL rendering with standard CSS, Tailwind, and DOM events seamlessly.')
+        advanced: '`<Html>` creates a portal that synchronizes a standard HTML `<div>` with a 3D `Vector3` position. It calculates the 2D screen projection of the 3D coordinate on every frame and applies CSS `transform: translate3d()` to the DOM element. This allows you to mix WebGL rendering with standard CSS, Tailwind, and DOM events seamlessly.'
+      },
     ],
     {
       title: 'Building an Interactive Floating Showcase',
@@ -1708,7 +1711,8 @@ React Three Fiber completely revolutionizes this. It abstracts the complex rayca
       {
         title: '6. HTML Overlays & Tooltips',
         beginner: 'Sometimes you want a standard HTML tooltip or info card to pop up when you hover over a 3D object. Drei\'s \`<Html>\` component lets you attach DOM elements directly to 3D meshes.',
-        advanced: 'By combining R3F pointer events with Drei\'s \`<Html>\` component, you can conditionally render React DOM components (like Tailwind-styled tooltips) that track the 3D intersection point (\`event.point`) in real-time. This bridges the gap between high-performance WebGL rendering and the rich styling capabilities of the HTML/CSS DOM.')
+        advanced: 'By combining R3F pointer events with Drei\'s \`<Html>\` component, you can conditionally render React DOM components (like Tailwind-styled tooltips) that track the 3D intersection point (\`event.point`) in real-time. This bridges the gap between high-performance WebGL rendering and the rich styling capabilities of the HTML/CSS DOM.'
+      },
     ],
     {
       title: 'Interactive 3D Product Card',
@@ -1833,7 +1837,8 @@ This final lesson bridges the gap between a "cool tech demo" and a production-re
       {
         title: '6. Profiling & Debugging Tools',
         beginner: 'If your scene is lagging, you need to know why. Is it the textures? The shadows? The JavaScript? Special browser tools let you look inside the graphics card to find the exact bottleneck.',
-        advanced: 'Use Spector.js (a Chrome extension) to capture WebGL frames and inspect exact draw calls, shader compilations, and state changes. Use the R3F `<Perf />` component to monitor FPS, memory, and draw calls in real-time. Use Chrome DevTools\' "Performance" and "Memory" tabs to identify JavaScript GC spikes and detached DOM/WebGL memory leaks.')
+        advanced: 'Use Spector.js (a Chrome extension) to capture WebGL frames and inspect exact draw calls, shader compilations, and state changes. Use the R3F `<Perf />` component to monitor FPS, memory, and draw calls in real-time. Use Chrome DevTools\' "Performance" and "Memory" tabs to identify JavaScript GC spikes and detached DOM/WebGL memory leaks.'
+      },
     ],
     {
       title: 'Production-Ready Optimized Showcase',
