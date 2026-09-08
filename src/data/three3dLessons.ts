@@ -775,7 +775,7 @@ The secret to professional 3D animation is "easing." Nothing in the real world m
       ],
       goal: 'Understand how external animation libraries like GSAP can safely control Three.js objects for smooth, physics-based motion.',
       code: {
-        html: \`<!-- Load GSAP Animation Library -->
+        html: `<!-- Load GSAP Animation Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <div id="canvas-container"></div>\`,
         css: 'body { margin: 0; overflow: hidden; background: #0f172a; }',
@@ -1276,7 +1276,7 @@ But particle systems require a shift in how you think about data. Instead of man
       code: {
         html: '',
         css: 'body { margin: 0; overflow: hidden; background: #030712; }',
-        js: \`const scene = new THREE.Scene();
+        js: `const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x030712);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1398,7 +1398,7 @@ When you write \`<mesh position={[0, 1, 0]}>\`, R3F's reconciler intercepts that
       code: {
         html: '',
         css: 'body { margin: 0; background: #0f172a; height: 100vh; }',
-        js: \`import React from 'react';
+        js: `import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Canvas } from '@react-three/fiber';
 
@@ -1726,7 +1726,7 @@ React Three Fiber completely revolutionizes this. It abstracts the complex rayca
       code: {
         html: '',
         css: 'body { margin: 0; background: #0f172a; height: 100vh; }',
-        js: \`import React, { useState, useEffect } from 'react';
+        js: `import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
