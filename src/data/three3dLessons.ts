@@ -1122,7 +1122,8 @@ Understanding how to enable shadows, configure the shadow camera frustum, fix "s
       {
         title: '4. Shadow Acne & Bias',
         beginner: 'Sometimes shadows look like they have ugly, striped zebra patterns or flickering noise on the surface of the object casting them. This is called "shadow acne." You fix it by tweaking a setting called "bias".',
-        advanced: 'Shadow acne occurs due to depth buffer precision errors (self-shadowing artifacts). The GPU incorrectly calculates that the surface is slightly behind itself. You fix this by applying a `light.shadow.bias` (usually a small negative number like -0.0005) which artificially pushes the shadow map depth slightly away from the surface. Too much bias causes "Peter Panning" (shadows detaching from the object).'),
+        advanced: 'Shadow acne occurs due to depth buffer precision errors (self-shadowing artifacts). The GPU incorrectly calculates that the surface is slightly behind itself. You fix this by applying a `light.shadow.bias` (usually a small negative number like -0.0005) which artificially pushes the shadow map depth slightly away from the surface. Too much bias causes "Peter Panning" (shadows detaching from the object).'
+      },
       {
         title: '5. Shadow Map Resolution',
         beginner: 'If your shadows look blocky and pixelated, the "resolution" of the shadow map is too low. You can increase it to make the shadows crisp and sharp, but it costs more performance.',
@@ -1131,7 +1132,8 @@ Understanding how to enable shadows, configure the shadow camera frustum, fix "s
       {
         title: '6. Performance Costs',
         beginner: 'Every single light that casts a shadow forces the computer to draw the whole scene an extra time. If you have 5 shadow-casting lights, the computer is drawing the scene 6 times! Keep shadow lights to an absolute minimum.',
-        advanced: 'Shadow mapping requires a separate render pass to a framebuffer texture for every shadow-casting light. In a complex scene, this destroys the fill rate. The professional approach is to use exactly ONE DirectionalLight for main shadows (the sun), and use fake "blob shadows" (a simple dark decal projected under characters) or baked ambient occlusion for secondary contact shadows.')
+        advanced: 'Shadow mapping requires a separate render pass to a framebuffer texture for every shadow-casting light. In a complex scene, this destroys the fill rate. The professional approach is to use exactly ONE DirectionalLight for main shadows (the sun), and use fake "blob shadows" (a simple dark decal projected under characters) or baked ambient occlusion for secondary contact shadows.'
+      },
     ],
     {
       title: 'Real-time Soft Shadow Scene',
