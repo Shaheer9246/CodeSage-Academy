@@ -140,7 +140,7 @@ When you change the DOM, the browser must recalculate the layout of the entire p
   ),
 
   L('local-4', 4, 'Web Storage (localStorage & sessionStorage)', '💾',
-    `Before the browser had databases, it had a drawer. The Web Storage API (`localStorage` and `sessionStorage`) provides a simple, synchronous key-value store that persists data directly on the user\'s hard drive. It is the backbone of almost every local-first application, used to remember user preferences, cache API responses, and save draft forms.
+    `Before the browser had databases, it had a drawer. The Web Storage API (\`localStorage\` and \`sessionStorage\`) provides a simple, synchronous key-value store that persists data directly on the user\'s hard drive. It is the backbone of almost every local-first application, used to remember user preferences, cache API responses, and save draft forms.
 
 But this simplicity is a trap. Because it is so easy to use, developers often abuse it, leading to quota exceeded errors, cross-site scripting vulnerabilities, and broken multi-tab experiences. 
 
@@ -182,11 +182,11 @@ Understanding the exact boundaries of Web Storage—its 5MB limit, its string-on
   ),
   
   L('local-5', 5, 'IndexedDB Basics', '🗄️',
-    `When 5MB isn't enough, or when you need to store complex objects, binary files, and query data efficiently, `localStorage` breaks down. Enter IndexedDB: the browser's built-in, high-performance, NoSQL database. 
+    `When 5MB isn't enough, or when you need to store complex objects, binary files, and query data efficiently, \`localStorage\` breaks down. Enter IndexedDB: the browser's built-in, high-performance, NoSQL database. 
 
 IndexedDB is a warehouse compared to localStorage's kitchen drawer. It can store hundreds of megabytes (or even gigabytes) of structured data, including Blobs and Files. It is asynchronous, meaning it won't freeze your UI when reading large datasets, and it supports transactions, ensuring data integrity.
 
-However, the native IndexedDB API is notoriously verbose, relying on an outdated event-based callback system from the early 2010s. To use it effectively in modern applications, developers almost universally rely on lightweight Promise wrappers like `idb` or `Dexie.js`. Mastering IndexedDB is the critical bridge between a simple toy app and a robust, offline-first productivity tool like Notion or Figma.`,
+However, the native IndexedDB API is notoriously verbose, relying on an outdated event-based callback system from the early 2010s. To use it effectively in modern applications, developers almost universally rely on lightweight Promise wrappers like \`idb\` or \`Dexie.js\`. Mastering IndexedDB is the critical bridge between a simple toy app and a robust, offline-first productivity tool like Notion or Figma.`,
     [
       { title: '1. The Limits of Web Storage', beginner: 'localStorage only holds 5MB of text. If you try to save a large list of items or images, it will crash. IndexedDB holds massive amounts of data.', advanced: 'Web Storage is synchronous and string-only, blocking the main thread. IndexedDB is asynchronous, transactional, and can store any structured cloneable object (including ArrayBuffers and Blobs), with quotas typically starting at 50MB and scaling up to 60% of the disk.' },
       { title: '2. The NoSQL Architecture', beginner: 'Think of it like a filing cabinet. The Database is the cabinet, Object Stores are the drawers, and Records are the folders inside.', advanced: 'IndexedDB uses a key-value store model. A Database contains Object Stores (analogous to SQL tables). Every record must have a unique Key (either a `keyPath` property or an auto-incrementing integer). You can create Indexes on specific properties to enable fast O(log N) lookups without scanning the entire store.' },
@@ -350,7 +350,7 @@ This lesson covers the exact criteria required to trigger the browser's native i
   ),
 
   L('local-9', 9, 'Project: Local Notes App', '📝',
-    `It is time to combine everything we have learned—DOM manipulation, `localStorage` persistence, safe rendering, and file exports—into a cohesive, production-ready application. 
+    `It is time to combine everything we have learned—DOM manipulation, \`localStorage\` persistence, safe rendering, and file exports—into a cohesive, production-ready application. 
 
 Building a "Notes App" is a rite of passage, but building it *correctly* in vanilla JavaScript without a framework like React requires a deep understanding of application architecture. How do you keep the UI in sync with the data? How do you prevent typing in a textarea from spamming the storage API and freezing the browser? How do you render user-generated text without opening the door to XSS attacks?
 
@@ -472,9 +472,9 @@ But building a live-preview Markdown editor introduces a severe security trap: C
   ),
 
   L('local-12', 12, 'Project: Pomodoro Timer', '⏱️',
-    `A focus timer seems like the simplest app to build: just use `setInterval` to count down from 25 minutes. But the browser is a hostile environment for timekeeping. To save battery, modern browsers aggressively throttle `setInterval` in background tabs, reducing it to once per minute or pausing it entirely. 
+    `A focus timer seems like the simplest app to build: just use \`setInterval\` to count down from 25 minutes. But the browser is a hostile environment for timekeeping. To save battery, modern browsers aggressively throttle \`setInterval\` in background tabs, reducing it to once per minute or pausing it entirely. 
 
-If you rely on naive interval counting, your 25-minute Pomodoro will silently fail, leaving the user staring at a frozen screen. Building a robust, production-grade timer requires abandoning interval counting in favor of absolute timestamp mathematics, `requestAnimationFrame` for UI updates, and the Web Notifications API to alert the user even when the tab is hidden.`,
+If you rely on naive interval counting, your 25-minute Pomodoro will silently fail, leaving the user staring at a frozen screen. Building a robust, production-grade timer requires abandoning interval counting in favor of absolute timestamp mathematics, \`requestAnimationFrame\` for UI updates, and the Web Notifications API to alert the user even when the tab is hidden.`,
     [
       { title: '1. The Interval Trap (Time Drift)', beginner: 'Don\'t use `setInterval` to subtract 1 second. If the browser pauses the tab, your timer freezes. Use real clock time instead.', advanced: 'Browsers throttle background timers to ~1 tick/minute to save CPU. Furthermore, `setInterval` is not guaranteed to fire exactly every 1000ms; it drifts based on main thread load. Relying on interval counting guarantees your timer will be inaccurate over long durations.' },
       { title: '2. Absolute Timestamp Math', beginner: 'When the user clicks "Start", calculate the exact millisecond the timer should end. On every frame, subtract the current time from the end time.', advanced: 'Store `endTime = Date.now() + (minutes * 60 * 1000)`. The remaining time is always `endTime - Date.now()`. This makes the timer completely immune to tab throttling, CPU lag, or browser restarts. The math is always perfectly accurate relative to the system clock.' },
@@ -552,7 +552,7 @@ By mastering the Canvas API, you can build privacy-preserving tools that manipul
   ),
 
   L('local-14', 14, 'Local Encryption Basics', '🔐',
-    `"Local-first" guarantees that your data doesn\'t live on a server, but it does not guarantee that your data is secure. If a malicious actor gains physical access to the user\'s device, or if the browser\'s storage is compromised, your plain-text `localStorage` or IndexedDB records are completely exposed.
+    `"Local-first" guarantees that your data doesn\'t live on a server, but it does not guarantee that your data is secure. If a malicious actor gains physical access to the user\'s device, or if the browser\'s storage is compromised, your plain-text \`localStorage\` or IndexedDB records are completely exposed.
 
 True privacy requires Zero-Knowledge architecture: encrypting the data on the client device *before* it is written to the disk, using a key derived from a user password that never leaves the browser. The Web Crypto API provides native, hardware-accelerated cryptographic primitives directly in the browser. Mastering PBKDF2 key derivation and AES-GCM encryption allows you to build local apps that are mathematically impossible to crack, even by the developers who wrote them.`,
     [
