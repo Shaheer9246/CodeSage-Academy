@@ -3751,6 +3751,299 @@ Use proper elements instead of generic divs:
         },
       ],
     },
+    {
+      id: 'vanilla-spa',
+      name: 'Vanilla SPA Architecture',
+      icon: '🧭',
+      lessons: [
+        {
+          id: 'spa-1',
+          title: 'Hash-Based Routing',
+          topic: 'Vanilla SPA Architecture',
+          level: 'intermediate',
+          content: `# Hash-Based Routing 🧭
+
+Real apps feel like they have many "pages" — but they never reload. How? The URL is lying to you (in a good way).
+
+## The Reload Problem
+
+A normal link asks the server for a whole new page:
+
+\`\`\`html
+<a href="/about">About</a>
+\`\`\`
+
+Every click re-downloads HTML, CSS, and JS. Your app "dies": open menus close, typed text vanishes, scroll resets. Slow and clunky.
+
+## The Hash Trick
+
+Everything after the \`#\` in a URL is **never sent to the server**. It exists only inside the browser:
+
+\`\`\`html
+<a href="#/about">About</a>
+\`\`\`
+
+Clicking it changes the address bar **with zero reloads and zero network requests**. The \`#\` part is called the *hash* (or *fragment*).
+
+## Listening for Hash Changes
+
+The browser fires an event every time the hash changes:
+
+\`\`\`javascript
+window.addEventListener("hashchange", () => {
+  console.log(window.location.hash); // "#/about"
+});
+\`\`\`
+
+This one event is your entire routing engine. When it fires, YOU decide what to draw.
+
+## Rendering a "Page"
+
+\`\`\`javascript
+function router() {
+  const route = window.location.hash || "#/";
+  const app = document.getElementById("app");
+
+  if (route === "#/") app.innerHTML = homeView();
+  else if (route === "#/about") app.innerHTML = aboutView();
+  else app.innerHTML = notFoundView();
+}
+
+window.addEventListener("hashchange", router);
+router(); // paint the first view on load
+\`\`\`
+
+Notice the pattern: **views are just functions that return HTML strings**. Sound familiar? That is exactly what a React component is. You are half-way to React Router already.
+
+## Why This Matters
+
+This ~20 line router is the *entire idea* behind React Router, Vue Router, and Angular Router. Production routers only add extras on top: params, guards, lazy loading, and the History API.
+
+Try it: click the nav in the preview and watch the URL change **without** the page reloading!`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav>
+    <a href="#/">Home</a>
+    <a href="#/about">About</a>
+    <a href="#/contact">Contact</a>
+  </nav>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; margin: 0; background: #1a1a2e; color: #e0e0e0; }
+nav { background: #16213e; padding: 14px 20px; display: flex; gap: 18px; }
+nav a { color: #4fc3f7; text-decoration: none; font-weight: bold; }
+nav a:hover { color: #e94560; }
+#app { padding: 30px; max-width: 700px; margin: 0 auto; }
+h1 { color: #e94560; }
+p { line-height: 1.7; color: #ccc; }
+.badge { display: inline-block; background: #16213e; border: 1px solid #333; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #16c79a; }`,
+          initialJs: `// Each "page" is just a function returning HTML
+function homeView() {
+  return \`<h1>🏠 Home</h1>
+    <p>Welcome! Click the nav above. Watch the URL change — the page NEVER reloads.</p>
+    <span class="badge">hash: \${window.location.hash || "#/"}</span>\`;
+}
+
+function aboutView() {
+  return \`<h1>ℹ️ About</h1>
+    <p>This view was rendered by JavaScript when the hash became "#/about".</p>
+    <span class="badge">hash: \${window.location.hash}</span>\`;
+}
+
+function contactView() {
+  return \`<h1>📬 Contact</h1>
+    <p>Same trick, different hash. No server involved at all.</p>
+    <span class="badge">hash: \${window.location.hash}</span>\`;
+}
+
+function notFoundView() {
+  return \`<h1>404 😵</h1>
+    <p>No view matches this hash. Try the nav links above.</p>\`;
+}
+
+// The router: hash -> view
+function router() {
+  const route = window.location.hash || "#/";
+  const app = document.getElementById("app");
+
+  if (route === "#/") app.innerHTML = homeView();
+  else if (route === "#/about") app.innerHTML = aboutView();
+  else if (route === "#/contact") app.innerHTML = contactView();
+  else app.innerHTML = notFoundView();
+}
+
+window.addEventListener("hashchange", router);
+router(); // first paint`,
+          language: 'html',
+          challenge: {
+            instruction: 'Build a hash router with 3 routes (#/, #/about, #/contact). Listen for hashchange and render a different view for each route, plus a 404 view for unknown hashes.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <nav>
+    <a href="#/">Home</a>
+    <a href="#/about">About</a>
+    <a href="#/contact">Contact</a>
+  </nav>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Create view functions (homeView, aboutView, contactView, notFoundView)
+// Create a router() that reads window.location.hash
+// Listen for "hashchange" and call router() once on load`,
+            validationKeywords: ['hashchange', 'location.hash', 'innerhtml', 'addeventlistener'],
+          },
+        },
+        {
+          id: 'spa-2',
+          title: 'Route Params & Active Links',
+          topic: 'Vanilla SPA Architecture',
+          level: 'intermediate',
+          content: `# Route Params & Active Links 🛠️
+
+React Router has \`useParams\` and \`NavLink\`. Guess what — you can build both in about 10 lines of vanilla JS.
+
+## Params Inside the Hash
+
+A route like \`#/user/42\` carries data in the URL. Parse it by splitting:
+
+\`\`\`javascript
+const path = window.location.hash.slice(1) || "/";   // "/user/42"
+const parts = path.split("/").filter(Boolean);        // ["user", "42"]
+
+if (parts[0] === "user") {
+  const id = parts[1]; // "42"
+}
+\`\`\`
+
+\`slice(1)\` removes the \`#\`. \`filter(Boolean)\` throws away empty strings so \`"/"\` becomes \`[]\` instead of \`[""]\`.
+
+## Highlighting the Active Link
+
+Users need to know which page they are on. Compare each link's href to the current hash:
+
+\`\`\`javascript
+document.querySelectorAll("nav a").forEach(a => {
+  const isActive = a.getAttribute("href") === window.location.hash;
+  a.classList.toggle("active", isActive);
+});
+\`\`\`
+
+Run this inside your router, after rendering, so the highlight updates on every navigation.
+
+## The Catch-All (404) Route
+
+Always end your if/else chain with a fallback view. Production routers call this \`path="*"\`. Without it, unknown URLs render a blank screen — the #1 beginner router bug.
+
+## You Just Rebuilt React Router
+
+- \`hashchange\` listener → the router engine
+- view functions → components
+- \`parts[1]\` → \`useParams()\`
+- \`.classList.toggle("active")\` → \`<NavLink>\`
+- fallback view → \`path="*"\`
+
+The Full Stack track lesson **fs-22 (React Router & Navigation)** shows the production version of everything you just built by hand.`,
+          initialCode: `<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
+<body>
+  <nav>
+    <a href="#/">Home</a>
+    <a href="#/users">Users</a>
+  </nav>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+          initialCss: `body { font-family: Arial; margin: 0; background: #1a1a2e; color: #e0e0e0; }
+nav { background: #16213e; padding: 14px 20px; display: flex; gap: 18px; }
+nav a { color: #4fc3f7; text-decoration: none; font-weight: bold; padding: 6px 12px; border-radius: 8px; }
+nav a.active { background: #e94560; color: white; }
+#app { padding: 30px; max-width: 700px; margin: 0 auto; }
+h1 { color: #e94560; }
+.user-row { background: #16213e; padding: 12px 16px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; }
+.user-row a { color: #16c79a; text-decoration: none; font-weight: bold; }
+.badge { display: inline-block; background: #0d1117; border: 1px solid #333; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #f39c12; }`,
+          initialJs: `const users = [
+  { id: 1, name: "Alice" },
+  { id: 2, name: "Bob" },
+  { id: 3, name: "Charlie" },
+];
+
+function homeView() {
+  return \`<h1>🏠 Home</h1><p>Go to Users, then click a profile link. The id lives in the URL!</p>\`;
+}
+
+function usersView() {
+  const rows = users.map(u => \`
+    <div class="user-row">
+      <span>\${u.name}</span>
+      <a href="#/user/\${u.id}">View profile →</a>
+    </div>\`).join("");
+  return \`<h1>👥 Users</h1>\${rows}\`;
+}
+
+function userView(id) {
+  const user = users.find(u => u.id === Number(id));
+  if (!user) return notFoundView();
+  return \`<h1>👤 \${user.name}</h1>
+    <p>Profile loaded from route param.</p>
+    <span class="badge">param id = \${id}</span>\`;
+}
+
+function notFoundView() {
+  return \`<h1>404 😵</h1><p>Catch-all route: nothing matched this hash.</p>\`;
+}
+
+function highlightNav() {
+  document.querySelectorAll("nav a").forEach(a => {
+    a.classList.toggle("active", a.getAttribute("href") === (window.location.hash || "#/"));
+  });
+}
+
+function router() {
+  const path = window.location.hash.slice(1) || "/";
+  const parts = path.split("/").filter(Boolean);
+  const app = document.getElementById("app");
+
+  if (parts.length === 0) app.innerHTML = homeView();
+  else if (parts[0] === "users") app.innerHTML = usersView();
+  else if (parts[0] === "user") app.innerHTML = userView(parts[1]);
+  else app.innerHTML = notFoundView();
+
+  highlightNav();
+}
+
+window.addEventListener("hashchange", router);
+router();`,
+          language: 'html',
+          challenge: {
+            instruction: 'Add a #/user/:id route: clicking a user link renders a profile view that reads the id from the hash and shows it. Also highlight the current nav link with an "active" class.',
+            initialCode: `<!DOCTYPE html>
+<html>
+<body>
+  <nav>
+    <a href="#/">Home</a>
+    <a href="#/users">Users</a>
+  </nav>
+  <div id="app"></div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+            initialJs: `// Parse the hash with slice(1) + split("/") + filter(Boolean)
+// If parts[0] === "user", read parts[1] as the id and render a profile
+// Toggle an "active" class on the matching nav link`,
+            validationKeywords: ['split', 'location.hash', 'classlist', 'active'],
+          },
+        },
+      ],
+    },
   ],
 };
 
