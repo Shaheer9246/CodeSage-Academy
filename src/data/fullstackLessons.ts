@@ -1243,6 +1243,59 @@ lesson('fs-28', 28, 'Capstone: Ship a Real SPA', '🏆',
   ],
   ['Small + shipped > massive + abandoned', 'Organize code by feature, not by technical type', 'Automate quality gates via Husky and CI', 'Ship → observe real users → iterate']
  ),
+
+    lesson('fs-29', 29, 'Escaping the Sandbox & Local Dev', '🚀',
+    'The browser sandbox is your flight simulator. It is safe, requires zero setup, and gives you instant feedback. But you are not actually flying. Real engineering happens on your local machine, where you control the file system, the build pipeline, and the server. Escaping the sandbox means taking ownership of your environment, transitioning from a student to a professional software engineer.',
+    [
+      {
+        title: '1. The Sandbox vs. The Real World',
+        beginner: 'The sandbox is like a playground with soft rubber floors. You can fall and nothing breaks. But real apps need to talk to real databases, read real files, and use real secret passwords. To do that, you have to move your code out of the browser and onto your actual computer\'s hard drive.',
+        advanced: 'Browser sandboxes bypass the HTTP server, file system access, and build pipelines to provide instant feedback. However, modern web apps require a local Node.js runtime to resolve dependencies, a local dev server to handle ES Modules, and a persistent file system to manage environment-specific configurations and version control. You cannot build production-grade software inside an iframe.'
+      },
+      {
+        title: '2. The Project Root & File System',
+        beginner: 'In the sandbox, your code lives in three invisible tabs. In the real world, your code lives in a real folder on your computer, just like your photos or documents. This folder holds your code, your settings, and a hidden list of instructions for your computer.',
+        advanced: 'A professional project is a directory containing a manifest (`package.json`), a source directory (`src/`), static assets (`public/`), and a dependency cache (`node_modules/`). The `.gitignore` file is critical here: it explicitly excludes `node_modules` and `.env` from version control. Committing dependencies bloats the repository with OS-specific binaries, while committing `.env` exposes production secrets to the public internet.'
+      },
+      {
+        title: '3. The Dev Server & HMR',
+        beginner: 'When you change code in the sandbox, the page reloads. In the real world, a tool like Vite watches your files. When you save a change, it instantly updates just that one button or color on your screen without reloading the whole page or deleting what you typed in a form.',
+        advanced: 'Modern dev servers (like Vite) leverage native ES Modules and Hot Module Replacement (HMR) via WebSockets. When a file changes, the server transpiles it and pushes only the updated module to the browser. The framework (React/Vue) patches the component tree instantly, preserving local state, scroll position, and network caches, completely eliminating the full-page reload penalty of legacy bundlers like Webpack.'
+      },
+      {
+        title: '4. Environment Variables (.env)',
+        beginner: 'Real apps need secret keys, like passwords for your database or API. You cannot put these in your normal code because if you share your code, you share the passwords. Instead, you put them in a hidden file called ".env" that stays only on your computer.',
+        advanced: 'The `.env` file stores local environment variables (e.g., `VITE_API_URL=http://localhost:3000`). Build tools inject these into the JavaScript bundle at compile time via `import.meta.env`. They must be strictly `.gitignore`d. In production, these variables are injected via the CI/CD pipeline or hosting platform (Vercel/AWS), ensuring secrets never touch the source code repository and differ between staging and production environments.'
+      },
+      {
+        title: '5. NPM Scripts & The Terminal',
+        beginner: 'Instead of clicking a green "Run" button, you use your terminal to type commands like "npm run dev". This is the remote control for your project. It tells your computer to start the server, check for errors, and open the browser.',
+        advanced: 'The `scripts` field in `package.json` maps CLI commands to complex shell operations, standardizing the developer experience across the entire team regardless of their IDE. `npm run dev` executes the local server, `npm run build` triggers the production compiler (TypeScript + Vite), and `npm run preview` serves the optimized `dist/` folder locally. This abstraction ensures that "how to run the app" is documented in code, not in a wiki page.'
+      },
+    ],
+    {
+      title: 'Escape to Localhost',
+      intro: 'Open your real terminal and your real code editor (VS Code). We are leaving the browser.',
+      steps: [
+        'Open your system terminal (Terminal on Mac, PowerShell/WSL on Windows). Type `mkdir my-real-app && cd my-real-app`. Expect a new, empty folder to be created on your hard drive.',
+        'Type `npm create vite@latest .` and press Enter. When prompted, select "React" and "TypeScript". Expect Vite to download the project skeleton and write files to your hard drive.',
+        'Type `npm install`. Expect a `node_modules` folder to appear. This contains millions of lines of code from the internet that your app needs to run. Never commit this folder.',
+        'Type `code .` to open the folder in VS Code. Expect to see `src/`, `package.json`, and `.gitignore` in the file explorer.',
+        'Type `npm run dev`. Expect the terminal to output a local URL, usually `http://localhost:5173`. Open this URL in your browser.',
+        'In VS Code, open `src/App.tsx`. Change the text inside the `<h1>` tag and press Save (Cmd+S / Ctrl+S). Watch the browser. Expect the text to change instantly without the page refreshing. This is Hot Module Replacement (HMR).',
+        'Create a file named `.env` in the root folder. Add `VITE_SECRET=hello`. In `App.tsx`, console.log `import.meta.env.VITE_SECRET`. Open the browser console. Expect to see "hello". Realize this file will never be pushed to GitHub.',
+      ],
+      goal: 'You have successfully escaped the sandbox. You are now running a local, transpiled, hot-reloading development server.'
+    },
+    [
+      q('Why can\'t you just open a modern React file directly in the browser using a `file://` URL?', ['React files are too large for the browser', 'Browsers cannot natively parse JSX or resolve ES Modules due to security (CORS) and syntax rules', 'You need a paid internet connection to run React', 'It only works on Mac computers'], 1, 'Browsers cannot parse JSX natively (it must be transpiled to `React.createElement`), and `file://` protocols block cross-origin module imports for security reasons. A local dev server (Vite) serves files over `http://localhost`, transpiles JSX on the fly, and resolves module paths correctly.'),
+      q('Which file must NEVER be committed to your GitHub repository?', ['package.json', '.env', 'README.md', 'index.html'], 1, '`.env` contains local secrets (API keys, database URLs, tokens). Committing it exposes your credentials to the public internet. `package.json` is required to track dependencies, `README` is documentation, and `index.html` is the application entry point.'),
+      q('What is the primary benefit of Hot Module Replacement (HMR)?', ['It reloads the whole page faster', 'It swaps only the changed code in the browser without losing your app\'s state or scroll position', 'It compresses your images automatically', 'It deletes old files from your hard drive'], 1, 'HMR uses WebSockets to push only the modified module to the browser, allowing the framework to patch the component tree instantly. This preserves local state (like typed form input) and scroll position, providing a vastly superior developer experience compared to a full page reload.'),
+      q('What does the `node_modules` folder contain?', ['Your personal source code', 'All the external libraries and dependencies your project needs to run', 'Your database backups', 'Your CSS styles'], 1, 'When you run `npm install`, Node downloads every package listed in `package.json` (and their sub-dependencies) into the `node_modules` folder. This folder is massive, OS-specific, and can always be regenerated from `package.json`, which is why it is excluded via `.gitignore`.'),
+      q('Why do we use `npm run build` before deploying an app?', ['To start the local development server', 'To transpile, minify, and bundle the code into optimized static assets for production', 'To delete the `.env` file', 'To connect to GitHub'], 1, '`npm run build` triggers the production compiler. It strips out development tools, transpiles modern JS/CSS for older browsers, minifies the code to reduce file size, and outputs a highly optimized `dist/` folder that is ready to be uploaded to a CDN or hosting platform.'),
+    ],
+    ['Sandbox = training wheels. Local = real engineering.', 'Never commit node_modules or .env to Git.', 'Vite gives you instant HMR and ES Module resolution.', 'Terminal scripts (npm run) replace UI buttons.']
+  ),
 ];
  
   
