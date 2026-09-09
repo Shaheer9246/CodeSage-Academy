@@ -8,6 +8,7 @@ import {
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, type LucideIcon,
 } from 'lucide-react';
 import PythonWorkspace from '@/components/PythonWorkspace';
+// import { useGuestLessonGate } from '@/lib/guestGate'; // Uncomment if you want guests in Expert track
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -35,12 +36,18 @@ const PythonExpertLessonPage = () => {
   const [qIndex, setQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
+  // const { isGuest } = useGuestLessonGate('pythonexpert', id); // Uncomment for guest support
+
   const quiz = lesson?.quiz ?? [];
   const correctCount = useMemo(
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
+  
+  // --- UPGRADE 1: The 75% Rule ---
+  const passingThreshold = Math.ceil(quiz.length * 0.75);
+  const passed = correctCount >= passingThreshold;
+  
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
@@ -48,6 +55,7 @@ const PythonExpertLessonPage = () => {
     ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
   );
 
+  // if (!user && !isGuest) return <Navigate to="/auth" replace />; // Uncomment for guest support
   if (!user) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/pythonexpert" replace />;
   if (!isPythonExpertLessonUnlocked(lesson.id, user.completedLessons)) return <Navigate to="/pythonexpert" replace />;
@@ -131,6 +139,32 @@ const PythonExpertLessonPage = () => {
         <main className="flex-1 min-w-0">
           {stage === 'concept' && (
             <div className="space-y-5 animate-fade-in">
+              
+              {/* --- UPGRADE 2: Terminal Notice Box --- */}
+              {lesson.terminalNotice && (
+                <section className={`rounded-2xl border p-4 flex items-start gap-3 ${
+                  lesson.id === 'pyx-01'
+                    ? 'border-cyan-500/30 bg-cyan-500/8'
+                    : 'border-border/30 bg-card/40'
+                }`}>
+                  <span className="text-lg shrink-0 mt-0.5">🖥️</span>
+                  <div className="flex-1 min-w-0">
+                    {lesson.id === 'pyx-01' && (
+                      <p className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.18em] mb-1">
+                        Terminal Notice
+                      </p>
+                    )}
+                    <p className={`text-xs leading-relaxed ${
+                      lesson.id === 'pyx-01' 
+                        ? 'text-cyan-200/90' 
+                        : 'text-muted-foreground'
+                    }`}>
+                      {lesson.terminalNotice}
+                    </p>
+                  </div>
+                </section>
+              )}
+
               <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
                 <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">Mission brief</p>
                 <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
@@ -254,9 +288,14 @@ const PythonExpertLessonPage = () => {
                 </div>
               </div>
 
-              {/* Code Editor + Terminal (Clean, no internal tabs) */}
-                            {/* Code Editor + Terminal */}
-              <PythonWorkspace practical={lesson.practical} />
+              {/* --- UPGRADE 3: Taller Workspace & Embedded Prop --- */}
+              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[85vh] flex flex-col">
+                <PythonWorkspace 
+                  practical={lesson.practical} 
+                  embedded={true} 
+                  requiresLocalTerminal={['pyx-06', 'pyx-10', 'pyx-19', 'pyx-23', 'pyx-25', 'pyx-27', 'pyx-28', 'pyx-29', 'pyx-30', 'pyx-test-2'].includes(lesson.id || '')} 
+                />
+              </div>
             </div>
           )}
 
@@ -268,7 +307,10 @@ const PythonExpertLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      {/* --- UPGRADE 4: Dynamic Score Text --- */}
+                      <p className="text-[11px] text-muted-foreground">
+                        Score {passingThreshold}/{quiz.length} to finish this lesson.
+                      </p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
