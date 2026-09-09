@@ -6,10 +6,10 @@ export type PythonLesson = NetworkingLesson;
 const L = (
   id: string, order: number, title: string, icon: string, philosophy: string,
   concepts: Concept[], practical: PythonLesson['practical'], quiz: QuizQuestion[],
-  keyTakeaways: string[]
+  keyTakeaways: string[], terminalNotice?: string // <--- Added parameter
 ): PythonLesson => ({
   id, module: 'Module 1: Python Programming', order, title, icon, philosophy,
-  concepts, practical, quiz, keyTakeaways,
+  concepts, practical, quiz, keyTakeaways, terminalNotice, // <--- Added to object
 });
 
 const q = (question: string, options: string[], correctIndex: number, explanation?: string): QuizQuestion =>
