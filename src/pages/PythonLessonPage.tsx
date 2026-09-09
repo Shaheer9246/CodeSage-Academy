@@ -287,9 +287,13 @@ const PythonLessonPage = () => {
                 </div>
               </div>
 
-              {/* Code Editor + Terminal (Taller, independent scrolling) */}
+              {/* Code Editor + Terminal (Taller, 50/50 split, independent scrolling) */}
               <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[85vh] flex flex-col">
-                <PythonWorkspace practical={lesson.practical} embedded={true} />
+                <PythonWorkspace 
+                  practical={lesson.practical} 
+                  embedded={true} 
+                  requiresLocalTerminal={['py-15', 'py-27', 'py-28', 'py-29', 'py-30', 'py-test-2'].includes(lesson.id)} 
+                />
               </div>
             </div>
           )}
