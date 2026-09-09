@@ -20,6 +20,7 @@ export interface NetworkingLesson {
   order: number;
   title: string;
   icon: string;
+  terminalNotice?: string;
   philosophy: string;
   concepts: Concept[];
   practical: {
