@@ -45,7 +45,8 @@ const PythonLessonPage = () => {
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
+  const passingThreshold = Math.ceil(quiz.length * 0.75);
+  const passed = correctCount >= passingThreshold;
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
@@ -135,12 +136,39 @@ const PythonLessonPage = () => {
         {/* ── Stage content ─────────────────────────── */}
         <main className="flex-1 min-w-0">
           {stage === 'concept' && (
-            <div className="space-y-5 animate-fade-in">
-              <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
-                <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">Mission brief</p>
-                <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
-                <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl" />
-              </section>
+  <div className="space-y-5 animate-fade-in">
+    
+    {/* ── Terminal Notice Box ─────────────────────── */}
+    {lesson.terminalNotice && (
+      <section className={`rounded-2xl border p-4 flex items-start gap-3 ${
+        lesson.id === 'py-01'
+          ? 'border-cyan-500/30 bg-cyan-500/8'
+          : 'border-border/30 bg-card/40'
+      }`}>
+        <span className="text-lg shrink-0 mt-0.5">🖥️</span>
+        <div className="flex-1 min-w-0">
+          {lesson.id === 'py-01' && (
+            <p className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.18em] mb-1">
+              Terminal Notice
+            </p>
+          )}
+          <p className={`text-xs leading-relaxed ${
+            lesson.id === 'py-01' 
+              ? 'text-cyan-200/90' 
+              : 'text-muted-foreground'
+          }`}>
+            {lesson.terminalNotice}
+          </p>
+        </div>
+      </section>
+    )}
+
+    {/* ── Mission Brief (Philosophy) ──────────────── */}
+    <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
+      <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">Mission brief</p>
+      <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
+      <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl" />
+    </section>
 
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">
@@ -274,7 +302,9 @@ const PythonLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      <p className="text-[11px] text-muted-foreground">
+                            Score {passingThreshold}/{quiz.length} to finish this lesson.
+                      </p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
