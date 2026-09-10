@@ -3,6 +3,7 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
+// 1. EXPERT IMPORTS
 import { getCppExpertLessonById, isCppExpertLessonUnlocked } from '@/data/cppExpertLessons';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
@@ -28,18 +29,22 @@ const renderFormattedText = (text: string) => {
         </code>
       );
     }
-    return part;
+    return <span key={index}>{part}</span>;
   });
 };
 
+// 2. COMPONENT NAME
 const CppExpertLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
   const [sp] = useSearchParams();
   const from = sp.get('from');
+  
+  // 3. EXPERT ROUTING
   const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/cpp/expert?from=dashboard' : '/cpp/expert';
 
+  // 4. EXPERT DATA FETCHER
   const lesson = id ? getCppExpertLessonById(id) : undefined;
 
   const [stage, setStage] = useState<Stage>('concept');
@@ -51,9 +56,9 @@ const CppExpertLessonPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('cpp-expert', id);
+  // 5. EXPERT GUEST GATE
+  const { isGuest } = useGuestLessonGate('cpp-expert', id);
 
-  // Reset internal states when switching expert lessons
   useEffect(() => {
     setStage('concept');
     setConceptView('beginner');
@@ -80,7 +85,8 @@ const CppExpertLessonPage = () => {
     ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
   );
 
-  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  // 6. EXPERT REDIRECTS
+  if (!user && !isGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/cpp/expert" replace />;
   if (!isCppExpertLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/cpp/expert" replace />;
 
@@ -91,7 +97,8 @@ const CppExpertLessonPage = () => {
     
     if (passed) {
       if (user) await completeLesson(lesson.id);
-      toast.success('Expert lesson complete! +1 XP · +2 Coins 🎉');
+      // 7. EXPERT REWARDS (Bumped up for Expert track!)
+      toast.success('Expert lesson complete! +15 XP · +5 ◈ 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
     setIsSubmitting(false);
@@ -117,8 +124,9 @@ const CppExpertLessonPage = () => {
               <span>{lesson.icon}</span> {lesson.title}
             </h1>
           </div>
+          {/* EXPERT REWARDS BADGE */}
           <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
-            <Sparkles className="w-3 h-3" /> +5 XP · +2 ◈
+            <Sparkles className="w-3 h-3" /> +15 XP · +5 ◈
           </div>
         </div>
         <div className="h-0.5 bg-secondary/40">
@@ -339,7 +347,9 @@ const CppExpertLessonPage = () => {
                               key={oi}
                               onClick={() => {
                                 setAnswers(p => ({ ...p, [qIndex]: oi }));
-                                if (qIndex < quiz.length - 1) setTimeout(() => setQIndex(qIndex + 1), 220);
+                                if (qIndex < quiz.length - 1) {
+                                  setTimeout(() => setQIndex(prev => prev + 1), 220);
+                                }
                               }}
                               className={`w-full text-left text-xs md:text-sm px-3.5 py-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                                 selected
