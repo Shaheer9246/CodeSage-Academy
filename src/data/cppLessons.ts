@@ -333,7 +333,7 @@ q('What happens when you dereference a pointer with `*pAge`?', ['It deletes the 
 q('Why are pointers dramatically more efficient than passing large objects by value into functions?', ['They compress the data automatically', 'They pass a tiny 8-byte address instead of copying every byte of the object', 'They skip the compiler checks', 'They store data on the hard drive'], 1, 'Pass-by-address transfers only the pointer (8 bytes on 64-bit), avoiding an O(n) copy constructor invocation on every call. **Why others are wrong:** No compression, no skipped checks, and no disk involvement — it is purely about avoiding copies.'),
 q('What is a "dangling pointer"?', ['A pointer set to nullptr', 'A pointer that still holds the address of an object that has already been destroyed', 'A pointer to a global variable', 'A pointer that has never been initialized'], 1, 'After the target object dies (scope exit or `delete`), the pointer keeps pointing at reclaimed memory — dereferencing it is Undefined Behavior. **Why others are wrong:** nullptr is the safe empty state, globals are alive, and a never-initialized pointer is a *wild* pointer, a related but distinct bug.')
 ],
-['Use &var to discover exactly where a variable lives in RAM.', 'A pointer (int* p) is a typed variable that stores a memory address.', 'Use *p (dereferencing) to read or change the data at that address.', 'Pointers avoid expensive copies by passing addresses instead of whole objects.', 'Always initialize pointers to nullptr to avoid dangling and wild pointer bugs.']
+['Use &var to discover exactly where a variable lives in RAM.', 'A pointer (int* p) is a typed variable that stores a memory address.', 'Use *p (dereferencing) to read or change the data at that address.', 'Pointers avoid expensive copies by passing addresses instead of whole objects.', 'Always initialize pointers to nullptr to avoid dangling and wild pointer bugs.'],
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -1382,16 +1382,6 @@ q('Which track topic connects `enum class`, namespaces, and [[nodiscard]] into o
 ['RAII + smart pointers = deterministic, leak-free resource management.', 'Templates, move semantics, and constexpr deliver zero-overhead abstractions.', 'Cache locality, cores, and synchronization connect code to physical hardware.', 'Multi-file structure, CMake, and profiling define the professional workflow.', 'The Expert Track awaits: coroutines, modules, SIMD, allocators, and lock-free structures.']
 )
 ];
-export const getCppLessonById = (id: string): CppLesson | undefined =>
-CPP_LESSONS.find(l => l.id === id);
-export const isCppLessonUnlocked = (id: string, completedLessons: string[]): boolean => {
-const idx = CPP_LESSONS.findIndex(l => l.id === id);
-if (idx <= 0) return true;
-return completedLessons.includes(CPP_LESSONS[idx - 1].id);
-};
-  
-];
-
 export const getCppLessonById = (id: string): CppLesson | undefined =>
 CPP_LESSONS.find(l => l.id === id);
 export const isCppLessonUnlocked = (id: string, completedLessons: string[]): boolean => {
