@@ -56,6 +56,8 @@ import PythonExpertLearn from "./pages/PythonExpertLearn";
 import PythonExpertLessonPage from "./pages/PythonExpertLessonPage";
 import CppLearn from "./pages/CppLearn";
 import CppLessonPage from "./pages/CppLessonPage";
+import CppExpertLearn from "./pages/CppExpertLearn";
+import CppExpertLessonPage from "./pages/CppExpertLessonPage";
 import Three3dLearn from "./pages/Three3dLearn";
 import Three3dLessonPage from "./pages/Three3dLessonPage";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -174,6 +176,8 @@ const App = () => (
               <Route path="/iai-lesson/:id" element={<ProtectedRoute><IntermediateAiLessonPage /></ProtectedRoute>} />
               <Route path="/cpp" element={<ProtectedRoute><CppLearn /></ProtectedRoute>} />
               <Route path="/cpp-lesson/:id" element={<ProtectedRoute><CppLessonPage /></ProtectedRoute>} />
+              <Route path="/cpp/expert" element={<ProtectedRoute><CppExpertLearn /></ProtectedRoute>} />
+              <Route path="/cppx-lesson/:id" element={<ProtectedRoute><CppExpertLessonPage /></ProtectedRoute>} />
               <Route path="/three3d" element={<ProtectedRoute><Three3dLearn /></ProtectedRoute>} />
               <Route path="/three-lesson/:id" element={<ProtectedRoute><Three3dLessonPage /></ProtectedRoute>} />
               <Route path="/" element={<Welcome />} />
