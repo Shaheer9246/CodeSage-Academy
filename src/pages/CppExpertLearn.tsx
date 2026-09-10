@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { CPP_EXPERT_LESSONS, isCppExpertLessonUnlocked } from '@/data/cppExpertLessons';
+import { CPP_EXPERT_LESSONS, isCppExpertLessonUnlocked } from '@/data/cppexpertLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
