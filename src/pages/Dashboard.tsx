@@ -27,6 +27,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
   { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
   { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Advance.' },
+  { target: 'cppexpert',  title: 'C++ Expert', body: 'Template metaprogramming, multithreading & low-level performance.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
   { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
@@ -160,6 +161,10 @@ const SECTIONS: SectionDef[] = [
         tour: 'cpp', lessons: 30, accent: 'accent-blue',
         tags: ['Compilers', 'Pointers', 'STL', 'RAII'], desc: 'Syntax → Memory → STL → High Performance',
         trackId: 'cpp' as TrackId },
+      { id: 'cppexpert', path: '/cpp/expert?from=dashboard', title: 'C++ Expert Programming', emoji: '🚀',
+        tour: 'cppexpert', lessons: 30, accent: 'accent-blue',
+        tags: ['Templates', 'Concurrency', 'Atomics', 'Performance'], desc: 'Metaprogramming → Threading → Low Level',
+        trackId: 'cppexpert' as TrackId },
     ],
   },
   {
@@ -307,6 +312,7 @@ const Dashboard = () => {
     '/three3d': 'three3d' as TrackId,
     '/java': 'java' as TrackId,
     '/cpp': 'cpp' as TrackId,
+    '/cpp/expert': 'cppexpert' as TrackId,
   };
   
   const isTrackLockedForGuest = (path: string) => isGuest && !GUEST_ALLOWED.has(path.split('?')[0]);
