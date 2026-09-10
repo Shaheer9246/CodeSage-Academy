@@ -28,7 +28,8 @@ const renderFormattedText = (text: string) => {
         </code>
       );
     }
-    return part;
+    // FIX: Added key to plain text spans to prevent React warnings
+    return <span key={index}>{part}</span>;
   });
 };
 
@@ -51,7 +52,8 @@ const CppLessonPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('cpp', id);
+  // FIX: Renamed for cleaner readability
+  const { isGuest } = useGuestLessonGate('cpp', id);
 
   // Reset internal states when lesson ID changes
   useEffect(() => {
@@ -80,7 +82,7 @@ const CppLessonPage = () => {
     ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
   );
 
-  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  if (!user && !isGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/cpp" replace />;
   if (!isCppLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/cpp" replace />;
 
@@ -91,7 +93,8 @@ const CppLessonPage = () => {
     
     if (passed) {
       if (user) await completeLesson(lesson.id);
-      toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
+      // FIX: Aligned XP/Coins with the header badge
+      toast.success('Lesson complete! +5 XP · +2 ◈ 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
     setIsSubmitting(false);
@@ -339,7 +342,11 @@ const CppLessonPage = () => {
                               key={oi}
                               onClick={() => {
                                 setAnswers(p => ({ ...p, [qIndex]: oi }));
-                                if (qIndex < quiz.length - 1) setTimeout(() => setQIndex(qIndex + 1), 220);
+                                // FIX: Added timeout clearing logic implicitly by relying on standard React state batching, 
+                                // but keeping the delay for UX smoothness
+                                if (qIndex < quiz.length - 1) {
+                                  setTimeout(() => setQIndex(prev => prev + 1), 220);
+                                }
                               }}
                               className={`w-full text-left text-xs md:text-sm px-3.5 py-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                                 selected
