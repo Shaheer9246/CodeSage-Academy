@@ -15,6 +15,7 @@ import { INTERMEDIATE_AI_LESSONS } from './intermediateAiLesson';
 import { THREE3D_LESSONS } from './three3dLessons';
 import { JAVA_LESSONS } from './javaLesson';
 import { CPP_LESSONS } from './cppLessons';
+import { CPP_EXPERT_LESSONS } from './cppExpertLessons';
 
 export type LessonTrackKey =
   | 'frontend'
@@ -30,7 +31,8 @@ export type LessonTrackKey =
   | 'intermediate-ai'
   | 'three3d'
   | 'java'
-  | 'cpp';
+  | 'cpp'
+  | 'cppexpert';
 
 const ids = (arr: { id: string }[]) => arr.map(l => l.id);
 
@@ -49,6 +51,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   three3d: ids(THREE3D_LESSONS),
   java: ids(JAVA_LESSONS),
   cpp: ids(CPP_LESSONS),
+  cppexpert: ids(CPP_EXPERT_LESSONS),
 };
 
 export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
@@ -66,6 +69,7 @@ export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
   three3d: '3D Web Dev',
   java: 'Java',
   cpp: 'C++',
+  cppexpert: 'C++ Expert',
 };
 
 export const LESSON_TRACK_KEYS = Object.keys(TRACK_LESSON_IDS) as LessonTrackKey[];
