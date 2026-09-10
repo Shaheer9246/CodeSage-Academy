@@ -112,3 +112,8 @@ export const isCppxLessonUnlocked = (id: string, completedLessons: string[]): bo
   if (idx <= 0) return true;
   return completedLessons.includes(CPPX_LESSONS[idx - 1].id);
 };
+
+// Aliases used across pages
+export const CPP_EXPERT_LESSONS = CPPX_LESSONS;
+export const getCppExpertLessonById = getCppxLessonById;
+export const isCppExpertLessonUnlocked = isCppxLessonUnlocked;
