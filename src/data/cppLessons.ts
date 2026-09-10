@@ -13,6 +13,8 @@ id, module: 'Module 1: C++ Foundations', order, title, icon, philosophy,
 concepts, practical, quiz, keyTakeaways, terminalNotice,
 });
 
+const TERMINAL_NOTICE_SHORT = 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1. ';
+
 const q = (question: string, options: string[], correctIndex: number, explanation?: string): QuizQuestion =>
 ({ question, options, correctIndex, explanation });
 
