@@ -14,6 +14,7 @@ import { SQL_LESSONS } from '@/data/sqlLessons';
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { JAVA_LESSONS } from '@/data/javaLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
+import { CPP_EXPERT_LESSONS } from '@/data/cppExpertLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
 import { badgeForLessons } from '@/lib/gamification';
@@ -36,9 +37,9 @@ const TRACKS: Track[] = [
   { prefix: 'sql-',        path: '/sql-lesson',   list: (SQL_LESSONS || []).map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'three3d-',    path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'three-',      path: '/three-lesson', list: THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
-  { prefix: 'cpp-',        path: '/cpp-lesson',   list: CPP_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
-  { prefix: 'java-',       path: '/java-lesson',  list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
-   { prefix: 'aiin-',       path: '/iai-lesson',   list: INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'cppx-',       path: '/cpp/expert-lesson', list: CPP_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'cpp-',        path: '/cpp-lesson',        list: CPP_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'java-',       path: '/java-lesson',       list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },{ prefix: 'aiin-',       path: '/iai-lesson',   list: INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'real-free-',  path: '/rf-lesson',    list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
 ];
 
@@ -55,6 +56,7 @@ const TRACK_HOME: Record<string, string> = {
   'three3d-': '/three3d',
   'three-': '/three3d',
   'java-': '/java',
+  'cppx-': '/cpp/expert',
   'cpp-': '/cpp',
   'real-free-': '/real-freelance',
 };
