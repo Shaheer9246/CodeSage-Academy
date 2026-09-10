@@ -16,7 +16,8 @@ export type TrackId =
   | 'three3d'
   | 'java'
   | 'cpp'
-  | 'cppexpert';
+  | 'cppexpert'
+  | 'c';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -46,7 +47,8 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'three3d',
   'java',
   'cpp',
-  'cppexpert'
+  'cppexpert',
+  'c'
 ]);
 
 
@@ -177,6 +179,13 @@ export const TRACK_META: Record<
     idPrefix: 'CS-CPPX',
     seed: 35,
     prereq: ['cpp'],
+  },
+  c: {
+    label: 'C Programming',
+    short: 'C',
+    route: '/c',
+    idPrefix: 'CS-C',
+    seed: 10,
   },
 };
 
