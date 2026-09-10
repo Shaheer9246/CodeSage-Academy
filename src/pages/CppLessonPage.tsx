@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -18,6 +18,20 @@ const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = 
   { key: 'quiz', icon: ClipboardCheck, label: 'Proof', hint: 'Prove it' },
 ];
 
+const renderFormattedText = (text: string) => {
+  const parts = text.split(/(`[^`]+`)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return (
+        <code key={index} className="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return part;
+  });
+};
+
 const CppLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -35,16 +49,31 @@ const CppLessonPage = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [qIndex, setQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { isGuest: __pgGuest } = useGuestLessonGate('cpp', id);
 
-  const quiz = lesson?.quiz ?? [];
+  // Reset internal states when lesson ID changes
+  useEffect(() => {
+    setStage('concept');
+    setConceptView('beginner');
+    setOpenConcept(0);
+    setDoneSteps({});
+    setAnswers({});
+    setQIndex(0);
+    setSubmitted(false);
+    setIsSubmitting(false);
+  }, [id]);
+
+  const quiz = useMemo(() => lesson?.quiz ?? [], [lesson]);
   const correctCount = useMemo(
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
-  const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
+  
+  const passingScore = useMemo(() => Math.ceil((quiz.length || 1) * 0.75), [quiz.length]);
+  const passed = correctCount >= passingScore;
+  const allAnswered = quiz.length > 0 && quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
   const journey = Math.round(
@@ -56,12 +85,16 @@ const CppLessonPage = () => {
   if (!isCppLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/cpp" replace />;
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setSubmitted(true);
+    
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -173,6 +206,7 @@ const CppLessonPage = () => {
                           }`}
                         />
                         <button
+                          aria-expanded={open}
                           onClick={() => setOpenConcept(open ? -1 : i)}
                           className={`w-full text-left glass-card rounded-2xl px-4 py-3 border transition-all ${
                             open ? 'border-primary/35' : 'border-border/25 hover:border-primary/20'
@@ -211,7 +245,7 @@ const CppLessonPage = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
               </section>
 
-              {/* Assignment Box: Goal + Steps (Scrollable) */}
+              {/* Assignment Box */}
               <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[40vh] overflow-y-auto">
                 <div className="mb-4">
                   <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
@@ -243,12 +277,9 @@ const CppLessonPage = () => {
                             }`}>
                               {done ? <Check className="w-3 h-3" /> : i + 1}
                             </span>
-                            <span
-                              className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
-                              dangerouslySetInnerHTML={{
-                                __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
-                              }}
-                            />
+                            <span className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                              {renderFormattedText(step)}
+                            </span>
                           </button>
                         </li>
                       );
@@ -272,7 +303,7 @@ const CppLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      <p className="text-[11px] text-muted-foreground">Score {passingScore}/{quiz.length} to finish this lesson.</p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
@@ -412,7 +443,7 @@ const CppLessonPage = () => {
 
       {/* ── Sticky action dock ──────────────────────── */}
       {/* Mobile: inline button at end of content */}
-      <div className="md:hidden mt-6 mb-4 space-y-3">
+      <div className="md:hidden mt-6 mb-4 space-y-3 px-3">
         {stageIndex > 0 && (
           <button
             onClick={() => setStage(STAGES[stageIndex - 1].key)}
@@ -431,7 +462,7 @@ const CppLessonPage = () => {
           </button>
         ) : !submitted ? (
           <button
-            disabled={!allAnswered}
+            disabled={!allAnswered || isSubmitting}
             onClick={handleSubmit}
             className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
@@ -468,7 +499,7 @@ const CppLessonPage = () => {
             </button>
           ) : !submitted ? (
             <button
-              disabled={!allAnswered}
+              disabled={!allAnswered || isSubmitting}
               onClick={handleSubmit}
               className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
