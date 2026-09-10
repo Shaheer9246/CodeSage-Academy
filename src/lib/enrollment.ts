@@ -15,7 +15,8 @@ export type TrackId =
   | 'intermediate-ai'
   | 'three3d'
   | 'java'
-  | 'cpp';
+  | 'cpp'
+  | 'cppexpert';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -44,7 +45,8 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'intermediate-ai',
   'three3d',
   'java',
-  'cpp'
+  'cpp',
+  'cppexpert'
 ]);
 
 
@@ -64,7 +66,7 @@ export const TRACK_META: Record<
     short: 'Frontend',
     route: '/learn',
     idPrefix: 'CS-FE',
-    seed: 200,
+    seed: 10,
   },
   networking: {
     label: 'Computer & Networking',
@@ -102,7 +104,7 @@ export const TRACK_META: Record<
     short: 'Python',
     route: '/python',
     idPrefix: 'CS-PY',
-    seed: 180,
+    seed: 10,
     prereq: ['networking'],
   },
   local: {
@@ -167,6 +169,14 @@ export const TRACK_META: Record<
     route: '/cpp',
     idPrefix: 'CS-CPP',
     seed: 95,
+  },
+  cppexpert: {
+    label: 'C++ Expert',
+    short: 'C++ Expert',
+    route: '/cpp/expert',
+    idPrefix: 'CS-CPPX',
+    seed: 35,
+    prereq: ['cpp'],
   },
 };
 
