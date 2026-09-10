@@ -74,6 +74,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: 'Intermediate AI covers advanced topics like PEFT, LoRA/QLoRA, fine-tuning, and model quantization. We strongly recommend completing AI Fundamentals first to build a solid grasp of LLM architecture.',
     ctas: [{ label: 'AI Fundamentals course', route: '/ai-fundamentals' }],
   },
+  cppexpert: {
+    title: 'Finish C++ Programming first',
+    body: 'C++ Expert covers advanced topics like dynamic memory, templates, Move Semantics, and modern C++ design patterns. Please complete C++ Programming first to establish a solid grasp of fundamental syntax.',
+    ctas: [{ label: 'C++ Programming course', route: '/cpp' }],
+  },
 };
 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
