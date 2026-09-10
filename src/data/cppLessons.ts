@@ -13,6 +13,8 @@ id, module: 'Module 1: C++ Foundations', order, title, icon, philosophy,
 concepts, practical, quiz, keyTakeaways, terminalNotice,
 });
 
+const TERMINAL_NOTICE_SHORT = 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1. ';
+
 const q = (question: string, options: string[], correctIndex: number, explanation?: string): QuizQuestion =>
 ({ question, options, correctIndex, explanation });
 
@@ -333,7 +335,7 @@ q('What happens when you dereference a pointer with `*pAge`?', ['It deletes the 
 q('Why are pointers dramatically more efficient than passing large objects by value into functions?', ['They compress the data automatically', 'They pass a tiny 8-byte address instead of copying every byte of the object', 'They skip the compiler checks', 'They store data on the hard drive'], 1, 'Pass-by-address transfers only the pointer (8 bytes on 64-bit), avoiding an O(n) copy constructor invocation on every call. **Why others are wrong:** No compression, no skipped checks, and no disk involvement — it is purely about avoiding copies.'),
 q('What is a "dangling pointer"?', ['A pointer set to nullptr', 'A pointer that still holds the address of an object that has already been destroyed', 'A pointer to a global variable', 'A pointer that has never been initialized'], 1, 'After the target object dies (scope exit or `delete`), the pointer keeps pointing at reclaimed memory — dereferencing it is Undefined Behavior. **Why others are wrong:** nullptr is the safe empty state, globals are alive, and a never-initialized pointer is a *wild* pointer, a related but distinct bug.')
 ],
-['Use &var to discover exactly where a variable lives in RAM.', 'A pointer (int* p) is a typed variable that stores a memory address.', 'Use *p (dereferencing) to read or change the data at that address.', 'Pointers avoid expensive copies by passing addresses instead of whole objects.', 'Always initialize pointers to nullptr to avoid dangling and wild pointer bugs.']
+['Use &var to discover exactly where a variable lives in RAM.', 'A pointer (int* p) is a typed variable that stores a memory address.', 'Use *p (dereferencing) to read or change the data at that address.', 'Pointers avoid expensive copies by passing addresses instead of whole objects.', 'Always initialize pointers to nullptr to avoid dangling and wild pointer bugs.'],
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -368,7 +370,7 @@ q('Why do professional C++ codebases pass large objects as `const T&` parameters
 q('What does the double-ampersand `int&& r` declare?', ['A pointer to a pointer', 'A reference to a reference', 'An rvalue reference that binds only to temporary values', 'A constant reference'], 2, '`T&&` is an rvalue reference, binding exclusively to temporaries — the foundation of move semantics. **Why others are wrong:** Pointer-to-pointer is `int**`, references-to-references do not exist, and const references use `const int&`.')
 ],
 ['A reference (&) is a permanent alias for an existing variable.', 'Pass-by-reference lets functions mutate caller data with no pointer syntax.', 'References can never be null and never reseat — pointers still own those jobs.', 'Use const T& to pass big objects with zero copy and zero mutation risk.', 'Rvalue references (&&) unlock move semantics later in this track.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -403,7 +405,7 @@ q('Which pair of keywords correctly frees heap memory?', ['free / malloc', 'dele
 q('When should you prefer the Heap over the Stack?', ['Always, because it is faster', 'When the size is only known at runtime or the object must outlive its creating function', 'Never, the heap is illegal in C++', 'Only for integer variables'], 1, 'Runtime-sized and long-lived data are the two classic heap use cases. **Why others are wrong:** The heap is slower not faster, perfectly legal, and used for all types, not just ints.')
 ],
 ['The Stack is small, fast, and self-cleaning; the Heap is huge but manually managed.', 'new allocates heap memory; delete / delete[] must return it.', 'A leak is heap memory with no reachable pointer — invisible and cumulative.', 'Default to the stack; choose the heap only for runtime size or extended lifetime.', 'Smart pointers (later in this track) automate heap cleanup via RAII.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -438,7 +440,7 @@ q('Why can `sizeof(struct)` be LARGER than the sum of its members\' sizes?', ['T
 q('What does `Player team[5];` create?', ['Five pointers to one Player', 'Five contiguous Player objects in memory', 'One Player copied lazily five times', 'A heap allocation of five Players'], 1, 'A fixed array stores five full Player objects side by side (on the stack here). **Why others are wrong:** It is not pointers, not lazy copies, and not heap memory unless you used `new[]`.')
 ],
 ['Structs bundle heterogeneous variables into one named blueprint.', 'Define structs above main() and instantiate them inside it.', 'Use the dot operator (.) to read and write members.', 'Pass structs by const reference to avoid expensive whole-bundle copies.', 'sizeof includes hidden alignment padding — layout is not naive addition.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -473,7 +475,7 @@ q('What is the ONLY syntactic difference between `struct` and `class` in C++?', 
 q('How do you invoke method `jump()` on object `player1`?', ['jump(player1);', 'player1.jump();', 'player1->jump;', 'jump.player1();'], 1, 'Dot operator on the instance, then method name with parentheses. **Why others are wrong:** Free-function syntax, pointer syntax without call parentheses, and reversed order are all invalid here.')
 ],
 ['A Class bundles attributes (state) and methods (behavior) into one blueprint.', 'An Object is a concrete instance with its own independent state.', 'Class members default to private — protection is built in.', 'Methods exist once as code; objects carry only their own data.', 'Use struct for plain data, class for protected types with invariants.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -509,7 +511,7 @@ q('What does a Getter typically return?', ['A reference allowing mutation', 'A c
 q('What does the `friend` keyword do?', ['Makes a function run faster', 'Grants a specific external function or class access to private members', 'Makes all members public', 'Creates a copy of the class'], 1, 'Friendship is a deliberate, explicit access grant bypassing private protection. **Why others are wrong:** It affects access control only — no speed, no global publicity, no copying.')
 ],
 ['Class members are private by default — the vault is sealed automatically.', 'public: defines your approved interface to the outside world.', 'Getters (const) provide safe read access to private state.', 'Setters enforce validation rules at the single mutation choke point.', 'friend grants rare, deliberate access — use it sparingly.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -544,7 +546,7 @@ q('How is a destructor written?', ['delete ClassName()', 'With a tilde: ~ClassNa
 q('What does the "Rule of Three" refer to?', ['Three access modifiers', 'Copy constructor, copy-assignment operator, and destructor — if you need one, you likely need all three', 'Three constructors maximum', 'Three member variables minimum'], 1, 'Owning raw resources couples these three special members; defining one without the others invites double-frees or leaks. **Why others are wrong:** It is not about modifiers, constructor counts, or member counts.')
 ],
 ['Constructors run automatically at birth; destructors run automatically at death.', 'A constructor shares the class name and has no return type.', 'Member initializer lists construct members directly and are mandatory for const/reference members.', 'Destructors are the backbone of RAII cleanup.', 'Remember the Rule of Three when your class owns raw resources.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -579,7 +581,7 @@ q('What exactly is `this` inside a member function?', ['A string holding the cla
 q('What does a `static` member variable represent?', ['A variable stored on the stack', 'One shared value belonging to the class itself, common to all objects', 'A constant that cannot be read', 'A per-object counter'], 1, 'Static data exists once per class, shared across every instance. **Why others are wrong:** Storage class is unrelated, it is readable, and per-object state is exactly what static is NOT.')
 ],
 ['Use :: to define method bodies cleanly outside the class block.', 'Header/source separation builds on declaration-vs-definition splitting.', 'this-> disambiguates members from same-named parameters.', 'Return *this by reference to enable fluent method chaining.', 'static members hold class-level shared state with no this pointer.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 
@@ -615,7 +617,7 @@ q('In what order do destructors run when a derived object dies?', ['Derived firs
 q('Which members of a base class are NOT accessible inside a derived class?', ['public members', 'protected members', 'private members', 'All members are accessible'], 2, 'Private members belong exclusively to the base class scope; derived classes must use public/protected getters or setters to interact with them. **Why others are wrong:** public and protected members are visible to derived classes, so "all members" is incorrect.')
 ],
 ['Inheritance lets a child class reuse a parent\'s variables and methods automatically (DRY).', 'Use the colon syntax: class Child : public Parent.', 'protected hides members from outsiders but shares them with child classes.', 'Construction runs base-first; destruction runs derived-first.', 'Beware the Diamond Problem when combining multiple inheritance paths.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -651,7 +653,7 @@ q('Why should a base class that is meant for polymorphic deletion have a virtual
 q('What does marking a method `final` do?', ['It makes the method run at program end', 'It prevents any derived class from overriding that method further', 'It deletes the method after one use', 'It makes the method static'], 1, '`final` seals the method against further overriding, locking the behavior for all deeper subclasses. **Why others are wrong:** It does not affect timing, lifetime, or staticness — only overridability.')
 ],
 ['Polymorphism lets one command behave differently per true object type.', 'Base pointers use static binding by default and call the BASE version.', 'The virtual keyword enables runtime dynamic dispatch via vtables.', 'Always add override in child classes to catch signature typos at compile time.', 'Give polymorphic base classes virtual destructors to avoid silent leaks.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -686,7 +688,7 @@ q('What is an "interface" in C++ terms?', ['A special compiler flag', 'A class c
 q('Why do interface classes almost always declare a virtual destructor?', ['To make objects delete faster', 'So deleting implementations through an interface pointer runs the full, correct destruction chain', 'Because pure virtual classes cannot have constructors', 'To enable multiple inheritance'], 1, 'Implementations are routinely owned and deleted via interface pointers; a virtual destructor guarantees their derived destructors execute. **Why others are wrong:** Speed is irrelevant, constructors are allowed, and multiple inheritance does not depend on it.')
 ],
 ['Pure virtual functions (= 0) define contracts with no implementation.', 'Abstract classes can never be instantiated — only pointed to or referenced.', 'Interfaces are all-pure-virtual classes and allow safe multiple inheritance.', 'A derived class stays abstract until EVERY pure virtual function is overridden.', 'Compile-time contract enforcement catches half-finished implementations before runtime.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -721,7 +723,7 @@ q('What does `vec.size()` return?', ['The total allocated capacity', 'The number
 q('Why does reallocation invalidate pointers and iterators into a vector?', ['Because the vector encrypts its data', 'Because elements are moved to a brand-new memory block, so old addresses point to freed memory', 'Because iterators expire after 1 second', 'Because the vector becomes private'], 1, 'After reallocation the original buffer is freed; any handle into it dangles. **Why others are wrong:** No encryption, timers, or access changes are involved — it is pure address migration.')
 ],
 ['Include <vector> and declare with angle brackets: std::vector<T> name;', 'push_back grows the container automatically; pop_back removes the last item.', 'Use .at() for bounds-checked safety, [] for raw speed.', 'size() counts active elements; capacity() counts allocated slots.', 'reserve() upfront avoids repeated reallocations and iterator invalidation.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -756,7 +758,7 @@ q('What is the Small String Optimization (SSO)?', ['Storing strings in a databas
 q('What is the key characteristic of `std::string_view`?', ['It owns and copies the text', 'It is a non-owning, zero-copy window over existing character data', 'It converts text to numbers', 'It encrypts the text'], 1, 'A string_view holds only a pointer and length, viewing text without copying or owning it. **Why others are wrong:** Ownership, conversion, and encryption are all outside its design — and its non-owning nature is exactly why dangling views must be avoided.')
 ],
 ['Use .length()/.size() to count characters and .find() to search.', 'Always compare find() results against std::string::npos for safety.', 'substr(start, length) extracts copied slices of text.', 'Prefer += over + in loops to avoid temporary string allocations.', 'std::string_view gives zero-copy read access — but never let it outlive its source.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -791,7 +793,7 @@ q('Why should you check `if (!file)` or `file.is_open()` after opening a file?',
 q('What is the purpose of `std::ios::binary` mode?', ['To compress the file automatically', 'To read/write raw memory bytes without text formatting transformations', 'To password-protect the file', 'To convert text to uppercase'], 1, 'Binary mode disables newline translation and formatting, moving exact byte sequences — essential for serialization and media data. **Why others are wrong:** It performs no compression, encryption, or case conversion.')
 ],
 ['Include <fstream> for ofstream (write), ifstream (read), fstream (both).', 'Default ofstream mode TRUNCATES; use std::ios::app to append safely.', 'Read line-by-line with while (std::getline(file, line)).', 'Always validate stream state and close files explicitly when done.', 'Binary mode moves raw bytes — the gateway to serialization.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -826,7 +828,7 @@ q('What is the primary benefit of `constexpr`?', ['It makes variables private', 
 q('What does `auto [x, y] = myPair;` accomplish?', ['It creates two copies of the pair', 'It decomposes the pair into two named variables in one line (structured binding)', 'It deletes the pair', 'It sorts the pair'], 1, 'Structured bindings unpack aggregate/pair/tuple contents into individual names cleanly. **Why others are wrong:** The pair remains intact, nothing is deleted, and no sorting occurs.')
 ],
 ['Use auto for compile-time deduction — same safety, less noise.', 'Always use nullptr for empty pointers; never 0 or NULL.', 'Range-based for loops iterate containers safely via iterators.', 'constexpr moves computation to compile time for free runtime speed.', 'Structured bindings (C++17) decompose pairs and tuples in one clean line.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
@@ -861,7 +863,7 @@ q('What problem does `std::weak_ptr` solve?', ['It makes shared_ptr faster', 'It
 q('Why are `std::make_unique` and `std::make_shared` recommended over raw `new`?', ['They are exception-safe, cleaner, and (for make_shared) allocate object + control block in one block', 'They run the constructor twice', 'They disable destructors', 'They store data in files'], 0, 'Makers prevent leak windows in complex expressions and improve locality; they also express intent clearly. **Why others are wrong:** Constructors run once, destructors remain active, and no file storage is involved.')
 ],
 ['Never manage heap memory with raw new/delete in Modern C++.', 'unique_ptr = exclusive ownership; copy is banned, move transfers it.', 'shared_ptr = shared ownership via an atomic reference count.', 'weak_ptr observes without owning and breaks reference cycles.', 'Always construct with make_unique / make_shared for safety and performance.']
-),
+,
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 
@@ -1389,13 +1391,4 @@ const idx = CPP_LESSONS.findIndex(l => l.id === id);
 if (idx <= 0) return true;
 return completedLessons.includes(CPP_LESSONS[idx - 1].id);
 };
-  
-];
 
-export const getCppLessonById = (id: string): CppLesson | undefined =>
-CPP_LESSONS.find(l => l.id === id);
-export const isCppLessonUnlocked = (id: string, completedLessons: string[]): boolean => {
-const idx = CPP_LESSONS.findIndex(l => l.id === id);
-if (idx <= 0) return true;
-return completedLessons.includes(CPP_LESSONS[idx - 1].id);
-};
