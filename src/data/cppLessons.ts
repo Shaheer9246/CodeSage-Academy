@@ -334,7 +334,6 @@ q('Why are pointers dramatically more efficient than passing large objects by va
 q('What is a "dangling pointer"?', ['A pointer set to nullptr', 'A pointer that still holds the address of an object that has already been destroyed', 'A pointer to a global variable', 'A pointer that has never been initialized'], 1, 'After the target object dies (scope exit or `delete`), the pointer keeps pointing at reclaimed memory — dereferencing it is Undefined Behavior. **Why others are wrong:** nullptr is the safe empty state, globals are alive, and a never-initialized pointer is a *wild* pointer, a related but distinct bug.')
 ],
 ['Use &var to discover exactly where a variable lives in RAM.', 'A pointer (int* p) is a typed variable that stores a memory address.', 'Use *p (dereferencing) to read or change the data at that address.', 'Pointers avoid expensive copies by passing addresses instead of whole objects.', 'Always initialize pointers to nullptr to avoid dangling and wild pointer bugs.']
-),
 'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
 ),
 L(
