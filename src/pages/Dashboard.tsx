@@ -26,6 +26,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'real-freelance', title: 'Real-World Freelancing', body: 'Proposals, Upwork & scaling.' },
   { target: 'python',     title: 'Python', body: 'Syntax → OOP → capstone. Beginner to Advance.' },
   { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
+  { target: 'c',          title: 'C Programming', body: 'Procedural programming, memory management & low-level fundamentals.' },
   { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Advance.' },
   { target: 'cppexpert',  title: 'C++ Expert', body: 'Template metaprogramming, multithreading & low-level performance.' },
   { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
@@ -149,6 +150,20 @@ const SECTIONS: SectionDef[] = [
         trackId: 'java' as TrackId },
     ],
   },
+       
+  {
+    id: 'c',
+    title: 'C Programming',
+    subtitle: 'Procedural logic, pointers & memory management',
+    Icon: Cpu,
+    gradient: 'from-blue-600/70 via-indigo-500/60 to-cyan-500/70',
+    tracks: [
+      { id: 'c', path: '/c?from=dashboard', title: 'C Programming', emoji: '⚡',
+        tour: 'c', lessons: 30, accent: 'accent-blue',
+        tags: ['Pointers', 'Memory', 'Structs', 'CLI'], desc: 'Syntax → Memory → Pointers → Low-Level Systems',
+        trackId: 'c' as TrackId },
+    ],
+  },
   
   {
     id: 'cpp',
@@ -241,7 +256,7 @@ const Dashboard = () => {
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [enrollTick, setEnrollTick] = useState(0);
 
-  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'career';
+  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'c' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'career';
   
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
@@ -311,6 +326,7 @@ const Dashboard = () => {
     '/intermediate-ai': 'intermediate-ai' as TrackId,
     '/three3d': 'three3d' as TrackId,
     '/java': 'java' as TrackId,
+    '/c': 'c' as TrackId,
     '/cpp': 'cpp' as TrackId,
     '/cpp/expert': 'cppexpert' as TrackId,
   };
@@ -379,6 +395,7 @@ const Dashboard = () => {
     { id: 'frontend', label: 'Frontend', icon: Layout },
     { id: 'python', label: 'Python', icon: Terminal },
     { id: 'java', label: 'Java', icon: Terminal },
+    { id: 'c', label: 'C Language', icon: Cpu },
     { id: 'cpp', label: 'C++', icon: Cpu },
     { id: 'sql', label: 'SQL & Backend', icon: Database },
     { id: 'ai', label: 'AI', icon: Sparkles },
