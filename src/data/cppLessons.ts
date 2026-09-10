@@ -1,947 +1,596 @@
-// C++ Track — 30 lessons (beginner → advanced)
+// =============================================================================
+// C++ TRACK — 40 lessons (beginner → advanced) 
+// =============================================================================
 import type { NetworkingLesson, Concept, QuizQuestion } from './networkingLessons';
-
 export type CppLesson = NetworkingLesson;
 
 const L = (
-  id: string, order: number, title: string, icon: string, philosophy: string,
-  concepts: Concept[], practical: CppLesson['practical'], quiz: QuizQuestion[],
-  keyTakeaways: string[]
+id: string, order: number, title: string, icon: string, philosophy: string,
+concepts: Concept[], practical: CppLesson['practical'], quiz: QuizQuestion[],
+keyTakeaways: string[], terminalNotice?: string
 ): CppLesson => ({
-  id, module: 'Module 1: C++ Foundations', order, title, icon, philosophy,
-  concepts, practical, quiz, keyTakeaways,
+id, module: 'Module 1: C++ Foundations', order, title, icon, philosophy,
+concepts, practical, quiz, keyTakeaways, terminalNotice,
 });
 
 const q = (question: string, options: string[], correctIndex: number, explanation?: string): QuizQuestion =>
-  ({ question, options, correctIndex, explanation });
-
-export const CPP_TRACK_NOTICE = {
-  type: "track-notice",
-  notice: "🖥️ C++ Track Status: This track is currently under development. In this module, we are focusing on establishing your core programming foundation. Please proceed through the available lessons to build your skills; we are actively updating the preview environment and will notify you as soon as the interactive compiler is fully integrated."
-};
-
-const TERMINAL_NOTICE_FULL = "🖥️ **Terminal Notice:** We now have a built-in terminal right here! However, if you want a bigger screen, you can use your computer's native terminal. The practical assignment below contains the full setup instructions to install a C++ compiler on your machine.\n\n";
-const TERMINAL_NOTICE_SHORT = "🖥️ **Terminal Notice:** If you want to use a big terminal on your own computer instead of the built-in one, please read Lesson 1 for the full setup instructions.\n\n";
+({ question, options, correctIndex, explanation });
 
 export const CPP_LESSONS: CppLesson[] = [
+L(
+'cpp-01', 1, 'Hello C++: The Compilation Pipeline', '🚀',
+'🚀 Every C++ program begins life as plain text and ends as pure machine code. Unlike Python, there is no interpreter babysitting your program at runtime — the compiler translates everything ahead of time, which is exactly why C++ runs at blistering speed. Today you install the toolchain, write your first program, and learn what actually happens between pressing "compile" and seeing output.',
+[
+{ title: '1. From Text to Machine: The Compiler', beginner: 'Think of the compiler as an extremely strict translator. Your computer\'s processor only understands 1s and 0s. The compiler reads your English-like C++ text and translates the WHOLE file into machine instructions before the program ever runs. If you make a spelling mistake, it refuses to translate and tells you exactly which line is wrong.', advanced: 'C++ is an ahead-of-time compiled language. The source file passes through the preprocessor (macros and includes), then the compiler proper (lexing, parsing, semantic analysis, optimization), emitting assembly that the assembler turns into an object file (`.o` / `.obj`). Because translation happens before execution, type errors are caught at compile time and carry zero runtime cost.' },
+{ title: '2. The Linker: Stitching Object Files', beginner: 'After translating, you have separate "pages" of machine code. The linker is the bookbinder: it glues your pages together with pages from libraries (like the code that prints text) into one finished executable book.', advanced: 'The linker resolves symbols across translation units: every function call must match exactly one definition. A call with no definition produces the classic `undefined reference` linker error; two definitions of the same symbol violate the One Definition Rule (ODR). Understanding this split (compile vs link) is how professionals diagnose build failures instantly.' },
+{ title: '3. main() & Exit Codes', beginner: 'Every C++ program MUST have a function called `main()`. It is the starting line of the race. When you run the program, the computer jumps straight to `main()` and executes its curly-brace block. The `return 0;` at the end is your program telling the operating system: "Everything went fine."', advanced: '`int main()` is the implementation-defined entry point. Its integer return value becomes the process exit status consumed by shells, scripts, and CI pipelines: `0` signals success, any non-zero value signals failure. This is why `return 0;` is a contract with the operating system, not decoration.' },
+{ title: '4. #include & the Standard Library', beginner: 'Core C++ is so lightweight it doesn\'t even know how to print to a screen! Writing `#include <iostream>` at the top borrows the official input/output toolbox so `std::cout` exists. No include, no printing.', advanced: '`#include` is a purely textual preprocessor operation: the header\'s contents are pasted into your source before compilation. Headers provide declarations (signatures), while definitions live in pre-compiled library binaries the linker attaches later. This is why `<iostream>` is "free" to include but still costs compile time.' },
+{ title: '5. Translation Units & Build Speed (Expert Teaser)', beginner: 'In a big project, each `.cpp` file is translated separately, like separate chefs cooking separate dishes. Because they are independent, the computer can cook many of them at the same time, which is how huge games get built in minutes instead of days.', advanced: '*(Pro Track Preview)* Each `.cpp` plus its included headers forms one Translation Unit (TU), compiled independently — enabling parallel builds but also causing massive redundant parsing. C++20 Modules replace textual inclusion with compiled binary interfaces, cutting build times dramatically. The Expert track dissects TUs, ODR, and module partitions.' }
+],
+{
+title: 'Workstation Setup & First Compilation',
+intro: '⚠️ This practical installs your local C++ toolchain (the equivalent of Python\'s Lesson 1 setup) and walks you through compiling, running, and deliberately breaking your first program.',
+steps: [
+'Install a compiler. WINDOWS: install MSYS2 (or MinGW) to get `g++`, or install Visual Studio with the "C++ workload". MAC: run `xcode-select --install` to get Clang. LINUX: run `sudo apt install build-essential`.',
+'Verify it: open your terminal and type `g++ --version` (or `clang++ --version`). You should see a version banner print out.',
+'Create a file named `hello.cpp` in your text editor.',
+'Type exactly: `#include <iostream>` then on the next line `int main() {` then `    std::cout << "Hello World!" << std::endl;` then `    return 0;` then `}`.',
+'Save it, then in your terminal navigate to that folder and compile: `g++ hello.cpp -o hello`. Expect: silence. No output means success — a new executable file just appeared.',
+'Run it: type `./hello` (Mac/Linux) or `hello.exe` (Windows). You should see `Hello World!` printed.',
+'Now break it on purpose: change `std::cout` to `std::cot`, save, and recompile. Read the compiler error — it names the file and line. Fix it.',
+'Break it at link time: add a line `missingFunction();` inside main, recompile, and observe the `undefined reference` LINKER error. Then delete that line and recompile clean.'
+],
+goal: 'You installed a C++ compiler, compiled source into a binary executable, ran it, and learned to distinguish compiler errors from linker errors.'
+},
+[
+q('Why must C++ code be compiled before it can run?', ['To compress the file so it downloads faster', 'To translate human-readable C++ text into native machine code the processor can execute directly', 'To connect the program to the internet', 'To make the text editor highlight colors'], 1, 'C++ is ahead-of-time compiled: the compiler converts your source into machine instructions before execution, which is why C++ binaries run at native speed with no interpreter. **Why others are wrong:** Compilation has nothing to do with compression, networking, or editor syntax highlighting.'),
+q('Which build stage is responsible for combining your object file with library code into a single executable?', ['The preprocessor', 'The compiler', 'The linker', 'The debugger'], 2, 'The linker resolves symbols across translation units and stitches object files plus library binaries into one executable. **Why others are wrong:** The preprocessor only handles `#include`/macros, the compiler only translates one translation unit, and the debugger runs after the build.'),
+q('What does `return 0;` at the end of `main()` communicate?', ['It returns zero dollars to the user', 'It signals to the operating system that the process finished successfully', 'It deletes all variables', 'It restarts the program'], 1, 'The integer returned from `main()` becomes the process exit status: `0` means success, non-zero means failure — shells and CI systems read this code. **Why others are wrong:** It does not involve money, memory deletion, or restarting; it is purely an OS-level status contract.'),
+q('What does `#include <iostream>` actually do?', ['It downloads the internet library at runtime', 'It textually pastes the input/output declarations into your file before compilation so `std::cout` exists', 'It creates an infinite loop', 'It shuts down the compiler after use'], 1, '`#include` is a preprocessor textual inclusion: the header\'s declarations are inserted into your source, giving the compiler the signatures for `std::cout` and `std::cin`. **Why others are wrong:** Nothing is downloaded at runtime, no loop is created, and the compiler is not shut down.'),
+q('You see `undefined reference to \'calculate()\'` when building. What does this mean?', ['You misspelled a variable name', 'The compiler found a declaration but the linker never found the function\'s definition', 'The file is too large', 'You forgot `#include <iostream>`'], 1, 'This is a LINKER error: the call compiled fine (a declaration was visible) but no object file provided the actual definition of `calculate()`. **Why others are wrong:** Misspelled variables and missing includes produce compiler errors, not linker errors, and file size is irrelevant.')
+],
+['C++ is compiled ahead of time into native machine code — no interpreter at runtime.', 'The linker stitches object files and libraries into one executable; `undefined reference` is a link-stage error.', 'Every program starts at int main() and reports success with return 0.', '#include <iostream> borrows the standard input/output toolbox.', 'Each .cpp file is an independent translation unit, enabling parallel compilation.'],
+'We now have a built-in terminal right here! However, C++ requires a real native compiler — for the best experience use your computer\'s own terminal (CMD/PowerShell/Terminal). The practical below contains full setup instructions to install a C++ compiler (GCC/Clang/MSVC) on your machine.'
+),
 
-  L(
-    'cpp-01', 1, 'Hello C++ World: Compilers & Output', '🚀', 
-    TERMINAL_NOTICE_FULL + 'Every incredible software engineering journey in C++ starts at the exact same place: the compiler. Unlike Python, C++ does not read and execute your text instantly. You must transform your raw text into low-level machine code using a Compiler before your computer can understand it. Today, we setup your tools and write your first program.',
-    [
-      { title: '1. The C++ Compiler & Linker', beginner: 'Think of the C++ Compiler as a highly strict translator. Your computer processor only understands 1s and 0s. The compiler takes your readable C++ English text and translates it entirely into an executable file (.exe or .out) that your machine can run at lightning speed.', advanced: 'C++ utilizes a multi-stage build process. The Preprocessor resolves macros and includes, the Compiler translates translation units into assembly/object files (`.o`), and finally, the Linker resolves symbol references to stitch those object files into a singular executable binary.' },
-      { title: '2. The main() Function', beginner: 'Every C++ program MUST have a function called `main()`. This is the starting line of your race. When you click run, the computer looks specifically for `main()` and executes whatever is inside its curly braces `{}` first.', advanced: 'The `int main()` function serves as the designated entry point for the operating system execution sequence. It strictly returns an integer status code to the OS; a return of `0` signals successful execution, while any non-zero integer flags an error or abnormal termination.' },
-      { title: '3. Header Includes (#include)', beginner: 'C++ is extremely lightweight by default; it doesn\'t even know how to print text to a screen! To get tools like printing, you have to "borrow" them by writing `#include <iostream>` at the very top of your file. This tells C++ to pack the standard input/output toolbox.', advanced: 'The `#include` directive is a preprocessor command that literally copies and pastes the contents of standard library header files directly into your source code before actual compilation begins, exposing function prototypes and stream objects.' },
-      { title: '4. Basic Output (std::cout)', beginner: 'To talk to the screen, we use `std::cout` (Standard Character Output) combined with two arrows `<<`. For example: `std::cout << "Hello";`. To press Enter and go to a new line, we attach `<< std::endl;` at the end.', advanced: '`std::cout` is a globally scoped instance of the `std::ostream` class. The `<<` is an overloaded stream insertion operator. Utilizing `std::endl` not only inserts a newline character but also explicitly flushes the output buffer, whereas using `\\n` avoids the performance cost of flushing.' }
-    ],
-    {
-      title: 'Workstation Setup & Compilation',
-      intro: '⚠️ NOTE: This practical covers setting up your local C++ compiler (GCC/MinGW for Windows, Clang for Mac/Linux) and compiling your first script!',
-      steps: [
-        'WINDOWS: Download and install MSYS2 or MinGW to get the GCC compiler. MAC: Open terminal and type `xcode-select --install` to get Clang. LINUX: Type `sudo apt install build-essential`.',
-        'Open your native terminal and verify the installation by typing `g++ --version` (or `clang++ --version`).',
-        'Create a new text file named `app.cpp` in your favorite editor.',
-        'Type the standard boilerplate: `#include <iostream>`, followed by `int main() {`, then `std::cout << "Hello World!" << std::endl;`, and finally `return 0; }`.',
-        'In your terminal, navigate to the folder where you saved `app.cpp`.',
-        'Compile the code by typing: `g++ app.cpp -o app` (This creates an executable named "app").',
-        'Run the compiled binary! On Windows type `.\\app.exe`, on Mac/Linux type `./app`.'
-      ],
-      goal: 'You successfully installed a C++ compiler, wrote a standard main function, compiled the source code into a binary executable, and ran it.'
-    },
-    [
-      q('Why does C++ require a compiler before you can run your code?', ['To check for spelling mistakes in your variable names', 'To translate your human-readable C++ text into low-level machine code (binary) that the processor can actually execute', 'To connect your computer to the internet', 'To make the text editor look colorful'], 1, 'C++ is a compiled language. The source code must be fully translated into a native machine code executable prior to runtime execution.'),
-      q('What is the absolute required starting point for any executable C++ program?', ['#include <start>', 'void begin()', 'int main()', 'std::cout'], 2, 'The OS explicitly looks for the `main()` function as the entry point to begin executing the program\'s logical sequence.'),
-      q('What does the `#include <iostream>` directive actually do?', ['It imports the standard input/output stream tools, allowing your program to print to the screen and read keyboard input', 'It allows the program to connect to Apple iOS devices', 'It creates a loop that runs forever', 'It shuts down the compiler'], 0, 'iostream stands for Input/Output Stream. Without including it, the compiler has no concept of what `std::cout` or `std::cin` are.'),
-      q('What is the structural difference between `std::endl` and `\\n` when formatting text output?', ['There is no difference, they are identical under the hood', '`std::endl` inserts a new line AND forces the program to instantly flush the output buffer, while `\\n` only inserts a new line', '`\\n` deletes the previous line of text', '`std::endl` causes the program to crash if used twice'], 1, 'While both create a new line, `std::endl` explicitly flushes the output buffer stream, which is safer but slightly less performant inside massive loops than `\\n`.')
-    ],
-    ['C++ code must be compiled into an executable binary before it can run.', 'Every C++ program begins execution at the int main() function.', 'You must include <iostream> to gain access to screen printing tools.', 'Use std::cout << "text" to print, and return 0; to exit successfully.']
-  ),
+L(
+'cpp-02', 2, 'Variables & Core Data Types', '📦',
+'📦 In C++ you must tell the compiler exactly what kind of data every variable holds before you use it. This is not bureaucracy — it is how the compiler knows precisely how many bytes of RAM to reserve. Master the core types and you control memory itself.',
+[
+{ title: '1. Static Typing & Declaration', beginner: 'In C++, variables are strict containers. If you label a box "integers only", you cannot put a word inside it! You write the type first, then the name: `int age = 20;`. The type can never change later.', advanced: 'C++ is statically typed: types are checked at compile time and each variable\'s type fixes its memory footprint and permitted operations. This eliminates entire classes of runtime type errors and enables aggressive compiler optimization.' },
+{ title: '2. The Integer Family', beginner: 'Use `int` for whole numbers like `int score = 100;`. C++ also offers smaller and bigger integer boxes: `short`, `long`, and `long long` for truly huge counts.', advanced: 'Integral types differ in width: `short` ≥ 16 bits, `int` ≥ 16 (32 on most platforms), `long` ≥ 32, `long long` ≥ 64. Choosing the right width is a memory-vs-range tradeoff; `<cstdint>` provides exact-width aliases like `int32_t` for portable code.' },
+{ title: '3. Decimals: float & double', beginner: 'Use `double` for numbers with decimal points, like `double price = 19.99;`. There is also `float`, but it holds fewer digits — `double` is the default choice.', advanced: 'Floating-point types follow IEEE 754: `float` is 32-bit single precision (~7 digits), `double` is 64-bit double precision (~15 digits). Binary floating point cannot represent 0.1 exactly, which is why `0.1 + 0.2 != 0.3` — compare with an epsilon, never with `==`.' },
+{ title: '4. char, bool & Text via std::string', beginner: 'Use `char` for ONE letter in single quotes: `char grade = \'A\';`. Use `bool` for `true`/`false`. For whole sentences use `std::string name = "Sage";` (needs `#include <string>`), and grab keyboard input with `std::cin >> name;`.', advanced: '`char` is a 1-byte integer holding an ASCII/UTF-8 code point; `bool` is 1 byte storing 0/1. `std::string` is a standard-library class managing a dynamic character buffer on the heap, and `std::cin >>` uses the overloaded extraction operator, stopping at whitespace.' },
+{ title: '5. sizeof & Fixed-Width Types (Expert Teaser)', beginner: 'You can ask C++ exactly how many bytes any type occupies by writing `sizeof(int)`. It prints the size like a measuring tape for memory.', advanced: '*(Pro Track Preview)* `sizeof` is evaluated at compile time. Widths are platform-dependent, which is why professional code uses `<cstdint>` (`uint8_t`, `int64_t`) for file formats and network protocols. The Expert track covers struct padding and alignment that make `sizeof(struct)` surprising.' }
+],
+{
+title: 'The Type X-Ray Machine',
+intro: 'Write a program that measures every core type with sizeof, exposes floating-point precision limits, and reads user input.',
+steps: [
+'Create `types.cpp` and include `<iostream>` and `<string>`.',
+'Inside `main()`, print sizes: `std::cout << "int: " << sizeof(int) << " bytes" << std::endl;` and repeat for `double`, `char`, `bool`.',
+'Expect on a typical machine: int 4, double 8, char 1, bool 1.',
+'Add a precision demo: `std::cout << (0.1 + 0.2) << std::endl;` and observe it prints `0.3` (rounded) — then add `if (0.1 + 0.2 == 0.3) std::cout << "equal"; else std::cout << "NOT equal";` and expect `NOT equal`.',
+'Declare `std::string name; int age;`, prompt with `std::cout`, and read with `std::cin >> name >> age;`.',
+'Print them back: `std::cout << name << " is " << age << std::endl;`.',
+'Compile with `g++ types.cpp -o types` and run `./types` (or `types.exe`). Feed it input like `Sage 25` and verify the echo.'
+],
+goal: 'You measured type memory footprints with sizeof, witnessed IEEE 754 precision limits firsthand, and performed typed console I/O.'
+},
+[
+q('What does it mean that C++ is statically typed?', ['Variables can change type at runtime', 'Every variable\'s type is declared and checked at compile time and never changes', 'C++ cannot store text', 'Types are guessed by the CPU'], 1, 'Static typing fixes each variable\'s type at compile time, letting the compiler reserve exact memory and reject type errors before execution. **Why others are wrong:** C++ variables cannot change type, text is fully supported via std::string, and the CPU does not guess types.'),
+q('On a typical modern desktop, what does `sizeof(double)` evaluate to?', ['4', '8', '1', '16'], 1, '`double` is a 64-bit (8-byte) IEEE 754 double-precision float on virtually all modern platforms. **Why others are wrong:** 4 bytes is `float`/`int`, 1 byte is `char`/`bool`, and 16 is not a standard double width.'),
+q('Why does `0.1 + 0.2 == 0.3` evaluate to false in C++?', ['The compiler is broken', 'Binary floating point cannot represent 0.1 and 0.2 exactly, so tiny rounding errors accumulate', 'Decimals are stored as text', 'The == operator only works on integers'], 1, 'IEEE 754 stores fractions in binary; 0.1 and 0.2 have infinite binary expansions, so their sum differs from 0.3 by ~1e-17. **Why others are wrong:** The compiler is fine, decimals are not text, and `==` works on floats (it is just unsafe for equality checks).'),
+q('What is stored in memory when you write `char grade = \'A\';`?', ['The letter as a picture', 'The integer ASCII code 65 in one byte', 'A 4-byte unicode block', 'A pointer to the alphabet'], 1, '`char` is a 1-byte integer type; \'A\' is stored as its ASCII code 65. **Why others are wrong:** Characters are not images or unicode blocks at the `char` level, and no pointer to an alphabet exists.'),
+q('Which operator feeds keyboard input from `std::cin` into a variable?', ['<<', '>>', '==', '::'], 1, 'The extraction operator `>>` pulls data out of the input stream and into your variable. **Why others are wrong:** `<<` inserts into output streams, `==` compares, and `::` resolves scope.')
+],
+['Declare every variable with an explicit type: int, double, char, bool, or std::string.', 'sizeof reveals the exact byte footprint of any type at compile time.', 'double is the default decimal type; never compare floats with ==.', 'char stores a 1-byte integer code; std::string manages real text.', 'std::cin >> reads typed input using the extraction operator.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-02', 2, 'Variables & Core Data Types', '📦', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. Strongly Typed Variables', beginner: 'In C++, variables are like strict containers. If you label a box as "Numbers Only", you cannot put a word inside it! You must tell C++ exactly what type of data you are storing the moment you create the variable, like `int age = 20;`.', advanced: 'C++ uses static typing. Variable types are evaluated and strictly enforced at compile-time, allocating precise byte sizes in memory. This eliminates the runtime overhead associated with dynamically typed languages like Python.' },
-      { title: '2. Integers (int) & Decimals (double)', beginner: 'Use `int` for whole numbers (e.g., `int score = 100;`). Use `double` for numbers with decimal points (e.g., `double price = 19.99;`). Don\'t mix them up, or C++ might chop off your decimals automatically!', advanced: 'An `int` typically occupies 4 bytes (32 bits), while a `double` is a double-precision floating-point format occupying 8 bytes (64 bits), conforming to the IEEE 754 standard for floating-point arithmetic.' },
-      { title: '3. Characters (char) & Logic (bool)', beginner: 'Use `char` to store a single letter wrapped in single quotes, like `char grade = \'A\';`. Use `bool` for logic that is either true or false, like `bool isGameOver = false;`.', advanced: 'A `char` requires exactly 1 byte of memory and actually stores the underlying ASCII integer value of the character. A `bool` evaluates strictly to `1` (true) or `0` (false) and technically occupies 1 byte for memory addressability.' },
-      { title: '4. Strings & User Input (std::cin)', beginner: 'To store full sentences, use `std::string name = "Sage";` (requires `#include <string>`). To let a user type their name into your program, use `std::cin >> name;` (Standard Character Input). Notice the arrows point INTO the variable!', advanced: '`std::string` is not a primitive type; it is a class provided by the standard library that dynamically manages a heap-allocated array of chars. `std::cin` utilizes the overloaded stream extraction operator `>>` to parse delimited input.' }
-    ],
-    {
-      title: 'The User Profile Generator',
-      intro: 'Let\'s create a program that asks the user for their details, stores them in the correct strictly-typed containers, and prints a profile.',
-      steps: [
-        'Create a file named `profile.cpp`.',
-        'Include your headers: `#include <iostream>` and `#include <string>`.',
-        'Inside `main()`, declare four different variables: an `int` for age, a `double` for height, a `char` for their favorite letter, and a `std::string` for their name.',
-        'Use `std::cout` to ask: "What is your name? ".',
-        'Use `std::cin >> name;` to grab their keyboard input and store it.',
-        'Repeat the ask-and-store process for their age, height, and favorite letter.',
-        'Finally, use `std::cout` to print a cleanly formatted sentence using all 4 variables.'
-      ],
-      goal: 'You successfully declared strongly-typed variables, received input via std::cin, and printed dynamically injected memory values.'
-    },
-    [
-      q('What does it mean that C++ is a "Statically Typed" language?', ['Variables can change their data type at any time', 'You must explicitly declare the data type of a variable before compiling, and it cannot change', 'It cannot run on laptops', 'Text can only be printed in static black and white'], 1, 'Static typing means type checking occurs during compile-time. The compiler must know exactly how much memory to allocate for a variable before the program ever runs.'),
-      q('Which data type should you use to store the value `3.14159`?', ['int', 'char', 'bool', 'double'], 3, '`double` (double-precision floating point) is the standard C++ data type for storing numerical values that require decimal precision.'),
-      q('What is the fundamental difference between single quotes (\'\') and double quotes ("") in C++?', ['There is no difference', 'Single quotes are for single `char` values, double quotes are for `std::string` text sequences', 'Single quotes are used for numbers, double quotes for text', 'Double quotes make the text print larger on the screen'], 1, 'In C++, syntax is strict: \'A\' is a single primitive character (char), while "A" is a character array / string sequence.'),
-      q('Which operator is used to extract keyboard input from `std::cin` into a variable?', ['<<', '>>', '==', '++'], 1, 'The stream extraction operator `>>` points data coming FROM the console (cin) INTO your target variable.')
-    ],
-    ['Always declare the data type (int, double, bool) when creating a variable.', 'C++ enforces static typing; an int cannot suddenly become a string.', 'Use single quotes for chars (\'A\') and double quotes for strings ("Hello").', 'std::cin >> var; extracts user keyboard input into your variables.']
-  ),
+L(
+'cpp-03', 3, 'Operators & Type Conversions', '🧮',
+'🧮 Operators are the verbs of C++ mathematics — but C++ follows hardware rules, not school rules. Divide two integers and the decimals vanish. Mix types and the compiler silently converts them. Learn the rules and the traps before they bite you.',
+[
+{ title: '1. Arithmetic & Integer Truncation', beginner: 'C++ does addition `+`, subtraction `-`, multiplication `*`, and division `/`. But beware: `10 / 3` gives `3`, not `3.33`! When BOTH sides are integers, C++ chops the decimal away entirely.', advanced: 'Integer division truncates toward zero because the ALU produces an integral quotient. To get real division, at least one operand must be floating point: `10.0 / 3` or `static_cast<double>(10) / 3`.' },
+{ title: '2. The Modulo Operator (%)', beginner: 'Modulo `%` gives the REMAINDER: `10 % 3` is `1`. It is the classic trick for detecting even/odd numbers (`n % 2 == 0`).', advanced: '`%` is defined only for integral operands; using it on doubles is a compile error (use `std::fmod`). Negative modulo semantics follow the sign of the dividend in C++, which surprises developers porting from Python.' },
+{ title: '3. Increment, Decrement & Prefix vs Postfix', beginner: 'Instead of `score = score + 1`, write `score++` or `++score`. They both add 1 — but in bigger expressions, `++score` adds first then uses, while `score++` uses first then adds.', advanced: 'Prefix `++x` increments and yields the new value; postfix `x++` yields a copy of the OLD value then increments. In tight loops over iterators the postfix copy historically cost performance, which is why `++it` is idiomatic C++.' },
+{ title: '4. Comparison & the = vs == Trap', beginner: 'To ask questions use `==` (equal), `!=` (not equal), `>`, `<`, `>=`, `<=`. These return `true`/`false`. The deadliest beginner bug: writing `if (x = 5)` (assignment) instead of `if (x == 5)` (comparison).', advanced: 'Assignment expressions yield the assigned value, which contextually converts to bool — `if (x = 5)` is always true and silently corrupts state. Modern compilers warn with `-Wall`; treat warnings as errors in professional builds.' },
+{ title: '5. Casting & Overflow (Expert Teaser)', beginner: 'You can force a type change with a cast: `static_cast<double>(7) / 2` gives `3.5`. Without it, C++ converts types silently using its own rules.', advanced: '*(Pro Track Preview)* Implicit conversions (int → double) are safe widening; double → int is narrowing and truncates. Signed integer overflow is UNDEFINED BEHAVIOR in C++ — the compiler may assume it never happens and optimize "impossible" branches away. The Expert track weaponizes UB knowledge.' }
+],
+{
+title: 'The Precision Converter',
+intro: 'Build a temperature converter that proves integer truncation, then fixes it with casting, and demos prefix vs postfix.',
+steps: [
+'Create `math_demo.cpp` with `<iostream>`.',
+'Declare `int celsius = 25;`.',
+'Compute wrong: `int fWrong = (celsius * 9 / 5) + 32;` and print it. Expect 77 (integer math happens to work here) — now try `int half = celsius / 2;` and print: expect 12, not 12.5.',
+'Compute right: `double fRight = (static_cast<double>(celsius) * 9.0 / 5.0) + 32.0;` and print. Expect 77.',
+'Demo postfix: `int x = 5; std::cout << x++ << std::endl;` expect it prints 5, then `std::cout << x << std::endl;` prints 6.',
+'Demo prefix: `int y = 5; std::cout << ++y << std::endl;` expect 6 immediately.',
+'Compile `g++ math_demo.cpp -o math_demo` and run it; verify every expected number matches.'
+],
+goal: 'You observed integer truncation, corrected it with static_cast, and distinguished prefix from postfix increment semantics.'
+},
+[
+q('What is the result of `7 / 2` when both operands are `int`?', ['3.5', '4', '3', 'A compile error'], 2, 'Integer division truncates toward zero, discarding the fractional part: 7/2 == 3. **Why others are wrong:** 3.5 requires a floating operand, 4 would be rounding (C++ truncates), and this is perfectly legal code.'),
+q('What does `10 % 3` evaluate to?', ['3', '1', '0.33', '30'], 1, 'Modulo returns the remainder after integer division: 10 = 3*3 + 1, so the remainder is 1. **Why others are wrong:** 3 is the quotient, 0.33 is a decimal division, and 30 is multiplication.'),
+q('Given `int x = 5; std::cout << x++;`, what prints?', ['6', '5', '4', 'Nothing'], 1, 'Postfix increment yields the OLD value (5) to the stream, then increments x to 6 afterwards. **Why others are wrong:** 6 would be prefix `++x`; 4 is decrement; the expression absolutely prints.'),
+q('How do you force true decimal division of two integers `a` and `b`?', ['a // b', 'static_cast<double>(a) / b', 'a / b with a comment', 'decimal(a / b)'], 1, 'Casting one operand to double promotes the whole expression to floating point division. **Why others are wrong:** `//` is not a C++ operator, comments change nothing, and `decimal()` does not exist in C++.'),
+q('Why is `if (x = 5) { ... }` dangerous?', ['It is a syntax error always', 'It assigns 5 to x and the condition evaluates to true, silently skipping the comparison you intended', 'It compares x to 5 correctly', 'It deletes x'], 1, 'Assignment yields 5, which converts to `true`, so the branch always runs and x is corrupted — a classic logic bug. **Why others are wrong:** It compiles (often with a warning), it does not compare, and it does not delete anything.')
+],
+['Integer division truncates decimals; cast to double for real division.', 'Modulo (%) yields remainders — perfect for even/odd logic.', 'Prefix ++x increments before use; postfix x++ uses then increments.', 'Never confuse = (assignment) with == (comparison) inside conditions.', 'Signed integer overflow is undefined behavior — respect type ranges.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-03', 3, 'Operators & Mathematical Expressions', '🧮', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. Standard Arithmetic', beginner: 'C++ can do all your basic math: Addition `+`, Subtraction `-`, Multiplication `*`, and Division `/`. Just remember, if you divide two whole integers (like `10 / 3`), C++ will chop off the decimal and just give you `3`!', advanced: 'Integer division truncates towards zero. To achieve float-precision division, at least one operand must be cast or declared as a floating-point type (e.g., `10.0 / 3` or `(double)x / y`).' },
-      { title: '2. The Modulo Operator (%)', beginner: 'The Modulo operator `%` gives you the REMAINDER of a division. For example, `10 % 3` is `1` (because 3 fits into 10 three times, with 1 left over). This is highly useful for figuring out if a number is even or odd!', advanced: 'Modulo `%` is strictly defined for integer operands in C++. Attempting to use `%` on floating-point types will result in a compiler error (use `fmod()` from `<cmath>` for floats).' },
-      { title: '3. Assignment & Incrementing', beginner: 'Programmers are lazy! Instead of writing `score = score + 5`, you can just write `score += 5`. Need to just add 1? Use the increment operator `score++`. Need to subtract 1? Use `score--`.', advanced: 'Be aware of postfix (`x++`) vs prefix (`++x`) evaluation. Prefix increments the value before evaluating the expression, whereas postfix evaluates the current value first, then increments the underlying memory address.' },
-      { title: '4. Comparison Operators', beginner: 'To ask C++ a question, use comparison operators. Is equal to: `==`. Is not equal to: `!=`. Greater than: `>`. Less than: `<`. These equations don\'t return numbers; they strictly return boolean logic (`true` or `false`).', advanced: 'A common critical bug in C++ is accidentally using a single `=` (assignment) instead of `==` (equality) inside a condition. An assignment returns the assigned value, which usually evaluates to truthy, causing logic failures.' }
-    ],
-    {
-      title: 'The Even/Odd Calculator',
-      intro: 'Let\'s utilize the Modulo operator and assignment math to build a quick calculation engine.',
-      steps: [
-        'Inside a new `main()` function, declare an integer variable `int myNum = 15;`.',
-        'Use the increment operator to add one to it: `myNum++;`.',
-        'Use compound assignment to multiply it by two: `myNum *= 2;`.',
-        'Declare an integer to capture the remainder: `int remainder = myNum % 2;`.',
-        'Print the final remainder to the screen using `std::cout`. If the remainder is 0, the number is mathematically even!'
-      ],
-      goal: 'You successfully mutated variable data using shorthand assignment operators and utilized modulo arithmetic to extract a remainder.'
-    },
-    [
-      q('What is the result of `7 / 2` in C++ if both numbers are stored as `int`?', ['3.5', '4', '3', 'Error'], 2, 'Because both operands are integers, C++ performs integer division, which completely truncates (chops off) the decimal portion, resulting in 3.'),
-      q('What does the modulo operator (`%`) return?', ['The percentage of a number', 'The mathematical remainder after integer division', 'The square root of a number', 'A random number generator'], 1, 'Modulo evaluates the remainder. For example, `10 % 4` equals `2`.'),
-      q('What is the difference between `=` and `==` in C++?', ['`=` means equal, `==` means very equal', '`=` assigns a value to a variable, `==` compares two values to see if they are the same', '`=` is for integers, `==` is for strings', 'There is no difference'], 1, 'The single equals sign assigns data into memory. The double equals sign is a logical question asking "are these two items identical?".'),
-      q('What is the fastest way to add exactly 1 to an integer named `count`?', ['count = count + 1.0;', 'add(count, 1);', 'count++;', 'count + 1;'], 2, 'The increment operator `++` is the standard, optimized shorthand for adding exactly 1 to a variable\'s current state.')
-    ],
-    ['Integer division chops off decimals; use a double if you need precision.', 'Modulo (%) finds the remainder, perfect for even/odd logic.', 'Use shorthand like += and *= to save time and keep code clean.', 'Never confuse = (assignment) with == (comparison).']
-  ),
+L(
+'cpp-04', 4, 'Conditional Logic & Short-Circuit Evaluation', '🚦',
+'🚦 Programs become intelligent the moment they can choose. C++ conditionals route execution down different paths — and its logical operators are smarter than they look: they stop evaluating the instant the answer is already known, which professionals exploit to prevent crashes.',
+[
+{ title: '1. The if Statement & Truthiness', beginner: 'An `if` checks a condition in parentheses. If it is true, the code inside the curly braces runs; otherwise it is skipped. In C++, any non-zero number counts as true, and zero counts as false.', advanced: 'Conditions contextually convert to bool: non-zero integrals, non-null pointers, and non-empty stream states are true; `0` and `nullptr` are false. This is why `if (ptr)` is the idiomatic null check.' },
+{ title: '2. else & else-if Ladders', beginner: 'Attach `else` for the backup plan when the condition fails. Chain multiple checks with `else if`. Only ONE branch in the whole ladder ever runs — the first one whose condition is true.', advanced: 'An if/else-if ladder forms mutually exclusive branches; the compiler may emit a jump table or branch predictions. Order matters: put the most likely or most specific condition first for both correctness and performance.' },
+{ title: '3. Logical AND (&&) & Short-Circuiting', beginner: '`&&` means BOTH sides must be true. The magic trick: if the left side is false, C++ never even looks at the right side — the answer is already decided.', advanced: 'Short-circuit evaluation guarantees the right operand of `&&` is skipped when the left is false. Professionals write guards like `if (ptr != nullptr && ptr->value > 10)` — dereferencing only happens when the pointer is valid, preventing segmentation faults.' },
+{ title: '4. Logical OR (||) & NOT (!)', beginner: '`||` means AT LEAST ONE side true (if the left is true, the right is skipped). `!` flips a condition: `!true` is `false`. Combine them to express any rule.', advanced: '`||` short-circuits on a true left operand. De Morgan\'s laws let you rewrite `!(a && b)` as `!a || !b` — essential when simplifying guard clauses in production code.' },
+{ title: '5. The Ternary Operator (Expert Teaser)', beginner: 'For tiny decisions, C++ offers a one-line shortcut: `std::string label = (age >= 18) ? "adult" : "minor";`. It picks one of two values based on a condition.', advanced: '*(Pro Track Preview)* The conditional operator `?:` yields a value (unlike if/else which is a statement), enabling concise initialization and `constexpr` branching. Misusing nested ternaries harms readability — professional style guides cap them at one level.' }
+],
+{
+title: 'The Theme Park Bouncer',
+intro: 'Build a ride-access checker that combines &&, ||, and ! with a short-circuit null-guard demo.',
+steps: [
+'Create `bouncer.cpp` with `<iostream>`.',
+'Declare `int age; double height;` and read them with `std::cin >> age >> height;`.',
+'Write: `if (age >= 12 && height > 50.0) { std::cout << "Welcome aboard!"; }`.',
+'Add: `else if (height <= 50.0) { std::cout << "Too short for this ride."; }`.',
+'Add: `else { std::cout << "Cannot ride today."; }`.',
+'Test with input `10 40` (expect "Too short"), `15 60` (expect "Welcome"), `20 45` (expect "Too short").',
+'Bonus guard demo: declare `int* ptr = nullptr;` and write `if (ptr != nullptr && *ptr > 10) std::cout << "big";` — run it and observe it does NOT crash, proving short-circuit protection.',
+'Compile `g++ bouncer.cpp -o bouncer` and run all three test inputs.'
+],
+goal: 'You routed execution with mutually exclusive branches and used short-circuit evaluation to safely guard a null pointer dereference.'
+},
+[
+q('What happens when an `if` condition evaluates to false?', ['The program crashes', 'The compiler converts it to true', 'The block inside the if is skipped entirely', 'The program restarts'], 2, 'A false condition simply bypasses the guarded block and execution continues after it. **Why others are wrong:** False conditions are normal control flow — no crash, no conversion, no restart.'),
+q('How do you require that BOTH condition A and condition B are true?', ['if (A || B)', 'if (A && B)', 'if (A + B)', 'if (A == B)'], 1, 'The logical AND `&&` is true only when both operands are true. **Why others are wrong:** `||` needs only one true, `+` is arithmetic, and `==` compares equality.'),
+q('What is short-circuit evaluation?', ['The CPU overheats and stops', 'Writing one statement on multiple lines', 'Skipping evaluation of the right operand of && or || once the result is already determined by the left operand', 'An if without an else'], 2, 'C++ evaluates left-to-right and stops as soon as the logical outcome is fixed — e.g. `false && anything` never evaluates `anything`. **Why others are wrong:** It is not hardware behavior, formatting, or a missing else branch.'),
+q('Which operator reverses a boolean value?', ['-', '!', '~', '!='], 1, 'The logical NOT `!` flips true to false and vice versa. **Why others are wrong:** `-` is arithmetic negation, `~` is bitwise NOT, and `!=` is inequality comparison.'),
+q('In an if / else-if / else ladder, how many branches execute?', ['All of them', 'Exactly one — the first whose condition is true (or the else)', 'Two at most', 'Zero always'], 1, 'Ladders are mutually exclusive: control enters the first true branch and skips the rest, with else as the fallback. **Why others are wrong:** Multiple branches never run, and else guarantees one runs when nothing matched.')
+],
+['if executes a block only when its condition is true; non-zero counts as true.', 'else-if ladders are mutually exclusive — only one branch runs.', '&& and || short-circuit: the right side may never be evaluated.', 'Use ptr != nullptr && ptr->x as a crash-proof guard pattern.', '! flips truth; the ternary ?: yields a value for tiny decisions.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-04', 4, 'Conditional Logic (If/Else)', '🚦', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. The if Statement', beginner: 'An `if` statement allows your program to make decisions. It checks a condition inside parentheses `()`. If the condition is true, it executes the code inside the curly braces `{}`. If false, it simply skips it!', advanced: 'An `if` statement evaluates any expression to a boolean context. Non-zero integers and non-null pointers evaluate to `true`, while `0` and `nullptr` evaluate to `false`.' },
-      { title: '2. The else & else if Statements', beginner: 'What if the condition is false? You can attach an `else` block to provide a backup plan. If you have multiple conditions to check in a row, you can chain them together using `else if`!', advanced: 'Chained `else if` statements form a mutually exclusive branch network. The compiler optimizes these jumps, ensuring that once a single truth condition is met, all subsequent branches in the chain are entirely bypassed.' },
-      { title: '3. Logical AND (&&)', beginner: 'Sometimes a decision needs TWO things to be true at the same time. The logical AND operator `&&` connects two conditions. For example: `if (age > 18 && hasTicket == true)`.', advanced: 'C++ utilizes "short-circuit evaluation" for `&&`. If the left operand evaluates to `false`, the compiler entirely skips evaluating the right operand, which is crucial for preventing segmentation faults (e.g., checking if a pointer is null before checking its value).' },
-      { title: '4. Logical OR (||) & NOT (!)', beginner: 'The logical OR operator `||` means "if THIS is true OR THAT is true, run the code". The NOT operator `!` is placed in front of a condition to reverse it. `!true` becomes `false`!', advanced: 'Similar to `&&`, the `||` operator short-circuits. If the left operand evaluates to `true`, the right operand is skipped. The `!` operator logically negates the evaluated boolean state of the expression it precedes.' }
-    ],
-    {
-      title: 'The Theme Park Bouncer',
-      intro: 'Write a program that determines if a user is allowed to ride a rollercoaster based on their height and age.',
-      steps: [
-        'Create `bouncer.cpp`. Declare an `int age;` and `double height;`.',
-        'Ask the user for their age and height using `std::cin`.',
-        'Write an `if` statement: if age is greater than or equal to 12 AND height is greater than 50.0, print "Welcome to the ride!".',
-        'Add an `else if` statement: if they are too short (height < 50.0), print "Sorry, you are not tall enough yet.".',
-        'Add a final `else` statement to catch any other scenario and print "Sorry, you cannot ride today.".'
-      ],
-      goal: 'You successfully controlled program flow using mutually exclusive conditional branches and logical operators.'
-    },
-    [
-      q('What happens if the condition inside an `if` statement evaluates to `false`?', ['The program crashes immediately', 'The program automatically turns it into `true`', 'The compiler skips the code block inside the `if` statement and moves on', 'The program restarts'], 2, 'If the condition is false, the execution pointer skips the corresponding code block entirely.'),
-      q('How do you check if BOTH condition A and condition B are true?', ['if (A || B)', 'if (A && B)', 'if (A + B)', 'if (A == B)'], 1, 'The `&&` (logical AND) operator requires both the left and right sides to be strictly true.'),
-      q('What is "short-circuit evaluation" in C++?', ['When the computer gets too hot and stops running code', 'When a single line of code is written on multiple lines', 'When C++ skips evaluating the right side of an `&&` or `||` operator because the overall result is already determined by the left side', 'When an `if` statement has no `else`'], 2, 'If evaluating `(false && ...)` C++ knows the whole expression is false immediately, so it skips reading the rest of the conditions to save time and prevent errors.'),
-      q('Which operator reverses a boolean value from true to false?', ['-', '!', '~', '!='], 1, 'The logical NOT operator `!` placed before a boolean or expression flips its logic.')
-    ],
-    ['Use if to execute code only when a specific condition is met.', 'Chain else if and else to handle backup conditions.', '&& means BOTH must be true. || means AT LEAST ONE must be true.', '! reverses the truth (e.g., !true is false).']
-  ),
+L(
+'cpp-05', 5, 'Switch Statements & Scoped Enumerations', '🔀',
+'🔀 When you route on one discrete value — a menu choice, a state code, a key press — long else-if ladders are slow and ugly. The switch statement compiles into a jump table, and scoped enumerations give your magic numbers real names. Together they are the backbone of state machines.',
+[
+{ title: '1. The switch Construct', beginner: 'A `switch(choice)` looks at ONE value and jumps straight to the matching `case` label, like a train switching tracks. No repeated comparisons needed.', advanced: '`switch` requires an integral or enumeration expression. Compilers often lower dense case ranges into a jump table — an O(1) dispatch — making switches measurably faster than sequential if-else chains.' },
+{ title: '2. case Labels & break', beginner: 'Each `case 1:` is a destination label. WARNING: after running a matched case, execution FALLS THROUGH into the cases below unless you end it with `break;`. Forgetting break is one of the most classic C++ bugs.', advanced: 'Case labels must be compile-time constants. Fallthrough is deliberate in the language (shared logic), but accidental fallthrough is such a common defect that compilers warn and C++17 added `[[fallthrough]]` to mark intentional cases.' },
+{ title: '3. The default Case', beginner: '`default:` is the safety net at the bottom — it runs when no case matches, exactly like a final `else`. Always include it to handle garbage input.', advanced: '`default` may appear anywhere in the block but conventionally ends it. Omitting it on an exhaustive enum switch enables compiler warnings (`-Wswitch`) that catch unhandled enumerators at compile time.' },
+{ title: '4. Scoped Enumerations (enum class)', beginner: 'Instead of magic numbers, name your options: `enum class Choice { Cola, Water, Chips };`. Now `Choice::Cola` reads like English and the compiler blocks nonsense comparisons.', advanced: '`enum class` scopes enumerators behind the type name and forbids implicit conversion to int (unlike plain `enum`), eliminating name collisions and accidental arithmetic. You can fix the underlying type: `enum class Choice : uint8_t`.' },
+{ title: '5. Switch on Enums & State Machines (Expert Teaser)', beginner: 'Game developers combine enum class + switch to build "state machines": a player is exactly one of Menu, Playing, or Paused, and a switch routes the logic for each.', advanced: '*(Pro Track Preview)* Exhaustive switches over `enum class` plus `-Wswitch` give compile-time proof that every state is handled. The Expert track builds full finite state machines and visitor patterns on this foundation.' }
+],
+{
+title: 'The Vending Machine',
+intro: 'Build a menu driven by a scoped enum and a switch, then deliberately trigger the fallthrough bug and fix it.',
+steps: [
+'Create `vending.cpp` with `<iostream>`.',
+'Above main, declare: `enum class Choice { Cola = 1, Water = 2, Chips = 3 };`.',
+'In main, read an int: `int input; std::cin >> input;` and convert: `Choice c = static_cast<Choice>(input);`.',
+'Write `switch (c) {` with `case Choice::Cola: std::cout << "Dispensing Cola"; break;` and same for Water and Chips.',
+'Add `default: std::cout << "Invalid selection"; break;` and close with `}`.',
+'BUG DEMO: temporarily delete the `break;` from the Cola case, compile, run with input `1`, and watch it print Cola AND Water AND Chips (fallthrough).',
+'Restore the break, recompile, and verify input `1` prints only "Dispensing Cola" and input `9` prints "Invalid selection".',
+'Compile with `g++ vending.cpp -o vending` and test inputs 1, 2, 3, and 9.'
+],
+goal: 'You dispatched on a scoped enum with an O(1) switch, experienced the fallthrough bug firsthand, and hardened the machine with default.'
+},
+[
+q('Which types are permitted inside `switch (x)` in C++?', ['std::string only', 'double only', 'Integral types and enumerations (int, char, enum)', 'Any type'], 2, 'Switch requires an integral or enumeration expression because jump tables need discrete integer indices. **Why others are wrong:** Strings and doubles cannot index a jump table and are rejected at compile time.'),
+q('What happens if you omit `break;` at the end of a matched case?', ['A compile error always', 'Execution falls through and runs the following cases too', 'It jumps to default', 'The program exits'], 1, 'Without break, control continues into subsequent case bodies — the classic fallthrough bug. **Why others are wrong:** It compiles fine, does not redirect to default, and does not terminate the program.'),
+q('What is the role of the `default:` label?', ['It runs first, before all cases', 'It catches every value that matched no explicit case, like a final else', 'It defines the variable type', 'It frees memory'], 1, '`default` is the fallback branch for unmatched values, guaranteeing graceful handling of unexpected input. **Why others are wrong:** It does not run first, define types, or manage memory.'),
+q('Why prefer `enum class` over plain `enum`?', ['It runs faster at runtime', 'It scopes enumerators and forbids implicit int conversion, preventing collisions and accidental arithmetic', 'It allows string values', 'It is required by the linker'], 1, 'Scoped enums namespace their enumerators (`Choice::Cola`) and are type-safe: no implicit conversion to integers, no enumerator name leakage. **Why others are wrong:** Runtime speed is identical, enums still hold integers, and the linker is indifferent.'),
+q('Why can a switch be faster than a long if-else chain?', ['It uses the internet', 'Compilers lower dense cases into a jump table giving O(1) dispatch instead of sequential comparisons', 'It skips the CPU', 'It caches variables in the hard drive'], 1, 'A jump table indexes directly into code addresses by case value — constant time regardless of case count. **Why others are wrong:** Networking, skipping the CPU, and disk caching are nonsense in this context.')
+],
+['switch dispatches on one integral/enum value, often via an O(1) jump table.', 'Always end cases with break unless fallthrough is intentional ([[fallthrough]]).', 'default: catches unmatched input — never omit it in user-facing menus.', 'enum class gives magic numbers names, scope, and type safety.', 'Exhaustive enum switches + -Wswitch catch unhandled states at compile time.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-05', 5, 'Branching with Switch Statements', '🔀', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. The Switch Construct', beginner: 'When you have a long list of specific values to check (like a restaurant menu with choices 1, 2, and 3), writing a giant chain of `else if` statements gets messy. A `switch` statement lets you "switch" execution tracks based on a single integer or character.', advanced: 'The `switch` statement evaluates a single integral expression (int, char, enum). Compilers often heavily optimize switches by generating a "jump table" in machine code, making them significantly faster than long sequential `if-else` chains.' },
-      { title: '2. Cases & Execution', beginner: 'Inside a `switch`, you define different `case` paths. If the variable matches a case, the program jumps to that line and starts running the code. E.g., `case 1: std::cout << "Pizza";`.', advanced: 'A `case` label must be a compile-time constant expression. You cannot use dynamic variables as case labels.' },
-      { title: '3. The break Keyword', beginner: 'WARNING: Once a `switch` finds a matching case, it runs that code, but then it keeps running ALL the cases below it! To stop this, you MUST put the word `break;` at the end of each case to tell C++ to escape the switch.', advanced: 'This behavior is known as "fallthrough". While usually a bug for beginners, intentional fallthrough can be powerful when multiple cases need to share the exact same execution logic without duplicating code.' },
-      { title: '4. The default Case', beginner: 'What if the user types a choice that isn\'t on the list? You use the `default:` case at the very bottom. It acts exactly like an `else` statement, catching anything that didn\'t match!', advanced: 'The `default` case is technically optional and can be placed anywhere within the switch block, though conventionally placed at the end. Best practices dictate always including a default case to handle unexpected integral states.' }
-    ],
-    {
-      title: 'The Vending Machine Menu',
-      intro: 'Build a text-based menu that responds to specific numeric choices using a switch statement.',
-      steps: [
-        'Declare an integer variable `int choice;`.',
-        'Print a menu using `std::cout`: "1. Cola, 2. Water, 3. Chips".',
-        'Use `std::cin` to capture the user\'s choice.',
-        'Create a `switch(choice) { ... }` block.',
-        'Write `case 1:`, print "Dispensing Cola", and add a `break;`.',
-        'Do the same for cases 2 and 3.',
-        'Add a `default:` case that prints "Invalid selection.".'
-      ],
-      goal: 'You successfully routed control flow using optimized jump tables and properly managed execution fallthrough with break statements.'
-    },
-    [
-      q('What data types are allowed inside the parentheses of a `switch(x)` statement in C++?', ['Only strings (`std::string`)', 'Only floating-point numbers (`double`)', 'Integral types like integers (`int`), characters (`char`), and enums', 'Any data type'], 2, 'C++ strictly requires the expression evaluated in a switch to be of an integral or enumeration type.'),
-      q('What happens if you forget to put a `break;` at the end of a matched `case`?', ['The program crashes', 'The switch statement skips to the default case', 'The program exhibits "fallthrough" and continues executing the code in the cases immediately below it', 'The compiler automatically adds a break for you'], 2, 'Without a break, execution falls right through the case boundaries and runs all subsequent code in the switch block until it hits a break or the end of the block.'),
-      q('What is the role of the `default:` case in a switch statement?', ['It runs first before any other cases', 'It catches any values that did not match any of the defined cases, acting like an `else` fallback', 'It defines the default variable type', 'It deletes the variable from memory'], 1, 'The `default` case acts as the catch-all execution path if none of the specific cases evaluate to a match.'),
-      q('Why might a programmer choose a `switch` statement over a long chain of `if-else` statements?', ['Switches can check for strings', 'Switches are faster because compilers optimize them into jump tables, and they are generally cleaner to read for specific discrete values', 'Switches do not require curly braces', 'Switches use less RAM'], 1, 'For many discrete checks against a single integral variable, jump tables are computationally faster and visually cleaner than sequential evaluation chains.')
-    ],
-    ['Use switch when checking a single integer or character against specific discrete values.', 'Always use break; at the end of a case unless you intentionally want fallthrough.', 'Include a default: case to handle unexpected inputs.', 'Switch statements cannot be used to check strings or doubles in C++.']
-  ),
+L(
+'cpp-06', 6, 'Loops & Iteration Patterns', '🔄',
+'🔄 Repetition is where computers earn their keep. C++ gives you three loop shapes — while, do-while, and for — each engineered for a different kind of repetition. Choose wrong and you get infinite loops or skipped work; choose right and massive work becomes one line.',
+[
+{ title: '1. The while Loop (Pre-Test)', beginner: 'A `while (condition)` loop checks FIRST, then runs. As long as the condition stays true, it repeats. If the condition starts false, the body never runs even once.', advanced: '`while` is a pre-test loop: the condition is evaluated before every iteration, making it ideal for sentinel-controlled repetition where the iteration count is unknown upfront.' },
+{ title: '2. The do-while Loop (Post-Test)', beginner: '`do { ... } while (condition);` runs the body FIRST and checks at the bottom. This guarantees the code executes at least once — perfect for asking the user for input before validating it.', advanced: 'As a post-test loop, do-while guarantees one execution, which maps cleanly to input-validation and menu loops. Note the mandatory trailing semicolon after the condition — a frequent syntax trap.' },
+{ title: '3. The for Loop & Counter Scope', beginner: '`for (int i = 0; i < 10; i++)` packs start, condition, and step into one line. The counter `i` exists ONLY inside the loop — it vanishes afterwards, keeping your code clean.', advanced: 'The for-init statement scopes the loop variable to the loop body, preventing leakage and name collisions. The three clauses (init; condition; increment) evaluate in a fixed order: init once, condition before each pass, increment after each pass.' },
+{ title: '4. break, continue & Nested Loops', beginner: '`break` smashes out of the loop immediately. `continue` skips the REST of the current pass and jumps to the next iteration. In nested loops, they only affect the INNERMOST loop they sit in.', advanced: '`break`/`continue` bind to the nearest enclosing loop only; exiting multiple levels requires flags, returns, or goto (rarely). `continue` in a for loop still executes the increment clause — a subtle but vital detail.' },
+{ title: '5. Infinite Loops & CPU Cost (Expert Teaser)', beginner: 'If the condition never becomes false, the loop runs forever and your computer fan screams. Always ensure something inside the loop moves toward the exit.', advanced: '*(Pro Track Preview)* A tight `while(true)` pegs one CPU core at 100%. Event loops intentionally run forever but MUST block on I/O or sleep between polls. The Expert track covers spin-waits vs blocking waits and cache-line contention in hot loops.' }
+],
+{
+title: 'The Guessing Game & Multiplication Grid',
+intro: 'Build a number guessing game with while, validate input with do-while, and print a filtered multiplication table with nested for + continue.',
+steps: [
+'Create `loops.cpp` with `<iostream>`.',
+'Game: `int secret = 7; int guess = 0;` then `while (guess != secret) { std::cout << "Guess: "; std::cin >> guess; }` followed by `std::cout << "You won!";`.',
+'Validation: add `int n; do { std::cout << "Enter 1-10: "; std::cin >> n; } while (n < 1 || n > 10);` — run and feed it 99 first, then 5; expect it to re-prompt once.',
+'Grid: `for (int r = 1; r <= 3; r++) { for (int c = 1; c <= 4; c++) { if (c == 3) continue; std::cout << r * c << " "; } std::cout << std::endl; }`.',
+'Expect row 1 to print `1 2 4` (column 3 skipped by continue).',
+'Compile `g++ loops.cpp -o loops`, run it, and play through all three sections verifying outputs.'
+],
+goal: 'You exercised all three loop shapes, controlled iteration with break/continue, and reasoned about nested loop scope.'
+},
+[
+q('What is the key difference between while and do-while?', ['while is faster', 'do-while checks the condition at the bottom, guaranteeing at least one execution; while checks first', 'do-while cannot use break', 'They are identical'], 1, 'do-while is post-test: the body always runs once before the condition is evaluated. while is pre-test and may run zero times. **Why others are wrong:** Speed is identical, break works in both, and their semantics differ fundamentally.'),
+q('What causes an infinite loop?', ['Using for instead of while', 'A condition that never becomes false because nothing inside moves toward the exit', 'Declaring too many variables', 'Using break'], 1, 'If the loop body never changes state so the condition flips false, iteration never terminates and the core spins at 100%. **Why others are wrong:** Loop kind and variable count are irrelevant, and break is the escape hatch, not the cause.'),
+q('In `for (int i = 0; i < 5; i++)`, when does `i++` execute?', ['Before the first check', 'After each pass through the loop body', 'Only once at the end', 'Never'], 1, 'The increment clause runs after every iteration of the body, before the next condition check. **Why others are wrong:** Init runs once before, the increment runs per pass, not once at the end.'),
+q('Inside a nested loop, what does `continue` affect?', ['Both loops', 'Only the innermost loop containing it', 'The outer loop', 'The whole program'], 1, 'break/continue bind to the nearest enclosing loop; outer loops continue unaffected. **Why others are wrong:** They never reach outward automatically — multi-level exit needs explicit structure.'),
+q('How many total inner iterations run for `for r in 1..3` nested with `for c in 1..4` (ignoring continue)?', ['7', '12', '3', '4'], 1, 'Nested loops multiply: 3 outer passes × 4 inner passes = 12 inner iterations. **Why others are wrong:** 7 is the sum (wrong model), 3 and 4 are single-loop counts.')
+],
+['while checks before running; do-while guarantees one run by checking after.', 'for scopes its counter to the loop body automatically.', 'break exits; continue skips to the next iteration of the INNERMOST loop.', 'Nested loop iterations multiply — reason about total work.', 'Always move state toward the exit condition to avoid infinite loops.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-06', 6, 'Loops & Iteration', '🔄', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. The while Loop', beginner: 'A `while` loop is basically an `if` statement that repeats forever! As long as the condition inside the parentheses remains true, it will run the code block, jump back to the top, and do it again.', advanced: 'A `while` loop is a pre-test loop. The condition is evaluated before every single iteration. If the condition evaluates to `false` initially, the internal block is never executed.' },
-      { title: '2. The Danger of Infinite Loops', beginner: 'If you create a `while` loop but never change the condition inside it, it will loop forever and crash your computer! You must ensure there is some logic inside the loop (like adding to a counter) that eventually makes the condition false.', advanced: 'An infinite loop (e.g., `while(true)`) blocks the main thread of execution permanently. Without an explicit escape trigger or operating system interrupt, the process will consume CPU resources indefinitely.' },
-      { title: '3. The do-while Loop', beginner: 'A `do-while` loop is unique. It runs the code block FIRST, and THEN checks the condition at the very bottom. This guarantees the code runs at least one single time, no matter what!', advanced: 'A `do-while` loop is a post-test loop. It is highly useful in scenarios like user input validation, where you must prompt the user for data at least once before validating if the data requires reprompting.' },
-      { title: '4. The for Loop', beginner: 'The `for` loop is the ultimate counter. It packs three things into one line: a starting variable, a condition, and an incrementer. E.g., `for(int i = 0; i < 10; i++)`. It is perfect for when you know exactly how many times you want to loop.', advanced: 'The `for` loop structure initializes a localized variable that exists strictly within the loop\'s scope, evaluates the test condition before the block, and processes the increment statement after the block completes.' }
-    ],
-    {
-      title: 'The Number Guessing Game',
-      intro: 'Build a game that forces the user to guess a secret number using a while loop.',
-      steps: [
-        'Declare a variable `int secret = 7;` and `int guess = 0;`.',
-        'Create a `while` loop with the condition `(guess != secret)`.',
-        'Inside the loop, print "Guess the secret number: " and use `std::cin` to capture `guess`.',
-        'Still inside the loop, add an `if` statement: if `guess != secret`, print "Wrong, try again!".',
-        'Outside and below the loop, print "You won!". This line will only run once the loop is escaped.'
-      ],
-      goal: 'You successfully utilized dynamic iteration logic to block program execution until a specific user input condition was met.'
-    },
-    [
-      q('What is the main structural difference between a `while` loop and a `do-while` loop?', ['`while` loops are used for math, `do-while` loops are used for text', 'A `do-while` loop evaluates the condition at the end, guaranteeing the code executes at least once. A `while` loop checks the condition first', 'A `while` loop is faster', 'There is no difference'], 1, 'Because the `do-while` evaluates at the bottom (post-test), the internal block is guaranteed to run an initial time regardless of the condition.'),
-      q('What causes an "Infinite Loop"?', ['Using a `for` loop instead of a `while` loop', 'Creating a loop where the truth condition is never modified to evaluate as false, trapping execution forever', 'Having too many variables inside the loop', 'Using the `break` keyword'], 1, 'If the condition never becomes false (e.g., you forget to increment a counter), the loop will run infinitely and lock the program.'),
-      q('In the statement `for(int i = 0; i < 5; i++)`, what does `i++` do?', ['It checks if `i` is positive', 'It initializes `i` to zero', 'It increments (adds 1 to) `i` at the end of every loop iteration', 'It prints `i` to the screen'], 2, 'The third parameter of a `for` loop dictates how the control variable changes after every single pass through the block.'),
-      q('What keyword allows you to manually force an exit out of a loop immediately, ignoring the condition?', ['stop', 'exit', 'break', 'return'], 2, 'The `break` keyword immediately halts iteration and jumps the execution pointer completely out of the active loop structure.')
-    ],
-    ['Use while when you don\'t know how many times the loop needs to run.', 'Use for when you know the exact number of iterations.', 'do-while guarantees the code will run at least once.', 'Always ensure your loops have a way to finish (avoid infinite loops).']
-  ),
+L(
+'cpp-07', 7, 'Functions, Overloading & the Call Stack', '🛠️',
+'🛠️ Functions turn chaos into architecture: name a behavior once, call it forever. But beneath every call, C++ is quietly stacking memory frames — understanding that stack is what separates coders from engineers.',
+[
+{ title: '1. Anatomy of a Function', beginner: 'A function has a return type, a name, parameters in parentheses, and a body in braces: `int add(int a, int b) { return a + b; }`. Call it with `add(2, 3)` and you get 5 back.', advanced: 'The signature (name + parameter types) identifies the function; the return type is NOT part of overload resolution. `return` hands a value back and immediately ends the frame.' },
+{ title: '2. Pass-by-Value & Local Scope', beginner: 'When you pass a variable into a function, C++ hands over a COPY. The function can wreck its copy all it wants — your original stays safe. Variables born inside a function die when it ends.', advanced: 'Pass-by-value invokes the copy constructor for class types — potentially expensive. Locals live in the function\'s stack frame and are destroyed on return, which is why returning a reference to a local is a fatal bug.' },
+{ title: '3. Prototypes & Separate Compilation', beginner: 'C++ reads top to bottom. If main() calls a function defined BELOW it, you must announce it first with a prototype: `int add(int, int);` at the top. This promise lets the compiler check your calls early.', advanced: 'A declaration (prototype) gives the compiler the signature; the definition provides the body, possibly in another translation unit. This split is the foundation of header/source architecture and parallel compilation.' },
+{ title: '4. Function Overloading', beginner: 'You can reuse one name for different jobs: `add(int, int)` and `add(double, double)` can coexist. C++ picks the right one by looking at the argument types you pass.', advanced: 'Overload resolution ranks candidates by conversion quality: exact match > promotion > conversion. Ambiguous matches are compile errors. Return type alone can never distinguish overloads.' },
+{ title: '5. The Call Stack & Recursion (Expert Teaser)', beginner: 'Every function call stacks a fresh memory frame on top, like plates. When the function finishes, its plate is popped off. A function that calls itself (recursion) stacks plates until a base case stops it.', advanced: '*(Pro Track Preview)* Each frame holds parameters, locals, and the return address. Unbounded recursion exhausts the stack (typically 1–8 MB) causing a stack overflow crash. The Expert track covers tail-call optimization and stack vs heap lifetimes in depth.' }
+],
+{
+title: 'The Overloaded Calculator & Recursion Depth',
+intro: 'Build overloaded add functions with a prototype, then watch the call stack grow with a depth-printing recursive factorial.',
+steps: [
+'Create `funcs.cpp` with `<iostream>`.',
+'At the TOP, write prototypes: `int add(int, int); double add(double, double); int factorial(int, int);`.',
+'In main, call `std::cout << add(2, 3) << std::endl;` (expect 5) and `std::cout << add(2.5, 3.1) << std::endl;` (expect 5.6).',
+'Call `std::cout << factorial(5, 1) << std::endl;` (expect 120).',
+'BELOW main, define: `int add(int a, int b) { return a + b; }` and `double add(double a, double b) { return a + b; }`.',
+'Define recursion with a depth trace: `int factorial(int n, int depth) { std::cout << "frame depth: " << depth << std::endl; if (n <= 1) return 1; return n * factorial(n - 1, depth + 1); }`.',
+'Compile `g++ funcs.cpp -o funcs` and run; expect depths 1..5 printed then 120.',
+'Experiment: call `factorial(20, 1)` and watch 20 frames print — imagine 2 million and you understand stack overflow.'
+],
+goal: 'You declared prototypes before definitions, resolved overloads by argument type, and visualized stack frames through recursive depth tracing.'
+},
+[
+q('What does a `void` return type mean?', ['It returns true/false', 'It returns an empty string', 'The function returns no value to the caller', 'The function is broken'], 2, '`void` declares that the function performs effects (printing, mutating) without producing a return value. **Why others are wrong:** void is not bool, not string, and not an error state.'),
+q('Why write a prototype above main() when the definition lives below it?', ['To make it run faster', 'Because the compiler checks calls top-down and needs the signature before use', 'To satisfy the linker', 'To create the variable'], 1, 'The compiler validates each call against a visible declaration; the prototype provides that signature ahead of the definition. **Why others are wrong:** Speed is unaffected, the linker needs definitions not prototypes, and no variable is created.'),
+q('Which pair is a VALID overload set?', ['int f(int); and int f(int);', 'int f(int); and double f(int);', 'int f(int); and int f(double);', 'int f(int); and int F(int);'], 2, 'Same name with different parameter types is a legal overload; the compiler selects by argument type. **Why others are wrong:** Identical signatures redeclare, differing only in return type is illegal, and `F` is a different name (case-sensitive).'),
+q('What happens to a local variable when its function returns?', ['It stays alive forever', 'Its stack frame is popped and the variable is destroyed', 'It becomes global', 'It is saved to disk'], 1, 'Locals live in the frame; returning pops the frame and ends their lifetime — hence returning references to locals is undefined behavior. **Why others are wrong:** They do not persist, promote, or persist to storage.'),
+q('What stops a recursive function from crashing with stack overflow?', ['Using break', 'A base case that returns without recursing further', 'Declaring variables static', 'Using double instead of int'], 1, 'The base case terminates the recursion chain, unwinding the stacked frames. **Why others are wrong:** break works in loops not recursion, static changes lifetime not termination, and the type is irrelevant.')
+],
+['Functions encapsulate behavior: return type, name, parameters, body.', 'Pass-by-value copies arguments; locals die when the frame pops.', 'Prototypes let you define functions below their call sites.', 'Overloads differ by parameter types — never by return type alone.', 'Every call stacks a frame; recursion needs a base case to avoid overflow.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-07', 7, 'Functions & Scope', '🛠️', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. Modularizing Code', beginner: 'Instead of writing hundreds of lines of code inside `main()`, we can create our own custom mini-programs called "Functions". You write a function once, name it, and then you can "call" it as many times as you want!', advanced: 'Functions allow for functional decomposition. By isolating logic into distinct operational blocks, you reduce redundancy, increase maintainability, and isolate memory scope on the call stack.' },
-      { title: '2. Return Types & Parameters', beginner: 'Every function needs a Return Type (what it gives back) and Parameters (what it takes in). E.g., `int addNumbers(int a, int b)`. This means "I take in two integers, and I promise to hand you an integer back." If a function gives nothing back, its return type is `void`.', advanced: 'The parameters defined in the function signature dictate the exact memory footprint allocated on the stack frame when the function is invoked. A `void` return type omits the return instruction payload in assembly.' },
-      { title: '3. Forward Declarations', beginner: 'C++ reads your file from top to bottom. If you call a function in `main()` but you wrote the function underneath `main()`, C++ will crash because it hasn\'t seen it yet! You fix this by writing the function\'s "signature" at the very top of the file as a promise.', advanced: 'Forward declarations (function prototypes) inform the compiler of the function\'s signature (name, return type, parameters) prior to definition, allowing the linker to safely resolve the memory addresses later during compilation.' },
-      { title: '4. Variable Scope', beginner: 'Variables created inside a function are strictly trapped inside that function! If you make `int x = 5;` inside `main()`, a different function cannot see or use `x`. This is called "Local Scope".', advanced: 'Local scope variables are pushed onto the active function\'s stack frame. When the function returns and the stack frame pops, all localized variables are automatically destroyed, freeing the memory.' }
-    ],
-    {
-      title: 'The Math Calculator Module',
-      intro: 'Create a custom function to handle mathematical operations outside of the main function.',
-      steps: [
-        'Above your `main()` function, define a new function: `int multiply(int x, int y) { ... }`.',
-        'Inside that function, write `return x * y;`.',
-        'Inside your `main()` function, declare an integer: `int result = multiply(5, 4);`.',
-        'Use `std::cout` to print `result`.',
-        'Call the function again with different numbers and print it directly: `std::cout << multiply(10, 10);`.'
-      ],
-      goal: 'You successfully abstracted logic into a reusable block, managed parameters, and returned computed values back to the calling scope.'
-    },
-    [
-      q('What does a `void` return type mean?', ['The function returns a boolean true or false', 'The function returns a massive string', 'The function does not return any data back to where it was called from', 'The function is broken'], 2, '`void` indicates the function strictly performs an action (like printing to a screen) without returning any payload data.'),
-      q('Why might C++ give you an error if you define a custom function directly below `main()`?', ['Because functions cannot be below main', 'Because C++ reads sequentially from top to bottom. If main() calls the function before seeing its definition or prototype, the compiler throws an "undeclared identifier" error', 'Because main() deletes all other functions', 'Because it violates variable scope'], 1, 'The compiler needs a forward declaration (prototype) at the top of the file to know the function exists before it encounters it in the main flow.'),
-      q('What is Variable Scope in C++?', ['The total size of a variable on the hard drive', 'The rule that variables declared inside a set of curly braces (like a function) are only visible and accessible within those braces', 'A tool used to zoom in on code', 'The maximum number a variable can hold'], 1, 'Scope defines visibility. Variables declared inside a local block (function/loop) are invisible to the rest of the program.'),
-      q('In the function signature `int calculate(double a, double b)`, what data type does this function promise to return?', ['double', 'calculate', 'int', 'void'], 2, 'The very first word in a function signature (`int`) explicitly defines the return type.')
-    ],
-    ['Functions organize your code into reusable, labeled blocks.', 'A function takes in arguments (parameters) and hands back a result (return type).', 'Use void if the function just performs an action and returns nothing.', 'Variables created inside a function cannot be seen by other functions.']
-  ),
+L(
+'cpp-08', 8, 'Arrays, Bounds & Memory Layout', '📚',
+'📚 An array is a row of identical boxes laid side by side in memory — contiguous, fast, and completely unforgiving. C++ trusts you to stay inside the lines; step outside and you read garbage or crash. Master the layout and arrays become your fastest tool.',
+[
+{ title: '1. Declaration & Contiguous Memory', beginner: '`int scores[5] = {90, 85, 80, 95, 100};` creates five integer boxes in a perfect row. One name, many slots, all the same type.', advanced: 'A C-array is a contiguous block of N elements of one type. Contiguity is why arrays are cache-friendly: the CPU prefetches neighboring elements into cache lines as you iterate.' },
+{ title: '2. Zero-Based Indexing & Offset Math', beginner: 'Counting starts at ZERO: `scores[0]` is the first box, `scores[4]` is the fifth. Under the hood, `scores[2]` means "start address + 2 × sizeof(int)".', advanced: 'Indexing is pure pointer arithmetic: `arr[i] == *(arr + i)`. The compiler multiplies the index by element size and adds it to the base address — constant time, no search.' },
+{ title: '3. Fixed Size & Out-of-Bounds = Undefined Behavior', beginner: 'An array\'s size is locked at birth. Ask for `scores[5]` in a 5-element array and C++ will NOT stop you — it hands you whatever garbage lives next door in memory. This is the most dangerous beginner trap.', advanced: 'C-arrays perform no bounds checking; out-of-bounds access is undefined behavior (UB): silent corruption, crashes, or "working" bugs. `std::array` and `std::vector::at()` add checked access for safety-critical code.' },
+{ title: '4. Traversal & the Count Trick', beginner: 'Loop with `for (int i = 0; i < 5; i++)` to visit every box. Forgot the size? Compute it: `sizeof(scores) / sizeof(scores[0])` gives the element count.', advanced: 'The sizeof-division trick works only on true arrays in scope (not decayed pointers). Modern C++ prefers range-based for or `std::size(arr)` from `<iterator>` for clarity and safety.' },
+{ title: '5. 2D Arrays & Row-Major Layout (Expert Teaser)', beginner: 'A grid is an array of arrays: `int grid[3][3];`. You address cells with two indices: `grid[row][col]`.', advanced: '*(Pro Track Preview)* 2D arrays store rows back-to-back (row-major). Iterating row-first matches memory order and maximizes cache hits; iterating column-first thrashes the cache — a 10x performance swing in real workloads. The Expert track measures it.' }
+],
+{
+title: 'The Grade Book & Grid Printer',
+intro: 'Build a grade book that sums and averages an array using the sizeof count trick, then print a 3x3 grid in row-major order.',
+steps: [
+'Create `arrays.cpp` with `<iostream>`.',
+'Declare: `int grades[4] = {85, 92, 78, 90};`.',
+'Compute count: `int count = sizeof(grades) / sizeof(grades[0]);` and print it — expect 4.',
+'Loop a sum: `int sum = 0; for (int i = 0; i < count; i++) { sum += grades[i]; }` then print `sum` (expect 345) and `sum / count` (expect 86).',
+'Declare a grid: `int grid[3][3] = { {1,2,3}, {4,5,6}, {7,8,9} };`.',
+'Print row-major with nested loops over r and c using `grid[r][c]` separated by spaces and `std::endl` per row — expect three clean rows.',
+'DANGER DEMO (comment out after): print `grades[4]` and observe a garbage value — proof there is no bounds checking.',
+'Compile `g++ arrays.cpp -o arrays` and run; verify 4, 345, 86, and the 3x3 grid.'
+],
+goal: 'You indexed contiguous memory safely, computed element counts with sizeof, traversed a row-major 2D grid, and witnessed unbounded access produce garbage.'
+},
+[
+q('What is the index of the LAST element in `int cars[5];`?', ['5', '4', '1', '6'], 1, 'Zero-based indexing means valid indices are 0..4; index 5 is out of bounds. **Why others are wrong:** 5 and 6 are past the end, and 1 is the second element.'),
+q('What happens if you read `arr[10]` from a 5-element C-array?', ['A safe exception is thrown', 'The array grows automatically', 'Undefined behavior: garbage data, a crash, or silent corruption', 'It returns 0'], 2, 'C-arrays have no bounds checking; out-of-bounds access is UB with unpredictable consequences. **Why others are wrong:** No exception is thrown, C-arrays never grow, and 0 is not guaranteed.'),
+q('How do you compute the element count of `int grades[4]` in scope?', ['grades.length()', 'sizeof(grades) / sizeof(grades[0])', 'count(grades)', 'grades->size'], 1, 'Total bytes divided by one element\'s bytes yields the element count for a true in-scope array. **Why others are wrong:** `.length()` and `->size` belong to std::string/vector, and `count()` is not a C-array function.'),
+q('How is a 2D array like `grid[3][3]` laid out in memory?', ['Column by column (column-major)', 'Row by row (row-major), rows stored back-to-back', 'Randomly scattered', 'In separate heap allocations per row'], 1, 'C++ stores multidimensional arrays row-major: row 0\'s elements, then row 1\'s, contiguously. **Why others are wrong:** Column-major is Fortran\'s layout, and a true 2D C-array is one contiguous block, not scattered heap rows.'),
+q('Why are arrays fast to iterate?', ['They compress data', 'Contiguous memory lets the CPU prefetch elements into cache lines', 'They skip the CPU', 'They store indices separately'], 1, 'Spatial locality: sequential access patterns match cache-line prefetching, making array loops dramatically faster than pointer-chasing structures. **Why others are wrong:** No compression is involved, the CPU is not skipped, and indices are computed, not stored.')
+],
+['Arrays are contiguous, fixed-size rows of one type.', 'Indexing starts at 0; arr[i] is base address + i * sizeof(type).', 'Out-of-bounds access is undefined behavior — C++ will not protect you.', 'sizeof(arr)/sizeof(arr[0]) computes element count for in-scope arrays.', '2D arrays are row-major: iterate rows first for cache-friendly speed.'],
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
-  L(
-    'cpp-08', 8, 'Fixed-Size Collections (Arrays)', '📚', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. What is an Array?', beginner: 'Imagine you need to store 100 test scores. Creating 100 separate variables (`score1`, `score2`...) is terrible! An array is a single variable that holds a list of items of the same type. E.g., `int scores[5] = {90, 85, 80, 95, 100};`.', advanced: 'A C-style array is a contiguous block of memory allocated specifically for a fixed number of homogeneous elements. The array variable itself essentially decays into a pointer to the memory address of the first element.' },
-      { title: '2. Zero-Based Indexing', beginner: 'To access a specific item in an array, you use square brackets `[]`. But remember, computers start counting at ZERO, not one! To get the very first item in the `scores` array, you ask for `scores[0]`.', advanced: 'The index represents an address offset. `scores[2]` instructs the compiler to take the base memory address of the array, calculate an offset of 2 integer sizes (usually 2 * 4 bytes), and fetch the data at that exact location.' },
-      { title: '3. Fixed Memory Constraints', beginner: 'Standard C++ arrays are extremely rigid. When you create `int numbers[10];`, you are telling the computer "give me exactly 10 boxes". You CANNOT add an 11th box later. It is permanently locked at that size!', advanced: 'Because standard arrays are allocated on the stack at compile-time (or fixed heap size), their dimensions must be constant. C++ does not perform automatic bounds checking, making arrays dangerous if indexing limits are breached.' },
-      { title: '4. Iterating with Loops', beginner: 'Arrays and `for` loops are best friends! You can use a `for` loop to easily step through every item in an array one by one by passing the loop\'s counter variable directly into the array brackets.', advanced: 'Iteration utilizes the counter integer as the dynamic index offset. Modern C++ also offers Range-Based For Loops (e.g., `for (int val : scores)`) to automatically iterate through bounds safely.' }
-    ],
-    {
-      title: 'The Grade Book Iteration',
-      intro: 'Create an array of grades and use a for loop to calculate the total sum of all grades.',
-      steps: [
-        'Inside `main()`, declare an array: `int grades[4] = {85, 92, 78, 90};`.',
-        'Declare an integer to hold the total: `int sum = 0;`.',
-        'Create a `for` loop starting at `int i = 0;`, going up to `i < 4;`, incrementing by `i++`.',
-        'Inside the loop, add the current array item to the sum: `sum += grades[i];`.',
-        'Outside the loop, use `std::cout` to print the final calculated sum.'
-      ],
-      goal: 'You successfully initialized contiguous memory structures and dynamically processed the elements using iterative address offsets.'
-    },
-    [
-      q('If you declare an array `int cars[5];`, what is the index of the last element in the array?', ['5', '4', '1', '6'], 1, 'Because C++ uses zero-based indexing, an array of size 5 has indexes 0, 1, 2, 3, and 4. Accessing index 5 goes out of bounds.'),
-      q('What happens if you try to add a 6th item to an array that was created with a size of 5?', ['The array automatically grows larger', 'The compiler creates a second array automatically', 'It causes an out-of-bounds memory error which can lead to severe program crashes or data corruption', 'The 6th item replaces the 1st item'], 2, 'Standard C-style arrays have fixed bounds and zero safety checks. Writing beyond bounds corrupts neighboring memory addresses.'),
-      q('Which loop is most commonly paired with an array to iterate over its elements?', ['A do-while loop', 'A for loop', 'A switch statement', 'An infinite while loop'], 1, 'A `for` loop provides a clean, localized counter variable that perfectly aligns with sequential array index numbers.'),
-      q('How does the compiler technically handle array indexing under the hood?', ['It searches through a text file', 'It calculates a memory offset by multiplying the index by the byte size of the data type and adding it to the base address', 'It asks the operating system to find the data', 'It converts the array into a string'], 1, 'Indexing `arr[3]` is mathematical: Base Address + (3 * sizeof(type)).')
-    ],
-    ['Arrays store multiple items of the SAME data type in a single row.', 'C++ arrays start counting at zero (index 0 is the first item).', 'Standard arrays cannot change their size once created.', 'Use a for loop to quickly iterate through every index of an array.']
-  ),
-
-  L(
-    'cpp-09', 9, 'Introduction to Pointers', '🎯', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. The Memory Address Operator (&)', beginner: 'When you create a variable like `int age = 20;`, the computer stores the number 20 in a physical location inside your RAM. You can actually see the exact physical address of that box by putting an ampersand `&` in front of the variable: `&age`. It looks like a crazy hex code (e.g., 0x7ffe4)!', advanced: 'The `&` (address-of) operator retrieves the literal hexadecimal memory address of a variable in the active execution stack frame.' },
-      { title: '2. What is a Pointer? (*)', beginner: 'A pointer is just a special type of variable that stores MEMORY ADDRESSES instead of normal data. To create a pointer that points to an integer, you use a star `*`. E.g., `int* pAge = &age;`. Now `pAge` acts as a direct GPS coordinate to your `age` variable.', advanced: 'Pointers are strongly typed (`int*`, `double*`) because the compiler needs to know exactly how many bytes to step over when navigating pointer arithmetic, and how to format the data it accesses at that address.' },
-      { title: '3. Dereferencing a Pointer (*)', beginner: 'If you have a GPS coordinate (a pointer), how do you actually look inside the box to see the data? You use the star `*` again! Putting a star in front of a pointer is called "Dereferencing". `std::cout << *pAge;` will print `20`.', advanced: 'The dereference operator `*` accesses the value stored in the memory location that the pointer holds. Modifying a dereferenced pointer directly mutates the original variable\'s memory block.' },
-      { title: '4. Why use Pointers?', beginner: 'Pointers are what make C++ incredibly fast and powerful. Instead of handing a giant 500-page book (a massive variable) to a friend and making a heavy photocopy, you just hand them a tiny sticky note with the GPS address of where the book is located!', advanced: 'Pointers eliminate massive overhead during function calls (pass-by-address instead of pass-by-value), allow direct hardware manipulation, and are the fundamental requirement for dynamic heap allocation.' }
-    ],
-    {
-      title: 'The Memory Inspector',
-      intro: 'Create a pointer to track a variable, print the raw memory addresses, and change the data remotely using dereferencing.',
-      steps: [
-        'Declare an integer: `int ammo = 100;`.',
-        'Print the raw memory address of ammo using the `&` operator.',
-        'Declare a pointer that stores that address: `int* pAmmo = &ammo;`.',
-        'Use the dereference operator to print the value inside the pointer: `std::cout << *pAmmo;`.',
-        'Now, change the value of ammo through the pointer: `*pAmmo = 50;`.',
-        'Print the original `ammo` variable. Notice how it magically changed to 50!'
-      ],
-      goal: 'You successfully exposed memory addresses, instantiated a pointer, and remotely mutated localized stack memory via dereferencing.'
-    },
-    [
-      q('What does the address-of operator `&` do in C++?', ['It adds two strings together', 'It fetches the physical hexadecimal memory location where a variable is stored in RAM', 'It deletes the variable', 'It creates a pointer'], 1, 'The ampersand `&` placed before a variable yields its explicit location address in memory.'),
-      q('What is a Pointer?', ['A variable that stores a memory address', 'A variable that stores only text', 'A function that returns nothing', 'A loop that runs forever'], 0, 'Pointers are special variables strictly designed to hold GPS-like memory addresses linking to other data.'),
-      q('What happens when you "dereference" a pointer using the `*` operator (e.g., `*pX`)?', ['It deletes the pointer', 'It reveals the memory address of the pointer itself', 'It reaches into the memory address stored in the pointer and interacts with the actual data inside', 'It causes the program to crash'], 2, 'Dereferencing follows the pointer\'s stored address to evaluate or mutate the raw data located at that specific coordinate.'),
-      q('Why are pointers highly efficient when dealing with massive data structures?', ['They compress the data automatically', 'Instead of copying massive amounts of data in memory, a pointer simply passes a tiny address, saving massive amounts of RAM and CPU time', 'They turn C++ code into Python code', 'They allow variables to have no data type'], 1, 'Passing data by value forces the system to make heavy duplicate copies. Passing a pointer just hands over a lightweight 8-byte address.')
-    ],
-    ['Use &var to find out EXACTLY where a variable lives in RAM.', 'A pointer (int* pVar) is a variable that stores a memory address.', 'Use *pVar (dereferencing) to remotely view or change the data at that address.', 'Pointers save memory and speed up your program by avoiding heavy data copies.']
-  ),
-
-  L(
-    'cpp-10', 10, 'References & Stack vs. Heap', '🧠', 
-    TERMINAL_NOTICE_SHORT,
-    [
-      { title: '1. What is a Reference? (&)', beginner: 'Pointers can be confusing with all the stars and ampersands. C++ introduced "References" to make it easier. A reference is just an alias—a nickname—for an existing variable. If you say `int& refAge = age;`, `refAge` is now the EXACT same box as `age`.', advanced: 'A reference acts as an implicit, immutable pointer. Once bound to a variable upon declaration, it cannot be reassigned to alias a different memory address, offering safety that raw pointers lack.' },
-      { title: '2. Pass-by-Reference', beginner: 'When you pass a variable into a function normally, C++ makes a complete COPY of it. If the function changes it, your original variable is safe. But if you pass it as a reference (`void add(int& x)`), the function gets a direct link and CAN permanently change your original variable!', advanced: 'Passing by reference avoids the overhead of copy constructors for heavy objects. It allows functions to mutate state across scope boundaries cleanly without the syntactic burden of dereferencing pointers.' },
-      { title: '3. The Stack (Automatic Memory)', beginner: 'Imagine the Stack as a neat, small desk. Whenever you create normal variables (like `int x = 5;`), C++ puts them on the desk. When a function finishes, C++ automatically sweeps the desk clean and deletes them. It is fast, safe, but limited in size.', advanced: 'Stack allocation handles contiguous, LIFO (Last-In-First-Out) memory management. It is incredibly fast because allocation/deallocation strictly involves adjusting the stack pointer, but a "Stack Overflow" occurs if you exceed the OS limit.' },
-      { title: '4. The Heap (Dynamic Memory)', beginner: 'The Heap is a giant warehouse outside. If you need a massive amount of space, you ask C++ to put it in the warehouse using the word `new`. BUT, C++ will NOT clean the warehouse for you! You must manually delete it using `delete`, or your computer runs out of memory (a memory leak)!', advanced: 'Heap (dynamic) allocation occurs at runtime. The OS allocates fragmented blocks of memory on request. Because it is unmanaged in C/C++, failure to explicitly `delete` dynamically allocated memory results in severe Memory Leaks.' }
-    ],
-    {
-      title: 'The Swap Function',
-      intro: 'Write a function that swaps the values of two variables using Pass-by-Reference.',
-      steps: [
-        'Above `main()`, create a function: `void swap(int& a, int& b) { ... }`. Notice the `&` symbols!',
-        'Inside the function, declare a temporary integer: `int temp = a;`.',
-        'Set `a = b;`.',
-        'Set `b = temp;`.',
-        'Inside `main()`, declare `int x = 10;` and `int y = 20;`.',
-        'Call `swap(x, y);` and then print `x` and `y`. They should now be reversed!'
-      ],
-      goal: 'You successfully bypassed localized scope restrictions by passing stack variable aliases, allowing remote mutation without pointer syntax.'
-    },
-    [
-      q('What is a Reference in C++?', ['A copy of a variable', 'An alias (nickname) that points to the exact same memory location as an existing variable', 'A pointer that can change its address', 'A new data type for text'], 1, 'References are syntactically simpler implicit pointers. They bind directly to an existing variable upon creation.'),
-      q('What happens when you pass a variable to a function by "Reference" instead of by "Value"?', ['The function receives a clone of the data', 'The function receives direct access to the original variable, meaning any changes made inside the function will permanently alter the original variable', 'The function crashes', 'The function changes the data type to a string'], 1, 'Pass-by-value copies data. Pass-by-reference shares the exact same memory space, enabling cross-scope mutation.'),
-      q('What is the key difference between Stack memory and Heap memory?', ['Stack memory is slow, Heap memory is fast', 'Stack variables are automatically cleaned up when they go out of scope. Heap variables require manual cleanup using `delete`', 'Stack memory is used for hard drives, Heap memory is for RAM', 'There is no difference'], 1, 'The Stack utilizes automatic lifetime scope destruction. The Heap requires manual memory management by the programmer.'),
-      q('What is a "Memory Leak"?', ['When water gets into your computer motherboard', 'When variables are copied too many times', 'When you allocate memory on the Heap using `new`, but forget to clean it up using `delete`, causing the computer to permanently lose that chunk of RAM', 'When an array gets too big'], 2, 'Memory leaks occur when dynamic memory is orphaned. The program loses the pointer to the heap block, preventing the OS from ever reclaiming that RAM.')
-    ],
-    ['A reference (&) acts as a permanent nickname/alias for an existing variable.', 'Pass-by-reference allows functions to directly modify your original variables.', 'The Stack is fast and cleans up automatically. The Heap is massive but requires manual cleanup.', 'Using the word "new" creates data on the Heap. You must always use "delete" when finished to prevent Memory Leaks.']
-  ),
+ L(
+'cpp-09', 9, 'Introduction to Pointers', '🎯',
+'Every variable you create lives at a physical address inside your RAM. Most programmers only ever touch the *value* stored in a variable — but elite C++ developers touch the *address itself*. Pointers are the foundation of dynamic memory, fast data structures, hardware control, and every smart pointer you will ever use. Master them here and the rest of C++ stops being magic.',
+[
+{ title: '1. The Memory Address Operator (&)', beginner: 'When you create `int age = 20;`, the computer puts the number 20 into a real physical box inside your RAM. That box has a house address, like `0x7ffe42`. You can see that address by putting an ampersand `&` in front of the variable: `&age`.', advanced: 'The address-of operator `&` yields the exact byte address of an object within the active stack frame. Addresses are printed in hexadecimal because memory is byte-addressed and hex maps cleanly to binary boundaries.' },
+{ title: '2. What is a Pointer? (*)', beginner: 'A pointer is just a special variable that stores ADDRESSES instead of normal data. `int* pAge = &age;` means "pAge holds the address of an integer." Think of it as a sticky note with the GPS coordinates of your variable.', advanced: 'Pointers are strongly typed (`int*`, `double*`) because the type tells the compiler two things: how many bytes to read at that address, and how many bytes to step when doing pointer arithmetic. A pointer on a 64-bit machine is 8 bytes regardless of what it points to.' },
+{ title: '3. Dereferencing a Pointer (*)', beginner: 'If a pointer is a GPS coordinate, dereferencing is actually driving to that location and opening the box. Putting a star in front of the pointer, `*pAge`, gives you the value inside. You can even change it: `*pAge = 50;` changes the original variable!', advanced: 'The dereference operator `*` performs a memory read (or write) at the addressed location. Dereferencing an invalid address is Undefined Behavior — the single most common source of crashes in C and C++ programs.' },
+{ title: '4. Why Pointers? (No More Heavy Copies)', beginner: 'Imagine handing a friend a 500-page book versus handing them a sticky note that says where the book is. Passing normal variables into functions photocopies the whole book. Passing a pointer hands over the tiny sticky note instead — instant and cheap.', advanced: 'Pass-by-address avoids invoking copy constructors on large objects. This is why C-style strings, arrays, and raw buffers are always passed as pointers: copying them would be an O(n) memory operation on every single call.' },
+{ title: '5. nullptr & Dangling Pointers (Expert Teaser)', beginner: 'A pointer that points to nothing should be set to `nullptr` (the modern safe "empty" value). A pointer that points to a variable that already died is called a "dangling pointer" — using it is like visiting a house that was demolished last week.', advanced: '*(Pro Track Preview)* Dangling pointers, wild pointers, and double-frees are the classic memory-safety bugs. Modern C++ eliminates most of them with smart pointers (`unique_ptr`, `shared_ptr`) which we master later in this track — but you must understand raw pointers first to understand what the smart ones are automating.' }
+],
+{
+title: 'The Memory Inspector',
+intro: 'Expose raw memory addresses, build a pointer, and remotely mutate a stack variable through dereferencing.',
+steps: [
+'Create `pointers.cpp` and include `<iostream>`.',
+'Inside `main()`, declare: `int ammo = 100;`.',
+'Print the address: `std::cout << "Address: " << &ammo << std::endl;`. Expect a hex code like `0x7ffd5c2a`.',
+'Create the pointer: `int* pAmmo = &ammo;`.',
+'Print the pointer itself (`std::cout << pAmmo`) — expect the SAME hex address.',
+'Print the dereferenced value: `std::cout << *pAmmo << std::endl;`. Expect `100`.',
+'Remotely mutate it: `*pAmmo = 50;`.',
+'Print the original: `std::cout << ammo << std::endl;`. Expect `50` — proof you edited the original variable through its address!'
+],
+goal: 'You successfully exposed memory addresses, instantiated a typed pointer, and remotely mutated localized stack memory via dereferencing.'
+},
+[
+q('What does the address-of operator `&` return when placed before a variable?', ['A copy of the variable', 'The physical hexadecimal memory location where the variable lives in RAM', 'The data type of the variable', 'A random number'], 1, '`&age` yields the exact byte address of `age` in the active stack frame, printed in hexadecimal. **Why others are wrong:** It does not copy the value, report the type, or produce randomness — it is a pure address query.'),
+q('What is a pointer in C++?', ['A variable that stores a memory address', 'A variable that stores only text', 'A function that returns nothing', 'A loop that runs forever'], 0, 'A pointer is a variable whose value is a memory address, typed so the compiler knows how many bytes live at that address. **Why others are wrong:** It is not text-only, not a function, and not a loop construct.'),
+q('What happens when you dereference a pointer with `*pAge`?', ['It deletes the pointer', 'It prints the address of the pointer', 'It reads or writes the actual data stored at the address the pointer holds', 'It converts the pointer to an integer'], 2, 'Dereferencing performs a memory access at the pointed-to address, yielding (or mutating) the live value. **Why others are wrong:** It does not delete anything, print the address (that is just `pAge`), or convert types.'),
+q('Why are pointers dramatically more efficient than passing large objects by value into functions?', ['They compress the data automatically', 'They pass a tiny 8-byte address instead of copying every byte of the object', 'They skip the compiler checks', 'They store data on the hard drive'], 1, 'Pass-by-address transfers only the pointer (8 bytes on 64-bit), avoiding an O(n) copy constructor invocation on every call. **Why others are wrong:** No compression, no skipped checks, and no disk involvement — it is purely about avoiding copies.'),
+q('What is a "dangling pointer"?', ['A pointer set to nullptr', 'A pointer that still holds the address of an object that has already been destroyed', 'A pointer to a global variable', 'A pointer that has never been initialized'], 1, 'After the target object dies (scope exit or `delete`), the pointer keeps pointing at reclaimed memory — dereferencing it is Undefined Behavior. **Why others are wrong:** nullptr is the safe empty state, globals are alive, and a never-initialized pointer is a *wild* pointer, a related but distinct bug.')
+],
+['Use &var to discover exactly where a variable lives in RAM.', 'A pointer (int* p) is a typed variable that stores a memory address.', 'Use *p (dereferencing) to read or change the data at that address.', 'Pointers avoid expensive copies by passing addresses instead of whole objects.', 'Always initialize pointers to nullptr to avoid dangling and wild pointer bugs.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-10', 10, 'References & Pass-by-Reference', '',
+'Pointers are powerful but dangerous: they can be null, they can be reseated, and they force you to write stars everywhere. C++ introduced references as the safe, clean alias mechanism — and they are the reason modern C++ function signatures look the way they do. If you want your functions to modify caller data without pointer syntax, this lesson is mandatory.',
+[
+{ title: '1. What is a Reference? (&)', beginner: 'A reference is a nickname for an existing variable. `int& refAge = age;` means refAge IS age — same box, second name. Change one and you change the other, because there is only one box.', advanced: 'A reference is an alias bound at initialization. Under the hood compilers implement it as a constant pointer that is automatically dereferenced, but the language guarantees it can never be null and never reseat to another object.' },
+{ title: '2. Pass-by-Reference', beginner: 'When you pass a variable normally, the function gets a photocopy. If you pass it as a reference (`void fix(int& x)`), the function gets the ORIGINAL box. Changes inside the function survive after it returns!', advanced: 'Pass-by-reference eliminates copy-constructor overhead for heavy objects and enables output parameters. It is the default choice for any non-trivial object that a function must mutate.' },
+{ title: '3. References vs Pointers', beginner: 'A pointer is a loose GPS coordinate — you can change it, forget it, or point it at nothing. A reference is a welded-on nickname: once created it can never point anywhere else, and it can never be empty.', advanced: 'Key differences: references must be initialized, cannot be null, cannot reseat, and need no dereference syntax. Pointers remain necessary for optional values, dynamic memory, arrays, and reseating — which is why both exist.' },
+{ title: '4. const References (Read-Only, Zero Copy)', beginner: 'What if a function only needs to LOOK at a big object, not change it? Use `const std::string& name`. You get the speed of a reference (no copy) with a guarantee nobody can modify your data.', advanced: '`const T&` parameters are the C++ workhorse: zero-copy passing plus compile-time mutation protection. This is why nearly every professional codebase passes all non-trivial parameters by const reference.' },
+{ title: '5. Rvalue References Preview (Expert Teaser)', beginner: 'There is a second flavor of reference written with two ampersands `&&` that only binds to temporary values about to die. It is the key that unlocks "move semantics" — stealing resources instead of copying them.', advanced: '*(Pro Track Preview)* Rvalue references (`T&&`) enable move constructors and `std::move`, turning O(n) deep copies into O(1) pointer steals. We master this fully in the Move Semantics lesson later in this track.' }
+],
+{
+title: 'The Swap Function',
+intro: 'Prove that pass-by-value cannot mutate caller data while pass-by-reference can, using the classic swap interview question.',
+steps: [
+'Create `refs.cpp` with `<iostream>`.',
+'Write a BROKEN swap by value: `void swapBad(int a, int b) { int t = a; a = b; b = t; }`.',
+'Write a REAL swap by reference: `void swapGood(int& a, int& b) { int t = a; a = b; b = t; }`.',
+'In `main()`: `int x = 10, y = 20;`.',
+'Call `swapBad(x, y);` then print x and y. Expect `10 20` — nothing changed!',
+'Call `swapGood(x, y);` then print x and y. Expect `20 10` — the originals were mutated.',
+'Add a read-only function: `void show(const int& v) { std::cout << v; }` and call `show(x);`. Expect `20` with zero copying.'
+],
+goal: 'You successfully bypassed localized scope restrictions by passing stack variable aliases, enabling remote mutation without pointer syntax.'
+},
+[
+q('What is a reference in C++?', ['A copy of a variable', 'An alias that refers to the exact same memory location as an existing variable', 'A pointer that can change its address freely', 'A new data type for text'], 1, 'A reference is a second name for an existing object; there is one memory box with two labels. **Why others are wrong:** It is not a copy, it cannot reseat like a pointer, and it is not a text type.'),
+q('What happens when you pass a variable by reference into a function?', ['The function receives a clone', 'The function receives direct access to the original variable, so mutations persist after the function returns', 'The function crashes', 'The variable becomes constant'], 1, 'The callee operates on the caller\'s object itself, so writes survive the return. **Why others are wrong:** Cloning is pass-by-value, no crash occurs, and constness is a separate qualifier.'),
+q('Which statement about references is TRUE?', ['They can be reassigned to a new variable later', 'They can be left uninitialized', 'They must be bound to an object at creation and can never be null', 'They require the * operator to use'], 2, 'References are bound at initialization, non-null, and non-reseatable — that is their safety contract versus pointers. **Why others are wrong:** Reseating, null states, and manual dereferencing are pointer behaviors, not reference behaviors.'),
+q('Why do professional C++ codebases pass large objects as `const T&` parameters?', ['To make the function run in a separate thread', 'To avoid copying the object while guaranteeing the function cannot mutate it', 'Because pointers are illegal in functions', 'To force the object onto the heap'], 1, 'Const references give zero-copy performance plus compile-time mutation protection — the best of both worlds. **Why others are wrong:** Threading, legality of pointers, and heap placement are unrelated to parameter passing style.'),
+q('What does the double-ampersand `int&& r` declare?', ['A pointer to a pointer', 'A reference to a reference', 'An rvalue reference that binds only to temporary values', 'A constant reference'], 2, '`T&&` is an rvalue reference, binding exclusively to temporaries — the foundation of move semantics. **Why others are wrong:** Pointer-to-pointer is `int**`, references-to-references do not exist, and const references use `const int&`.')
+],
+['A reference (&) is a permanent alias for an existing variable.', 'Pass-by-reference lets functions mutate caller data with no pointer syntax.', 'References can never be null and never reseat — pointers still own those jobs.', 'Use const T& to pass big objects with zero copy and zero mutation risk.', 'Rvalue references (&&) unlock move semantics later in this track.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-11', 11, 'Stack vs Heap & Dynamic Memory', '🧠',
+'Your program has two memory playgrounds: a small, ultra-fast, self-cleaning desk (the Stack) and a giant warehouse you must manage yourself (the Heap). Every memory leak, every stack overflow crash, and every smart pointer in existence exists because of the difference between these two regions. Understand them and you understand C++ memory forever.',
+[
+{ title: '1. The Stack (Automatic Memory)', beginner: 'The Stack is a neat little desk. Normal variables (`int x = 5;`) are placed on it automatically. When a function ends, the desk is swept clean and everything on it vanishes. Fast, safe, but small.', advanced: 'Stack allocation is just moving the stack pointer — essentially free. Frames are LIFO, cache-friendly, and automatically reclaimed on scope exit. Exceeding the OS limit (often 1–8 MB) causes a Stack Overflow crash.' },
+{ title: '2. The Heap (Dynamic Memory)', beginner: 'The Heap is a giant warehouse. When you need a LOT of space, or space that must outlive the function, you request it with `new`. But nobody cleans the warehouse for you — you must return the space with `delete` yourself.', advanced: 'Heap allocation invokes the allocator at runtime, is slower, and can fragment. Memory lives until explicitly `delete`d (or `delete[]` for arrays), which is exactly why leaks and double-frees are possible.' },
+{ title: '3. Memory Leaks', beginner: 'If you take space from the warehouse and lose the paperwork (the pointer) without calling `delete`, that space is gone forever while your program runs. That is a memory leak — like renting a storage unit and throwing away the key.', advanced: 'A leak occurs when no reachable pointer refers to an allocated block. In long-running servers, leaks accumulate until the OS kills the process. This is the exact problem RAII and smart pointers solve deterministically.' },
+{ title: '4. Choosing Stack vs Heap', beginner: 'Small, short-lived data? Stack. Huge arrays, data whose size you only know at runtime, or objects that must outlive the function? Heap. Rule of thumb: default to the stack, go to the heap only when you have a reason.', advanced: 'Prefer stack allocation for locality and automatic lifetime. Use the heap when size is runtime-dependent, lifetime must exceed scope, or the object is too large for a stack frame. Modern C++ wraps all heap usage in smart pointers.' },
+{ title: '5. Smart Pointers Preview (Expert Teaser)', beginner: 'Remembering to call `delete` is exhausting and humans forget. Modern C++ invented "smart pointers" — pointers that delete themselves automatically when they go out of scope. They are your safety net.', advanced: '*(Pro Track Preview)* `std::unique_ptr` and `std::shared_ptr` implement RAII over heap memory, making leaks structurally impossible in well-designed code. We dedicate a full lesson to them later in this track.' }
+],
+{
+title: 'The Heap Array Lab',
+intro: 'Allocate a dynamic array on the heap at runtime, use it, and free it correctly — then witness what a leak looks like.',
+steps: [
+'Create `heap.cpp` with `<iostream>`.',
+'Ask for a runtime size: `int n = 3;` (imagine this came from user input).',
+'Allocate on the heap: `int* scores = new int[n]{90, 85, 80};`.',
+'Loop and print: `for (int i = 0; i < n; i++) std::cout << scores[i] << " ";`. Expect `90 85 80 `.',
+'Free it correctly: `delete[] scores;`.',
+'Set the pointer to safety: `scores = nullptr;`.',
+'LEAK DEMO: comment out the `delete[]` line, recompile, and run. The output looks identical — but the memory was never returned. This invisible waste is exactly why leaks survive code review and kill servers.'
+],
+goal: 'You successfully allocated and freed runtime-sized heap memory, and visually understood why invisible leaks are so dangerous.'
+},
+[
+q('Which memory region automatically cleans up its variables when a function returns?', ['The Heap', 'The Stack', 'The hard drive', 'The CPU cache'], 1, 'Stack frames are popped on scope exit, reclaiming all local variables deterministically. **Why others are wrong:** The heap requires manual freeing, and disk/cache are not program memory regions in this sense.'),
+q('What does `new int[10]` do?', ['Allocates 10 integers on the stack', 'Allocates 10 integers on the heap and returns a pointer to the first one', 'Creates 10 separate pointer variables', 'Reserves 10 bytes total'], 1, '`new[]` requests a contiguous heap block for 10 ints and yields its base address as a pointer. **Why others are wrong:** It is heap not stack, it returns one pointer not ten, and the size is 10 × sizeof(int), not 10 bytes.'),
+q('What is a memory leak?', ['Water damage to RAM', 'Allocated heap memory that is never freed because no pointer refers to it anymore', 'Deleting a pointer twice', 'Using too many stack variables'], 1, 'The block stays reserved for the process lifetime with no way to reach or free it. **Why others are wrong:** Double-delete is a different bug (double free), stack variables cannot leak, and physical water is irrelevant.'),
+q('Which pair of keywords correctly frees heap memory?', ['free / malloc', 'delete for single objects, delete[] for arrays', 'remove / clear', 'pop / push'], 1, 'C++ pairs `new` with `delete` and `new[]` with `delete[]`; mixing them is Undefined Behavior. **Why others are wrong:** malloc/free are C, not C++ idioms here, and the other pairs do not manage memory.'),
+q('When should you prefer the Heap over the Stack?', ['Always, because it is faster', 'When the size is only known at runtime or the object must outlive its creating function', 'Never, the heap is illegal in C++', 'Only for integer variables'], 1, 'Runtime-sized and long-lived data are the two classic heap use cases. **Why others are wrong:** The heap is slower not faster, perfectly legal, and used for all types, not just ints.')
+],
+['The Stack is small, fast, and self-cleaning; the Heap is huge but manually managed.', 'new allocates heap memory; delete / delete[] must return it.', 'A leak is heap memory with no reachable pointer — invisible and cumulative.', 'Default to the stack; choose the heap only for runtime size or extended lifetime.', 'Smart pointers (later in this track) automate heap cleanup via RAII.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-12', 12, 'Custom Data Types (Structs)', '🏗️',
+'Real-world entities are never a single integer. A Player has a name, health, and position. A Product has an ID, price, and stock. Structs let you bundle heterogeneous data into one cohesive, named type — the first step toward modeling reality in code, and the ancestor of the class.',
+[
+{ title: '1. Defining a Struct', beginner: 'A struct is a blueprint you write above `main()`: `struct Player { std::string name; int health; };`. This teaches C++ what a Player looks like without creating one yet.', advanced: 'A struct is a user-defined aggregate type. In C++ (unlike C) structs can also contain functions, but by convention they model plain data. Members are public by default.' },
+{ title: '2. Instantiation & Member Access (.)', beginner: 'Create a real Player with `Player p1;` and reach inside with the dot: `p1.name = "Hero"; p1.health = 100;`. The dot operator is your key into the bundle.', advanced: 'Instantiation allocates a contiguous block large enough for all members. The dot operator resolves each member\'s offset from the base address at compile time — zero runtime cost.' },
+{ title: '3. Arrays of Structs & Contiguity', beginner: 'You can make a whole team at once: `Player team[5];`. Access members like `team[0].health = 100;`. All five players sit side by side in memory.', advanced: 'Arrays of structs are dense and cache-friendly, which is why data-oriented design (game engines, SIMD code) prefers structs-of-arrays or arrays-of-structs over pointer-heavy object graphs.' },
+{ title: '4. Passing Structs to Functions', beginner: 'Passing a struct normally copies the WHOLE bundle. For big structs that is wasteful — so pass by reference (`void heal(Player& p)`) or const reference (`void show(const Player& p)`) instead.', advanced: 'Copying a struct invokes member-wise copies (or copy constructors). Passing by (const) reference avoids this entirely and is the professional default for any non-trivial aggregate.' },
+{ title: '5. Struct Padding & Alignment (Expert Teaser)', beginner: 'You might expect a struct of a char (1 byte) and an int (4 bytes) to be 5 bytes. It is often 8! The compiler inserts invisible spacer bytes so each member sits at a "comfortable" memory boundary.', advanced: '*(Pro Track Preview)* Alignment rules exist because CPUs read aligned words far faster. Padding explains sizeof surprises and matters deeply in network protocols and file formats, where you must control layout with `#pragma pack` or explicit serialization.' }
+],
+{
+title: 'The NPC Generator',
+intro: 'Define a custom NPC struct, instantiate it, mutate members, and inspect how much memory the bundle really occupies.',
+steps: [
+'Create `structs.cpp` with `<iostream>` and `<string>`.',
+'Above `main()`, define: `struct NPC { std::string name; int level; };`.',
+'Inside `main()`: `NPC guard;`.',
+'Assign members: `guard.name = "City Watch"; guard.level = 15;`.',
+'Print: `std::cout << guard.name << " L" << guard.level << std::endl;`. Expect `City Watch L15`.',
+'Create an array: `NPC squad[2]; squad[0].level = 3; squad[1].level = 7;`.',
+'Print sizes: `std::cout << sizeof(int) << " " << sizeof(NPC) << std::endl;`. Expect `4` then a much larger number (often 32 or 40) — the string object plus alignment padding!'
+],
+goal: 'You successfully defined a custom composite data type, instantiated it, and observed real memory layout including hidden alignment costs.'
+},
+[
+q('What is a struct in C++?', ['A function returning multiple values', 'A built-in math type', 'A user-defined blueprint bundling variables of different types into one unit', 'A type of loop'], 2, 'A struct aggregates heterogeneous members under one named type. **Why others are wrong:** It is not a function, not built-in, and not a control-flow construct.'),
+q('Which operator accesses a struct member on a normal instance?', ['->', '*', '.', '&'], 2, 'The dot operator resolves the member offset from the instance base address. **Why others are wrong:** `->` is for pointers-to-struct, `*` dereferences, and `&` takes addresses.'),
+q('Why prefer `void show(const NPC& n)` over `void show(NPC n)`?', ['It runs on the GPU', 'It avoids copying the entire struct while preventing mutation', 'Structs cannot be passed by value at all', 'It deletes the struct afterwards'], 1, 'Const reference passing is zero-copy and mutation-safe. **Why others are wrong:** No GPU involvement, pass-by-value is legal but wasteful, and no deletion occurs.'),
+q('Why can `sizeof(struct)` be LARGER than the sum of its members\' sizes?', ['The compiler adds invisible padding bytes to satisfy memory alignment rules', 'The struct stores its own name as text', 'Members are duplicated for safety', 'The operating system taxes each struct'], 0, 'Alignment padding inserts spacer bytes so each member starts at an efficiently addressable boundary. **Why others are wrong:** Names are not stored, members are not duplicated, and there is no OS tax.'),
+q('What does `Player team[5];` create?', ['Five pointers to one Player', 'Five contiguous Player objects in memory', 'One Player copied lazily five times', 'A heap allocation of five Players'], 1, 'A fixed array stores five full Player objects side by side (on the stack here). **Why others are wrong:** It is not pointers, not lazy copies, and not heap memory unless you used `new[]`.')
+],
+['Structs bundle heterogeneous variables into one named blueprint.', 'Define structs above main() and instantiate them inside it.', 'Use the dot operator (.) to read and write members.', 'Pass structs by const reference to avoid expensive whole-bundle copies.', 'sizeof includes hidden alignment padding — layout is not naive addition.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-13', 13, 'Classes & Objects (OOP)', '🏭',
+'Structs bundle data. Classes bundle data AND the behaviors that operate on that data, wrapped in a protective design philosophy called Object-Oriented Programming. This is the single most important architectural leap in your C++ journey: from writing procedures to designing entities.',
+[
+{ title: '1. What is a Class?', beginner: 'A Class is a super-struct: it holds variables (attributes) AND functions (methods). If `Car` is a class, `speed` and `color` are attributes, while `drive()` and `brake()` are methods.', advanced: 'A class defines both state layout and behavior, and — critically — defaults its members to private, enforcing encapsulation. The only syntactic difference from struct is default access; the semantic difference is intent: classes model abstract types with invariants.' },
+{ title: '2. Objects (Instantiation)', beginner: 'A class is paper; an object is the real thing. `Car myCar;` builds an actual car in memory from the blueprint. Each object gets its own attribute values.', advanced: 'Instantiation allocates per-instance state (usually on the stack unless you use `new`). Methods, however, exist once as compiled code — objects carry state, not copies of functions.' },
+{ title: '3. Attributes vs Methods', beginner: 'Attributes are what an object KNOWS (its data). Methods are what an object DOES (its functions). Every object keeps its own attributes; all objects share the same method code.', advanced: 'Member functions receive an implicit pointer to the invoking object (the `this` pointer, next lessons), which is how one shared function body can operate on many distinct states.' },
+{ title: '4. Calling Methods (.)', beginner: 'Trigger behavior with the dot: `myCar.drive();`. It reads exactly like English: "my car, drive."', advanced: 'Method calls compile to ordinary function calls with the object address passed implicitly — zero overhead versus free functions, which is why C++ OOP costs nothing at runtime.' },
+{ title: '5. Class vs Struct: The Modern Rule (Expert Teaser)', beginner: 'Both work almost identically in C++! The community rule of thumb: use `struct` for simple data bundles, and `class` when you need protection and behavior.', advanced: '*(Pro Track Preview)* The C++ Core Guidelines suggest: use struct for plain data aggregates (all public, no invariants), and class when you must maintain invariants behind private state. This semantic distinction makes codebases instantly more readable.' }
+],
+{
+title: 'Your First Class',
+intro: 'Transition from structs to classes by building a Robot blueprint with state and behavior, then instantiate and command it.',
+steps: [
+'Create `classes.cpp` with `<iostream>` and `<string>`.',
+'Above `main()`, declare: `class Robot { public: std::string name; void sayHi() { std::cout << "Beep boop, I am " << name << "!"; } };`.',
+'Notice the `public:` label — without it, everything would be locked private by default.',
+'Inside `main()`: `Robot r1;`.',
+'Set state: `r1.name = "Wall-E";`.',
+'Trigger behavior: `r1.sayHi();`. Expect `Beep boop, I am Wall-E!`.',
+'Create a second object: `Robot r2; r2.name = "EVE"; r2.sayHi();`. Expect `Beep boop, I am EVE!` — same blueprint, independent state.'
+],
+goal: 'You successfully transitioned to OOP by defining a class with both state (attributes) and behavior (methods), and instantiated independent objects.'
+},
+[
+q('What is the primary difference between a Class and an Object?', ['They are identical', 'A Class is the blueprint; an Object is a concrete instance built from it', 'A Class is for numbers, an Object is for text', 'An Object is the blueprint, a Class is the instance'], 1, 'The class defines layout and behavior; the object is allocated memory holding real state. **Why others are wrong:** They are distinct concepts, not type-restricted, and the direction of the relationship is class→object.'),
+q('What do we call a function defined inside a class?', ['A global function', 'A struct', 'A method (member function)', 'An attribute'], 2, 'Functions bound to a class are methods; they operate on instance state via the implicit this pointer. **Why others are wrong:** Globals live outside classes, structs are types, and attributes are data.'),
+q('If two objects come from the same `BankAccount` class, do they share one balance?', ['Yes, all memory is shared', 'No, each object holds its own independent copy of member variables', 'Only inside arrays', 'Yes, unless one is deleted'], 1, 'Per-instance state is allocated separately for every object. **Why others are wrong:** Sharing one balance would require a `static` member, which is a deliberate opt-in, not the default.'),
+q('What is the ONLY syntactic difference between `struct` and `class` in C++?', ['struct cannot contain functions', 'class members default to private, struct members default to public', 'struct is faster at runtime', 'class cannot be instantiated'], 1, 'Default access specifier is the sole syntactic distinction; everything else is convention. **Why others are wrong:** Structs can hold functions, performance is identical, and both instantiate normally.'),
+q('How do you invoke method `jump()` on object `player1`?', ['jump(player1);', 'player1.jump();', 'player1->jump;', 'jump.player1();'], 1, 'Dot operator on the instance, then method name with parentheses. **Why others are wrong:** Free-function syntax, pointer syntax without call parentheses, and reversed order are all invalid here.')
+],
+['A Class bundles attributes (state) and methods (behavior) into one blueprint.', 'An Object is a concrete instance with its own independent state.', 'Class members default to private — protection is built in.', 'Methods exist once as code; objects carry only their own data.', 'Use struct for plain data, class for protected types with invariants.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-14', 14, 'Encapsulation & Access Modifiers', '🛡️',
+'In a game, you never want a player to type `health = 999999` and cheat. Encapsulation locks the internal state of a class behind a controlled door: the outside world may only interact through methods YOU approved. This is how real systems keep their data valid forever.',
+[
+{ title: '1. private: The Default Vault', beginner: 'Everything inside a `class` is private by default: invisible and untouchable from `main()`. It is an impenetrable safe.', advanced: 'Private members are accessible only from the class\'s own member functions (and friends). This is compile-time enforcement, costing zero runtime performance.' },
+{ title: '2. public: The Approved Door', beginner: 'The `public:` label opens a door. Anything under it can be used normally from outside with the dot operator. Public members are your class\'s official interface.', advanced: 'The public surface is your API contract. Keeping it small and stable is what allows you to refactor internals later without breaking any client code.' },
+{ title: '3. Getters (Accessors)', beginner: 'To READ a private variable safely, provide a getter: `int getHealth() { return health; }`. Outside code can look but never touch.', advanced: 'Getters should be marked `const` (`int getHealth() const`) to promise they do not mutate state — enabling use on const objects and references.' },
+{ title: '4. Setters (Mutators) with Validation', beginner: 'To CHANGE a private variable safely, provide a setter with rules: `void setHealth(int h) { if (h >= 0) health = h; }`. Negative health is now impossible.', advanced: 'Setters enforce class invariants at the single choke point where mutation happens. This is the core practical payoff of encapsulation: invalid states become unrepresentable.' },
+{ title: '5. Friends & const Methods (Expert Teaser)', beginner: 'Sometimes a trusted outsider function needs full access to your private vault. C++ lets you hand out a special key with the `friend` keyword — use it rarely and deliberately.', advanced: '*(Pro Track Preview)* `friend` functions/classes bypass access control, and `const` member functions guarantee non-mutation. Together they form the fine-grained access toolkit used heavily in operator overloading (like `operator<<` for printing).' }
+],
+{
+title: 'The Secure Bank Account',
+intro: 'Lock a balance behind encapsulation so that invalid states (negative money) become impossible to create from outside.',
+steps: [
+'Create `bank.cpp` with `<iostream>`.',
+'Define: `class BankAccount { private: double balance = 0.0; public:`.',
+'Add getter: `double getBalance() const { return balance; }`.',
+'Add validated setter: `void deposit(double amt) { if (amt > 0) balance += amt; }`.',
+'Add guarded withdrawal: `void withdraw(double amt) { if (amt > 0 && amt <= balance) balance -= amt; }` and close the class with `};`.',
+'In `main()`: `BankAccount acc; acc.deposit(100); acc.withdraw(30); acc.withdraw(500);`.',
+'Print `acc.getBalance()`. Expect `70` — the impossible 500 withdrawal was silently rejected by your invariant!',
+'Try adding `acc.balance = -5;` in main and compile: expect a COMPILER ERROR proving the vault is sealed.'
+],
+goal: 'You successfully encapsulated sensitive state and enforced invariants, making invalid states unrepresentable from outside the class.'
+},
+[
+q('What is the default access level of members inside a C++ `class`?', ['public', 'protected', 'private', 'global'], 2, 'Class members are private by default, unlike structs which default to public. **Why others are wrong:** public/protected must be explicitly labeled, and global is not an access specifier.'),
+q('What is the main purpose of Encapsulation?', ['To make code run faster', 'To hide internal state and force all interaction through controlled, validated methods', 'To merge multiple classes', 'To delete unused variables'], 1, 'Encapsulation protects invariants by restricting direct state access to approved choke points. **Why others are wrong:** It has no speed purpose, does not merge classes, and does not delete variables.'),
+q('Why use a Setter instead of a public variable?', ['The compiler requires it', 'It lets you validate data at the single point of mutation, rejecting invalid values', 'Setters use less memory', 'Variables cannot be public'], 1, 'Validation at the mutation choke point makes invalid states impossible to create. **Why others are wrong:** It is not compulsory, memory is identical, and public variables are legal but unsafe.'),
+q('What does a Getter typically return?', ['A reference allowing mutation', 'A copy of the private value, providing read-only access', 'The variable\'s memory address', 'Nothing'], 1, 'Getters hand out copies (or const references) so callers can read but not write. **Why others are wrong:** Returning mutable references or addresses would break encapsulation.'),
+q('What does the `friend` keyword do?', ['Makes a function run faster', 'Grants a specific external function or class access to private members', 'Makes all members public', 'Creates a copy of the class'], 1, 'Friendship is a deliberate, explicit access grant bypassing private protection. **Why others are wrong:** It affects access control only — no speed, no global publicity, no copying.')
+],
+['Class members are private by default — the vault is sealed automatically.', 'public: defines your approved interface to the outside world.', 'Getters (const) provide safe read access to private state.', 'Setters enforce validation rules at the single mutation choke point.', 'friend grants rare, deliberate access — use it sparingly.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-15', 15, 'Constructors & Destructors', '🏗️',
+'Objects should never be born broken. A Player must not spawn with garbage health; a database connection must not die without closing. Constructors and destructors are the automatic birth and death ceremonies of every object — the heartbeat of deterministic C++ lifecycles.',
+[
+{ title: '1. The Default Constructor', beginner: 'A constructor has the EXACT same name as the class and NO return type: `Player() { health = 100; }`. Now every `Player p;` is born with 100 health automatically.', advanced: 'If you define no constructors, the compiler synthesizes a default one. Defining ANY constructor suppresses that implicit default — a rule that surprises every beginner at least once.' },
+{ title: '2. Parameterized Constructors', beginner: 'Force callers to provide data at birth: `Player(std::string n) { name = n; }`. Now `Player p1("Arthur");` — nobody can create a nameless player.', advanced: 'Multiple constructors with different signatures coexist via overloading, giving your type several legal birth pathways (default, parameterized, converting).' },
+{ title: '3. Member Initializer Lists', beginner: 'The pro way to set up members is with a colon BEFORE the body: `Player(int h) : health(h) {}`. It builds members directly instead of building-then-overwriting them.', advanced: 'Initializer lists construct members in declaration order with no default-construct-then-assign double work. They are MANDATORY for `const` members, reference members, and members without default constructors.' },
+{ title: '4. The Destructor (~)', beginner: 'The destructor `~Player() { ... }` runs automatically the moment an object dies (leaves scope). It is your last chance to clean up messes like heap memory or open files.', advanced: 'Destructors run in reverse construction order and are the backbone of RAII: every resource acquired in a constructor is released in the destructor, guaranteeing cleanup even during exception stack unwinding.' },
+{ title: '5. The Copy Constructor (Expert Teaser)', beginner: 'What happens when you write `Player p2 = p1;`? A special hidden constructor — the copy constructor — duplicates the object. If your object owns heap memory, the default copy can cause disasters.', advanced: '*(Pro Track Preview)* The copy constructor plus copy-assignment plus destructor form the "Rule of Three": if you define one, you probably need all three. We resolve this fully with move semantics and smart pointers later in this track.' }
+],
+{
+title: 'The Database Connection Lifecycle',
+intro: 'Watch constructors and destructors fire automatically as an object enters and leaves a scope block — no manual cleanup calls anywhere.',
+steps: [
+'Create `lifecycle.cpp` with `<iostream>`.',
+'Define: `class Database { public: Database() { std::cout << "OPENED" << std::endl; } ~Database() { std::cout << "CLOSED" << std::endl; } };`.',
+'Inside `main()`, open a scope: `{`.',
+'Instantiate: `Database db;`. Expect immediate output `OPENED`.',
+'Print: `std::cout << "working..." << std::endl;`. Expect `working...`.',
+'Close the scope: `}`. Expect immediate output `CLOSED` the instant the brace is crossed.',
+'Rerun with `Database db;` placed OUTSIDE the braces at the end of main and observe that CLOSED only appears at program exit — proof that lifetime follows scope exactly.'
+],
+goal: 'You successfully managed an object\'s automated lifecycle, observing deterministic construction and destruction driven purely by scope.'
+},
+[
+q('What is unique about constructor syntax?', ['It must be named init()', 'It must return bool', 'It shares the exact class name and has no return type', 'It takes exactly one parameter'], 2, 'Name-equals-class and no return type are the defining syntactic rules. **Why others are wrong:** init() is not special, bool returns are illegal here, and parameter counts vary freely.'),
+q('When does a constructor execute?', ['Only when called manually', 'Automatically at the exact moment of object instantiation', 'At program end', 'Only when members change'], 1, 'Construction is automatic during instantiation — you never call a constructor like a normal function. **Why others are wrong:** Manual calls, program-end timing, and mutation triggers are all incorrect.'),
+q('Why are member initializer lists preferred over assignment in the constructor body?', ['They run after the body', 'They construct members directly, avoiding default-construct-then-assign double work, and are mandatory for const/reference members', 'They delete members first', 'They are the only way to print text'], 1, 'Direct construction is both faster and sometimes the only legal option (const, references, non-default-constructible members). **Why others are wrong:** They run before the body, delete nothing, and printing is unrelated.'),
+q('How is a destructor written?', ['delete ClassName()', 'With a tilde: ~ClassName()', 'With a minus sign', 'end()'], 1, 'The tilde prefix marks the destructor, invoked automatically on scope exit or delete. **Why others are wrong:** delete is an operator, minus signs are arithmetic, and end() is not a destructor.'),
+q('What does the "Rule of Three" refer to?', ['Three access modifiers', 'Copy constructor, copy-assignment operator, and destructor — if you need one, you likely need all three', 'Three constructors maximum', 'Three member variables minimum'], 1, 'Owning raw resources couples these three special members; defining one without the others invites double-frees or leaks. **Why others are wrong:** It is not about modifiers, constructor counts, or member counts.')
+],
+['Constructors run automatically at birth; destructors run automatically at death.', 'A constructor shares the class name and has no return type.', 'Member initializer lists construct members directly and are mandatory for const/reference members.', 'Destructors are the backbone of RAII cleanup.', 'Remember the Rule of Three when your class owns raw resources.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
+L(
+'cpp-16', 16, 'Class Methods, the this Pointer & static Members', '👉',
+'As classes grow, dumping every function body inside the class block becomes unreadable, and parameter names collide with member names. This lesson gives you the professional toolkit: scope resolution for clean separation, the this pointer for disambiguation, and static members for class-level shared state.',
+[
+{ title: '1. Separating Declaration from Definition (::)', beginner: 'Inside the class, promise the method: `void attack();`. Outside, deliver it: `void Monster::attack() { ... }`. The double colon glues the function back to its class.', advanced: 'This separation is what enables header (.h) / source (.cpp) splitting: declarations in headers, definitions in one translation unit — the foundation of fast incremental compilation in real projects.' },
+{ title: '2. The Scope Resolution Operator (::)', beginner: '`::` literally means "belongs to". `Monster::setPower` tells the compiler: this function body belongs to the Monster class over there.', advanced: 'The operator qualifies names into their enclosing scope (class or namespace), resolving ambiguity between same-named entities across scopes.' },
+{ title: '3. Name Shadowing & the this Pointer', beginner: 'If a parameter is named `power` and the member is also `power`, writing `power = power;` assigns the parameter to itself — useless! `this->power = power;` fixes it: "MY power gets YOUR value."', advanced: '`this` is an implicit `T* const` pointer passed to every non-static member function, holding the address of the invoking object. The arrow operator dereferences it to reach members.' },
+{ title: '4. Method Chaining with this', beginner: 'Because `this` points at the object, a method can return the object itself (`return *this;`) letting you chain calls: `m.setPower(10).setName("Boss");` — fluent and fast.', advanced: 'Returning `*this` by reference enables fluent interfaces. Returning by value would copy the object each link and break chaining semantics for mutating calls.' },
+{ title: '5. static Members (Expert Teaser)', beginner: 'Normal members belong to each object. A `static` member belongs to the CLASS itself — one shared value across every object, like a global counter of how many Monsters exist.', advanced: '*(Pro Track Preview)* Static data members exist once per class (defined outside the class body), and static member functions have no `this` pointer — they are the bridge between OOP and class-level global state, used for registries, counters, and singletons.' }
+],
+{
+title: 'The Confused Parameter & Fluent Chaining',
+intro: 'Resolve parameter/member name collisions with the this pointer, separate definitions with ::, and build a chainable fluent interface.',
+steps: [
+'Create `thisptr.cpp` with `<iostream>` and `<string>`.',
+'Declare the class: `class Monster { private: int power; std::string name; public:`.',
+'Promise methods: `Monster& setPower(int power); Monster& setName(std::string name); void show(); };`.',
+'Define outside with scope resolution: `Monster& Monster::setPower(int power) { this->power = power; return *this; }`.',
+'Define: `Monster& Monster::setName(std::string name) { this->name = name; return *this; }`.',
+'Define: `void Monster::show() { std::cout << name << " P" << power << std::endl; }`.',
+'In `main()`: `Monster m; m.setPower(10).setName("Boss").show();`. Expect `Boss P10` — one fluent chain, zero ambiguity.'
+],
+goal: 'You successfully separated declarations from definitions, resolved shadowing via the this pointer, and built a chainable fluent interface returning *this.'
+},
+[
+q('What does the Scope Resolution Operator `::` do in `void Monster::attack()`?', ['Creates an array', 'Connects an out-of-class function definition back to its class declaration', 'Deletes the method', 'Makes the method static'], 1, 'It qualifies the function name into the Monster class scope. **Why others are wrong:** It creates nothing, deletes nothing, and staticness is a separate keyword.'),
+q('Why separate method definitions from the class block?', ['It runs faster', 'It keeps the class a clean blueprint and enables header/source file splitting for faster builds', 'Logic inside classes is illegal', 'It hides code from the compiler'], 1, 'Clean declarations plus external definitions enable .h/.cpp architecture and incremental compilation. **Why others are wrong:** Speed of execution is unchanged, inline logic is legal, and nothing is hidden from the compiler.'),
+q('What is Name Shadowing in a setter like `void setPower(int power)`?', ['The class has no name', 'The parameter hides the member of the same name, so bare `power` refers to the parameter', 'Text renders darkly', 'The object is deleted'], 1, 'Inner scope (parameter) wins over class scope, so unqualified names resolve to the parameter. **Why others are wrong:** It is purely a scope-resolution phenomenon, not a naming or rendering issue.'),
+q('What exactly is `this` inside a member function?', ['A string holding the class name', 'An implicit pointer to the specific object invoking the method', 'A function returning the object', 'A command to stop execution'], 1, '`this` is a `T* const` implicit parameter holding the invoking object\'s address. **Why others are wrong:** It is not a string, not a function, and not a control command.'),
+q('What does a `static` member variable represent?', ['A variable stored on the stack', 'One shared value belonging to the class itself, common to all objects', 'A constant that cannot be read', 'A per-object counter'], 1, 'Static data exists once per class, shared across every instance. **Why others are wrong:** Storage class is unrelated, it is readable, and per-object state is exactly what static is NOT.')
+],
+['Use :: to define method bodies cleanly outside the class block.', 'Header/source separation builds on declaration-vs-definition splitting.', 'this-> disambiguates members from same-named parameters.', 'Return *this by reference to enable fluent method chaining.', 'static members hold class-level shared state with no this pointer.']
+),
+'If you want to use a big terminal, use your CMD. Full guide is in Lesson 1.'
+),
 
   
- L(
-    'cpp-11', 11, 'Custom Data Types (Structs)', '🏗️', 
-    TERMINAL_NOTICE_SHORT + 'Up until now, you have used built-in containers like int and double. But what if you need to store a "Player" that has a name, a health score, and a position? Creating 3 separate variables for every player is a nightmare. Structs allow you to bundle different data types together into a single, custom super-variable.',
-    [
-      { title: '1. Defining a Struct', beginner: 'You define a struct outside of main(). Think of it as a blueprint. `struct Player { std::string name; int health; };`. You haven\'t created a player yet; you just taught C++ what a "Player" looks like!', advanced: 'A `struct` in C++ is a user-defined type. By default, all members of a struct are public. It dictates the memory layout of the bundled variables, padding them according to architecture alignment requirements.' },
-      { title: '2. Creating Struct Instances', beginner: 'Once the blueprint is made, you can create actual variables using it inside main(): `Player p1;`. Now `p1` is a single variable that holds both a name and health inside it!', advanced: 'Instantiating a struct allocates a contiguous block of memory on the stack large enough to hold all its member variables, accounting for byte alignment.' },
-      { title: '3. Member Access Operator (.)', beginner: 'To look inside your struct variable and change its data, use a period `.`. E.g., `p1.name = "Hero";` and `p1.health = 100;`.', advanced: 'The dot operator `.` resolves the memory offset of the specific member variable relative to the base address of the struct instance.' },
-      { title: '4. Arrays of Structs', beginner: 'You can create an array of your new custom type! `Player team[5];` gives you 5 players. You can access them like this: `team[0].health = 100;`.', advanced: 'An array of structs creates a dense, contiguous array of these composite types. This layout is highly cache-friendly for performance-critical loops.' }
-    ],
-    {
-      title: 'The NPC Generator',
-      intro: 'Create a custom struct for a Non-Player Character (NPC) and instantiate it.',
-      steps: [
-        'Above `main()`, define a `struct NPC { std::string name; int level; };`.',
-        'Inside `main()`, create an instance: `NPC guard;`.',
-        'Use the dot operator to assign: `guard.name = "City Watch";` and `guard.level = 15;`.',
-        'Print out a greeting using the struct\'s data: "Halt! I am " + name + " (Level " + level + ")".'
-      ],
-      goal: 'You successfully defined a custom composite data type and instantiated it to manage grouped variables.'
-    },
-    [
-      q('What is a Struct in C++?', ['A function that returns multiple values', 'A built-in data type for math', 'A user-defined blueprint that groups multiple variables of different data types into a single unit', 'A type of loop'], 2, 'Structs bundle related variables (like an int, double, and string) into one cohesive block of data.'),
-      q('Which operator is used to access or modify the internal variables of a struct instance?', ['->', '*', '.', '&'], 2, 'The dot operator `.` allows you to reach inside the instantiated struct and access its specific members.'),
-      q('Where should you typically define the blueprint for a struct?', ['Inside a for loop', 'Outside and above the `main()` function, so the compiler knows about the custom type before it is used', 'At the very end of the file', 'Inside a string'], 1, 'Like forward declarations, the compiler must see the struct definition before it can allocate memory for it in main().'),
-      q('If you have `struct Car { int speed; };` and create `Car myCar;`, how do you set the speed to 60?', ['Car(60);', 'myCar = 60;', 'myCar.speed = 60;', 'speed.myCar = 60;'], 2, 'You must reference the specific instance (`myCar`), use the dot operator, and then target the member variable (`speed`).')
-    ],
-    ['Structs allow you to bundle multiple different variables into one custom type.', 'Define your struct blueprints above main().', 'Use the dot operator (.) to read or change a struct\'s internal data.', 'You can create arrays of structs to manage massive lists of grouped data efficiently.']
-  ),
-
-  L(
-    'cpp-12', 12, 'Classes & Objects (OOP)', '🏭', 
-    TERMINAL_NOTICE_SHORT + 'Structs are great for grouping data, but what if we want to group data AND the functions that manipulate that data together? Welcome to Object-Oriented Programming (OOP). Classes are the ultimate blueprints. They don\'t just store data; they define behaviors!',
-    [
-      { title: '1. What is a Class?', beginner: 'A Class is a super-struct. Instead of just holding variables (Attributes), it also holds functions (Methods). If a `Car` is a class, its attributes are `speed` and `color`, and its methods are `drive()` and `brake()`.', advanced: 'A Class is the fundamental building block of OOP in C++. The only technical difference between a struct and a class in C++ is default visibility: struct members are public by default, while class members are private.' },
-      { title: '2. Objects (Instantiation)', beginner: 'A Class is just a blueprint on a piece of paper. You can\'t drive a blueprint! An "Object" is the actual car built from that blueprint. E.g., `Car myCar;` creates an Object from the `Car` class.', advanced: 'Instantiation is the process of allocating memory for a class object. Each object maintains its own distinct state (instance variables) in memory.' },
-      { title: '3. Attributes (Member Variables)', beginner: 'Variables inside a class are called Attributes. Every object you create gets its own unique set of attributes. My car can be red, while your car can be blue, even though they came from the same blueprint.', advanced: 'Non-static member variables are allocated per instance. Static member variables exist once at the class level and are shared among all instances.' },
-      { title: '4. Methods (Member Functions)', beginner: 'Functions written inside a class are called Methods. You call them using the dot operator just like data! `myCar.drive();`.', advanced: 'Member functions possess an implicit parameter, the `this` pointer, which points to the memory address of the specific object invoking the method.' }
-    ],
-    {
-      title: 'Your First Class',
-      intro: 'Transition from structs to classes by building a simple Robot blueprint.',
-      steps: [
-        'Above `main()`, declare `class Robot { public: std::string name; void sayHi() { std::cout << "Beep boop!"; } };`.',
-        'Notice the word `public:`! (We will explain this in the next lesson).',
-        'Inside `main()`, instantiate an object: `Robot r1;`.',
-        'Set the name: `r1.name = "Wall-E";`.',
-        'Call the object\'s method: `r1.sayHi();`.'
-      ],
-      goal: 'You successfully transitioned to OOP by defining a class with both state (variables) and behavior (methods).'
-    },
-    [
-      q('What is the primary difference between a Class and an Object?', ['They are the same thing', 'A Class is the theoretical blueprint; an Object is the physical instance created from that blueprint', 'A Class is for numbers, an Object is for text', 'An Object is the blueprint, a Class is the instance'], 1, 'The Class defines what the entity is and does. The Object is the actual allocated data residing in memory.'),
-      q('What do we call a function that is defined inside a class?', ['A global function', 'A struct', 'A method (or member function)', 'An attribute'], 2, 'Functions bound to a specific class blueprint are referred to as Methods or Member Functions.'),
-      q('If you create two objects from the same `BankAccount` class, do they share the same account balance?', ['Yes, they share all memory', 'No, each instantiated object maintains its own independent set of member variables (attributes)', 'Only if they are in an array', 'Yes, unless you delete one'], 1, 'Every object gets its own distinct memory block for its state. One account can have $50 while the other has $100.'),
-      q('How do you trigger a method named `jump()` on an object named `player1`?', ['jump(player1);', 'player1.jump();', 'player1->jump;', 'jump.player1();'], 1, 'You use the dot operator on the object instance, followed by the method name and parentheses.')
-    ],
-    ['A Class is a blueprint that groups variables (attributes) AND functions (methods).', 'An Object is a concrete instance built from a Class blueprint.', 'Every Object maintains its own independent state (variable values).', 'Use the dot operator to trigger an object\'s custom methods.']
-  ),
-
-  L(
-    'cpp-13', 13, 'Encapsulation & Access Modifiers', '🛡️', 
-    TERMINAL_NOTICE_SHORT + 'In a video game, you wouldn\'t want a player to be able to type `player.health = 999999;` and cheat! We need to protect our class data from the outside world. This concept of locking down data and controlling how it is accessed is called Encapsulation.',
-    [
-      { title: '1. Private Access Modifier', beginner: 'By default, everything inside a C++ class is strictly `private`. This means nothing outside the class (like `main()`) can see or touch those variables. It is an impenetrable safe!', advanced: 'Private access restricts visibility strictly to the class\'s own member functions and explicitly declared `friend` classes/functions.' },
-      { title: '2. Public Access Modifier', beginner: 'To allow the outside world to interact with your class, you use the `public:` label. Anything written under `public:` can be accessed normally from `main()` using the dot operator.', advanced: 'Public members define the API (Application Programming Interface) of your class. Best practice dictates keeping state (variables) private and exposing behavior (methods) publicly.' },
-      { title: '3. Getters (Accessors)', beginner: 'If a variable like `health` is locked in the private safe, how do we read it? We create a public function called a "Getter". E.g., `int getHealth() { return health; }`. Now `main()` can safely ask for the value without being able to arbitrarily change it!', advanced: 'Getters should typically be marked with the `const` qualifier (e.g., `int getHealth() const;`) to guarantee to the compiler that calling this method will not mutate the object\'s state.' },
-      { title: '4. Setters (Mutators)', beginner: 'To safely change a private variable, we use a "Setter". E.g., `void setHealth(int h)`. Why do this? Because inside the setter, you can add rules! E.g., `if (h < 0) health = 0; else health = h;`. This stops negative health bugs!', advanced: 'Setters enforce class invariants and encapsulate validation logic, preventing the object from entering an invalid or undefined state.' }
-    ],
-    {
-      title: 'The Secure Bank Account',
-      intro: 'Protect a bank balance using encapsulation, ensuring no one can set it to a negative number.',
-      steps: [
-        'Create a `class BankAccount { ... };`.',
-        'Inside, create a `private:` section with `double balance = 0.0;`.',
-        'Create a `public:` section.',
-        'Add a getter: `double getBalance() { return balance; }`.',
-        'Add a setter: `void deposit(double amount)`. Inside it, write an `if` statement so it only adds to the balance if the amount is greater than 0.',
-        'In `main()`, try to access `.balance` directly (it will error!). Then use your setter and getter to safely manage the money.'
-      ],
-      goal: 'You successfully encapsulated sensitive state data and enforced strict mutation rules using public accessors and mutators.'
-    },
-    [
-      q('What is the default access modifier for members of a C++ `class` if you don\'t specify one?', ['public', 'protected', 'private', 'global'], 2, 'Unlike structs which default to public, class members are completely locked down (private) by default in C++.'),
-      q('What is the main purpose of Encapsulation in Object-Oriented Programming?', ['To make the code run faster', 'To bundle data and methods together and hide the internal state, preventing unauthorized direct modification', 'To allow multiple classes to merge', 'To delete unused variables'], 1, 'Encapsulation protects the integrity of an object by forcing the outside world to interact with it strictly through approved public methods.'),
-      q('Why use a Setter method instead of just making the variable public?', ['Setters are required by the compiler', 'Setters allow you to add validation logic (like checking bounds) before actually modifying the internal data', 'Setters use less memory', 'Variables cannot be public in C++'], 1, 'A setter acts as a gatekeeper. It can intercept bad data (like negative age or negative money) and reject it before the internal state is corrupted.'),
-      q('What does a Getter method typically do?', ['Changes the variable to zero', 'Returns a copy of the private variable\'s current value to the outside world', 'Deletes the variable', 'Creates a new object'], 1, 'Getters simply "get" the data and hand it back, providing read-only access to a private attribute.')
-    ],
-    ['By default, everything in a C++ class is private and locked away.', 'Use the public: label to expose methods to the outside world.', 'Keep variables private, and use public Getters to read them.', 'Use Setters to change private variables safely by adding validation rules.']
-  ),
-
-  L(
-    'cpp-14', 14, 'Constructors & Destructors', '🏗️', 
-    TERMINAL_NOTICE_SHORT + 'When an object is born (instantiated), you usually want to set up its initial data immediately. You don\'t want a player spawning into the game with zero health! Constructors are special functions that run automatically the exact millisecond an object is created.',
-    [
-      { title: '1. The Default Constructor', beginner: 'A Constructor is a method that has the EXACT SAME NAME as the class and has NO return type (not even void). `class Player { public: Player() { health = 100; } };`. Now, every time you type `Player p1;`, they get 100 health automatically!', advanced: 'If you do not explicitly define any constructor, the C++ compiler implicitly generates a default, parameterless constructor. However, if you define any custom constructor, the implicit one is suppressed.' },
-      { title: '2. Parameterized Constructors', beginner: 'You can pass data into a constructor right when you create the object! `Player(std::string n) { name = n; }`. To use it in main: `Player p1("Arthur");`. This forces anyone making a Player to provide a name!', advanced: 'Parameterized constructors allow for Constructor Overloading. You can define multiple constructors with different parameter signatures to offer various initialization pathways.' },
-      { title: '3. Member Initializer Lists', beginner: 'There is a faster way to assign data in a constructor. Instead of writing it inside the brackets, you can use a colon: `Player(int h) : health(h) {}`. This is the preferred C++ way to initialize attributes!', advanced: 'Initializer lists are significantly more efficient. They initialize the member directly during allocation, rather than default-constructing it and then explicitly assigning a new value in the constructor body. For constant (`const`) or reference members, initializer lists are mandatory.' },
-      { title: '4. The Destructor (~)', beginner: 'If a Constructor runs when an object is born, a Destructor runs when an object dies (gets deleted or the function ends). It has a tilde in front: `~Player() { ... }`. It is used to clean up messy data!', advanced: 'The Destructor handles cleanup tasks, primarily `delete`-ing dynamically allocated heap memory to prevent memory leaks. The compiler automatically invokes it when an object goes out of scope.' }
-    ],
-    {
-      title: 'The Database Connection',
-      intro: 'Simulate opening and closing a database connection using Constructors and Destructors.',
-      steps: [
-        'Create a `class Database { ... };`.',
-        'Add a public Constructor: `Database() { std::cout << "Database Opened!"; }`.',
-        'Add a public Destructor: `~Database() { std::cout << "Database Closed!"; }`.',
-        'Inside `main()`, create a scope block using plain curly braces `{ ... }`.',
-        'Inside those braces, instantiate `Database db;`.',
-        'Run the program. You will see it open, and then immediately close as soon as it hits the closing brace and goes out of scope!'
-      ],
-      goal: 'You successfully managed an object\'s automated lifecycle, executing initialization and teardown logic implicitly based on scope.'
-    },
-    [
-      q('What is unique about the syntax of a Constructor function?', ['It must be named `init()`', 'It must return a boolean', 'It shares the exact name of the Class and has absolutely no return type defined', 'It can only take one parameter'], 2, 'Constructors are strictly identified by matching the class name identically and omitting return types (even void).'),
-      q('When does a Constructor execute?', ['When you manually call `obj.Constructor()`', 'Automatically, at the exact moment the object is instantiated into memory', 'Right before the program ends', 'Only when variables are modified'], 1, 'Constructors are lifecycle hooks that the compiler automatically invokes during memory allocation to initialize the state.'),
-      q('What is the purpose of a Member Initializer List?', ['To create an array inside a class', 'To initialize member variables more efficiently before the constructor body even executes', 'To delete variables', 'To list out all functions'], 1, 'It directly constructs the member variables with the provided values, avoiding a double-operation of default construction followed by reassignment.'),
-      q('How is a Destructor function denoted in C++?', ['Using the `delete` keyword', 'Using a tilde `~` before the class name', 'Using the `-` minus sign', 'Using `end()`'], 1, 'The tilde (`~ClassName()`) defines the destructor, which the compiler calls automatically when the object is destroyed.')
-    ],
-    ['Constructors run automatically when an object is created to set up initial data.', 'A Constructor shares the exact same name as the class and has no return type.', 'You can pass parameters to a constructor to force custom setups (e.g., passing a name).', 'Destructors (~Class) run automatically when an object dies to clean up memory.']
-  ),
-
-  L(
-    'cpp-15', 15, 'Class Methods & The \'this\' Pointer', '👉', 
-    TERMINAL_NOTICE_SHORT + 'As your classes grow, your code can get messy. Best practice in C++ is to separate the "What it does" (Declaration) from the "How it does it" (Definition). Also, what happens if your function parameter has the exact same name as your class attribute? You need the `this` pointer!',
-    [
-      { title: '1. Separation of Definition', beginner: 'Instead of writing long functions inside the class blueprint, we just write the promise: `void attack();`. Then, entirely outside the class, we write the actual code using the Scope Resolution Operator `::`. E.g., `void Player::attack() { ... }`.', advanced: 'In real-world C++, the class declaration is placed in a Header file (`.h` / `.hpp`), and the implementation (definitions using `::`) is placed in a Source file (`.cpp`). This drastically improves compilation times.' },
-      { title: '2. The Scope Resolution Operator (::)', beginner: 'The double colon `::` basically tells the compiler "This function belongs to that class over there." It maps the external code back to the original blueprint.', advanced: 'The `::` operator resolves naming scope. It explicitly qualifies a member, telling the linker which namespace or class a specific identifier resides in.' },
-      { title: '3. Name Shadowing', beginner: 'Imagine your class has a private variable `int health`. Your setter is `void setHealth(int health)`. Now you have two variables named `health`! If you write `health = health;`, C++ gets confused. This is called Name Shadowing.', advanced: 'When a local variable or parameter shares an identical identifier with a member variable, the local scope shadows (hides) the class scope member.' },
-      { title: '4. The \'this\' Pointer', beginner: 'To fix Name Shadowing, use the `this` keyword! `this->health` explicitly means "The health variable belonging to THIS specific object." So you write `this->health = health;`. (The parameter value goes into the object\'s value).', advanced: '`this` is an implicit, constant pointer passed to all non-static member functions. It holds the memory address of the specific object instance invoking the function. You use the `->` operator because `this` is a pointer, not a direct value.' }
-    ],
-    {
-      title: 'The Confused Parameter',
-      intro: 'Resolve a name shadowing conflict using the this pointer and separate your function definition.',
-      steps: [
-        'Create a `class Monster { private: int power; public: void setPower(int power); };`.',
-        'Outside the class, define the function using `::`: `void Monster::setPower(int power) { ... }`.',
-        'Inside the function body, resolve the naming conflict: `this->power = power;`.',
-        'In `main()`, instantiate a Monster and set its power!'
-      ],
-      goal: 'You successfully separated class declarations from definitions using scope resolution, and navigated identifier shadowing via the `this` pointer.'
-    },
-    [
-      q('What is the purpose of the Scope Resolution Operator `::` when defining class methods?', ['To create an array', 'To connect a method implementation written outside the class back to its original class declaration', 'To delete a method', 'To make variables public'], 1, 'It qualifies the function name, e.g., `ClassName::methodName()`, ensuring the compiler knows exactly which class owns this specific logic.'),
-      q('Why might developers prefer to write method bodies outside of the class block?', ['Because it runs faster', 'To keep the class declaration clean, readable, and focused strictly on the blueprint structure, paving the way for Header/Source file splitting', 'Because you cannot write logic inside a class', 'Because it hides the code from users'], 1, 'Inline definitions clutter the blueprint. Separating them keeps the declaration concise and allows for proper multi-file architecture.'),
-      q('What is Name Shadowing in this context?', ['When a class has no name', 'When a function parameter has the exact same name as a class attribute, causing the compiler to prioritize the parameter and hide the attribute', 'When text becomes dark in the terminal', 'When an object is deleted'], 1, 'The innermost local scope (the parameter) takes precedence, completely hiding the wider class scope variable.'),
-      q('What exactly is the `this` keyword in C++?', ['A string representing the class name', 'An implicit pointer that holds the memory address of the specific object instance currently executing the method', 'A function that returns the object', 'A command to stop the program'], 1, '`this` explicitly points to the current object. `this->variableName` guarantees you are modifying the object\'s attribute, not a local parameter.')
-    ],
-    ['Use the Scope Resolution Operator (::) to write function code outside of the main class block.', 'A local function parameter with the same name as a class variable causes "Shadowing".', 'The \'this\' keyword is a pointer to the specific object running the code.', 'Use this->variableName to explicitly target the object\'s attribute instead of the local parameter.']
-  ),
-
-  L(
-    'cpp-16', 16, 'Inheritance (Base & Derived Classes)', '🧬', 
-    TERMINAL_NOTICE_SHORT + 'If you are making a zoo simulation, you might have a Lion, a Tiger, and a Bear. They all need a `health` variable and a `move()` method. Copying and pasting that code into three different classes is terrible! Inheritance lets you create a master "Animal" class, and have other classes inherit its code automatically.',
-    [
-      { title: '1. Base Classes (The Parent)', beginner: 'A Base class holds the common code. `class Animal { public: int health; void eat() { ... } };`. This is your master blueprint.', advanced: 'The Base class (Superclass) defines generalized state and behavior. It centralizes common logic, promoting strict DRY (Don\'t Repeat Yourself) principles.' },
-      { title: '2. Derived Classes (The Child)', beginner: 'To inherit from Animal, use a colon: `class Lion : public Animal { ... };`. Now, the Lion class is totally empty inside, but it MAGICALLY possesses the `health` variable and `eat()` method from the Animal class!', advanced: 'The Derived class (Subclass) inherits the memory layout and methods of the Base class. Specifying `public Animal` means public base members remain public in the derived class.' },
-      { title: '3. Adding Specifics', beginner: 'The child class isn\'t restricted to just parent code! The Lion can have its own unique things. You can add `void roar()` inside the Lion class. The Lion can eat AND roar, but standard Animals cannot roar!', advanced: 'Inheritance models an "IS-A" relationship. A Lion IS-A Animal. The derived class extends the base class with specialized behavior while retaining generalized capabilities.' },
-      { title: '4. The Protected Modifier', beginner: 'We learned that `private` variables cannot be touched by anyone. Unfortunately, that includes Child classes! If you want variables to be hidden from `main()`, BUT still accessible to child classes, use `protected:` instead of `private:`.', advanced: '`protected` acts as an intermediary access modifier. It restricts access from external clients (like private does) but explicitly grants visibility to derived class scopes.' }
-    ],
-    {
-      title: 'The Vehicle Hierarchy',
-      intro: 'Create a Base Vehicle class and inherit from it to create a specific Car class.',
-      steps: [
-        'Define a base class: `class Vehicle { protected: int speed; public: void setSpeed(int s) { speed = s; } };`.',
-        'Define a child class: `class Car : public Vehicle { public: void honk() { std::cout << "Beep! Speed: " << speed; } };`.',
-        'Notice how the Car class can directly access the `speed` variable because it is `protected`!',
-        'In `main()`, instantiate `Car myCar;`.',
-        'Call `myCar.setSpeed(60);` (Inherited method).',
-        'Call `myCar.honk();` (Unique method).'
-      ],
-      goal: 'You successfully established an IS-A relationship hierarchy, inherited generalized methods, and utilized protected visibility for subclass data access.'
-    },
-    [
-      q('What is the main benefit of Inheritance in OOP?', ['It makes code run faster', 'It prevents you from writing the exact same common variables and methods multiple times across different classes, promoting code reuse', 'It allows variables to hold multiple data types', 'It deletes unused classes automatically'], 1, 'Inheritance centralizes common logic. If a bug is found in the common code, you only fix it in the Base class, and all Child classes inherit the fix immediately.'),
-      q('How do you declare that `class Dog` inherits publicly from `class Animal`?', ['class Dog inherits Animal', 'class Dog + Animal', 'class Dog : public Animal', 'class Animal : public Dog'], 2, 'The colon followed by the access specifier (`: public Animal`) establishes the inheritance link from the Base class.'),
-      q('What does the `protected` access modifier do?', ['Makes the variable public to everyone', 'Locks the variable completely, even from child classes', 'Hides the variable from the outside world, but allows Derived (child) classes to directly access and modify it', 'Changes the variable type'], 2, '`protected` is specifically designed for inheritance. It maintains encapsulation from external clients while trusting subclasses with internal data.'),
-      q('If `class Car` inherits from `class Vehicle`, which statement is true?', ['A Vehicle can use all of Car\'s unique methods', 'A Car possesses all public methods and attributes of Vehicle, plus its own unique ones', 'Vehicle is the derived class', 'They are completely unrelated'], 1, 'The flow of inheritance is strictly top-down. The child inherits the parent\'s traits, but the parent does not receive the child\'s traits.')
-    ],
-    ['Inheritance allows a Child class to automatically copy the variables and methods of a Parent class.', 'Use a colon to inherit: class Child : public Parent.', 'Child classes can add their own unique methods on top of the inherited ones.', 'Use protected: instead of private: if you want child classes to have direct access to parent variables.']
-  ),
-
-  L(
-    'cpp-17', 17, 'Polymorphism & Virtual Functions', '🎭', 
-    TERMINAL_NOTICE_SHORT + 'If a Base class `Animal` has a `makeSound()` method, a Dog should bark, but a Cat should meow. Polymorphism (Many-Forms) allows Child classes to OVERWRITE the Parent\'s methods so they can behave uniquely while sharing the same command!',
-    [
-      { title: '1. Method Overriding', beginner: 'If the Parent class has `void speak()`, the Child class can just write its own `void speak()` with new code inside. When you call `speak()` on the Child, it uses its own new version, ignoring the Parent\'s version!', advanced: 'Method overriding redefines a base class method in a derived class. The method signatures (name, parameters, const-ness) must match exactly.' },
-      { title: '2. The Problem with Pointers', beginner: 'In advanced C++, we often use Pointers to group things. E.g., `Animal* ptr = &myDog;`. Because the pointer thinks it is looking at a generic Animal, if you call `ptr->speak()`, it will trigger the generic Animal sound, NOT the Dog bark! This is a massive problem.', advanced: 'Standard method resolution occurs at Compile-Time (Static Binding) based strictly on the pointer\'s declared type, completely ignoring the actual derived object type residing in memory.' },
-      { title: '3. The \'virtual\' Keyword', beginner: 'To fix this, we put the word `virtual` in front of the Parent\'s method: `virtual void speak()`. This acts as a flag that tells C++: "Hey! If a pointer looks at this, wait until the code is actually running, check what the object REALLY is (a Dog), and use the Dog\'s overridden method!"', advanced: 'The `virtual` keyword enables Run-Time Polymorphism (Dynamic Binding). The compiler constructs a V-Table (Virtual Table) of function pointers for the class, allowing the program to dynamically resolve the correct overridden method implementation at runtime.' },
-      { title: '4. The \'override\' Keyword', beginner: 'In the Child class, when you rewrite the method, it is good practice to put `override` at the end: `void speak() override { ... }`. This doesn\'t change how it works, but it double-checks your spelling and prevents bugs!', advanced: '`override` is a context-sensitive keyword that forces the compiler to verify that the method actually overrides a virtual base method. If signatures mismatch, it throws a compile error instead of accidentally creating a new, unrelated method.' }
-    ],
-    {
-      title: 'The Farm Simulator',
-      intro: 'Utilize virtual functions to ensure pointers trigger the correct polymorphic behavior.',
-      steps: [
-        'Create a base class `Animal` with a virtual method: `virtual void speak() { std::cout << "?"; }`.',
-        'Create a derived class `Cow : public Animal`.',
-        'Override the method in Cow: `void speak() override { std::cout << "Moo!"; }`.',
-        'In `main()`, create a Cow: `Cow myCow;`.',
-        'Create a base class pointer that points to your Cow: `Animal* ptr = &myCow;`.',
-        'Trigger the method through the pointer: `ptr->speak();`. Without `virtual`, it would print "?". With `virtual`, it prints "Moo!".'
-      ],
-      goal: 'You successfully implemented Run-Time Polymorphism via V-Tables, ensuring dynamic binding resolved to the correct derived implementation.'
-    },
-    [
-      q('What does Polymorphism mean in the context of Object-Oriented Programming?', ['Writing code using multiple programming languages', 'The ability for different derived classes to implement their own unique versions of a shared base class method', 'Hiding variables from the user', 'Creating infinite loops'], 1, 'Polymorphism (Many Forms) allows a single interface/method name to dictate different underlying behaviors depending on the specific object type executing it.'),
-      q('Why do we need the `virtual` keyword on base class methods?', ['To make the method run on the internet', 'To enable dynamic binding, ensuring that a Base pointer pointing to a Derived object correctly executes the Derived object\'s overridden method', 'To prevent the method from being modified', 'To delete the method'], 1, 'Without `virtual`, a base pointer strictly uses static binding (executing the base method). `virtual` forces runtime inspection (V-Tables).'),
-      q('What is the purpose of the `override` keyword in a derived class?', ['It forces the compiler to verify that you are actually overriding a valid virtual base method (catching typos in method names)', 'It deletes the base method entirely', 'It makes the code run 10x faster', 'It allows you to change the return type'], 0, '`override` is a safety net. If you accidentally misspell the method name in the child class, the compiler will alert you that nothing is actually being overridden.'),
-      q('If `class Bird` inherits from `Animal`, and `Animal` has `virtual void fly()`, can `Bird` choose to NOT override `fly()`?', ['No, it must override it or the program crashes', 'Yes. If Bird doesn\'t override it, it simply inherits and uses the generic `fly()` implementation from Animal', 'No, only mammals can override', 'Yes, but the method gets deleted'], 1, 'Overriding is optional. If a derived class lacks an explicit override, it seamlessly falls back to the base class implementation.')
-    ],
-    ['Polymorphism allows Child classes to "overwrite" (redefine) Parent methods with custom logic.', 'Standard pointers look at the data type, not the actual object, causing them to trigger the wrong methods.', 'Putting the word \'virtual\' on a Parent method forces pointers to look at the TRUE object type at runtime.', 'Always use the \'override\' keyword in Child classes to catch spelling mistakes!']
-  ),
-
-  L(
-    'cpp-18', 18, 'Dynamic Arrays (std::vector)', '🚄', 
-    TERMINAL_NOTICE_SHORT + 'Standard arrays in C++ are rigid. Once you say `int scores[5]`, it can NEVER hold 6 scores. If you are building a shopping cart, you have no idea how many items the user will add! Enter `std::vector`: the smart, dynamic, resizing array of C++.',
-    [
-      { title: '1. Including and Declaring', beginner: 'First, you must `#include <vector>`. To create one, you specify the data type in angle brackets: `std::vector<int> scores;`. Notice we didn\'t give it a size! It starts completely empty.', advanced: '`std::vector` is a sequence container from the Standard Template Library (STL). It dynamically manages a heap-allocated array, abstracting away manual memory management and reallocation.' },
-      { title: '2. Adding Elements (push_back)', beginner: 'To add data, use the `push_back()` method. `scores.push_back(100);`. This literally pushes the number 100 onto the back of the list. The vector automatically grows to accommodate it!', advanced: 'When a vector reaches its capacity, `push_back` triggers a reallocation. The container allocates a new, larger memory block (usually double the size), copies/moves existing elements, and destroys the old block.' },
-      { title: '3. Accessing & Sizing', beginner: 'You access elements just like normal arrays: `scores[0]`. To find out exactly how many items are currently inside the vector, you use the `.size()` method. This is incredibly helpful for loops!', advanced: 'The `[]` operator provides direct access without bounds checking (fast). The `.at()` method provides bounds checking and throws a `std::out_of_range` exception if breached (safe). `.size()` evaluates in constant time O(1).' },
-      { title: '4. Removing Elements', beginner: 'If the user removes an item from their cart, you can use `.pop_back()` to instantly delete the very last item in the vector and shrink its size down by one.', advanced: '`pop_back` destroys the final element and decrements the internal size counter, but it does NOT typically reduce the underlying allocated memory `capacity()`, preventing reallocation overhead on subsequent pushes.' }
-    ],
-    {
-      title: 'The Dynamic Inventory',
-      intro: 'Create an expanding inventory system using std::vector that automatically adjusts its size.',
-      steps: [
-        'Include `<iostream>`, `<string>`, and `<vector>`.',
-        'In `main()`, declare an empty vector of strings: `std::vector<std::string> inventory;`.',
-        'Use `.push_back("Sword");` and `.push_back("Shield");`.',
-        'Print out the size of the inventory using `inventory.size()`.',
-        'Use a `for` loop to iterate from `0` to `inventory.size()` and print each item using `inventory[i]`.',
-        'Call `.pop_back();` to drop the Shield, and print the size again!'
-      ],
-      goal: 'You successfully utilized STL containers to manage dynamically scaling heap memory without manual allocation.'
-    },
-    [
-      q('What is the primary advantage of a `std::vector` over a standard C-style array?', ['It uses fewer CPU cycles', 'It can dynamically resize itself at runtime to accommodate new elements', 'It can hold multiple different data types at once', 'It does not require `#include`'], 1, 'While standard arrays have fixed compile-time bounds, vectors automatically allocate more heap memory and scale as you push more data into them.'),
-      q('Which method is used to add a new item to the very end of a vector?', ['add_end()', 'insert()', 'push_back()', 'append()'], 2, '`push_back(value)` appends the data to the contiguous sequence, increasing the vector\'s active size by one.'),
-      q('How do you safely determine exactly how many active elements are inside `std::vector<int> myVec`?', ['myVec.length', 'myVec.size()', 'sizeof(myVec)', 'myVec.count'], 1, 'The `.size()` method returns an unsigned integer representing the exact number of active elements currently managed by the vector.'),
-      q('What happens behind the scenes when a vector runs out of memory capacity during a `push_back()`?', ['The program crashes', 'It asks the user to delete data', 'It automatically allocates a larger block of memory, copies the old data over, and deletes the old block', 'It converts into a standard array'], 2, 'This is the hidden magic of STL containers. It handles the heavy lifting of dynamic heap reallocation and data migration for you.')
-    ],
-    ['Include <vector> to access dynamic arrays that can grow and shrink.', 'Create them using angle brackets: std::vector<dataType> name;', 'Use .push_back(value) to add items, and .pop_back() to remove the last item.', 'Use .size() to loop through them safely without going out of bounds.']
-  ),
-
-  L(
-    'cpp-19', 19, 'Advanced Strings (std::string)', '📝', 
-    TERMINAL_NOTICE_SHORT + 'You\'ve used basic strings to store text, but `std::string` is actually a powerful Class packed with methods! Searching for words, slicing sentences apart, and dynamically chaining text together are all built-in features you need to master.',
-    [
-      { title: '1. Length and Capacity', beginner: 'Just like vectors, you can find out exactly how many characters are in a string using `.length()` or `.size()`. `std::string name = "Leo";` means `name.length()` is 3!', advanced: '`std::string` dynamically manages a character array. `.length()` and `.size()` are synonymous and execute in O(1) time. The underlying `.capacity()` may be larger to optimize concatenation.' },
-      { title: '2. Concatenation (+)', beginner: 'You can glue strings together (Concatenation) using the simple `+` operator. `string fullName = "Bat" + "man";`. You can also use `+=` to append text to an existing variable!', advanced: 'The overloaded `+` operator generates a new string object and copies the buffer. Using `+=` or `.append()` is generally more performant as it attempts to utilize existing capacity without full reallocation.' },
-      { title: '3. Finding Substrings', beginner: 'Want to know if an email contains an "@" symbol? Use `.find()`. E.g., `email.find("@");`. If it finds it, it returns the exact index number. If it doesn\'t, it returns a massive error number called `std::string::npos`.', advanced: '`.find()` returns an unsigned integer `size_t`. Comparing the result against `std::string::npos` (which represents the maximum possible value for `size_t`) is the standard validation paradigm for search failures.' },
-      { title: '4. Extracting Substrings', beginner: 'You can extract a specific chunk of text using `.substr(start_index, length)`. If your string is `"Hello World"`, doing `.substr(0, 5)` starts at index 0 and grabs 5 letters, returning just `"Hello"`!', advanced: '`substr()` instantiates and returns a brand new string object by copying the requested character block. Be mindful of performance inside heavy loops.' }
-    ],
-    {
-      title: 'The Email Validator',
-      intro: 'Write a program that analyzes an email address string and extracts the username.',
-      steps: [
-        'Include `<string>`.',
-        'Declare `std::string email = "hero@server.com";`.',
-        'Find the index of the "@" symbol: `int pos = email.find("@");`.',
-        'Write an `if` statement checking if `pos` is NOT equal to `std::string::npos`.',
-        'If it is found, extract the username using `email.substr(0, pos)` and print it out. (The length of the username is exactly the index of the @ symbol!)'
-      ],
-      goal: 'You successfully utilized string member methods to search character arrays and dynamically extract substring data based on algorithmic conditions.'
-    },
-    [
-      q('Which operator allows you to seamlessly glue two `std::string` objects together?', ['&', '+', '*', '->'], 1, 'The overloaded `+` addition operator handles string concatenation cleanly (e.g., `string A + string B`).'),
-      q('What does `myString.find("Z")` return if the letter "Z" is NOT in the string?', ['-1', '0', 'false', 'std::string::npos'], 3, 'Because indexes are unsigned (cannot be negative), C++ returns the constant `npos` (no-position) to indicate a failed search.'),
-      q('If `std::string word = "Programming";`, what will `word.substr(3, 4)` extract?', ['"gram"', '"Prog"', '"ramm"', '"ming"'], 0, 'It starts at index 3 (the letter \'g\') and pulls exactly 4 characters total, resulting in "gram".'),
-      q('Are `.size()` and `.length()` functionally different for `std::string`?', ['Yes, size() includes spaces, length() does not', 'No, they are identical and return the exact number of characters in the string', 'Yes, size() returns bytes, length() returns characters', 'Yes, one is for arrays, one is for text'], 1, 'They are exactly the same. `.length()` exists to make strings feel natural to read, while `.size()` exists to maintain consistency with STL containers like vectors.')
-    ],
-    ['Use the + operator to easily glue (concatenate) strings together.', 'string.find("text") returns the index of the text, or std::string::npos if it fails.', 'string.substr(start, length) extracts a custom slice of the string.', '.length() and .size() do the exact same thing for strings.']
-  ),
-
-  L(
-    'cpp-20', 20, 'File I/O (Reading & Writing)', '💾', 
-    TERMINAL_NOTICE_SHORT + 'If your user plays your game for 5 hours, gets a high score, and closes the window... the RAM is wiped and the score is gone forever! To save data permanently to a hard drive, we must learn to Read and Write to physical text files.',
-    [
-      { title: '1. The <fstream> Header', beginner: 'To interact with the hard drive, you must `#include <fstream>` (File Stream). This library provides the tools to open files, write text into them, and read text back out.', advanced: '`<fstream>` utilizes the RAII (Resource Acquisition Is Initialization) pattern. It manages underlying OS file descriptors, opening streams upon instantiation and releasing OS locks upon destruction.' },
-      { title: '2. Writing to Files (ofstream)', beginner: 'To output (write) data, use `std::ofstream`. `std::ofstream myFile("save.txt");`. This creates a text file. You write to it EXACTLY like `std::cout`! `myFile << "Score: 100";`.', advanced: '`ofstream` defaults to `std::ios::out`. If the file does not exist, it creates it. If it does exist, it completely overwrites it (truncates). To append without erasing, initialize with `std::ios::app`.' },
-      { title: '3. Closing Files', beginner: 'When you are done writing, you MUST close the file: `myFile.close();`. If you don\'t, the file gets locked by the operating system, and data might not fully save!', advanced: 'While the destructor of `ofstream` implicitly calls `close()`, explicitly calling `.close()` allows you to catch and handle any final I/O flush errors before the object goes out of scope.' },
-      { title: '4. Reading from Files (ifstream)', beginner: 'To input (read) data, use `std::ifstream`. You can use a `while` loop combined with the `getline()` function to read the file line-by-line until it reaches the end! `while (getline(myFile, lineText)) { ... }`.', advanced: '`std::getline(stream, string_var)` extracts characters from the input stream until a delimiter (newline) is found. The stream state implicitly evaluates to `false` when EOF (End Of File) is reached.' }
-    ],
-    {
-      title: 'The High Score Saver',
-      intro: 'Write a program that writes a high score to a text file, closes it, and then reads it back to prove it saved to the hard drive.',
-      steps: [
-        'Include `<iostream>`, `<string>`, and `<fstream>`.',
-        'In `main()`, open a file for writing: `std::ofstream outFile("score.txt");`.',
-        'Write to it: `outFile << "High Score: 9999" << std::endl;`.',
-        'Close it: `outFile.close();`.',
-        'Now, open it for reading: `std::ifstream inFile("score.txt");`.',
-        'Create a string to hold the incoming text: `std::string line;`.',
-        'Use `std::getline(inFile, line);` to grab the text, and print `line` using `std::cout`!'
-      ],
-      goal: 'You successfully persisted runtime state to physical non-volatile storage via stream insertion, and retrieved it via stream extraction.'
-    },
-    [
-      q('Which C++ standard library header must be included to read and write physical files?', ['<iostream>', '<fstream>', '<file>', '<disk>'], 1, '`<fstream>` stands for File Stream and contains the definitions for `ofstream` and `ifstream`.'),
-      q('What happens if you open a file using `std::ofstream myFile("data.txt");` and the file "data.txt" does not exist yet?', ['The program crashes', 'It asks the user to create the file', 'C++ automatically creates the new file for you on the hard drive', 'It throws an exception'], 2, 'By default, output streams will automatically generate the specified file if it cannot be found in the directory.'),
-      q('Why is it critically important to call `.close()` on your file streams when you are finished?', ['To free up RAM, release the OS file lock, and guarantee all buffered text is permanently flushed to the hard drive', 'To encrypt the file', 'To delete the file', 'To prevent viruses'], 0, 'Failing to close a file stream can leave data hanging in an output buffer, resulting in incomplete file saves and locked resources.'),
-      q('Which function is best used inside a while loop to read a file completely line-by-line?', ['cin >>', 'file.read()', 'std::getline()', 'file.text()'], 2, '`std::getline(stream, string)` elegantly grabs an entire line of text including spaces, advancing the stream pointer until it gracefully hits the End Of File.')
-    ],
-    ['Include <fstream> to unlock file saving and loading.', 'Use std::ofstream to Output (write) data exactly like you use std::cout.', 'Always use .close() when you are done to save the data properly.', 'Use std::ifstream and std::getline() to read data back line-by-line.']
-  ),
-
-  L(
-    'cpp-21', 21, 'Modern C++ Features (auto, nullptr, constexpr)', '⚡', 
-    TERMINAL_NOTICE_SHORT + 'Older C++ codebases were messy and prone to dangerous null pointer bugs. Modern C++ (C++11 and beyond) introduced sleek features that make your code safer, faster, and much cleaner to write.',
-    [
-      { title: '1. Type Deduction (auto)', beginner: 'Tired of typing long data types? `auto` tells the compiler to automatically figure out the type for you! E.g., `auto score = 100;` automatically knows it is an integer. It saves time without sacrificing static typing speed.', advanced: 'Type deduction happens strictly at compile-time. It does not incur runtime overhead, but note that `auto` strips away references and const qualifiers by default unless explicitly specified as `auto&`.' },
-      { title: '2. The Safe Null Pointer (nullptr)', beginner: 'In old C++, programmers used the number `0` or `NULL` to represent empty pointers, which caused massive confusion with integer math. Modern C++ introduced `nullptr` as a dedicated, type-safe keyword for unassigned pointers.', advanced: '`nullptr` has its own type (`std::nullptr_t`), eliminating the ambiguity of integer-zero overloads in function signatures and preventing subtle compiler resolution bugs.' },
-      { title: '3. Range-Based For Loops', beginner: 'Remember writing `for(int i = 0; i < vec.size(); i++)`? Modern C++ lets you loop through lists effortlessly: `for (int num : myVector) { ... }`. It reads like plain English!', advanced: 'Range-based for loops under the hood utilize iterator pairs (`begin()` and `end()`), providing a clean, concise syntactic abstraction for sequential container iteration.' },
-      { title: '4. Compile-Time Evaluation (constexpr)', beginner: 'Want calculations to happen BEFORE your program even runs to speed things up? Use `constexpr`. It forces the compiler to compute the math during compilation time rather than wasting CPU cycles at runtime!', advanced: '`constexpr` instructs the compiler to evaluate expressions at compile-time, allowing computed values to be used in constant contexts like array bounds or template arguments.' }
-    ],
-    {
-      title: 'Modern Syntax Refactor',
-      intro: 'Refactor old-style code using auto, nullptr, and range-based loops.',
-      steps: [
-        'Include `<vector>` and `<iostream>`.',
-        'Declare a vector of integers using `auto`: `auto numbers = {1, 2, 3, 4, 5};`.',
-        'Create a pointer initialized safely: `int* ptr = nullptr;`.',
-        'Use a range-based for loop to print every number in the vector: `for (int n : numbers) { std::cout << n; }`.'
-      ],
-      goal: 'You successfully modernized your codebase by implementing compile-time type deduction, safe null pointers, and range-based loops.'
-    },
-    [
-      q('What does the `auto` keyword do in Modern C++?', ['It makes the variable run automatically in the background', 'It instructs the compiler to automatically deduce the variable\'s data type from its initialization value at compile-time', 'It allows a variable to change its data type at runtime', 'It creates a loop'], 1, '`auto` simplifies syntax by letting the compiler figure out the type during compilation, preserving strict static typing.'),
-      q('Why was `nullptr` introduced to replace `NULL` or `0` for empty pointers?', ['To make code look cooler', 'To provide a distinct, type-safe null pointer literal that avoids ambiguity with integer types in function overloads', 'To speed up the computer\'s hard drive', 'To allow pointers to hold strings'], 1, '`nullptr` prevents type-matching ambiguity where integer `0` could accidentally match integer function parameters instead of pointer parameters.'),
-      q('How does a Range-Based For Loop (`for (int x : list)`) differ from a standard index loop?', ['It is slower', 'It completely hides iterator logic, allowing you to seamlessly pull elements out of a container without managing index numbers or bounds', 'It only works with strings', 'It runs infinitely'], 1, 'Range-based loops abstract away the counter variables and index lookups, preventing out-of-bounds errors entirely.'),
-      q('What is the primary benefit of using `constexpr`?', ['It makes variables private', 'It evaluates expressions at compile-time, saving runtime CPU cycles and enabling constant expression mapping', 'It connects your code to the cloud', 'It deletes memory leaks'], 1, '`constexpr` shifts computational costs from runtime execution over to the compilation phase.')
-    ],
-    ['Use auto to let the compiler deduce types, keeping code clean without losing performance.', 'Always use nullptr instead of 0 or NULL to represent empty pointers safely.', 'Range-based for loops (for (auto item : list)) make iterating through collections effortless.', 'Use constexpr to evaluate math and logic at compile-time for ultimate optimization.']
-  ),
-
-  L(
-    'cpp-22', 22, 'Smart Pointers & Ownership (unique_ptr, shared_ptr)', '🛡️', 
-    TERMINAL_NOTICE_SHORT + 'Managing raw heap memory with `new` and `delete` is dangerous. If you forget to delete, you get a Memory Leak. If you delete twice, your program crashes. Modern C++ solved this forever with "Smart Pointers", which automatically clean up after themselves!',
-    [
-      { title: '1. The Problem with Raw Pointers', beginner: 'When you create data on the Heap using `new`, YOU are entirely responsible for remembering to type `delete` later. If an exception throws before you reach the delete line, your RAM leaks permanently.', advanced: 'Raw pointers lack deterministic ownership semantics. In complex codebases with branching logic and early returns, manual memory management reliably leads to leaks or double-frees.' },
-      { title: '2. std::unique_ptr (Exclusive Ownership)', beginner: 'A `unique_ptr` guarantees that ONLY ONE pointer can own that heap data at a time. You cannot copy it. When the unique_ptr goes out of scope, it automatically destroys the heap data for you! E.g., `std::unique_ptr<int> p = std::make_unique<int>(50);`.', advanced: '`unique_ptr` enforces exclusive ownership semantics. Its copy constructor is explicitly deleted; ownership can only be transferred via move semantics (`std::move`).' },
-      { title: '3. std::shared_ptr (Shared Ownership)', beginner: 'What if multiple parts of your program need to point to the exact same heap data? Use `std::shared_ptr`. It keeps a secret "Reference Count". Every time a new shared pointer points to it, the count goes up. When a pointer dies, the count goes down. When the count hits zero, it automatically deletes the data!', advanced: '`shared_ptr` maintains a control block containing a reference counter. While incredibly flexible, it introduces minor atomic increment/decrement overhead and risks cyclic reference memory leaks if not paired with weak_ptr.' },
-      { title: '4. std::make_unique & std::make_shared', beginner: 'Always use `std::make_unique` and `std::make_shared` to create your smart pointers. It is cleaner, safer, and prevents subtle memory allocation bugs.', advanced: '`make_shared` allocates the control block and the object in a single contiguous memory block, drastically improving cache locality and performance compared to separate allocations.' }
-    ],
-    {
-      title: 'The Leak-Free Workspace',
-      intro: 'Replace dangerous raw heap pointers with modern unique and shared smart pointers.',
-      steps: [
-        'Include `<memory>` and `<iostream>`.',
-        'Create a unique pointer holding an integer: `std::unique_ptr<int> score = std::make_unique<int>(100);`.',
-        'Print the value by dereferencing it: `std::cout << *score;`.',
-        'Create a shared pointer structure: `std::shared_ptr<int> item = std::make_shared<int>(500);`.',
-        'Check the reference count using `item.use_count();` (It will output 1).'
-      ],
-      goal: 'You successfully eliminated manual memory management by implementing automated smart pointer ownership models.'
-    },
-    [
-      q('Why are Smart Pointers preferred over raw pointers in Modern C++?', ['They run slower', 'They automatically manage heap lifetime, preventing memory leaks and double-free crashes when they go out of scope', 'They can only hold strings', 'They use the stack instead of the heap'], 1, 'Smart pointers implement RAII, ensuring heap memory is deterministically freed when the pointer object is destroyed.'),
-      q('What is the ownership rule of a `std::unique_ptr`?', ['Multiple pointers can share it', 'It has exclusive ownership; it cannot be copied, only moved to another unique pointer', 'It can only be accessed inside functions', 'It deletes itself immediately'], 1, '`unique_ptr` enforces strict single ownership. Copying is banned to prevent multiple pointers from attempting to delete the same memory block.'),
-      q('How does a `std::shared_ptr` track when it is safe to delete underlying heap data?', ['It uses a reference count that increments when shared and decrements when pointers go out of scope', 'It asks the operating system every second', 'It deletes data randomly', 'It relies on garbage collection'], 0, 'A control block tracks the active reference count. The memory is only freed when the counter drops precisely to zero.'),
-      q('Which helper function is strongly recommended when instantiating a unique pointer?', ['new int()', 'std::make_unique<int>()', 'malloc()', 'auto_ptr()'], 1, '`std::make_unique` is exception-safe and modern, wrapping the allocation cleanly without requiring explicit `new` syntax.')
-    ],
-    ['Never use raw new and delete in Modern C++; use smart pointers instead.', 'std::unique_ptr enforces exclusive ownership and cleans up automatically when out of scope.', 'std::shared_ptr allows multiple pointers to share ownership using a reference count.', 'Always use std::make_unique and std::make_shared for safe, clean allocations.']
-  ),
-
-  L(
-    'cpp-23', 23, 'RAII Pattern (Resource Acquisition Is Initialization)', '🔒', 
-    TERMINAL_NOTICE_SHORT + 'RAII is the single most important design pattern in C++. It ties the lifecycle of system resources (like files, database connections, and locks) directly to the lifespan of stack objects. When an object dies, its destructor cleans up the resource automatically!',
-    [
-      { title: '1. What is RAII?', beginner: 'Resource Acquisition Is Initialization. It sounds complex, but it means this: Wrap your resources inside an object. When the object is created (initialized), it grabs the resource. When the object goes out of scope and dies, its destructor automatically releases the resource.', advanced: 'RAII bridges memory management and resource acquisition. Because stack unwinding guarantees deterministic destruction when exceptions occur, RAII eliminates resource leaks without garbage collection.' },
-      { title: '2. Deterministic Destruction', beginner: 'In languages with Garbage Collection, you never know WHEN resources will be cleaned up. In C++, destruction is 100% deterministic. The exact nanosecond your code leaves a set of curly braces `{}`, the destructor fires immediately.', advanced: 'Deterministic destruction ensures predictable resource reclamation. File locks, sockets, and GPU handles are released instantly upon scope exit, preventing resource starvation.' },
-      { title: '3. Exception Safety via RAII', beginner: 'Imagine opening a file, and halfway through reading, an exception crashes your code. If you used manual cleanup, the file never closes! With RAII, because the object leaves scope during the stack unwind, the destructor STILL fires, safely closing your file.', advanced: 'RAII achieves strong exception safety guarantees. Even during stack unwinding due to unhandled exceptions, local object destructors are guaranteed to execute.' },
-      { title: '4. Building an RAII Wrapper', beginner: 'You can build your own RAII classes! Simply open a resource in the constructor, and close/free it in the destructor. Now you never have to worry about cleanup code again.', advanced: 'Custom RAII wrappers manage unique resource handles (e.g., custom mutex locks, file descriptors) by deleting copy constructors and implementing move semantics.' }
-    ],
-    {
-      title: 'The Custom File RAII Wrapper',
-      intro: 'Build a custom RAII class that automatically opens a log file on birth and closes it on death.',
-      steps: [
-        'Create a `class LogFile { private: std::ofstream file; public: ... };`.',
-        'In the Constructor, open the file: `LogFile(std::string filename) { file.open(filename); }`.',
-        'In the Destructor, close the file: `~LogFile() { if(file.is_open()) file.close(); }`.',
-        'Add a method to write logs: `void write(std::string msg) { file << msg; }`.',
-        'In `main()`, instantiate your wrapper inside a scope block. Watch it manage the file lifecycle automatically!'
-      ],
-      goal: 'You successfully implemented the RAII design pattern, binding non-memory system resources to deterministic stack object lifecycles.'
-    },
-    [
-      q('What does the RAII design pattern stand for and mean?', ['Random Access Internal Index; finding data fast', 'Resource Acquisition Is Initialization; binding resource management to object lifecycles so destruction handles cleanup automatically', 'Run All Instances Immediately; threading pattern', 'Real-time Artificial Intelligence Integration'], 1, 'RAII ties acquiring a resource to object construction, and releasing that resource directly to object destruction.'),
-      q('Why is deterministic destruction a massive advantage in C++?', ['It makes the screen flicker', 'You know the exact nanosecond a resource is freed when an object goes out of scope, eliminating memory and handle leaks', 'It uses garbage collection', 'It prevents classes from being inherited'], 1, 'Unlike garbage collection which runs unpredictably, RAII guarantees immediate, deterministic resource cleanup upon scope exit.'),
-      q('How does RAII protect your program during an exception crash?', ['It restarts the computer', 'Because local stack objects are guaranteed to be destroyed during stack unwinding, their destructors fire and clean up resources even if an exception occurs', 'It deletes all files', 'It turns off exceptions'], 1, 'Stack unwinding guarantees that all active local objects are destroyed, executing their destructors and preventing resource leaks during error states.'),
-      q('Which standard C++ features are prime examples of RAII in action?', ['std::vector and std::unique_ptr', 'if statements and switches', 'int and double primitives', 'for loops'], 0, 'Smart pointers and containers manage heap memory and buffer allocations via RAII, releasing them automatically upon destruction.')
-    ],
-    ['RAII ties resource cleanup directly to object destruction.', 'Destruction in C++ is 100% deterministic; it happens the exact moment an object leaves scope.', 'RAII guarantees exception safety because destructors still fire even if your code crashes.', 'Use RAII wrappers to manage files, network sockets, and locks without manual close statements.']
-  ),
-
-  L(
-    'cpp-24', 24, 'References Deep Dive & Move Semantics (rvalues, std::move)', '📦', 
-    TERMINAL_NOTICE_SHORT + 'In C++, copying massive objects (like a vector with 1 million items) into functions wastes immense CPU time and RAM. Modern C++ introduced Move Semantics, allowing you to "steal" resources from temporary objects instantly instead of copying them!',
-    [
-      { title: '1. Lvalues vs. Rvalues', beginner: 'An Lvalue has a permanent memory address that you can point to (e.g., a named variable like `int x = 10;`). An Rvalue is a temporary, nameless value that is about to vanish immediately (e.g., the number `50`, or the result of `a + b`).', advanced: 'An lvalue (locator value) persists beyond a single expression. An rvalue is a temporary value with no persistent storage address.' },
-      { title: '2. Rvalue References (&&)', beginner: 'Modern C++ introduced double-ampersands `&&` to capture temporary rvalues. E.g., `int&& ref = 50;`. This allows your code to target dying temporary objects directly.', advanced: 'An rvalue reference (`T&&`) binds specifically to temporary objects, enabling functions to distinguish between persistent variables and ephemeral temporaries.' },
-      { title: '3. The Cost of Copying', beginner: 'When you pass a massive string or vector into a function, C++ usually makes a heavy duplicate copy byte-by-byte. For large datasets, this slows your application down significantly.', advanced: 'Copying heap-allocated containers triggers deep copies: allocating new heap memory, copying every element, and deallocating later. This is a severe performance bottleneck.' },
-      { title: '4. std::move & Stealing Resources', beginner: '`std::move` doesn\'t actually move anything! It simply casts an lvalue into an rvalue. This tricks C++ into saying: "Treat this variable like a temporary; you have permission to STEAL its internal heap pointer instead of copying it!"', advanced: '`std::move` casts an object to an rvalue reference, invoking the move constructor or move assignment operator. The destination steals the source\'s internal buffer pointers, leaving the source in a valid but empty state.' }
-    ],
-    {
-      title: 'The Resource Stealer',
-      intro: 'Utilize std::move to transfer ownership of heavy heap data without making duplicate copies.',
-      steps: [
-        'Include `<iostream>` and `<string>`, `<utility>`.',
-        'Declare a heavy string: `std::string source = "Massive Data Payload";`.',
-        'Use `std::move` to cast it into a temporary: `std::string destination = std::move(source);`.',
-        'Print `source`. You will notice it is now completely empty because its internal heap buffer was stolen by destination!'
-      ],
-      goal: 'You successfully bypassed deep-copy performance penalties by implementing move semantics and resource stealing.'
-    },
-    [
-      q('What is the fundamental difference between an Lvalue and an Rvalue?', ['Lvalues are large, Rvalues are small', 'Lvalues have a persistent memory address and a name, while Rvalues are temporary, nameless values about to expire', 'Lvalues are numbers, Rvalues are text', 'There is no difference'], 1, 'Lvalues persist in memory (variables), while Rvalues are ephemeral expressions or literals.'),
-      q('What does `std::move` actually do under the hood?', ['It teleports variables to another computer', 'It acts as a cast that converts an lvalue into an rvalue reference, enabling resource stealing instead of copying', 'It deletes variables from memory', 'It sorts an array'], 1, '`std::move` performs zero runtime data movement; it merely casts the type to trigger move constructors/assignments.'),
-      q('Why are Move Semantics a massive performance upgrade for C++?', ['They eliminate expensive deep-copy operations by stealing internal heap pointers from temporary objects', 'They make the compiler compile code twice as fast', 'They remove the need for functions', 'They automatically compress hard drives'], 0, 'Moving transfers ownership of existing heap allocations in O(1) time instead of duplicating data byte-by-byte.'),
-      q('What happens to a source variable after its contents are moved using `std::move`?', ['It explodes', 'It is permanently deleted from RAM', 'It remains in a valid but unspecified/empty state until reassigned or destroyed', 'It doubles in size'], 2, 'The source object is left empty (e.g., size 0, null pointer), safe to be destructed or reused.')
-    ],
-    ['Lvalues have names and persistent memory addresses; Rvalues are temporary expressions.', 'Rvalue references (&&) allow you to capture and interact with temporary objects.', 'std::move casts a variable into an rvalue, granting permission to steal its data.', 'Move semantics provide massive performance boosts by avoiding heavy deep copies.']
-  ),
-
-  L(
-    'cpp-25', 25, 'Function Templates', '🧬', 
-    TERMINAL_NOTICE_SHORT + 'If you write a function to swap two integers, what happens when you want to swap two doubles? Or two strings? Writing the exact same function three times is exhausting. Function Templates let you write ONE generic blueprint that automatically works for any data type!',
-    [
-      { title: '1. The Template Syntax', beginner: 'You start a template with `template <typename T>`. Here, `T` is a placeholder for a data type. E.g., `template <typename T> T getMax(T a, T b) { return (a > b) ? a : b; }`. Now this function can compare ints, doubles, or strings!', advanced: 'Templates are the foundation of C++ generic programming. They are not actual code; they are blueprints that instruct the compiler to generate specialized function code for every data type you pass in.' },
-      { title: '2. Compile-Time Code Generation', beginner: 'When you call `getMax(5, 10)`, the compiler looks at your template and automatically writes a custom integer version of the function behind the scenes. It gives you the best of both worlds: generic code for you, and optimized native code for the machine.', advanced: 'This process is known as Template Instantiation. The compiler performs syntactic checks and generates specialized binary code for each unique type combination used.' },
-      { title: '3. Multiple Template Types', beginner: 'You aren\'t limited to just one placeholder! You can define multiple types in your template brackets: `template <typename T1, typename T2> void printPair(T1 a, T2 b) { ... }`.', advanced: 'Multi-parameter templates allow heterogeneous data handling, forming the architectural backbone for STL containers like `std::pair` and `std::unordered_map`.' },
-      { title: '4. Template Deduction', beginner: 'In most cases, you don\'t even need to tell the template what type you are using. If you call `getMax(10.5, 20.1)`, C++ automatically deduces that `T` is a `double`.', advanced: 'The compiler performs argument deduction by matching function call parameter types against the template parameter list.' }
-    ],
-    {
-      title: 'The Universal Sorter',
-      intro: 'Write a generic template function that can swap any two variables regardless of their data type.',
-      steps: [
-        'Write the template declaration above your function: `template <typename T> void mySwap(T& a, T& b) { T temp = a; a = b; b = temp; }`.',
-        'Inside `main()`, declare two integers: `int x = 5, y = 10;`.',
-        'Call your template function: `mySwap(x, y);`. They are swapped!',
-        'Now, test it with strings: `std::string s1 = "Hello", s2 = "World";`.',
-        'Call `mySwap(s1, s2);`. It works instantly without rewriting code!'
-      ],
-      goal: 'You successfully implemented generic programming via function templates, enabling type-agnostic code reuse.'
-    },
-    [
-      q('What is the primary purpose of a Function Template in C++', ['To make functions run slower', 'To write a single generic function blueprint that automatically generates type-safe code for any data type', 'To create loops', 'To delete duplicate files'], 1, 'Templates enable generic programming, letting you write algorithms once and apply them to ints, doubles, classes, and more.'),
-      q('When does the compiler actually generate the specific machine code for a template function?', ['At runtime', 'During compilation, when the compiler encounters specific template instantiations in your code', 'When the user types input', 'Never'], 1, 'Templates are meta-programming blueprints. The compiler instantiates concrete functions for each unique data type used during compilation.'),
-      q('How do you declare a template placeholder type in C++?', ['<type T>', '<typename T>', '<class:T>', '<template.T>'], 1, '`template <typename T>` (or `template <class T>`) defines the generic type placeholder.'),
-      q('Can a template function accept more than one generic data type?', ['No, templates are restricted to exactly one type', 'Yes, by defining multiple parameters like `template <typename T1, typename T2>`', 'Only if the types are both integers', 'Only inside classes'], 1, 'Templates support multiple comma-separated type parameters for handling heterogeneous data.')
-    ],
-    ['Function templates let you write one generic function that works for any data type.', 'Define templates using template <typename T> right above your function signature.', 'The compiler automatically generates optimized, type-specific code behind the scenes during compilation.', 'You can use multiple types in a single template (e.g., template <typename T1, typename T2>).']
-  ),
-
-  L(
-    'cpp-26', 26, 'Class Templates', '🏗️', 
-    TERMINAL_NOTICE_SHORT + 'Just like functions can be templated, entire Classes can be templated! This is how the creators of C++ built `std::vector`—a container that can hold ints, strings, or custom objects. Today, you will build your own generic container class.',
-    [
-      { title: '1. Templating a Class', beginner: 'If you want to build a custom box class that can hold ANY data type, you template the class: `template <typename T> class Box { private: T data; public: void set(T val) { data = val; } };`.', advanced: 'Class templates parameterize entire class blueprints. Member functions defined outside the class template also require full template prefixing.' },
-      { title: '2. Instantiating a Template Class', beginner: 'When creating an object from a class template, you MUST explicitly tell C++ what data type goes inside the angle brackets! E.g., `Box<int> intBox;` or `Box<std::string> strBox;`.', advanced: 'Unlike function templates which support argument deduction, class templates historically required explicit argument specification (though C++17 introduced class template argument deduction - CTAD).' },
-      { title: '3. Defining Methods Outside the Class', beginner: 'When writing class template method definitions outside the class body, you must include the full template prefix: `template <typename T> void Box<T>::set(T val) { ... }`.', advanced: 'Every outside method definition must be prefixed with `template <typename T>` and scope-resolved with `ClassName<T>::methodName`, reflecting its templated nature to the compiler.' },
-      { title: '4. The Foundation of the STL', beginner: 'Every major container in the C++ Standard Template Library (Vectors, Queues, Maps) is built using Class Templates under the hood!', advanced: 'Standard Template Library (STL) containers leverage class templates and allocator parameters to achieve extreme flexibility, type safety, and high performance.' }
-    ],
-    {
-      title: 'The Generic Pair Container',
-      intro: 'Build a custom class template that holds two related items of any data type.',
-      steps: [
-        'Write the template declaration: `template <typename T> class Pair { private: T first; T second; public: ... };`.',
-        'Add a constructor that initializes both items using an initializer list.',
-        'Add a public getter method to print them out.',
-        'In `main()`, instantiate an integer pair: `Pair<int> p1(10, 20);`.',
-        'Instantiate a string pair: `Pair<std::string> p2("Hello", "World");`. Both use the exact same class blueprint!'
-      ],
-      goal: 'You successfully engineered a type-agnostic custom container class using class templates.'
-    },
-    [
-      q('How do you instantiate an object from a class template named `Holder` holding an integer?', ['Holder holder;', 'Holder<int> holder;', 'Holder(int) holder;', 'template<Holder> int;'], 1, 'Class templates require explicit type specification in angle brackets during instantiation (e.g., `Holder<int>`).'),
-      q('When writing a class template method definition outside the class body, what prefix is required?', ['`class::method`', '`template <typename T> returnType ClassName<T>::methodName`', '`void`', '`template<>::`'], 1, 'You must re-declare the template parameter and attach `<T>` to the class scope resolution.'),
-      q('What is the main benefit of Class Templates?', ['They compile instantly', 'They allow you to design reusable container structures (like vectors or pairs) that work with any data type securely', 'They eliminate the need for destructors', 'They convert code into Python'], 1, 'Class templates enable type-safe container design, avoiding code duplication across different data types.'),
-      q('What does CTAD stand for in Modern C++ (C++17)?', ['Class Template Argument Deduction', 'Compiled Type Array Data', 'Common Template Access Design', 'Conditional Type Allocation Driver'], 0, 'CTAD allows the compiler to deduce class template parameters from constructor arguments automatically, e.g., `Pair p(10, 20);`.')
-    ],
-    ['Class templates let you build generic data structures that work with any data type.', 'Instantiate class templates by providing the type in angle brackets (e.g., Box<int> box;).', 'Outside method definitions require the full template <typename T> and Class<T>:: prefix.', 'This is the exact mechanism behind C++ STL containers like std::vector.']
-  ),
-
-  L(
-    'cpp-27', 27, 'Lambda Expressions & Callbacks', '⚡', 
-    TERMINAL_NOTICE_SHORT + 'Sometimes you need a quick, one-off function for a specific task, but writing an entire named function feels like overkill. Modern C++ introduced "Lambdas"—anonymous, inline functions that you can write directly inside your code on the fly!',
-    [
-      { title: '1. Lambda Syntax', beginner: 'A Lambda is an anonymous function written like this: `auto myLambda = []() { std::cout << "Hello Lambda!"; };`. You trigger it by adding parentheses at the end: `myLambda();`.', advanced: 'A lambda expression generates an unnamed function object (functor) under the hood. The compiler creates a unique closure class for every lambda.' },
-      { title: '2. The Capture Clause ([ ])', beginner: 'By default, a lambda is trapped in its own world and cannot see variables declared outside of it. The Capture Clause `[]` at the very beginning lets you "capture" outside variables into the lambda.', advanced: 'Capturing bridges outer scope variables into the closure object. Capturing by value creates a copied member variable inside the closure; capturing by reference maintains a reference.' },
-      { title: '3. Capturing by Value vs. Reference', beginner: 'Capture by value using `[x]` to take a read-only copy of `x`. Capture by reference using `[&x]` to give the lambda permission to modify the outside variable `x`. Capture everything using `[=]` or `[&]`.', advanced: 'Use `[=]` with caution inside asynchronous callbacks to prevent dangling references if the outer stack frame expires before execution.' },
-      { title: '4. Passing Lambdas as Callbacks', beginner: 'Lambdas are extremely powerful when paired with algorithms or asynchronous event callbacks, allowing you to inject custom inline logic directly into functions.', advanced: '`std::function<void(int)>` from `<functional>` can store, copy, and invoke lambda expressions, providing type-erased callback flexibility.' }
-    ],
-    {
-      title: 'The Inline Filter',
-      intro: 'Write a lambda expression with a capture clause to filter and print data from a vector.',
-      steps: [
-        'Include `<vector>`, `<iostream>`, and `<algorithm>`.',
-        'Declare a vector of numbers: `std::vector<int> nums = {10, 25, 30, 45, 50};`.',
-        'Declare a threshold variable: `int threshold = 30;`.',
-        'Use `std::for_each` combined with a lambda capturing threshold by value: `std::for_each(nums.begin(), nums.end(), [threshold](int n) { if(n > threshold) std::cout << n; });`.',
-        'Run the code and watch it filter inline without a separate named function!'
-      ],
-      goal: 'You successfully utilized anonymous lambda expressions and capture clauses to inject inline logic into algorithms.'
-    },
-    [
-      q('What is a Lambda Expression in C++?', ['A permanent function stored on the hard drive', 'An anonymous, inline function object that can be defined directly where it is needed', 'A mathematical symbol for loops', 'A type of smart pointer'], 1, 'Lambdas are anonymous inline closures that eliminate the need to write separate named functions for one-off tasks.'),
-      q('What is the role of the Capture Clause `[]` at the beginning of a lambda?', ['To hold function parameters', 'To bring variables from the surrounding outer scope into the lambda\'s internal closure', 'To name the function', 'To return data'], 1, 'The capture clause explicitly defines how outer scope variables are accessed inside the lambda body.'),
-      q('What is the difference between `[x]` and `[&x]` capture clauses?', ['There is no difference', '`[x]` captures the variable by value (copy), while `[&x]` captures it by reference (allowing modification)', '`[x]` is for integers, `[&x]` is for strings', '`[x]` deletes the variable'], 1, 'Capture by value creates an internal copy; capture by reference binds directly to the outer variable.'),
-      q('How do you immediately execute a lambda the moment it is written?', ['By adding `()` at the very end of the lambda definition', 'By writing `run` in front', 'It runs automatically', 'You cannot execute lambdas immediately'], 0, 'Adding `()` immediately invokes the generated closure object (Immediately Invoked Lambda Expression - IILE).')
-    ],
-    ['Lambdas are anonymous, inline functions written directly inside your code.', 'Use the capture clause [] to pull outside variables into your lambda.', 'Capture by value [var] for read copies, or by reference [&var] to modify outside variables.', 'Lambdas are perfect for short, one-off tasks and algorithm callbacks.']
-  ),
-
-  L(
-    'cpp-28', 28, 'Modern Utilities (std::optional, std::variant, std::string_view)', '🧰', 
-    TERMINAL_NOTICE_SHORT + 'Older C++ code relied on messy hacks—like returning `-1` or `nullptr`—to indicate that a function failed to find data. Modern C++ (C++17/20) introduced robust standard utilities to make your code expressive, safe, and lightning fast.',
-    [
-      { title: '1. std::optional (Maybe Data)', beginner: 'What if a function searches for a user in a database, but the user doesn\'t exist? Instead of returning an error code, use `std::optional<User>`. It explicitly represents a value that might exist OR might be empty (`std::nullopt`).', advanced: '`std::optional` wraps a value with an internal boolean flag indicating presence. It prevents the use of magic numbers (`-1`, `nullptr`) and enforces safe `.has_value()` or `.value()` checks.' },
-      { title: '2. std::variant (Type-Safe Unions)', beginner: 'A `std::variant` is a variable that can hold ONE of several different data types safely. E.g., `std::variant<int, std::string, double> result;`. It can hold an int today, and a string tomorrow!', advanced: '`std::variant` is a type-safe successor to C-style unions. It tracks its active type at runtime and throws exceptions or prevents unsafe type extraction.' },
-      { title: '3. std::string_view (Zero-Copy Text)', beginner: 'Passing a `std::string` into a function creates a brand new copy of the text string in memory, which is slow. `std::string_view` is a lightweight read-only "window" pointing to existing text without copying a single byte!', advanced: '`std::string_view` stores a pointer and a length. It provides O(1) non-owning read access to string literals or std::strings, eliminating allocation overhead.' },
-      { title: '4. Safe Data Extraction', beginner: 'Using `.value()` on an optional or `std::get<T>` on a variant ensures your program safely inspects data with built-in runtime exception checks.', advanced: 'Modern utilities prioritize type safety and explicit state management, reducing undefined behavior across complex systems.' }
-    ],
-    {
-      title: 'The Optional Finder',
-      intro: 'Write a function returning a std::optional to handle missing search results safely without magic numbers.',
-      steps: [
-        'Include `<optional>` and `<iostream>`, `<string>`.',
-        'Write a function returning optional: `std::optional<int> findAge(std::string name) { if(name == "Alice") return 25; return std::nullopt; }`.',
-        'In `main()`, call the function: `auto result = findAge("Bob");`.',
-        'Use an `if` statement with `.has_value()` or check `if (result)` to handle the missing data safely without crashing!'
-      ],
-      goal: 'You successfully utilized modern utility wrappers to handle missing data and zero-copy string views.'
-    },
-    [
-      q('What is the main purpose of `std::optional`?', ['To make optional homework assignments', 'To explicitly represent a value that may or may not exist, eliminating confusing magic error numbers like `-1` or `nullptr`', 'To create optional loops', 'To delete files'], 1, '`std::optional` cleanly encapsulates presence or absence, making function return contracts explicit.'),
-      q('How does `std::string_view` improve string performance?', ['It compresses files', 'It provides a lightweight, read-only pointer window to existing string memory, avoiding expensive duplicate string allocations', 'It turns strings into integers', 'It deletes strings when finished'], 1, '`string_view` avoids copying string data by acting as a non-owning pointer-and-length wrapper.'),
-      q('What is a `std::variant`?', ['A virus scanner', 'A type-safe union container that can hold one of several specified data types at any given time', 'A variable that changes its name', 'An array of vectors'], 1, '`variant` allows a single variable to safely alternate between multiple distinct types with runtime state tracking.'),
-      q('What does `std::nullopt` represent when working with `std::optional`?', ['An infinite loop', 'An explicit empty state indicating the optional holds no value', 'A null pointer exception crash', 'A zero-copy string'], 1, '`std::nullopt` is the designated literal used to reset or initialize an optional to an empty state.')
-    ],
-    ['Use std::optional to return values that might not exist, avoiding magic error numbers.', 'std::variant lets a variable hold one of several distinct types safely.', 'std::string_view provides zero-copy read-only access to text, boosting performance.', 'These modern utilities make your codebase cleaner, expressive, and robust.']
-  ),
-
-  L(
-    'cpp-29', 29, 'Exception Handling & Safety (try, catch, throw)', '🚨', 
-    TERMINAL_NOTICE_SHORT + 'Even the best programs encounter disasters: hard drives disconnect, network servers crash, and users type invalid text. Instead of letting your program crash instantly, Modern C++ uses Exception Handling to catch errors gracefully and recover.',
-    [
-      { title: '1. Throwing Exceptions', beginner: 'When an unrecoverable error occurs inside your code, you "throw" an exception object. E.g., `if (age < 0) throw std::invalid_argument("Age cannot be negative!");`. This instantly stops normal execution.', advanced: 'Throwing an exception constructs an exception object and initiates stack unwinding, searching up the call stack for a matching catch block.' },
-      { title: '2. Try and Catch Blocks', beginner: 'To protect risky code, wrap it inside a `try { ... }` block. If an exception is thrown inside the try block, execution instantly jumps to the attached `catch (const std::exception& e)` block where you can handle the error safely.', advanced: 'Catch blocks handle exceptions polymorphically by catching base exception classes or specific derived errors. Always catch exceptions by const reference to avoid slicing.' },
-      { title: '3. Custom Exception Classes', beginner: 'You aren\'t limited to standard errors! You can build your own custom exceptions by inheriting from `std::exception`. E.g., `class InsufficientFunds : public std::exception { ... };`.', advanced: 'Custom exceptions inherit from `std::exception` and override the `what()` method to provide descriptive diagnostic strings for debugging.' },
-      { title: '4. Exception Safety Guarantees', beginner: 'Modern C++ promotes robust guarantees: Basic (no memory leaks when exceptions throw), Strong (commit-or-rollback transactions), and No-throw (guaranteed never to fail).', advanced: 'Exception safety guarantees dictate how object states and memory buffers behave during stack unwinding under error conditions.' }
-    ],
-    {
-      title: 'The Safe Division Guard',
-      intro: 'Write a division function that throws an exception on zero division and catches it gracefully.',
-      steps: [
-        'Include `<iostream>` and `<stdexcept>`.',
-        'Write a function: `double divide(double a, double b) { if(b == 0) throw std::runtime_error("Division by zero!"); return a / b; }`.',
-        'In `main()`, wrap a risky call in a `try { divide(10, 0); }` block.',
-        'Attach a catch block: `catch (const std::exception& e) { std::cout << "Error caught: " << e.what(); }`.',
-        'Run the code. Instead of crashing, it catches the error gracefully!'
-      ],
-      goal: 'You successfully implemented robust error management using try-catch blocks and exception throwing.'
-    },
-    [
-      q('What happens when an exception is thrown inside a C++ program?', ['The computer turns off', 'Normal execution halts, and the program initiates "stack unwinding", searching up the call stack for a matching catch block', 'The error is ignored', 'An infinite loop starts'], 1, 'Throwing an exception interrupts normal flow, triggering stack unwinding and invoking destructors until a catch block intercepts it.'),
-      q('Why should you always catch exceptions by `const reference` (e.g., `catch (const std::exception& e)`)?', ['It is required by the compiler', 'It prevents object slicing, preserves polymorphism, and avoids expensive object copying', 'It makes the error disappear', 'It turns the exception into an integer'], 1, 'Catching by reference ensures polymorphic derived exceptions are caught correctly without slicing away derived data.'),
-      q('What is the role of the `what()` method on standard exceptions?', ['It deletes the exception', 'It returns a C-style character string describing the error details for debugging', 'It restarts the program', 'It checks memory leaks'], 1, '`what()` provides a descriptive human-readable error message explaining why the exception was triggered.'),
-      q('What is a "Strong Exception Safety Guarantee"?', ['The program never has bugs', 'A transactional guarantee stating that if an operation fails due to an exception, the program state remains entirely unchanged (commit-or-rollback)', 'Memory is allocated on the stack', 'Exceptions are turned off'], 1, 'Strong safety ensures zero side-effects occur if an operation aborts halfway through, preserving clean state integrity.')
-    ],
-    ['Use throw to signal when an unrecoverable error occurs in your code.', 'Wrap risky operations inside a try block and handle failures using catch.', 'Always catch exceptions by const reference (catch (const std::exception& e)) to prevent object slicing.', 'Custom exceptions inherit from std::exception and override what() for clear debugging.']
-  ),
-
-  L(
-    'cpp-30', 30, 'C++ Performance & Memory Layout (Cache Locality, Profiling)', '🚀', 
-    TERMINAL_NOTICE_SHORT + 'Congratulations on reaching Lesson 30! You are now entering the elite tier of C++ development. To write high-performance software (game engines, physics simulators, high-frequency trading), you must understand how your hardware\'s CPU cache actually interacts with RAM memory layouts.',
-    [
-      { title: '1. The Hardware Reality (CPU vs RAM)', beginner: 'Your CPU is blindingly fast, but fetching data from your RAM is agonizingly slow (in computer terms!). To solve this, CPUs use small, ultra-fast "Caches" (L1, L2, L3) to store data nearby before processing it.', advanced: 'RAM latency is orders of magnitude slower than CPU register operations. Modern performance optimization revolves entirely around feeding the CPU cache efficiently.' },
-      { title: '2. Cache Locality (Contiguous Memory)', beginner: 'When your CPU fetches one item from an array or vector, the computer grabs a whole chunk of neighboring items and loads them into the cache together. This is called Cache Locality. Storing data in contiguous blocks (like std::vector) makes your code fly!', advanced: 'Spatial locality ensures that sequential memory accesses hit the CPU cache line directly, avoiding expensive RAM cache misses.' },
-      { title: '3. Linked Lists vs. Vectors (Performance Myth)', beginner: 'Beginners often think Linked Lists are fast because they can grow anywhere. In reality, Linked Lists scatter nodes randomly all over RAM, causing constant CPU cache misses. A `std::vector` is almost ALWAYS faster because its memory is contiguous!', advanced: 'Pointer chasing in node-based containers (std::list, std::map) causes cache thrashing. Dense arrays/vectors maximize hardware cache prefetching.' },
-      { title: '4. Profiling & Optimization Mindset', beginner: 'Never guess where your code is slow—measure it! Use profiling tools like Valgrind, gprof, or modern IDE profilers to inspect CPU bottlenecks and memory footprints before optimizing.', advanced: 'Premature optimization is the root of all evil. Profile first, identify cache misses or algorithmic bottlenecks, and optimize hot loops scientifically.' }
-    ],
-    {
-      title: 'The Elite C++ Architectural Review',
-      intro: 'Review your complete journey across 30 foundational lessons and understand elite hardware optimization.',
-      steps: [
-        'Reflect on your progression from basic `std::cout` compilers in Lesson 1 all the way to advanced memory layouts in Lesson 30.',
-        'Review how choosing `std::vector` over scattered pointer structures maximizes CPU cache locality.',
-        'Ensure all dynamic allocations in your projects are wrapped in smart pointers, utilizing RAII for 100% leak-free execution.',
-        'You have mastered C++ Foundations, Object-Oriented Programming, and Modern C++ Memory Mastery. Welcome to the elite tier!'
-      ],
-      goal: 'You successfully completed the entire 30-lesson C++ track, mastering memory layouts, cache optimization, and elite systems engineering.'
-    },
-    [
-      q('Why is `std::vector` generally much faster in performance-critical loops than a Linked List (`std::list`)?', ['Vectors use more RAM', 'Vectors store elements contiguously in memory, maximizing CPU cache locality and preventing cache misses', 'Linked lists cannot hold integers', 'Vectors use smart pointers'], 1, 'Contiguous memory layout allows the CPU cache prefetcher to load subsequent elements instantly, whereas linked lists scatter nodes randomly across RAM.'),
-      q('What is a "Cache Miss" in computer hardware?', ['When you forget your computer password', 'When the CPU looks for data in its fast local cache, fails to find it, and is forced to wait for a slow retrieval from main RAM', 'When a pointer is set to nullptr', 'When an exception is thrown'], 1, 'Cache misses stall the CPU pipeline while waiting for memory buses to fetch data from RAM, heavily degrading application performance.'),
-      q('What is the golden rule of software optimization?', ['Always rewrite your code in assembly', 'Never guess where code is slow—profile first to identify actual bottlenecks before optimizing', 'Never use functions', 'Use as many global variables as possible'], 1, 'Premature optimization wastes engineering time. Profiling tools provide empirical data on where bottlenecks actually reside.'),
-      q('What design pattern ensures 100% leak-free, exception-safe resource management across your entire C++ codebase?', ['Garbage Collection', 'RAII (Resource Acquisition Is Initialization) combined with Smart Pointers', 'Infinite while loops', 'Global variables'], 1, 'RAII ties resource lifecycles strictly to stack scopes, eliminating memory and handle leaks deterministically.')
-    ],
-    ['Contiguous memory structures (std::vector) maximize CPU cache locality and speed.', 'Scattered node structures (linked lists) cause cache misses and slow down high-performance loops.', 'Always profile your code using tools like Valgrind or profilers before attempting optimization.', 'You have completed the entire 30-lesson C++ track! You are now ready to build elite, high-performance software.']
-  ) 
 ];
 
 export const getCppLessonById = (id: string): CppLesson | undefined =>
-  CPP_LESSONS.find(l => l.id === id);
-
+CPP_LESSONS.find(l => l.id === id);
 export const isCppLessonUnlocked = (id: string, completedLessons: string[]): boolean => {
-  const idx = CPP_LESSONS.findIndex(l => l.id === id);
-  if (idx <= 0) return true;
-  return completedLessons.includes(CPP_LESSONS[idx - 1].id);
+const idx = CPP_LESSONS.findIndex(l => l.id === id);
+if (idx <= 0) return true;
+return completedLessons.includes(CPP_LESSONS[idx - 1].id);
 };
-  
