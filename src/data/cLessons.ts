@@ -16,7 +16,7 @@ const L = (
   icon: string,
   philosophy: string,
   concepts: Concept[],
-  practical: CFreeLesson['practical'],
+  practical: CLesson['practical'],
   quiz: QuizQuestion[],
   keyTakeaways: string[],
   terminalNotice?: string
@@ -53,7 +53,7 @@ export const C_TRACK_NOTICE = {
     '🧠 C Track Status: This track takes you from absolute C beginner to advanced systems thinking. You will learn compilation, memory, pointers, arrays, strings, functions, debugging, and professional C discipline. Use the lightweight browser C lab for small examples, but always verify serious programs using GCC or Clang in your local terminal.',
 };
 
-export const C_LESSONS: CFreeLesson[] = [
+export const C_LESSONS: CLesson[] = [
   L(
     'c-01',
     1,

@@ -37,7 +37,7 @@ import JavaExpertLessonPage from '@/pages/JavaExpertLessonPage';
 import CLearn from "./pages/CLearn";
 import CLessonPage from "./pages/CLessonPage";
 import CExpertLearn from "./pages/CExpertLearn";
-import CExpertLessonPage from "./pages/CExpertLessonpage";
+import CExpertLessonPage from "./pages/CExpertLessonPage";
 import PythonLearn from "./pages/PythonLearn";
 import PythonLessonPage from "./pages/PythonLessonPage";
 import LocalLearn from "./pages/LocalLearn";

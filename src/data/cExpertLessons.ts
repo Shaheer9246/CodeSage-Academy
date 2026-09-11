@@ -10,6 +10,8 @@ import type {
 
 export type CExpertLesson = NetworkingLesson & {
   tier: 'paid';
+  starterCode?: string;
+  initialCode?: string;
 };
 
 const L = (
