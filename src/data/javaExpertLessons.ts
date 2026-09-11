@@ -1528,8 +1528,8 @@ advanced: 'OAuth2 Authorization Code Flow: (1) Client redirects to /oauth2/autho
 },
 {
 title: '4. Method Security (@PreAuthorize)',
-beginner: 'URL-based security is coarse. Method security protects individual functions: @PreAuthorize("hasRole('ADMIN')") on a method means only admins can call it. @PreAuthorize("#userId == authentication.name") means users can only access their OWN data. This is defense-in-depth.',
-advanced: 'Method security: @EnableMethodSecurity activates @PreAuthorize/@PostAuthorize/@PreFilter/@PostFilter. SpEL expressions: hasRole(), hasAuthority(), isAuthenticated(), #param references, @bean.method() calls. Example: @PreAuthorize("hasRole('ADMIN') or #orderId == authentication.principal.orderId"). Post-filter: @PostFilter("filterObject.owner == authentication.name") filters returned collections. JSR-250: @RolesAllowed("ADMIN"). AspectJ proxy intercepts method calls, evaluates SpEL, throws AccessDeniedException on failure. Performance: SpEL evaluation adds ~1μs per call — negligible for I/O-bound methods.'
+beginner: 'URL-based security is coarse. Method security protects individual functions: @PreAuthorize("hasRole(\'ADMIN\')") on a method means only admins can call it. @PreAuthorize("#userId == authentication.name") means users can only access their OWN data. This is defense-in-depth.',
+advanced: 'Method security: @EnableMethodSecurity activates @PreAuthorize/@PostAuthorize/@PreFilter/@PostFilter. SpEL expressions: hasRole(), hasAuthority(), isAuthenticated(), #param references, @bean.method() calls. Example: @PreAuthorize("hasRole(\'ADMIN\') or #orderId == authentication.principal.orderId"). Post-filter: @PostFilter("filterObject.owner == authentication.name") filters returned collections. JSR-250: @RolesAllowed("ADMIN"). AspectJ proxy intercepts method calls, evaluates SpEL, throws AccessDeniedException on failure. Performance: SpEL evaluation adds ~1μs per call — negligible for I/O-bound methods.'
 },
 {
 title: '5. CORS, CSRF & Security Headers (Expert Teaser)',
@@ -1544,8 +1544,8 @@ steps: [
 'Create Spring Boot app with dependencies: spring-boot-starter-security, spring-boot-starter-oauth2-resource-server, spring-boot-starter-web.',
 'Configure JWT decoder: spring.security.oauth2.resourceserver.jwt.issuer-uri=https://your-auth-server.com (or jwk-set-uri).',
 'Define SecurityFilterChain: @Bean SecurityFilterChain filterChain(HttpSecurity http) { http.sessionManagement(s -> s.sessionCreationPolicy(STATELESS)).authorizeHttpRequests(a -> a.requestMatchers("/public").permitAll().anyRequest().authenticated()).oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults())); }.',
-'Create controller: @RestController with @GetMapping("/api/orders"). @PreAuthorize("hasRole('USER')") public List<Order> getOrders() { ... }.',
-'Add admin endpoint: @PreAuthorize("hasRole('ADMIN')") @DeleteMapping("/api/orders/{id}") public void delete(@PathVariable Long id) { ... }.',
+'Create controller: @RestController with @GetMapping("/api/orders"). @PreAuthorize("hasRole(\'USER\')") public List<Order> getOrders() { ... }.',
+'Add admin endpoint: @PreAuthorize("hasRole(\'ADMIN\')") @DeleteMapping("/api/orders/{id}") public void delete(@PathVariable Long id) { ... }.',
 'Enable method security: @EnableMethodSecurity on main class.',
 'Test with curl: curl -H "Authorization: Bearer <valid-jwt>" http://localhost:8080/api/orders. Verify 200.',
 'Test without token: curl http://localhost:8080/api/orders. Verify 401 Unauthorized.',
@@ -1639,7 +1639,7 @@ q('What is the advantage of the Criteria API over JPQL string queries?', ['Crite
 
 L(
 'javax-29', 29, 'Reactive Spring WebFlux & Non-Blocking I/O', '🌊',
-'🌊 Spring MVC is built on the Servlet API — one thread per request. When a request blocks on I/O (database, API call), that thread sits idle, wasting resources. WebFlux is Spring's reactive alternative: built on Netty's event-loop architecture, it handles thousands of concurrent connections with just a handful of threads. This is the architecture behind systems processing millions of requests per second — Netflix, eBay, and Trello all run on reactive stacks.',
+'🌊 Spring MVC is built on the Servlet API — one thread per request. When a request blocks on I/O (database, API call), that thread sits idle, wasting resources. WebFlux is Spring\'s reactive alternative: built on Netty\'s event-loop architecture, it handles thousands of concurrent connections with just a handful of threads. This is the architecture behind systems processing millions of requests per second — Netflix, eBay, and Trello all run on reactive stacks.',
 [
 {
 title: '1. WebFlux Architecture & Netty Event Loop',
@@ -1659,7 +1659,7 @@ advanced: 'R2DBC is the reactive JDBC equivalent. Spring Data R2DBC provides Rea
 {
 title: '4. WebClient: Reactive HTTP Client',
 beginner: 'RestTemplate is blocking — it freezes your thread while waiting for the HTTP response. WebClient is its reactive replacement: it returns Mono/Flux and never blocks, making it perfect for microservice-to-microservice communication in reactive architectures.',
-advanced: 'WebClient is Spring's reactive HTTP client (replaces RestTemplate). Fluent API: webClient.get().uri("/users/{id}", id).retrieve().bodyToMono(User.class). Supports: all HTTP methods, request/response interceptors (ExchangeFilterFunction), connection pooling (Reactor Netty), timeout configuration, retry with backoff (retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))). For service-to-service calls in WebFlux, ALWAYS use WebClient — never RestTemplate.'
+advanced: 'WebClient is Spring\'s reactive HTTP client (replaces RestTemplate). Fluent API: webClient.get().uri("/users/{id}", id).retrieve().bodyToMono(User.class). Supports: all HTTP methods, request/response interceptors (ExchangeFilterFunction), connection pooling (Reactor Netty), timeout configuration, retry with backoff (retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))). For service-to-service calls in WebFlux, ALWAYS use WebClient — never RestTemplate.'
 },
 {
 title: '5. When to Use WebFlux vs MVC (Expert Teaser)',
@@ -1686,7 +1686,7 @@ goal: 'You built a fully reactive REST API with non-blocking database access (R2
 q('How does WebFlux handle 10,000 concurrent connections with only 4 threads?', ['It creates 10,000 virtual threads', 'It uses Netty event-loop threads with non-blocking I/O multiplexing — threads handle I/O events, not individual requests', 'It queues requests and processes them sequentially', 'It spawns 10,000 OS processes'], 1, 'Netty event loops use epoll/kqueue I/O multiplexing. A few threads (typically = CPU cores) handle thousands of connections by never blocking. Why others are wrong: It does not create virtual threads (that is Loom). It does not queue sequentially. It does not use processes.'),
 q('What is the reactive equivalent of JDBC for database access?', ['JDBC Reactive Extension', 'R2DBC (Reactive Relational Database Connectivity)', 'JDBC Async', 'ReactiveJDBC'], 1, 'R2DBC provides non-blocking database access with Mono/Flux return types. It replaces JDBC in reactive stacks. Why others are wrong: The other names do not exist as official specifications.'),
 q('Why must you NEVER call blocking code (JDBC, Thread.sleep) on a WebFlux event loop thread?', ['It throws a compilation error', 'Blocking an event loop thread stalls ALL connections handled by that thread, causing cascading latency across thousands of requests', 'It triggers a JVM crash', 'It is a style violation only'], 1, 'Event loop threads handle many connections. Blocking one thread blocks ALL its connections. Use subscribeOn(Schedulers.boundedElastic()) to offload blocking work. Why others are wrong: It does not cause compilation errors or JVM crashes. It is not merely a style issue.'),
-q('What does WebClient replace in reactive Spring applications?', ['WebMvcConfigurer', 'RestTemplate (blocking HTTP client)', 'HttpClient from java.net', 'OkHttp'], 1, 'WebClient is Spring's reactive replacement for RestTemplate. RestTemplate is blocking and deprecated for reactive use. Why others are wrong: It does not replace WebMvcConfigurer, java.net.HttpClient, or OkHttp directly.'),
+q('What does WebClient replace in reactive Spring applications?', ['WebMvcConfigurer', 'RestTemplate (blocking HTTP client)', 'HttpClient from java.net', 'OkHttp'], 1, 'WebClient is Spring\'s reactive replacement for RestTemplate. RestTemplate is blocking and deprecated for reactive use. Why others are wrong: It does not replace WebMvcConfigurer, java.net.HttpClient, or OkHttp directly.'),
 q('When should you choose Spring MVC over WebFlux?', ['Always — MVC is universally better', 'For CPU-bound workloads, CRUD-heavy applications, or when you have existing JDBC/JPA investments', 'Never — WebFlux is always superior', 'Only for mobile backends'], 1, 'MVC is simpler for CPU-bound work, traditional CRUD, and when JDBC/JPA investment exists. WebFlux shines for high-concurrency I/O-bound systems. Why others are wrong: Neither is universally superior. WebFlux is not mobile-specific.')
 ],
 [
@@ -2086,7 +2086,7 @@ q('What is continuous profiling and why is it valuable?', ['Profiling during dev
 
 L(
 'javax-36', 36, 'Project Valhalla: Value Types & Memory Optimization', '💎',
-'💎 Java objects carry a 12-16 byte header overhead (mark word + class pointer). For millions of small objects (coordinates, pixels, financial ticks), this overhead dominates memory and destroys cache locality. Project Valhalla introduces Value Types — objects without identity that are stored inline, eliminating headers and enabling flat memory layouts. This is the most significant change to Java's object model since its inception.',
+'💎 Java objects carry a 12-16 byte header overhead (mark word + class pointer). For millions of small objects (coordinates, pixels, financial ticks), this overhead dominates memory and destroys cache locality. Project Valhalla introduces Value Types — objects without identity that are stored inline, eliminating headers and enabling flat memory layouts. This is the most significant change to Java\'s object model since its inception.',
 [
 {
 title: '1. The Object Header Problem',
@@ -2111,7 +2111,7 @@ advanced: 'Value type arrays: Point[] points = new Point[1_000_000] allocates a 
 {
 title: '5. Migration Path & Compatibility (Expert Teaser)',
 beginner: 'Valhalla is designed for backward compatibility. Existing code continues to work. Value types are opt-in — you choose which classes become value types. The JVM handles the transition transparently.',
-advanced: '(Expert Teaser) Migration: (1) Existing reference types remain unchanged. (2) value modifier is opt-in. (3) Migrate data-heavy classes (coordinates, vectors, financial amounts) to value types for memory savings. (4) Avoid identity-dependent patterns (synchronized, IdentityHashMap, WeakReference) on value types. (5) Serialization: value types serialize by value, not reference. Timeline: Valhalla has been in development since 2014, with previews in JDK 24+. In the Expert track, we explore: Valhalla's impact on collections (ArrayList<int>), interaction with virtual threads (Loom), and benchmarks comparing value types vs records vs classes for numerical workloads.'
+advanced: '(Expert Teaser) Migration: (1) Existing reference types remain unchanged. (2) value modifier is opt-in. (3) Migrate data-heavy classes (coordinates, vectors, financial amounts) to value types for memory savings. (4) Avoid identity-dependent patterns (synchronized, IdentityHashMap, WeakReference) on value types. (5) Serialization: value types serialize by value, not reference. Timeline: Valhalla has been in development since 2014, with previews in JDK 24+. In the Expert track, we explore: Valhalla\'s impact on collections (ArrayList<int>), interaction with virtual threads (Loom), and benchmarks comparing value types vs records vs classes for numerical workloads.'
 }
 ],
 {
@@ -2127,7 +2127,7 @@ steps: [
 'Preview Valhalla syntax (JDK 24+ with --enable-preview): value class FlatPoint(int x, int y). Compile with javac --enable-preview.',
 'Document findings: header overhead, memory savings, cache locality improvement.'
 ],
-goal: 'You quantified the object header overhead, understood value type memory savings, and previewed Valhalla's flat array layout.'
+goal: 'You quantified the object header overhead, understood value type memory savings, and previewed Valhalla\'s flat array layout.'
 },
 [
 q('How much overhead does a standard Java object header add to every object?', ['0 bytes — objects have no overhead', '12-16 bytes (mark word + compressed class pointer + padding)', '64 bytes', '1 byte'], 1, 'Object header: 8-byte mark word + 4-byte compressed class pointer + alignment padding = 12-16 bytes minimum. Why others are wrong: Objects DO have overhead. 64 bytes is a cache line, not header. 1 byte is incorrect.'),
@@ -2274,7 +2274,7 @@ q('What does the when clause in a pattern case do?', ['It creates a loop', 'It a
 
 L(
 'javax-39', 39, 'Foreign Function & Memory API (Project Panama)', '🌉',
-'🌉 Java has always been isolated from the native world. JNI (Java Native Interface) was the only bridge — complex, error-prone, and dangerous. Project Panama replaces JNI with the Foreign Function & Memory API: safe, fast, and pure Java. Allocate off-heap memory, call C libraries directly, and access hardware features without writing a single line of C code. This is Java's gateway to systems programming.',
+'🌉 Java has always been isolated from the native world. JNI (Java Native Interface) was the only bridge — complex, error-prone, and dangerous. Project Panama replaces JNI with the Foreign Function & Memory API: safe, fast, and pure Java. Allocate off-heap memory, call C libraries directly, and access hardware features without writing a single line of C code. This is Java\'s gateway to systems programming.',
 [
 {
 title: '1. The JNI Problem & Panama Solution',
