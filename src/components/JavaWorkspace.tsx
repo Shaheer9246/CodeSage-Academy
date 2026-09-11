@@ -27,7 +27,7 @@ const DEFAULT_STARTER = `public class Main {
 }
 `;
 
-const JavaWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false, practical }: JavaWorkspaceProps) => {
+const JavaWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false, requiresLocalTerminal = false, practical }: JavaWorkspaceProps) => {
   const initial = initialCode ?? starterCode ?? DEFAULT_STARTER;
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([
