@@ -32,8 +32,12 @@ import FullstackLearn from "./pages/FullstackLearn";
 import FullstackLessonPage from "./pages/FullstackLessonPage";
 import JavaLearn from "./pages/JavaLearn";
 import JavaLessonPage from "./pages/JavaLessonPage";
+import JavaExpertLearn from '@/pages/JavaExpertLearn';
+import JavaExpertLessonPage from '@/pages/JavaExpertLessonPage'; 
 import CLearn from "./pages/CLearn";
 import CLessonPage from "./pages/CLessonPage";
+import CExpertLearn from "./pages/CExpertLearn";
+import CExpertLessonPage from "./pages/CExpertLessonpage";
 import PythonLearn from "./pages/PythonLearn";
 import PythonLessonPage from "./pages/PythonLessonPage";
 import LocalLearn from "./pages/LocalLearn";
@@ -149,8 +153,12 @@ const App = () => (
               <Route path="/fs-lesson/:id" element={<ProtectedRoute><FullstackLessonPage /></ProtectedRoute>} />
               <Route path="/java" element={<ProtectedRoute><JavaLearn /></ProtectedRoute>} />
               <Route path="/java-lesson/:id" element={<ProtectedRoute><JavaLessonPage /></ProtectedRoute>} />
+              <Route path="/java-expert" element={<ProtectedRoute><JavaExpertLearn /></ProtectedRoute>} />
+              <Route path="/javax-lesson/:id" element={<ProtectedRoute><JavaExpertLessonPage /></ProtectedRoute>} />
               <Route path="/c" element={<ProtectedRoute><CLearn /></ProtectedRoute>} />
               <Route path="/c-lesson/:id" element={<ProtectedRoute><CLessonPage /></ProtectedRoute>} />
+              <Route path="/c-expert" element={<ProtectedRoute><CExpertLearn /></ProtectedRoute>} />
+              <Route path="/cx-lesson/:id" element={<ProtectedRoute><CExpertLessonPage /></ProtectedRoute>} />
               <Route path="/python" element={<ProtectedRoute><PythonLearn /></ProtectedRoute>} />
               <Route path="/py-lesson/:id" element={<ProtectedRoute><PythonLessonPage /></ProtectedRoute>} />
               <Route path="/local" element={<ProtectedRoute><LocalLearn /></ProtectedRoute>} />
