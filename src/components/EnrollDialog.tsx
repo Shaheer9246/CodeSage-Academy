@@ -79,6 +79,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: 'C++ Expert covers advanced topics like dynamic memory, templates, Move Semantics, and modern C++ design patterns. Please complete C++ Programming first to establish a solid grasp of fundamental syntax.',
     ctas: [{ label: 'C++ Programming course', route: '/cpp' }],
   },
+  javaexpert: {
+    title: 'Finish Java Programming first',
+    body: 'Java Expert is an advanced-level track that covers multithreading, concurrency, JVM performance tuning, and enterprise architecture. Please complete Java Programming first to establish a solid grasp of core OOP and Java fundamentals.',
+    ctas: [{ label: 'Java Programming course', route: '/java' }],
+  },
 };
 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
