@@ -83,7 +83,7 @@ const JavaExpertLessonPage = () => {
     setSubmitted(true);
     if (passed) {
       if (user) await completeLesson(lesson.id);
-      toast.success('Expert Lesson Complete! +1 XP · +3 Coins 💎');
+      toast.success('Expert Lesson Complete! +1 XP · +2 Coins 💎');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
@@ -109,7 +109,7 @@ const JavaExpertLessonPage = () => {
             </h1>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 shrink-0">
-            <Crown className="w-3 h-3" /> +3 XP · +5 💎
+            <Crown className="w-3 h-3" /> +1 XP · +2 💎
           </div>
         </div>
         <div className="h-0.5 bg-secondary/40">
