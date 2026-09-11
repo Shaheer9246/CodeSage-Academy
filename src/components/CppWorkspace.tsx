@@ -26,6 +26,44 @@ interface CppWorkspaceProps {
 // Using 2.0.6 which is confirmed to have the dist folder [[25]].
 const JSCPP_MAIN = 'https://cdn.jsdelivr.net/npm/JSCPP@2.0.6/dist/JSCPP.es5.min.js';
 
+/**
+ * Preprocesses C++ source code before passing it to JSCPP.
+ * JSCPP is a lightweight in-browser PEG interpreter that:
+ * 1. Does not support the scope resolution operator `::` (e.g. `std::cout`, `std::endl`).
+ * 2. Lacks a native `std::string` class, but supports `typedef char string[256];` for I/O.
+ * 3. Only includes headers: iostream, cmath, cstdio, cstdlib, cstring, ctime, iomanip, cctype.
+ */
+function preprocessCppCode(source: string): string {
+  let code = source;
+
+  // 1. Remove std:: prefix so std::cout -> cout, std::cin -> cin, std::endl -> endl
+  code = code.replace(/\bstd::/g, '');
+
+  // 2. Safely comment out standard headers not available in JSCPP's virtual include tree
+  const SUPPORTED_HEADERS = new Set([
+    'iostream', 'cmath', 'cstdio', 'cstdlib', 'cstring', 'ctime',
+    'iomanip', 'cctype', 'math.h', 'stdio.h', 'stdlib.h', 'string.h',
+    'time.h', 'ctype.h'
+  ]);
+
+  code = code.replace(/#include\s*<([^>]+)>/g, (match, header) => {
+    if (SUPPORTED_HEADERS.has(header.trim())) return match;
+    return `// ${match} (omitted in browser interpreter)`;
+  });
+
+  // 3. Inject typedef for 'string' if used and not declared
+  if (
+    /\bstring\b/.test(code) &&
+    !/typedef\s+.*\bstring\b/.test(code) &&
+    !/class\s+string\b/.test(code) &&
+    !/struct\s+string\b/.test(code)
+  ) {
+    code = `typedef char string[256];\n` + code;
+  }
+
+  return code;
+}
+
 // FIX 2: Web Workers don't have a 'window' object. UMD scripts often crash with "window is not defined".
 // We alias 'self' to 'window' before importing the script to prevent this crash.
 const WORKER_CODE = `
@@ -173,6 +211,8 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
       write('in', `STDIN:\n${inputText}\n`);
     }
 
+    const codeToRun = preprocessCppCode(code);
+
     let worker: Worker | null = null;
     let workerUrl: string = '';
 
@@ -208,7 +248,7 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
             resolveRun();
           };
           
-          worker!.postMessage({ type: 'run', code, input: inputText });
+          worker!.postMessage({ type: 'run', code: codeToRun, input: inputText });
         });
 
         if (runOnMainThread) throw new Error("Fallback to main thread");
@@ -233,7 +273,7 @@ const CppWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = false
           unsigned_overflow: "warn",
           maxTimeout: 5000
         };
-        const exitCode = JSCPP.run(code, inputText, config);
+        const exitCode = JSCPP.run(codeToRun, inputText, config);
         write('sys', `$ exit ${exitCode}`);
       }
     } catch (err: any) {
