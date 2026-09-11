@@ -14,7 +14,7 @@ import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson'; // <-- ADD THIS LINE
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
-import { JAVA_LESSONS } from '@/data/javaLessons';
+import { JAVA_LESSONS } from '@/data/javaLesson';
 import { JAVA_EXPERT_LESSONS } from '@/data/javaExpertLessons';
 import { C_LESSONS } from '@/data/cLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';

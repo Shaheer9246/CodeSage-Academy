@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { JAVA_LESSONS, isJavaLessonUnlocked } from '@/data/javaLessons';
+import { JAVA_LESSONS, isJavaLessonUnlocked } from '@/data/javaLesson';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';

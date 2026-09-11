@@ -12,7 +12,7 @@ import { LOCAL_LESSONS } from '@/data/localLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 import { SQL_LESSONS } from '@/data/sqlLessons';
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
-import { JAVA_LESSONS } from '@/data/javaLessons';
+import { JAVA_LESSONS } from '@/data/javaLesson';
 import { JAVA_EXPERT_LESSONS } from '@/data/javaExpertLessons';
 import { C_LESSONS } from '@/data/cLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';

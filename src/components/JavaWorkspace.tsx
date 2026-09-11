@@ -8,6 +8,7 @@ interface JavaWorkspaceProps {
   initialCode?: string;       // Used by Challenges.tsx
   onCodeChange?: (code: string) => void; // Used by Challenges.tsx
   embedded?: boolean;         // Hides assignment tabs to save space
+  requiresLocalTerminal?: boolean; // Shows a notice that this lab needs a local JDK/terminal
   practical?: {
     title: string;
     intro: string;
