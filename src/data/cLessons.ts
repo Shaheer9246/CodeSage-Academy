@@ -5,7 +5,7 @@ import type {
   QuizQuestion,
 } from './networkingLessons';
 
-export type CFreeLesson = NetworkingLesson & {
+export type CLesson = NetworkingLesson & {
   tier: 'free';
 };
 
@@ -20,7 +20,7 @@ const L = (
   quiz: QuizQuestion[],
   keyTakeaways: string[],
   terminalNotice?: string
-): CFreeLesson => ({
+): CLesson => ({
   id,
   module: 'Module 1: C Programming — Beginner to Advanced (Free)',
   order,
@@ -47,13 +47,13 @@ const q = (
   explanation,
 });
 
-export const C_FREE_TRACK_NOTICE = {
+export const C_TRACK_NOTICE = {
   type: 'track-notice',
   notice:
-    '🧠 C Free Track Status: This track takes you from absolute C beginner to advanced systems thinking. You will learn compilation, memory, pointers, arrays, strings, functions, debugging, and professional C discipline. Use the lightweight browser C lab for small examples, but always verify serious programs using GCC or Clang in your local terminal.',
+    '🧠 C Track Status: This track takes you from absolute C beginner to advanced systems thinking. You will learn compilation, memory, pointers, arrays, strings, functions, debugging, and professional C discipline. Use the lightweight browser C lab for small examples, but always verify serious programs using GCC or Clang in your local terminal.',
 };
 
-export const C_FREE_LESSONS: CFreeLesson[] = [
+export const C_LESSONS: CFreeLesson[] = [
   L(
     'c-01',
     1,
@@ -3337,16 +3337,16 @@ L(
  )
 ];
 
-export const getCFreeLessonById = (id: string): CFreeLesson | undefined =>
-  C_FREE_LESSONS.find((lesson) => lesson.id === id);
+export const getCLessonById = (id: string): CLesson | undefined =>
+  C_LESSONS.find((lesson) => lesson.id === id);
 
-export const isCFreeLessonUnlocked = (
+export const isCLessonUnlocked = (
   id: string,
   completedLessons: string[]
 ): boolean => {
-  const index = C_FREE_LESSONS.findIndex((lesson) => lesson.id === id);
+  const index = C_LESSONS.findIndex((lesson) => lesson.id === id);
 
   if (index <= 0) return true;
 
-  return completedLessons.includes(C_FREE_LESSONS[index - 1].id);
+  return completedLessons.includes(C_LESSONS[index - 1].id);
 };
