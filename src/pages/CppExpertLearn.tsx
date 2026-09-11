@@ -99,7 +99,7 @@ const CppExpertLearn = () => {
                 transition={{ delay: i * 0.02 }}
                 onClick={() =>
                   isUnlocked &&
-                  navigate(`/cpp/expert-lesson/${lesson.id}${fromQs}`)
+                  navigate(`/cppx-lesson/${lesson.id}${fromQs}`)
                 }
                 disabled={!isUnlocked}
                 className={`w-full glass-card rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3 text-left transition-all ${
