@@ -155,6 +155,12 @@ const JavaWorkspace = ({ starterCode, initialCode, onCodeChange, embedded = fals
         </div>
       </div>
 
+      {requiresLocalTerminal && (
+        <div className="px-3 py-1.5 text-[10px] font-mono text-amber-400/90 bg-amber-500/10 border-b border-amber-500/20">
+          This lab uses tools beyond the in-browser simulator — run it locally with your installed JDK to complete it fully.
+        </div>
+      )}
+
       {/* Editor */}
       <div className={`${embedded ? 'flex-1 min-h-0' : 'h-[260px] md:h-[320px]'} border-b border-border/30`}>
         <CodeEditor code={code} onChange={handleCodeChange} language="java" showShortcuts={false} />
