@@ -98,7 +98,7 @@ const CppExpertLessonPage = () => {
     if (passed) {
       if (user) await completeLesson(lesson.id);
       // 7. EXPERT REWARDS (Bumped up for Expert track!)
-      toast.success('Expert lesson complete! +15 XP · +5 ◈ 🎉');
+      toast.success('Expert lesson complete! +1 XP · +2 ◈ 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
     setIsSubmitting(false);
