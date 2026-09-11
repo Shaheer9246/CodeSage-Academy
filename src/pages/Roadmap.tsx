@@ -15,6 +15,7 @@ import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson'; // <-- AD
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { JAVA_LESSONS } from '@/data/javaLessons';
+import { JAVA_EXPERT_LESSONS } from '@/data/javaExpertLessons';
 import { C_LESSONS } from '@/data/cLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
 import { CPP_EXPERT_LESSONS } from '@/data/cppExpertLessons';
@@ -34,7 +35,7 @@ interface TrackNode {
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
     | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'intermediate-ai-lesson' | 'three-lesson' | 'rf-lesson'
-    | 'java-lesson' | 'cpp-lesson' | 'cppx-lesson' | 'c-lesson';
+    | 'java-lesson' | 'javax-lesson'| 'cpp-lesson' | 'cppx-lesson' | 'c-lesson';
   locked?: boolean;
 }
 
@@ -128,12 +129,14 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
  cpp: buildTrack(CPP_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚙️' })), 'cpp-lesson', 'Module 1: C++ Foundations', 'C++ MASTER'),
  cppexpert: buildTrack(CPP_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🚀' })), 'cppx-lesson', 'Module 1: Advanced C++', 'C++ EXPERT MASTER'),
  java: buildTrack(JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'java-lesson', 'Module 1: Java Programming', 'JAVA COMPLETE'),
- c: buildTrack(C_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚡' })), 'c-lesson', 'Module 1: C Foundations', 'C MASTER'),
+ javaexpert: buildTrack(JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '☕' })), 'javax-lesson', 'Module 1: Advanced Java', 'JAVA EXPERT MASTER'),
+  c: buildTrack(C_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚡' })), 'c-lesson', 'Module 1: C Foundations', 'C MASTER'),
 };
 
 const TRACKS = [
   { key: 'frontend',     label: 'Frontend Dev' },
   { key: 'java',         label: 'Java' },
+  { key: 'javaexpert',   label: 'Java Expert' },
   { key: 'c',            label: 'C' },
   { key: 'cpp',          label: 'C++' },
   { key: 'cppexpert',    label: 'C++ Expert' },
