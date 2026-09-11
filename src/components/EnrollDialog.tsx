@@ -84,6 +84,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: 'Java Expert is an advanced-level track that covers multithreading, concurrency, JVM performance tuning, and enterprise architecture. Please complete Java Programming first to establish a solid grasp of core OOP and Java fundamentals.',
     ctas: [{ label: 'Java Programming course', route: '/java' }],
   },
+  cexpert: {
+    title: 'Finish C Programming first',
+    body: 'C Expert covers advanced low-level topics like custom allocators, advanced pointer arithmetic, complex memory alignment, and system-level performance. Please complete C Programming first to establish a solid grasp of procedural logic and fundamentals.',
+    ctas: [{ label: 'C Programming course', route: '/c' }],
+  },
 };
 
 export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props) {
