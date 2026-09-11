@@ -15,6 +15,7 @@ export type TrackId =
   | 'intermediate-ai'
   | 'three3d'
   | 'java'
+  | 'javaexpert'
   | 'cpp'
   | 'cppexpert'
   | 'c';
@@ -46,6 +47,7 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'intermediate-ai',
   'three3d',
   'java',
+  'javaexpert',
   'cpp',
   'cppexpert',
   'c'
@@ -163,7 +165,16 @@ export const TRACK_META: Record<
     short: 'Java',
     route: '/java',
     idPrefix: 'CS-JV',
-    seed: 150,
+    seed: 20,
+  },
+  },
+  javaexpert: {
+    label: 'Java Expert',
+    short: 'Java Expert',
+    route: '/java-expert',
+    idPrefix: 'CS-JVX',
+    seed: 10,
+    prereq: ['java'],
   },
   cpp: {
     label: 'C++ Programming',
