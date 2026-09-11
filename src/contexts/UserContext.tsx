@@ -252,12 +252,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       dailyXpDate: todayKey(),
     });
 
+    // Check localStorage cache freshness (5 minutes) to prevent redundant database egress
+    const cached = getCachedProfile();
+    const cachedTime = Number(localStorage.getItem('cached_profile_time') || 0);
+    const now = Date.now();
+    if (cached && cached.id === authUser.id && (now - cachedTime < 5 * 60 * 1000)) {
+      setUser(cached);
+      return;
+    }
+
     try {
       const { data, error } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error.message);
       }
       if (data) {
+        try { localStorage.setItem('cached_profile_time', String(Date.now())); } catch {}
         let row = data;
         // Retry any completions that failed to reach the server earlier.
         const pending = readPending();
