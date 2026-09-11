@@ -15,6 +15,7 @@ import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { JAVA_LESSONS } from '@/data/javaLesson';
 import { JAVA_EXPERT_LESSONS } from '@/data/javaExpertLessons';
 import { C_LESSONS } from '@/data/cLessons';
+import { C_EXPERT_LESSONS } from '@/data/cExpertLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
 import { CPP_EXPERT_LESSONS } from '@/data/cppExpertLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
@@ -42,6 +43,7 @@ const TRACKS: Track[] = [
   { prefix: 'cppx-',       path: '/cpp/expert-lesson', list: CPP_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'cpp-',        path: '/cpp-lesson',        list: CPP_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'c-',          path: '/c-lesson',          list: C_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'cx-',         path: '/cx-lesson',         list: C_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'java-',       path: '/java-lesson',       list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'javax-',      path: '/javax-lesson', list: JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'free-',       path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
@@ -63,6 +65,7 @@ const TRACK_HOME: Record<string, string> = {
   'java-': '/java',
   'jvx-': '/java-expert',
   'c-': '/c',
+  'cx-': '/c-expert',
   'cppx-': '/cpp/expert',
   'cpp-': '/cpp',
   'real-free-': '/real-freelance',
