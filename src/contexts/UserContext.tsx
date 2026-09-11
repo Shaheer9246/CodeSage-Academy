@@ -253,7 +253,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     });
 
     // Check localStorage cache freshness (5 minutes) to prevent redundant database egress
-    const cached = getCachedProfile();
+    const cached = readCachedProfile();
     const cachedTime = Number(localStorage.getItem('cached_profile_time') || 0);
     const now = Date.now();
     if (cached && cached.id === authUser.id && (now - cachedTime < 5 * 60 * 1000)) {
