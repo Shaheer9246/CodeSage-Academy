@@ -3,11 +3,11 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
-// ⚠️ IMPORTANT: Ensure these functions exist in your javaLessons.ts data file
-import { getJavaLessonById, isJavaLessonUnlocked } from '@/data/javaExpertLessons'; 
+// ⚠️ Wired to your existing javaExpertLessons.ts file
+import { getJavaExpertLessonById, isJavaExpertLessonUnlocked } from '@/data/javaExpertLessons';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
-  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Crown, type LucideIcon,
+  Check, X, ChevronRight, ChevronLeft, GraduationCap, Crown, type LucideIcon,
 } from 'lucide-react';
 import JavaWorkspace from '@/components/JavaWorkspace';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,7 +22,7 @@ const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = 
 
 // Expert lessons requiring local JDK/Terminal instead of browser IDE
 const EXPERT_LOCAL_TERMINAL_LESSONS = [
-  'javax-01', 'javax-04', 'javax-11', 'javax-15', 
+  'javax-01', 'javax-04', 'javax-11', 'javax-15',
   'javax-24', 'javax-30', 'javax-39', 'javax-40'
 ];
 
@@ -33,18 +33,20 @@ const JavaExpertLessonPage = () => {
   const isMobile = useIsMobile();
   const [sp] = useSearchParams();
   const from = sp.get('from');
-  
+
   // Expert track routing
-  const backTo = from === 'roadmap' 
-    ? '/roadmap' 
-    : from === 'dashboard' 
-      ? '/java-expert?from=dashboard' 
+  const backTo = from === 'roadmap'
+    ? '/roadmap'
+    : from === 'dashboard'
+      ? '/java-expert?from=dashboard'
       : '/java-expert';
 
-  const lesson = id ? getJavaLessonById(id) : undefined;
+  // ✅ Wired to your javaExpertLessons.ts exports
+  const lesson = id ? getJavaExpertLessonById(id) : undefined;
 
   const [stage, setStage] = useState<Stage>('concept');
-  const [conceptView, setConceptView] = useState<'beginner' | 'advanced'>('advanced'); // Default to advanced for expert track
+  // Default to advanced for expert track
+  const [conceptView, setConceptView] = useState<'beginner' | 'advanced'>('advanced');
   const [openConcept, setOpenConcept] = useState<number>(0);
   const [doneSteps, setDoneSteps] = useState<Record<number, boolean>>({});
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -55,7 +57,7 @@ const JavaExpertLessonPage = () => {
   const { isGuest: __pgGuest } = useGuestLessonGate('java-expert', id);
 
   const quiz = lesson?.quiz ?? [];
-  
+
   // ✅ DYNAMIC 75% PASSING THRESHOLD
   const correctCount = useMemo(
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
@@ -73,7 +75,7 @@ const JavaExpertLessonPage = () => {
 
   if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/java-expert" replace />;
-  if (!__pgGuest && !isJavaLessonUnlocked(lesson.id, (user?.completedLessons || []))) {
+  if (!__pgGuest && !isJavaExpertLessonUnlocked(lesson.id, (user?.completedLessons || []))) {
     return <Navigate to="/java-expert" replace />;
   }
 
@@ -81,15 +83,10 @@ const JavaExpertLessonPage = () => {
     setSubmitted(true);
     if (passed) {
       if (user) await completeLesson(lesson.id);
-      toast.success('Expert Lesson Complete! +1 XP · +2 Coins 💎');
+      toast.success('Expert Lesson Complete! +1 XP · +3 Coins 💎');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
-
-  // Premium amber/gold theme constants for expert tier
-  const accentColor = 'amber';
-  const primaryBtnClass = `bg-${accentColor}-500 text-black hover:bg-${accentColor}-400`;
-  const activeBorderClass = `border-${accentColor}-500/50 bg-${accentColor}-500/10 text-${accentColor}-400 shadow-[0_0_20px_-8px_hsl(var(--${accentColor}-500))]`;
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -104,20 +101,20 @@ const JavaExpertLessonPage = () => {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1 min-w-0">
-            <p className={`text-[10px] font-mono uppercase tracking-[0.18em] truncate text-${accentColor}-400/80`}>
+            <p className="text-[10px] text-amber-400/80 font-mono uppercase tracking-[0.18em] truncate">
               {lesson.module}
             </p>
             <h1 className="font-display font-bold text-sm text-foreground truncate flex items-center gap-1.5">
               <span>{lesson.icon}</span> {lesson.title}
             </h1>
           </div>
-          <div className={`hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border shrink-0 border-${accentColor}-500/30 bg-${accentColor}-500/10 text-${accentColor}-400`}>
+          <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 shrink-0">
             <Crown className="w-3 h-3" /> +3 XP · +5 💎
           </div>
         </div>
         <div className="h-0.5 bg-secondary/40">
           <div
-            className={`h-full bg-gradient-to-r from-${accentColor}-500 to-orange-400 transition-all duration-500`}
+            className="h-full bg-gradient-to-r from-amber-500 to-orange-400 transition-all duration-500"
             style={{ width: `${Math.max(journey, 6)}%` }}
           />
         </div>
@@ -136,7 +133,7 @@ const JavaExpertLessonPage = () => {
                   onClick={() => setStage(s.key)}
                   className={`flex-1 md:flex-none flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all ${
                     active
-                      ? activeBorderClass
+                      ? 'border-amber-500/50 bg-amber-500/10 text-amber-400 shadow-[0_0_20px_-8px_hsl(var(--amber-500))]'
                       : 'border-border/30 bg-card/40 text-muted-foreground hover:border-amber-500/25 hover:text-foreground'
                   }`}
                 >
@@ -161,7 +158,7 @@ const JavaExpertLessonPage = () => {
         <main className="flex-1 min-w-0">
           {stage === 'concept' && (
             <div className="space-y-5 animate-fade-in">
-              
+
               {/* ✅ TERMINAL NOTICE BOX */}
               {lesson.terminalNotice && (
                 <section className={`rounded-2xl border p-4 flex items-start gap-3 ${
@@ -177,8 +174,8 @@ const JavaExpertLessonPage = () => {
                       </p>
                     )}
                     <p className={`text-xs leading-relaxed ${
-                      lesson.id === 'javax-01' 
-                        ? 'text-cyan-200/90' 
+                      lesson.id === 'javax-01'
+                        ? 'text-cyan-200/90'
                         : 'text-muted-foreground'
                     }`}>
                       {lesson.terminalNotice}
@@ -188,10 +185,10 @@ const JavaExpertLessonPage = () => {
               )}
 
               {/* ── Mission Brief (Philosophy) ──────────────── */}
-              <section className={`relative overflow-hidden rounded-3xl border border-${accentColor}-500/25 bg-gradient-to-br from-${accentColor}-500/12 via-card/60 to-transparent p-5`}>
-                <p className={`text-[10px] font-mono text-${accentColor}-400 uppercase tracking-[0.2em] mb-2`}>Expert Brief</p>
+              <section className="relative overflow-hidden rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/12 via-card/60 to-transparent p-5">
+                <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2">Expert Brief</p>
                 <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
-                <div className={`absolute -right-10 -top-10 w-32 h-32 rounded-full bg-${accentColor}-500/20 blur-3xl`} />
+                <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-amber-500/20 blur-3xl" />
               </section>
 
               <div className="flex items-center justify-between gap-3">
@@ -204,8 +201,8 @@ const JavaExpertLessonPage = () => {
                       key={v}
                       onClick={() => setConceptView(v)}
                       className={`px-3 py-1 rounded-full text-[10px] font-display font-semibold capitalize transition-all ${
-                        conceptView === v 
-                          ? `bg-${accentColor}-500 text-black` 
+                        conceptView === v
+                          ? 'bg-amber-500 text-black'
                           : 'text-muted-foreground'
                       }`}
                     >
@@ -217,7 +214,7 @@ const JavaExpertLessonPage = () => {
 
               {/* Accordion spine */}
               <div className="relative pl-5">
-                <span className={`absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-${accentColor}-500/50 via-border/40 to-transparent`} />
+                <span className="absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-amber-500/50 via-border/40 to-transparent" />
                 <div className="space-y-2.5">
                   {lesson.concepts.map((c, i) => {
                     const open = openConcept === i;
@@ -225,17 +222,17 @@ const JavaExpertLessonPage = () => {
                       <div key={i} className="relative">
                         <span
                           className={`absolute -left-5 top-4 w-[11px] h-[11px] rounded-full border-2 transition-colors ${
-                            open ? `bg-${accentColor}-500 border-${accentColor}-500` : 'bg-background border-border'
+                            open ? 'bg-amber-500 border-amber-500' : 'bg-background border-border'
                           }`}
                         />
                         <button
                           onClick={() => setOpenConcept(open ? -1 : i)}
                           className={`w-full text-left glass-card rounded-2xl px-4 py-3 border transition-all ${
-                            open ? `border-${accentColor}-500/35` : 'border-border/25 hover:border-amber-500/20'
+                            open ? 'border-amber-500/35' : 'border-border/25 hover:border-amber-500/20'
                           }`}
                         >
                           <span className="flex items-center gap-2">
-                            <span className={`text-[10px] font-mono text-${accentColor}-400`}>{String(i + 1).padStart(2, '0')}</span>
+                            <span className="text-[10px] font-mono text-amber-400">{String(i + 1).padStart(2, '0')}</span>
                             <span className="flex-1 font-display font-bold text-sm text-foreground">{c.title}</span>
                             <ChevronRight
                               className={`w-4 h-4 text-muted-foreground transition-transform ${open ? 'rotate-90' : ''}`}
@@ -270,16 +267,16 @@ const JavaExpertLessonPage = () => {
               {/* Assignment Box: Goal + Steps (Scrollable) */}
               <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[40vh] overflow-y-auto">
                 <div className="mb-4">
-                  <p className={`text-[10px] font-mono text-${accentColor}-400 uppercase tracking-wider mb-2 flex items-center gap-1`}>
+                  <p className="text-[10px] font-mono text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                     <Check className="w-3 h-3" /> Objective
                   </p>
                   <p className="text-sm text-foreground leading-relaxed">{lesson.practical.goal}</p>
                 </div>
-                
+
                 <div>
                   <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10 pb-2 border-b border-border/10">
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Execution Steps</p>
-                    <span className={`text-[10px] font-mono text-${accentColor}-400`}>
+                    <span className="text-[10px] font-mono text-amber-400">
                       {stepsDone}/{lesson.practical?.steps?.length ?? 0}
                     </span>
                   </div>
@@ -299,7 +296,7 @@ const JavaExpertLessonPage = () => {
                             }`}>
                               {done ? <Check className="w-3 h-3" /> : i + 1}
                             </span>
-                            <span 
+                            <span
                               className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}
                               dangerouslySetInnerHTML={{
                                 __html: step.replace(/`([^`]+)`/g, '<code class="bg-secondary/60 text-amber-400 px-1.5 py-0.5 rounded text-[11px] font-mono">$1</code>')
@@ -315,10 +312,10 @@ const JavaExpertLessonPage = () => {
 
               {/* Code Editor + Terminal */}
               <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[85vh] flex flex-col">
-                <JavaWorkspace 
-                  practical={lesson.practical} 
-                  embedded={true} 
-                  requiresLocalTerminal={EXPERT_LOCAL_TERMINAL_LESSONS.includes(lesson.id)} 
+                <JavaWorkspace
+                  practical={lesson.practical}
+                  embedded={true}
+                  requiresLocalTerminal={EXPERT_LOCAL_TERMINAL_LESSONS.includes(lesson.id)}
                 />
               </div>
             </div>
@@ -329,10 +326,11 @@ const JavaExpertLessonPage = () => {
             <div className="space-y-4 animate-fade-in">
               {!submitted ? (
                 <>
-                  <section className={`rounded-3xl border border-${accentColor}-500/25 bg-gradient-to-br from-${accentColor}-500/10 to-transparent p-5 flex items-center gap-3`}>
-                    <GraduationCap className={`w-5 h-5 text-${accentColor}-400 shrink-0`} />
+                  <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5 flex items-center gap-3">
+                    <GraduationCap className="w-5 h-5 text-amber-400 shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery Validation</p>
+                      {/* ✅ DYNAMIC 75% threshold display */}
                       <p className="text-[11px] text-muted-foreground">
                         Score {passingThreshold}/{quiz.length} (75%) to certify this expert module.
                       </p>
@@ -344,9 +342,9 @@ const JavaExpertLessonPage = () => {
                           onClick={() => setQIndex(i)}
                           className={`w-2 h-2 rounded-full transition-all ${
                             i === qIndex
-                              ? `bg-${accentColor}-400 scale-125`
+                              ? 'bg-amber-400 scale-125'
                               : answers[i] !== undefined
-                              ? `bg-${accentColor}-400/50`
+                              ? 'bg-amber-400/50'
                               : 'bg-secondary'
                           }`}
                           aria-label={`Question ${i + 1}`}
@@ -375,14 +373,14 @@ const JavaExpertLessonPage = () => {
                               }}
                               className={`w-full text-left text-xs md:text-sm px-3.5 py-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                                 selected
-                                  ? `border-${accentColor}-500/50 bg-${accentColor}-500/10 text-${accentColor}-400`
+                                  ? 'border-amber-500/50 bg-amber-500/10 text-amber-400'
                                   : 'border-border/30 text-foreground hover:border-amber-500/30'
                               }`}
                             >
                               <span
                                 className={`w-5 h-5 rounded-md grid place-items-center text-[10px] font-mono shrink-0 border ${
-                                  selected 
-                                    ? `border-${accentColor}-500 bg-${accentColor}-500 text-black` 
+                                  selected
+                                    ? 'border-amber-500 bg-amber-500 text-black'
                                     : 'border-border/50'
                                 }`}
                               >
@@ -426,7 +424,7 @@ const JavaExpertLessonPage = () => {
                     {!passed && (
                       <button
                         onClick={() => { setAnswers({}); setSubmitted(false); setQIndex(0); }}
-                        className={`mt-4 bg-${accentColor}-500 text-black text-xs font-semibold px-5 py-2 rounded-xl hover:bg-${accentColor}-400 transition-colors`}
+                        className="mt-4 bg-amber-500 text-black text-xs font-semibold px-5 py-2 rounded-xl hover:bg-amber-400 transition-colors"
                       >
                         Retry validation
                       </button>
@@ -490,7 +488,7 @@ const JavaExpertLessonPage = () => {
         {stage !== 'quiz' ? (
           <button
             onClick={() => setStage(STAGES[stageIndex + 1].key)}
-            className={`w-full font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2 ${primaryBtnClass}`}
+            className="w-full bg-amber-500 text-black font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
           >
             {stage === 'concept' ? 'Enter the lab' : 'Begin validation'} <ChevronRight className="w-4 h-4" />
           </button>
@@ -498,7 +496,7 @@ const JavaExpertLessonPage = () => {
           <button
             disabled={!allAnswered}
             onClick={handleSubmit}
-            className={`w-full font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed ${primaryBtnClass}`}
+            className="w-full bg-amber-500 text-black font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {allAnswered ? 'Submit validation' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
           </button>
@@ -527,7 +525,7 @@ const JavaExpertLessonPage = () => {
           {stage !== 'quiz' ? (
             <button
               onClick={() => setStage(STAGES[stageIndex + 1].key)}
-              className={`font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-${accentColor}-500/20 ${primaryBtnClass}`}
+              className="bg-amber-500 text-black font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
             >
               {stage === 'concept' ? 'Enter the lab' : 'Begin validation'} <ChevronRight className="w-4 h-4" />
             </button>
@@ -535,7 +533,7 @@ const JavaExpertLessonPage = () => {
             <button
               disabled={!allAnswered}
               onClick={handleSubmit}
-              className={`font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed ${primaryBtnClass}`}
+              className="bg-amber-500 text-black font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {allAnswered ? 'Submit validation' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
             </button>
