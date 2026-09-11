@@ -28,10 +28,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'java',       title: 'Java', body: 'Core Java, OOPs concepts & backend fundamentals. Beginner to Expert.' },
   { target: 'c',          title: 'C Programming', body: 'Procedural programming, memory management & low-level fundamentals.' },
   { target: 'cpp',        title: 'C++', body: 'Compilers, memory, pointers & high-performance code. Beginner to Advance.' },
-  { target: 'cppexpert',  title: 'C++ Expert', body: 'Template metaprogramming, multithreading & low-level performance.' },
-  { target: 'local',      title: 'Local-Only Coding', body: 'DOM, localStorage, PWAs.' },
   { target: 'sql',        title: 'SQL Databases', body: 'Queries, joins, schema design.' },
-  { target: 'three3d', title: '3D Web Dev', body: 'Three.js & React Three Fiber. How to create 3d animated web.' },
   { target: 'challenges', title: 'Challenges', body: 'Bite-sized puzzles. Test your coding level.' },
   { target: 'playground', title: 'Code Editor', body: 'Real in-browser editor.' },
 ];
@@ -166,6 +163,10 @@ const SECTIONS: SectionDef[] = [
         tour: 'c', lessons: 30, accent: 'accent-blue',
         tags: ['Pointers', 'Memory', 'Structs', 'CLI'], desc: 'Syntax → Memory → Pointers → Low-Level Systems',
         trackId: 'c' as TrackId },
+    { id: 'cexpert', path: '/c-expert?from=dashboard', title: 'C Expert', emoji: '🧙‍♂️',
+        tour: 'cexpert', lessons: 30, accent: 'accent-blue',
+        tags: ['Advanced Memory', 'Data Structures', 'Performance'], desc: 'Advanced Pointers → Memory Optimization → Systems',
+        trackId: 'cx' as TrackId },
     ],
   },
   
@@ -332,6 +333,7 @@ const Dashboard = () => {
     '/java': 'java' as TrackId,
     '/java-expert': 'javaexpert' as TrackId,
     '/c': 'c' as TrackId,
+    '/c-expert': 'cx' as TrackId,
     '/cpp': 'cpp' as TrackId,
     '/cpp/expert': 'cppexpert' as TrackId,
   };
