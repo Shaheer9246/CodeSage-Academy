@@ -43,7 +43,7 @@ const TRACKS: Track[] = [
   { prefix: 'cpp-',        path: '/cpp-lesson',        list: CPP_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'c-',          path: '/c-lesson',          list: C_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'java-',       path: '/java-lesson',       list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
-  { prefix: 'java-',       path: '/java-lesson',       list: JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
+  { prefix: 'javax-',      path: '/javax-lesson', list: JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'free-',       path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
   { prefix: 'real-free-',  path: '/rf-lesson',    list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways })) },
 ];
