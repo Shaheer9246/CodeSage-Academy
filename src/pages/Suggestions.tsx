@@ -54,6 +54,25 @@ const Suggestions = () => {
   };
 
   const refresh = useCallback(async () => {
+    const cacheKey = 'codesage_suggestions_feed';
+    const cacheTimeKey = 'codesage_suggestions_feed_time';
+    const now = Date.now();
+    const cachedTime = Number(localStorage.getItem(cacheTimeKey) || 0);
+    const cachedData = localStorage.getItem(cacheKey);
+
+    // If cached less than 15 minutes ago, serve instantly from localStorage with ZERO egress
+    if (cachedData && now - cachedTime < 15 * 60 * 1000) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setItems(parsed);
+        if (user) {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          setPostedToday(parsed.some((s: any) => s.is_mine && new Date(s.created_at) >= today));
+        }
+        return;
+      } catch {}
+    }
+
     const { data: suggestionsData, error: suggestionsError } = await sb
       .from('suggestions_public')
       .select('*')
@@ -86,6 +105,10 @@ const Suggestions = () => {
     })) as Suggestion[];
 
     setItems(itemsWithVotes);
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(itemsWithVotes));
+      localStorage.setItem(cacheTimeKey, String(now));
+    } catch {}
 
     if (user) {
       const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -98,13 +121,6 @@ const Suggestions = () => {
 
   useEffect(() => {
     refresh();
-    // FIX 1: Unique channel name prevents the realtime crash on remount
-    const ch = supabase
-      .channel('suggestions-feed-' + Date.now())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestions' }, () => refresh())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestion_votes' }, () => refresh())
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
   }, [refresh]);
 
   useEffect(() => {
