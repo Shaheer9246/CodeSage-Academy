@@ -167,7 +167,6 @@ export const TRACK_META: Record<
     idPrefix: 'CS-JV',
     seed: 20,
   },
-  },
   javaexpert: {
     label: 'Java Expert',
     short: 'Java Expert',
