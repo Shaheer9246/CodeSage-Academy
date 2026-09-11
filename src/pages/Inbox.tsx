@@ -88,49 +88,63 @@ const InboxPage = () => {
   };
 
   const refresh = useCallback(async () => {
+    const cacheKey = 'codesage_inbox_announcements';
+    const cacheTimeKey = 'codesage_inbox_announcements_time';
+    const now = Date.now();
+    const cachedTime = Number(localStorage.getItem(cacheTimeKey) || 0);
+    const cachedData = localStorage.getItem(cacheKey);
+
+    // If cached less than 30 minutes ago, load from localStorage with ZERO database egress
+    if (cachedData && now - cachedTime < 30 * 60 * 1000) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setItems(parsed);
+        return;
+      } catch {
+        // fallback to fetch if parse fails
+      }
+    }
+
     const { data, error } = await supabase
       .from('announcements')
-      .select('*')
+      .select('id, title, body, created_at')
       .order('created_at', { ascending: false });
     if (error) { console.error(error); return; }
-    setItems((data || []) as Announcement[]);
+    const list = (data || []) as Announcement[];
+    setItems(list);
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(list));
+      localStorage.setItem(cacheTimeKey, String(now));
+    } catch {}
     
     // Mark all seen ids as read
     if (user?.id) {
-      const list = (data || []) as Announcement[];
       const key = `codesage_inbox_seen_${user.id}`;
       let seen: string[] = [];
       try { seen = JSON.parse(localStorage.getItem(key) || '[]'); } catch { seen = []; }
-      // AFTER
-  const unseen = list.filter(a => !seen.includes(a.id));
-  if (unseen.length) {
-    // FIX: Batch the reads into a SINGLE database operation instead of N separate RPC calls
-    const readsToInsert = unseen.map(a => ({
-      user_id: user.id,
-      announcement_id: a.id
-    }));
-    
-    const { error: batchError } = await supabase
-      .from('announcement_reads')
-      .upsert(readsToInsert, { onConflict: 'user_id,announcement_id' });
-      
-    if (batchError) {
-      console.error('Failed to batch mark announcements as read:', batchError);
-    }
-    
-    try { localStorage.setItem(key, JSON.stringify(list.map(a => a.id))); } catch { /* ignore */ }
-    window.dispatchEvent(new Event('inbox:read'));
-  }
+      const unseen = list.filter(a => !seen.includes(a.id));
+      if (unseen.length) {
+        const readsToInsert = unseen.map(a => ({
+          user_id: user.id,
+          announcement_id: a.id
+        }));
+        
+        const { error: batchError } = await supabase
+          .from('announcement_reads')
+          .upsert(readsToInsert, { onConflict: 'user_id,announcement_id' });
+          
+        if (batchError) {
+          console.error('Failed to batch mark announcements as read:', batchError);
+        }
+        
+        try { localStorage.setItem(key, JSON.stringify(list.map(a => a.id))); } catch { /* ignore */ }
+        window.dispatchEvent(new Event('inbox:read'));
+      }
     }
   }, [user?.id]);
 
   useEffect(() => {
     refresh();
-    const ch = supabase
-      .channel('announcements-feed-' + Date.now())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => refresh())
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
   }, [refresh]);
 
   const post = async () => {
