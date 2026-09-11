@@ -18,7 +18,8 @@ export type TrackId =
   | 'javaexpert'
   | 'cpp'
   | 'cppexpert'
-  | 'c';
+  | 'c'
+  | 'cx';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
@@ -50,7 +51,8 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'javaexpert',
   'cpp',
   'cppexpert',
-  'c'
+  'c',
+  'cx'
 ]);
 
 
@@ -196,6 +198,14 @@ export const TRACK_META: Record<
     route: '/c',
     idPrefix: 'CS-C',
     seed: 10,
+  },
+  cx: {
+    label: 'C Expert',
+    short: 'C Expert',
+    route: '/c-expert',
+    idPrefix: 'CS-CX',
+    seed: 10,
+    prereq: ['c'],
   },
 };
 
