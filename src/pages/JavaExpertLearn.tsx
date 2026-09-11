@@ -105,7 +105,7 @@ const JavaExpertLearn = () => {
                 transition={{ delay: i * 0.02 }}
                 onClick={() =>
                   isUnlocked &&
-                  navigate(`/java-expert-lesson/${lesson.id}${fromQs}`)
+                  navigate(`/javax-lesson/${lesson.id}${fromQs}`)
                 }
                 disabled={!isUnlocked}
                 className={`w-full glass-card rounded-xl p-3.5 sm:p-4 flex items-center gap-3 text-left transition-all touch-manipulation active:scale-[0.99] min-h-[64px] ${
