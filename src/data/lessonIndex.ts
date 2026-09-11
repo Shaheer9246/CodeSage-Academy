@@ -14,6 +14,7 @@ import { AI_LESSONS } from './aiFundamentalsLesson';
 import { INTERMEDIATE_AI_LESSONS } from './intermediateAiLesson';
 import { THREE3D_LESSONS } from './three3dLessons';
 import { JAVA_LESSONS } from './javaLesson';
+import { JAVA_EXPERT_LESSONS } from './javaExpertLessons';
 import { C_LESSONS } from './cLessons';
 import { CPP_LESSONS } from './cppLessons';
 import { CPP_EXPERT_LESSONS } from './cppExpertLessons';
@@ -32,6 +33,7 @@ export type LessonTrackKey =
   | 'intermediate-ai'
   | 'three3d'
   | 'java'
+  | 'javaexpert'
   | 'cpp'
   | 'cppexpert'
   | 'c';
@@ -52,6 +54,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   'intermediate-ai': ids(INTERMEDIATE_AI_LESSONS),
   three3d: ids(THREE3D_LESSONS),
   java: ids(JAVA_LESSONS),
+  javaexpert: ids(JAVA_EXPERT_LESSONS),
   cpp: ids(CPP_LESSONS),
   cppexpert: ids(CPP_EXPERT_LESSONS),
   c: ids(C_LESSONS),
@@ -71,6 +74,7 @@ export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
   'intermediate-ai': 'Intermediate AI',
   three3d: '3D Web Dev',
   java: 'Java',
+  javaexpert: 'Java Expert',
   cpp: 'C++',
   cppexpert: 'C++ Expert',
   c: 'C',
