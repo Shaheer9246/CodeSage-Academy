@@ -94,7 +94,7 @@ const CppLessonPage = () => {
     if (passed) {
       if (user) await completeLesson(lesson.id);
       // FIX: Aligned XP/Coins with the header badge
-      toast.success('Lesson complete! +5 XP · +2 ◈ 🎉');
+      toast.success('Lesson complete! +1 XP · +2 ◈ 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
     setIsSubmitting(false);
