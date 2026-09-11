@@ -3,12 +3,13 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
-import { getJavaLessonById, isJavaLessonUnlocked } from '@/data/javaLessons';
+import { getJavaLessonById, isJavaLessonUnlocked } from '@/data/javaLesson';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, type LucideIcon,
 } from 'lucide-react';
 import JavaWorkspace from '@/components/JavaWorkspace';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -18,10 +19,16 @@ const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = 
   { key: 'quiz', icon: ClipboardCheck, label: 'Proof', hint: 'Prove it' },
 ];
 
+// Lessons that require local JDK/terminal instead of browser IDE
+const LOCAL_TERMINAL_LESSONS = [
+  'java-01', 'java-25', 'java-30', 'java-test-2',
+];
+
 const JavaLessonPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
+  const isMobile = useIsMobile();
   const [sp] = useSearchParams();
   const from = sp.get('from');
   const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/java?from=dashboard' : '/java';
@@ -39,12 +46,16 @@ const JavaLessonPage = () => {
   const { isGuest: __pgGuest } = useGuestLessonGate('java', id);
 
   const quiz = lesson?.quiz ?? [];
+
+  // ✅ 75% PASSING THRESHOLD (dynamic, not hardcoded)
   const correctCount = useMemo(
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
+  const passingThreshold = Math.ceil(quiz.length * 0.75);
+  const passed = correctCount >= passingThreshold;
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
+
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
   const journey = Math.round(
@@ -61,7 +72,7 @@ const JavaLessonPage = () => {
     setSubmitted(true);
     if (passed) {
       if (user) await completeLesson(lesson.id);
-      toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
+      toast.success('Lesson complete! +5 XP · +2 Coins 🎉');
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
@@ -136,6 +147,33 @@ const JavaLessonPage = () => {
         <main className="flex-1 min-w-0">
           {stage === 'concept' && (
             <div className="space-y-5 animate-fade-in">
+
+              {/* ✅ TERMINAL NOTICE BOX (matches Python pattern exactly) */}
+              {lesson.terminalNotice && (
+                <section className={`rounded-2xl border p-4 flex items-start gap-3 ${
+                  lesson.id === 'java-01'
+                    ? 'border-cyan-500/30 bg-cyan-500/8'
+                    : 'border-border/30 bg-card/40'
+                }`}>
+                  <span className="text-lg shrink-0 mt-0.5">🖥️</span>
+                  <div className="flex-1 min-w-0">
+                    {lesson.id === 'java-01' && (
+                      <p className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.18em] mb-1">
+                        Terminal Notice
+                      </p>
+                    )}
+                    <p className={`text-xs leading-relaxed ${
+                      lesson.id === 'java-01'
+                        ? 'text-cyan-200/90'
+                        : 'text-muted-foreground'
+                    }`}>
+                      {lesson.terminalNotice}
+                    </p>
+                  </div>
+                </section>
+              )}
+
+              {/* ── Mission Brief (Philosophy) ──────────────── */}
               <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
                 <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">Mission brief</p>
                 <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
@@ -259,13 +297,18 @@ const JavaLessonPage = () => {
                 </div>
               </div>
 
-              {/* Code Editor + Terminal (Clean, no internal tabs) */}
-              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
-                <JavaWorkspace practical={lesson.practical} />
+              {/* ✅ Code Editor + Terminal (with all required props) */}
+              <div className="glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl h-[85vh] flex flex-col">
+                <JavaWorkspace
+                  practical={lesson.practical}
+                  embedded={true}
+                  requiresLocalTerminal={LOCAL_TERMINAL_LESSONS.includes(lesson.id)}
+                />
               </div>
             </div>
           )}
 
+          {/* ── QUIZ STAGE ─────────────────────── */}
           {stage === 'quiz' && (
             <div className="space-y-4 animate-fade-in">
               {!submitted ? (
@@ -274,7 +317,10 @@ const JavaLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      {/* ✅ DYNAMIC threshold display instead of hardcoded "3/4" */}
+                      <p className="text-[11px] text-muted-foreground">
+                        Score {passingThreshold}/{quiz.length} to finish this lesson.
+                      </p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
