@@ -26,10 +26,10 @@ export default function InboxBadge({ className }: InboxBadgeProps) {
     const cacheKey = `codesage_badge_unread_${user.id}`;
     const timeKey = `codesage_badge_time_${user.id}`;
 
-    // Throttle: at most one server check per 60 seconds (unless forced).
+    // Throttle: at most one server check per 15 minutes (unless forced).
     if (!force) {
       const last = Number(localStorage.getItem(timeKey) || 0);
-      if (Date.now() - last < 60000) {
+      if (Date.now() - last < 15 * 60 * 1000) {
         setUnread(Number(localStorage.getItem(cacheKey) || 0));
         return;
       }
