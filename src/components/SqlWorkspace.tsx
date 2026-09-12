@@ -14,10 +14,17 @@ const loadSqlJs = (): Promise<any> => {
       return;
     }
     const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
+    script.src = '/sql/sql-wasm.js';
     script.async = true;
     script.onload = () => resolve((window as any).initSqlJs);
-    script.onerror = () => reject(new Error('Failed to load local database driver.'));
+    script.onerror = () => {
+      const cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
+      cdnScript.async = true;
+      cdnScript.onload = () => resolve((window as any).initSqlJs);
+      cdnScript.onerror = () => reject(new Error('Failed to load local database driver.'));
+      document.body.appendChild(cdnScript);
+    };
     document.body.appendChild(script);
   });
 };
@@ -73,9 +80,16 @@ export default function SqlWorkspace() {
   useEffect(() => {
     loadSqlJs()
       .then(async (initSqlJs) => {
-        const SQL = await initSqlJs({
-          locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-        });
+        let SQL;
+        try {
+          SQL = await initSqlJs({
+            locateFile: (file: string) => `/sql/${file}`
+          });
+        } catch {
+          SQL = await initSqlJs({
+            locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+          });
+        }
         SQLRef.current = SQL;
         setDbLoading(false);
       })
