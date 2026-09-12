@@ -505,7 +505,7 @@ export const AI_LESSONS: AILesson[] = [
         'It affects context-window limits, cost, latency, and how much text the model can process.',
         'It changes the color of the user interface.',
         'It determines whether the model can use JavaScript.',
-        'It controls the computer's screen brightness.'
+        "It controls the computer's screen brightness."
       ],
       correctIndex: 0,
       explanation: "Option A is correct. Token count directly affects how much context fits, how much APIs charge, and how much computation is required. Why the others are wrong: Token count does not control UI color, programming language support, or hardware display settings."
@@ -1647,7 +1647,7 @@ export const AI_LESSONS: AILesson[] = [
     {
       title: '1. The Non-Deterministic Testing Problem',
       beginner: "If you ask an AI 'What is the capital of France?' three times, it might say 'Paris', 'The capital is Paris', and 'Paris, France.' A normal computer test would fail because the text doesn't match exactly. We need smarter ways to grade the AI.",
-      advanced: "Traditional deterministic assertions (`assert output == "Paris"`) fail against generative models due to semantic variance. AI evaluation requires semantic equivalence checking, where the system must validate the underlying meaning and factual accuracy of the output, regardless of syntactic variation."
+      advanced: "Traditional deterministic assertions (`assert output == 'Paris'`) fail against generative models due to semantic variance. AI evaluation requires semantic equivalence checking, where the system must validate the underlying meaning and factual accuracy of the output, regardless of syntactic variation."
     },
     {
       title: '2. Lexical Metrics (BLEU and ROUGE)',
