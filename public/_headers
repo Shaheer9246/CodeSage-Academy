@@ -7,5 +7,12 @@
 /*.css
   Content-Type: text/css; charset=utf-8
 
+/*.wasm
+  Content-Type: application/wasm
+
+/sql/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
