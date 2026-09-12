@@ -36,1387 +36,2469 @@ export interface SQLLesson {
 
 export const SQL_LESSONS: SQLLesson[] = [
   {
-    id: 'sql-01',
+    id: `sql-01`,
     order: 1,
-    module: 'Relational Foundations',
-    icon: '💾',
-    title: 'Relational Databases & SELECT',
-    philosophy: 'Before databases, companies stored information in messy spreadsheet files. Relational databases—with PostgreSQL being the industry gold-standard for backend engineering—solved this by establishing strict structural order. They organize data into clean tables of rigid rows and columns. Your journey to becoming a backend developer begins with the absolute core statement: retrieving target data out of a table using SQL (Structured Query Language).',
+    module: `Relational Foundations`,
+    icon: `💾`,
+    title: `Relational Databases & SELECT`,
+    philosophy: `A relational database is not just a place to store data. It is a system of order. Before databases, applications stored information in messy files, duplicated lists, and fragile spreadsheets. Relational databases solve this by organizing data into tables with clear columns, strict rows, and predictable relationships. Your backend journey begins with the most important question in data engineering: how do I retrieve exactly what I need?`,
     concepts: [
       {
-        title: '1. The Relational Model & PostgreSQL',
-        beginner: 'Think of a PostgreSQL database as a highly organized digital filing cabinet. Everything is stored in tables (like a spreadsheet named "employees"). Rows represent individual items (a single employee), while Columns define properties (like name, email, or role).',
-        advanced: 'Relational databases are built on the mathematical theory of relations. Every table adheres to a rigid schema. High-performance engines like PostgreSQL enforce strict ACID (Atomicity, Consistency, Isolation, Durability) compliance, preventing corrupt or orphan data from ever entering the storage layer.'
+        title: `1. Tables, Rows, and Columns`,
+        beginner: `Think of a table like a very clean spreadsheet. Each table has a name, like employees. Each row is one thing, like one employee. Each column is one fact about that thing, like name, role, or salary.`,
+        advanced: `A relational table is a typed relation. Columns define attributes and data domains, while rows represent tuples. The schema enforces structure, allowing the database engine to optimize storage, validate writes, and plan efficient reads.`
       },
       {
-        title: '2. The SELECT and FROM Keywords',
-        beginner: 'When your backend application needs to look at data, it sends SQL statements to the database. "SELECT" tells the database exactly which columns to grab, and "FROM" tells it which table holds them. Example: "SELECT name FROM employees;"',
-        advanced: 'The SELECT keyword initiates the projection phase of relational algebra. The database query planner parses your request, opens the target relation (FROM table), isolates projected attributes in memory, and returns the dataset over the network without modifying physical disk storage.'
+        title: `2. SELECT Chooses Columns`,
+        beginner: `The SELECT keyword tells the database which columns you want to see. If you only need names, ask for names. Do not ask for every column unless you truly need every column.`,
+        advanced: `SELECT performs projection in relational algebra. The engine reads the source relation, projects only the requested attributes, and returns the result set. Precise projection reduces network payload, memory usage, and accidental data exposure.`
       },
       {
-        title: '3. Column Aliasing (AS)',
-        beginner: 'Sometimes, backend database columns have ugly technical names like "emp_usr_name". You can temporarily rename a column in your results using the "AS" keyword (e.g., "SELECT emp_usr_name AS username"). This is exactly how backend APIs rename data before sending it to a frontend application.',
-        advanced: 'Aliasing assigns temporary virtual identifiers to query outputs. This does not alter the physical table schema in PostgreSQL; it simply maps the output variables during the projection step, which is crucial for resolving naming collisions during table joins.'
+        title: `3. FROM Chooses the Source Table`,
+        beginner: `The FROM keyword tells the database where to look. If you write SELECT name FROM employees, the database knows it should read from the employees table.`,
+        advanced: `FROM identifies the target relation for the query planner. Before execution, the planner evaluates available access paths, such as sequential scans or index scans, based on the table and its statistics.`
+      },
+      {
+        title: `4. Aliasing with AS`,
+        beginner: `Sometimes a column has an ugly name, like emp_usr_name. You can rename it only in the query result using AS. For example, SELECT emp_usr_name AS username makes the result easier to use.`,
+        advanced: `Aliasing creates a temporary output label. It does not mutate the table schema. In backend APIs, aliases are often used to shape database columns into clean JSON keys for frontend clients.`
       }
     ],
     practical: {
-      title: 'Retrieving Employee Roles',
-      intro: 'We have seeded a virtual `employees` table containing fields like `id`, `name`, `role`, and `salary`. Your task is to query this database and retrieve only the employee names and their respective roles.',
+      title: `Retrieving Employee Roles`,
+      intro: `We have seeded an employees table with columns id, name, role, and salary. Your task is to retrieve only the employee names and roles. This is the backend equivalent of saying: give me exactly these fields, nothing more.`,
       steps: [
-        'Examine the seeded table. It contains columns for `id`, `name`, `role`, and `salary`.',
-        'Write a SQL query that retrieves only two columns: `name` and `role` (in that exact order).',
-        'Tell the query engine to pull this data from the `employees` table using the `FROM` keyword.',
-        'Always end your SQL statements with a clean semicolon (`;`).'
+        `Look at the seeded employees table. It contains id, name, role, and salary.`,
+        `Write a query that selects only two columns: name and role.`,
+        `Use FROM to tell the database to read from the employees table.`,
+        `End the statement with a semicolon.`,
+        `Run the query. You should see four rows returned, including Alice Smith as Lead Engineer and Bob Jones as UI Designer.`
       ],
-      goal: 'Retrieve only the "name" and "role" columns from the "employees" table.',
-      starterQuery: '-- Write your SQL query here\nSELECT ',
-      solutionQuery: 'SELECT name, role FROM employees;',
-      seedSql: `
-        CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, role TEXT, salary INTEGER);
-        INSERT INTO employees VALUES (1, 'Alice Smith', 'Lead Engineer', 120000);
-        INSERT INTO employees VALUES (2, 'Bob Jones', 'UI Designer', 85000);
-        INSERT INTO employees VALUES (3, 'Charlie Brown', 'Database Admin', 95000);
-        INSERT INTO employees VALUES (4, 'Diana Prince', 'Product Manager', 110000);
-      `
+      goal: `Retrieve only the name and role columns from the employees table.`,
+      starterQuery: `-- Write your SQL query here\nSELECT `,
+      solutionQuery: `SELECT name, role FROM employees;`,
+      seedSql: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, role TEXT, salary INTEGER); INSERT INTO employees VALUES (1, 'Alice Smith', 'Lead Engineer', 120000); INSERT INTO employees VALUES (2, 'Bob Jones', 'UI Designer', 85000); INSERT INTO employees VALUES (3, 'Charlie Brown', 'Database Admin', 95000); INSERT INTO employees VALUES (4, 'Diana Prince', 'Product Manager', 110000);`
     },
     quiz: [
       {
-        question: 'What is the purpose of the FROM keyword in a standard SQL query?',
+        question: `What does the FROM clause do in a SQL query?`,
         options: [
-          'It defines the filters applied to rows',
-          'It specifies which table containing target data should be queried',
-          'It creates a new database table inside the schema',
-          'It renames columns to display them nicer'
+          `It filters rows based on a condition`,
+          `It specifies the table the query should read from`,
+          `It creates a new table permanently`,
+          `It renames the result columns`
         ],
         correctIndex: 1,
-        explanation: 'The FROM clause tells the query planner exactly which target database table it needs to open to retrieve the requested records.'
+        explanation: `FROM tells the database which table is the source of the query. Filtering is done by WHERE, renaming output labels is done by AS, and creating tables requires CREATE TABLE.`
       },
       {
-        question: 'Which query correctly displays only the "name" column from a table named "users"?',
+        question: `Which query correctly returns only the name column from a users table?`,
         options: [
-          'GET name FROM users;',
-          'SELECT users FROM name;',
-          'SELECT name FROM users;',
-          'DISPLAY name OF users;'
+          `GET name FROM users;`,
+          `SELECT users FROM name;`,
+          `SELECT name FROM users;`,
+          `DISPLAY name OF users;`
         ],
         correctIndex: 2,
-        explanation: 'SQL syntax dictates the structure "SELECT [columns] FROM [table];" to query data.'
+        explanation: `SQL uses SELECT to choose columns and FROM to choose the table. SELECT name FROM users; is the correct syntax. The other options use non-standard keywords or reversed structure.`
       },
       {
-        question: 'How do you temporarily rename a column in your output query results?',
+        question: `What does SELECT name, role FROM employees; return?`,
         options: [
-          'Using the RENAME keyword',
-          'Using the IS keyword',
-          'Using the AS keyword',
-          'Using the LINK keyword'
+          `All columns from employees`,
+          `Only the name column`,
+          `Only the role column`,
+          `Only the name and role columns`
         ],
-        correctIndex: 2,
-        explanation: 'The AS keyword is used for "aliasing," which lets you temporarily change the column display label in your results. This is heavily used when formatting API responses.'
+        correctIndex: 3,
+        explanation: `The query projects exactly two columns: name and role. It does not return salary or id because those columns were not listed in SELECT.`
+      },
+      {
+        question: `What is the purpose of AS in a query like SELECT emp_usr_name AS username?`,
+        options: [
+          `It permanently renames the column in the table`,
+          `It gives the output column a temporary label`,
+          `It converts the column into text`,
+          `It deletes the original column`
+        ],
+        correctIndex: 1,
+        explanation: `AS creates an alias for the query output only. It does not modify the actual database schema, convert data types, or delete columns.`
       }
     ],
     milestones: [
-      'Understand relational table schemas, rows, and columns.',
-      'Master projecting specific columns using SELECT.',
-      'Use FROM to target explicit database tables.',
-      'Employ the AS keyword to dynamically alias column outputs for APIs.'
+      `Understand that tables store rows and columns in a structured schema.`,
+      `Use SELECT to choose exactly which columns to retrieve.`,
+      `Use FROM to identify the source table.`,
+      `Use AS to shape query output for cleaner API responses.`
     ]
   },
   {
-    id: 'sql-02',
+    id: `sql-02`,
     order: 2,
-    module: 'Relational Foundations',
-    icon: '🔍',
-    title: 'Precision Filtering & NULL Handling',
-    philosophy: 'Pulling every record from a massive PostgreSQL database is incredibly inefficient and will crash your server. To build fast, responsive backend APIs, you must filter data down to exact criteria. We achieve this surgical targeting using the WHERE clause. Furthermore, backend engineers must master handling NULL values—the database\'s strict way of representing completely empty or unknown data.',
+    module: `Relational Foundations`,
+    icon: `🔍`,
+    title: `Precision Filtering & NULL Handling`,
+    philosophy: `A database with millions of rows is useless if every query returns everything. Backend engineers must ask precise questions: which users are active? Which orders are unpaid? Which records are missing required data? The WHERE clause gives you surgical control, and NULL handling protects you from the silent bugs that happen when missing data is treated like normal data.`,
     concepts: [
       {
-        title: '1. The WHERE Filtering Clause',
-        beginner: 'Think of WHERE as a customizable search filter. Instead of dumping 10,000 products onto a screen, writing "WHERE price < 20" restricts your database engine so it only returns items costing less than twenty dollars. This saves massive amounts of server memory.',
-        advanced: 'The WHERE clause operates as the selection operator in relational algebra. PostgreSQL\'s execution plan evaluates the boolean expression in the WHERE clause against candidate rows, discarding rows that evaluate to False or Null before they ever reach the projection phase.'
+        title: `1. The WHERE Clause`,
+        beginner: `WHERE is a filter. If you have 10,000 products but only want products under $20, you write WHERE price < 20. The database returns only the rows that pass your test.`,
+        advanced: `WHERE is the selection operator in relational algebra. The engine evaluates the predicate against candidate rows and discards rows that evaluate to false or unknown before projection. This reduces I/O, memory, and network transfer.`
       },
       {
-        title: '2. NULL and Three-Valued Logic',
-        beginner: 'In databases, a missing piece of info (like a user who never provided an email) is stored as NULL. NULL does not mean zero or an empty string; it means "unknown". You cannot use "=" to find NULLs. You must write "IS NULL" or "IS NOT NULL".',
-        advanced: 'PostgreSQL implements strict three-valued logic: True, False, and Unknown (NULL). Comparing any value to NULL using standard operators (like "WHERE email = NULL") evaluates to Unknown, which the WHERE filter drops. You must use monadic predicates (IS NULL).'
+        title: `2. AND, OR, and Parentheses`,
+        beginner: `You can combine filters. AND means both conditions must be true. OR means at least one condition must be true. When logic gets complex, use parentheses so your meaning is impossible to misunderstand.`,
+        advanced: `SQL boolean logic follows operator precedence. Without explicit parentheses, compound predicates can produce unintended results. Professional queries make logical grouping explicit, especially when mixing AND and OR.`
       },
       {
-        title: '3. COALESCE (Backend Fallbacks)',
-        beginner: 'If you want a fallback value for missing info (like showing "No Email" instead of a blank spot), use COALESCE. Example: "COALESCE(email, \'No Email\')" looks at the email, and if it is missing, safely prints your fallback text instead.',
-        advanced: 'COALESCE accepts an arbitrary number of arguments and evaluates them sequentially, returning the first non-null expression. This is a highly efficient function for data transformation layers, preventing NullPointerExceptions in your backend application.'
+        title: `3. NULL Means Unknown`,
+        beginner: `NULL does not mean zero. It does not mean an empty string. It means the value is missing or unknown. Because of that, you cannot safely use equals to find NULL. You must use IS NULL.`,
+        advanced: `SQL uses three-valued logic: true, false, and unknown. Comparisons with NULL usually evaluate to unknown, so WHERE email = NULL does not match missing emails. Use IS NULL or IS NOT NULL to test nullability explicitly.`
+      },
+      {
+        title: `4. COALESCE for Fallback Values`,
+        beginner: `Sometimes you want to show a backup value when data is missing. COALESCE(email, 'No Email') returns the email if it exists, and returns No Email if the email is NULL.`,
+        advanced: `COALESCE evaluates its arguments in order and returns the first non-null value. It is commonly used in API response formatting to prevent null values from leaking into frontends or causing runtime errors.`
       }
     ],
     practical: {
-      title: 'Finding Incomplete Accounts',
-      intro: 'We have seeded a `users` table containing `id`, `username`, `email`, and `phone`. Some users have not verified their email addresses, resulting in `NULL` values. Write a query to find the usernames of all users who are missing an email address.',
+      title: `Finding Incomplete Accounts`,
+      intro: `We have seeded a users table with id, username, email, and phone. Some users never provided an email, so their email column is NULL. Your task is to find the usernames of users missing an email address.`,
       steps: [
-        'Select only the `username` column.',
-        'Target the `users` table.',
-        'Add a `WHERE` clause check to see if the `email` column is empty.',
-        'Remember: do not use `= NULL`. Use the correct monadic syntax: `IS NULL`.',
-        'End with a semicolon.'
+        `Select only the username column.`,
+        `Read from the users table.`,
+        `Add a WHERE clause that checks the email column.`,
+        `Use IS NULL, not = NULL.`,
+        `Run the query. You should see ghost_coder and mystery_guest returned.`
       ],
-      goal: 'Identify all users who have not registered an email address.',
-      starterQuery: '-- Write your SQL query here\nSELECT username FROM users WHERE ',
-      solutionQuery: 'SELECT username FROM users WHERE email IS NULL;',
-      seedSql: `
-        CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, phone TEXT);
-        INSERT INTO users VALUES (1, 'john_doe', 'john@example.com', '555-0199');
-        INSERT INTO users VALUES (2, 'ghost_coder', NULL, '555-0122');
-        INSERT INTO users VALUES (3, 'matrix_neo', 'neo@neb.io', NULL);
-        INSERT INTO users VALUES (4, 'mystery_guest', NULL, NULL);
-      `
+      goal: `Identify all users whose email is NULL.`,
+      starterQuery: `-- Write your SQL query here\nSELECT username FROM users WHERE `,
+      solutionQuery: `SELECT username FROM users WHERE email IS NULL;`,
+      seedSql: `CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, phone TEXT); INSERT INTO users VALUES (1, 'john_doe', 'john@example.com', '555-0199'); INSERT INTO users VALUES (2, 'ghost_coder', NULL, '555-0122'); INSERT INTO users VALUES (3, 'matrix_neo', 'neo@neb.io', NULL); INSERT INTO users VALUES (4, 'mystery_guest', NULL, NULL);`
     },
     quiz: [
       {
-        question: 'Why does "WHERE email = NULL" fail to return records with empty emails in PostgreSQL?',
+        question: `Why does WHERE email = NULL fail to find missing emails?`,
         options: [
-          'NULL is a reserved command and cannot be written in filter clauses',
-          'Database engines interpret NULL comparisons as "Unknown", which always evaluates to false in a filter',
-          'You must use double equal signs (==) to compare NULLs',
-          'The equal sign can only compare numerical values, not text columns'
+          `NULL is a reserved word that can never appear in WHERE`,
+          `Comparisons with NULL evaluate to unknown, so IS NULL must be used`,
+          `You must use double equals for NULL`,
+          `NULL can only be used with numeric columns`
         ],
         correctIndex: 1,
-        explanation: 'SQL uses three-valued logic. Any direct equality test with NULL yields NULL (Unknown), so you must use monadic predicates like "IS NULL".'
+        explanation: `NULL represents unknown data. Equality comparisons with NULL do not return true; they return unknown. Therefore WHERE email = NULL filters out those rows. IS NULL is the correct null test.`
       },
       {
-        question: 'What is the function of the COALESCE operator?',
+        question: `What does COALESCE(email, 'No Email') do?`,
         options: [
-          'It combines two database tables together without matching keys',
-          'It deletes empty records from your hard drive',
-          'It evaluates arguments in order and returns the first non-null value',
-          'It converts text rows into capitalized letters'
+          `Deletes rows where email is NULL`,
+          `Returns email if it is not NULL, otherwise returns No Email`,
+          `Converts email into a number`,
+          `Creates a new email column`
+        ],
+        correctIndex: 1,
+        explanation: `COALESCE returns the first non-null argument. If email exists, it returns email. If email is NULL, it returns the fallback string. It does not delete rows or create columns.`
+      },
+      {
+        question: `What does WHERE price < 20 return?`,
+        options: [
+          `Rows where price is exactly 20`,
+          `Rows where price is greater than 20`,
+          `Rows where price is less than 20`,
+          `All rows in the table`
         ],
         correctIndex: 2,
-        explanation: 'COALESCE(val1, val2, ...) sequentially checks its inputs and returns the first value in the list that is NOT NULL.'
+        explanation: `The less-than operator filters rows where the price column is below 20. Rows equal to 20 or greater than 20 do not pass the predicate.`
+      },
+      {
+        question: `Why should you use parentheses when combining AND and OR?`,
+        options: [
+          `They make the query run faster on every database`,
+          `They make the logical grouping explicit and prevent precedence bugs`,
+          `They automatically remove NULL values`,
+          `They convert text into boolean values`
+        ],
+        correctIndex: 1,
+        explanation: `Parentheses clarify which conditions belong together. They do not magically speed up every query or remove NULLs. Their main value is correctness and maintainability.`
       }
     ],
     milestones: [
-      'Understand the row-level selection mechanics of WHERE.',
-      'Deploy single and multiple conditional assertions using AND/OR.',
-      'Master SQL three-valued logic and handle NULL values safely with IS NULL.',
-      'Leverage COALESCE to establish clean default fallbacks for null columns.'
+      `Use WHERE to filter rows precisely.`,
+      `Combine conditions safely with AND and OR.`,
+      `Understand that NULL means unknown, not zero or empty string.`,
+      `Use IS NULL and COALESCE to handle missing data correctly.`
     ]
   },
   {
-    id: 'sql-03',
+    id: `sql-03`,
     order: 3,
-    module: 'Relational Foundations',
-    icon: '⏳',
-    title: 'Sorting & Boundaries',
-    philosophy: 'When a frontend application displays data to a user, it expects an orderly sequence—like lowest price first, or newest sign-ups. Unordered database returns feel chaotic. SQL lets backend developers take absolute command over the data payload size and display hierarchy using sorting variables and exact limit caps.',
+    module: `Relational Foundations`,
+    icon: `⏳`,
+    title: `Sorting & Boundaries`,
+    philosophy: `Users do not want raw database output. They want the newest posts first, the cheapest products first, or the highest scores at the top. Sorting is how databases become user-friendly. Boundaries are how databases stay fast. LIMIT protects your API from sending too much data, and OFFSET helps with pagination, but deep pagination has hidden performance costs that professional backend engineers must understand.`,
     concepts: [
       {
-        title: '1. Ordering Results (ORDER BY)',
-        beginner: 'The "ORDER BY" clause lets you sort your results. By default, it sorts from lowest to highest (A-Z or 0-9). You can specify "ASC" for ascending, or "DESC" for descending (highest to lowest, like finding the most expensive item).',
-        advanced: 'ORDER BY instructs the database engine to perform a sorting pass. In PostgreSQL, if the sorted column is not indexed, the engine performs a costly memory or disk-based Merge Sort. Utilizing B-Tree indices completely bypasses this runtime penalty.'
+        title: `1. ORDER BY`,
+        beginner: `ORDER BY sorts your result. By default, sorting is usually ascending: A to Z or low to high. You can use DESC to sort descending, such as showing the most expensive products first.`,
+        advanced: `ORDER BY introduces a sort operation into the execution plan. If an appropriate index exists, the engine may avoid an explicit sort. Without an index, the database may need to materialize and sort rows in memory or on disk.`
       },
       {
-        title: '2. Limiting Network Payloads (LIMIT)',
-        beginner: 'If you have a table with millions of products, sending them all to a mobile app will crash it. "LIMIT" caps the total number of rows returned. Writing "LIMIT 5" guarantees the database only sends 5 rows over the network.',
-        advanced: 'LIMIT inserts a truncation operator into the execution plan. Once PostgreSQL hits the specified row threshold, it halts execution immediately, protecting buffer pools from excessive I/O and saving network bandwidth.'
+        title: `2. Ascending, Descending, and Tie-Breakers`,
+        beginner: `If two products have the same price, sorting only by price may not always give the same order. Add a second sort column, like id or name, to make the order predictable.`,
+        advanced: `Deterministic pagination requires stable ordering. If ORDER BY contains non-unique values, add a unique tie-breaker such as the primary key. This prevents rows from shifting across pages when using LIMIT and OFFSET.`
       },
       {
-        title: '3. Pagination (OFFSET)',
-        beginner: 'When you click "Page 2" on a website, the backend uses OFFSET. "OFFSET 10" tells the database to skip the first ten records and start displaying data from record eleven onwards.',
-        advanced: 'OFFSET instructs the database to discard the first N rows. However, PostgreSQL must still compute and traverse those N rows before throwing them away. Because of this, deep offsets (like OFFSET 100000) are heavily discouraged in modern backend engineering in favor of Keyset/Cursor pagination.'
+        title: `3. LIMIT Protects the API`,
+        beginner: `LIMIT caps the number of rows returned. If you write LIMIT 5, the database sends at most five rows. This prevents huge responses from crashing your backend or frontend.`,
+        advanced: `LIMIT is a truncation operator in the execution plan. Once the engine has produced enough rows to satisfy the limit, it can stop returning more rows. This reduces network payload and client memory pressure.`
+      },
+      {
+        title: `4. OFFSET and Pagination Costs`,
+        beginner: `OFFSET skips rows. OFFSET 10 skips the first ten rows. This is useful for page two, page three, and so on. But skipping a huge number of rows can still be slow because the database has to process them first.`,
+        advanced: `OFFSET forces the engine to generate and discard rows before returning the requested page. Deep offsets can become expensive. Modern backends often prefer keyset pagination, where the query continues from a known cursor such as WHERE id > last_seen_id.`
       }
     ],
     practical: {
-      title: 'Top 3 Highest-Price Products',
-      intro: 'We have seeded a `stock` table containing columns `id`, `name`, `price`, and `quantity`. Your task is to query this table and return only the `name` and `price` of the top 3 most expensive products.',
+      title: `Top 3 Highest-Price Products`,
+      intro: `We have seeded a stock table with id, name, price, and quantity. Your task is to return the name and price of the three most expensive products.`,
       steps: [
-        'Select the `name` and `price` columns.',
-        'Target the `stock` table.',
-        'Sort the results by the `price` column in descending order (`DESC`) so the most expensive item is first.',
-        'Limit the final output to exactly `3` records.',
-        'End with a semicolon.'
+        `Select the name and price columns.`,
+        `Read from the stock table.`,
+        `Sort by price in descending order so the most expensive item appears first.`,
+        `Limit the result to 3 rows.`,
+        `Run the query. You should see Espresso Machine, Grinder, and Organic Coffee returned in that order.`
       ],
-      goal: 'Identify the top 3 highest-priced items in the store.',
-      starterQuery: '-- Write your SQL query here\nSELECT name, price FROM stock ',
-      solutionQuery: 'SELECT name, price FROM stock ORDER BY price DESC LIMIT 3;',
-      seedSql: `
-        CREATE TABLE stock (id INTEGER PRIMARY KEY, name TEXT, price REAL, quantity INTEGER);
-        INSERT INTO stock VALUES (1, 'Organic Coffee', 18.50, 40);
-        INSERT INTO stock VALUES (2, 'Loose Leaf Tea', 12.00, 65);
-        INSERT INTO stock VALUES (3, 'Espresso Machine', 899.99, 5);
-        INSERT INTO stock VALUES (4, 'Grinder', 75.00, 12);
-        INSERT INTO stock VALUES (5, 'Ceramic Mug', 15.00, 100);
-      `
+      goal: `Return the top three most expensive products using ORDER BY and LIMIT.`,
+      starterQuery: `-- Write your SQL query here\nSELECT name, price FROM stock `,
+      solutionQuery: `SELECT name, price FROM stock ORDER BY price DESC LIMIT 3;`,
+      seedSql: `CREATE TABLE stock (id INTEGER PRIMARY KEY, name TEXT, price REAL, quantity INTEGER); INSERT INTO stock VALUES (1, 'Organic Coffee', 18.50, 40); INSERT INTO stock VALUES (2, 'Loose Leaf Tea', 12.00, 65); INSERT INTO stock VALUES (3, 'Espresso Machine', 899.99, 5); INSERT INTO stock VALUES (4, 'Grinder', 75.00, 12); INSERT INTO stock VALUES (5, 'Ceramic Mug', 15.00, 100);`
     },
     quiz: [
       {
-        question: 'Which clause is used to sort the result set of a query?',
+        question: `Which clause sorts query results?`,
         options: [
-          'SORT BY',
-          'ORDER BY',
-          'GROUP BY',
-          'ARRANGE BY'
+          `SORT BY`,
+          `ORDER BY`,
+          `GROUP BY`,
+          `ARRANGE BY`
         ],
         correctIndex: 1,
-        explanation: 'The ORDER BY clause is the standardized SQL command used to sort output datasets.'
+        explanation: `ORDER BY is the standard SQL clause for sorting results. GROUP BY creates aggregate groups, while SORT BY and ARRANGE BY are not standard SQL clauses.`
       },
       {
-        question: 'Why is using high OFFSET values (e.g., OFFSET 100000) bad for backend performance?',
+        question: `What does ORDER BY price DESC do?`,
         options: [
-          'It deletes the first 100,000 entries from the storage disk',
-          'The engine must still read, parse, and evaluate the first 100,000 entries before discarding them',
-          'The OFFSET keyword is not supported in modern databases',
-          'It forces the database to convert text data into numbers'
+          `Sorts price from lowest to highest`,
+          `Sorts price from highest to lowest`,
+          `Deletes duplicate prices`,
+          `Limits the result to price rows`
         ],
         correctIndex: 1,
-        explanation: 'An offset does not skip index evaluation magically. The database must traverse and discard all offset records, creating massive read costs on deep pagination requests.'
+        explanation: `DESC means descending, so the largest values appear first. ASC would sort from lowest to highest. ORDER BY does not delete duplicates or limit rows by itself.`
+      },
+      {
+        question: `Why is OFFSET 100000 potentially expensive?`,
+        options: [
+          `It deletes 100,000 rows permanently`,
+          `The database still has to process and discard the first 100,000 rows`,
+          `It forces the database to restart`,
+          `It converts text columns into numbers`
+        ],
+        correctIndex: 1,
+        explanation: `OFFSET does not magically jump to the end. The engine must evaluate and discard the skipped rows before returning the requested page. This is why deep pagination often uses keyset techniques instead.`
+      },
+      {
+        question: `Why add a unique column like id to ORDER BY during pagination?`,
+        options: [
+          `To encrypt the page token`,
+          `To make the row order stable and deterministic`,
+          `To automatically remove NULL values`,
+          `To make the query return more rows`
+        ],
+        correctIndex: 1,
+        explanation: `A unique tie-breaker ensures rows with equal sort values do not randomly shift between pages. This prevents duplicate or missing rows in paginated API responses.`
       }
     ],
     milestones: [
-      'Master sorting datasets numerically and alphabetically using ORDER BY.',
-      'Differentiate between ascending (ASC) and descending (DESC) directions.',
-      'Control network payloads using LIMIT restrictions to protect APIs.',
-      'Understand pagination architectures and the performance cost of OFFSET.'
+      `Sort results using ORDER BY.`,
+      `Understand ASC and DESC ordering.`,
+      `Use LIMIT to control API payload size.`,
+      `Understand OFFSET costs and why stable ordering matters.`
     ]
   },
   {
-    id: 'sql-04',
+    id: `sql-04`,
     order: 4,
-    module: 'Relational Foundations',
-    icon: '📊',
-    title: 'Aggregations & Grouping',
-    philosophy: 'A database is not just a storage repository; it is a powerful analytics engine. Backend developers rarely pull raw rows to calculate metrics in their code (like Node.js or Python). Instead, we offload the heavy math to the database. We ask mathematical questions like: "What is the total revenue?" by grouping rows and summarizing them with aggregation calculations.',
+    module: `Relational Foundations`,
+    icon: `📊`,
+    title: `Aggregations & Grouping`,
+    philosophy: `Backend systems rarely need every raw row. They need answers: total revenue, average order value, number of active users, inventory by category. Aggregation lets the database do the math close to the data. This is faster than pulling rows into application code and safer because the database engine understands grouping rules, NULL behavior, and execution order.`,
     concepts: [
       {
-        title: '1. Aggregate Functions',
-        beginner: 'Aggregate functions perform math on a whole column of numbers and return a single summary result. The main ones are COUNT() (total items), SUM() (add them all up), AVG() (get the average), MAX() (find the biggest value), and MIN() (find the smallest).',
-        advanced: 'Aggregate functions process a set of rows to calculate a single scalar value. High-performance databases optimize these deeply, parsing B-Tree indexes directly when possible to calculate MIN/MAX without ever reading the physical table rows.'
+        title: `1. Aggregate Functions`,
+        beginner: `Aggregate functions turn many rows into one summary value. COUNT counts rows. SUM adds values. AVG calculates the average. MAX finds the highest value. MIN finds the lowest value.`,
+        advanced: `Aggregate functions reduce a set of rows to a scalar value. Engines can optimize some aggregates using indexes, especially MIN and MAX. Understanding NULL behavior is essential because aggregate functions handle NULLs differently.`
       },
       {
-        title: '2. GROUP BY Mechanics',
-        beginner: 'If you ask for "SUM(price)", the database adds everything into one number. If you instead want the sum of prices *for each category* (like shoes, shirts, electronics), you add "GROUP BY category". This splits your table into sub-groups before applying the math.',
-        advanced: 'GROUP BY aggregates data into distinct bucket segments. PostgreSQL enforce strict grouping rules: any column projected in your SELECT statement *must* either be wrapped inside an aggregate function or specified inside the GROUP BY clause.'
+        title: `2. COUNT(*) vs COUNT(column)`,
+        beginner: `COUNT(*) counts all rows. COUNT(email) counts only rows where email is not NULL. If you want to know how many users are missing email, this difference matters.`,
+        advanced: `COUNT(*) measures row cardinality, while COUNT(expression) counts non-null values of that expression. This distinction is critical for data-quality checks and analytics where missing values must be treated separately from present values.`
       },
       {
-        title: '3. HAVING vs WHERE',
-        beginner: 'You cannot use WHERE on aggregated math (like "WHERE AVG(price) > 50") because WHERE filters rows *before* the math happens. To filter after data is grouped and math is completed, you must use the special "HAVING" keyword.',
-        advanced: 'WHERE acts as a pre-filter, stripping rows before grouping operations occur. HAVING acts as a post-filter, evaluating conditions against aggregated metric outputs once the grouping hash map is fully constructed.'
+        title: `3. GROUP BY Creates Buckets`,
+        beginner: `If you want the total quantity for each category, you group by category. The database makes one bucket for each category, then calculates the aggregate inside each bucket.`,
+        advanced: `GROUP BY partitions rows into grouping sets. Each SELECT column must either appear in GROUP BY or be wrapped in an aggregate function. This rule prevents ambiguous results where one aggregate value would be paired with many unmatched detail values.`
+      },
+      {
+        title: `4. WHERE Filters Before Aggregation, HAVING Filters After`,
+        beginner: `WHERE filters rows before grouping and math happen. HAVING filters after the math. If you want categories whose total quantity is greater than 100, you must use HAVING.`,
+        advanced: `WHERE is a pre-aggregation predicate. HAVING is a post-aggregation predicate. This execution order is why aggregate results cannot usually be filtered directly in WHERE.`
       }
     ],
     practical: {
-      title: 'Counting Inventory by Category',
-      intro: 'We have seeded an `inventory` table detailing `id`, `item_name`, `category`, and `quantity`. Your job is to output a list showing each `category` and the total `quantity` of items inside it.',
+      title: `Counting Inventory by Category`,
+      intro: `We have seeded an inventory table with id, item_name, category, and quantity. Your task is to output each category and the total quantity of items in that category.`,
       steps: [
-        'Select the `category` column.',
-        'Use the `SUM(quantity)` aggregate function to add up items, and alias it as `total_items`.',
-        'Specify `FROM inventory` as your data source.',
-        'Add a `GROUP BY` clause targeting the `category` column so the sum runs separately for each category.',
-        'Ensure proper semicolon syntax.'
+        `Select the category column.`,
+        `Use SUM(quantity) and alias it as total_items.`,
+        `Read from the inventory table.`,
+        `Group the results by category.`,
+        `Run the query. You should see Produce with 230, Dairy with 75, and Bakery with 60.`
       ],
-      goal: 'Output categories paired with the total sum of items in each category under the alias "total_items".',
-      starterQuery: '-- Write your SQL query here\nSELECT category, ',
-      solutionQuery: 'SELECT category, SUM(quantity) AS total_items FROM inventory GROUP BY category;',
-      seedSql: `
-        CREATE TABLE inventory (id INTEGER PRIMARY KEY, item_name TEXT, category TEXT, quantity INTEGER);
-        INSERT INTO inventory VALUES (1, 'Apples', 'Produce', 150);
-        INSERT INTO inventory VALUES (2, 'Carrots', 'Produce', 80);
-        INSERT INTO inventory VALUES (3, 'Milk', 'Dairy', 45);
-        INSERT INTO inventory VALUES (4, 'Cheese', 'Dairy', 30);
-        INSERT INTO inventory VALUES (5, 'Bread', 'Bakery', 60);
-      `
+      goal: `Calculate total inventory quantity per category using GROUP BY.`,
+      starterQuery: `-- Write your SQL query here\nSELECT category, `,
+      solutionQuery: `SELECT category, SUM(quantity) AS total_items FROM inventory GROUP BY category;`,
+      seedSql: `CREATE TABLE inventory (id INTEGER PRIMARY KEY, item_name TEXT, category TEXT, quantity INTEGER); INSERT INTO inventory VALUES (1, 'Apples', 'Produce', 150); INSERT INTO inventory VALUES (2, 'Carrots', 'Produce', 80); INSERT INTO inventory VALUES (3, 'Milk', 'Dairy', 45); INSERT INTO inventory VALUES (4, 'Cheese', 'Dairy', 30); INSERT INTO inventory VALUES (5, 'Bread', 'Bakery', 60);`
     },
     quiz: [
       {
-        question: 'Why does a query like "SELECT category, SUM(price) FROM items;" fail in strict databases like PostgreSQL?',
+        question: `Why does SELECT category, SUM(price) FROM items; fail in strict SQL databases?`,
         options: [
-          'SUM() is not a valid SQL keyword',
-          'You cannot use columns and mathematical equations together',
-          'The category column is not grouped, causing a structural contradiction (one aggregated number paired with many category names)',
-          'Items is a reserved keyword in database systems'
+          `SUM is not a valid function`,
+          `You cannot mix columns and functions`,
+          `category is not grouped and is not aggregated, creating an ambiguous result`,
+          `The table name is invalid`
         ],
         correctIndex: 2,
-        explanation: 'Because SUM() reduces rows to a single output value, strict databases require a GROUP BY clause to define how the un-aggregated columns (like category) should be segmented.'
+        explanation: `When using an aggregate like SUM, every non-aggregated selected column must be included in GROUP BY. Otherwise the database cannot decide which category value should be paired with the aggregated result.`
       },
       {
-        question: 'What is the critical structural difference between WHERE and HAVING?',
+        question: `What is the difference between WHERE and HAVING?`,
         options: [
-          'WHERE filters before grouping is calculated; HAVING filters after grouping is calculated',
-          'WHERE only works on numbers; HAVING only works on text characters',
-          'HAVING can only be written at the absolute beginning of a SQL statement',
-          'There is no difference; they are interchangeable'
+          `WHERE filters before grouping; HAVING filters after grouping`,
+          `WHERE works only on numbers; HAVING works only on text`,
+          `HAVING runs before WHERE`,
+          `They are identical`
         ],
         correctIndex: 0,
-        explanation: 'WHERE acts as a row filter before calculations. HAVING runs after the grouping step, letting you filter the results of your aggregate calculations.'
+        explanation: `WHERE filters individual rows before aggregation. HAVING filters grouped or aggregated results after GROUP BY has been processed.`
+      },
+      {
+        question: `What does COUNT(email) ignore?`,
+        options: [
+          `Rows where email is NULL`,
+          `All rows in the table`,
+          `Rows where email is an empty string`,
+          `Duplicate table names`
+        ],
+        correctIndex: 0,
+        explanation: `COUNT(column) counts non-null values only. If email is NULL, that row is not counted by COUNT(email). COUNT(*) would count the row regardless.`
+      },
+      {
+        question: `What does GROUP BY category do?`,
+        options: [
+          `Deletes duplicate categories`,
+          `Creates one aggregate bucket for each distinct category`,
+          `Sorts categories alphabetically`,
+          `Converts categories into primary keys`
+        ],
+        correctIndex: 1,
+        explanation: `GROUP BY forms groups based on distinct category values. Aggregate functions then calculate one result per group. It does not delete data or change schema keys.`
       }
     ],
     milestones: [
-      'Master scalar operations using MIN, MAX, SUM, AVG, and COUNT.',
-      'Deploy the GROUP BY segmenter to partition tables into metric buckets.',
-      'Understand the execution lifecycle order (WHERE -> GROUP BY -> HAVING).',
-      'Leverage HAVING expressions to filter aggregate calculations.'
+      `Use COUNT, SUM, AVG, MIN, and MAX.`,
+      `Understand COUNT(*) versus COUNT(column).`,
+      `Use GROUP BY to aggregate by category or segment.`,
+      `Understand WHERE versus HAVING execution order.`
     ]
   },
   {
-    id: 'sql-05',
+    id: `sql-05`,
     order: 5,
-    module: 'Database Data Mutation & Schema',
-    icon: '🛡️',
-    title: 'Table Constraints & Data Types',
-    philosophy: 'A database is a fortress of integrity. If you let bad data leak into your backend—like registering a user without a username, or duplicating an email—your entire application will crash. We prevent this by establishing strong constraints and strict Data Types directly on the database tables during creation.',
+    module: `Database Data Mutation & Schema`,
+    icon: `🛡️`,
+    title: `Table Constraints & Data Types`,
+    philosophy: `A backend is only as trustworthy as its data. If your database allows duplicate emails, blank usernames, or negative ages, your application will eventually produce bugs that feel impossible to debug. Constraints are the database's immune system. They reject bad data immediately, close to the source, instead of relying on every API route to be perfect forever.`,
     concepts: [
       {
-        title: '1. Standard vs PostgreSQL Data Types',
-        beginner: 'When creating a table, you must label every column. While basic SQL uses types like INTEGER and TEXT, PostgreSQL gives engineers powerful specific types: VARCHAR (text with a length limit), BOOLEAN (true/false), and JSONB (for storing complex app data).',
-        advanced: 'Strict relational systems like PostgreSQL enforce static typing on disk blocks. Defining precise types allows the engine to pre-allocate storage blocks. PostgreSQL also supports advanced types like UUIDs and Arrays, vastly outperforming generic TEXT columns.'
+        title: `1. Data Types Define Meaning`,
+        beginner: `Every column needs a type. INTEGER stores whole numbers. TEXT stores strings. REAL stores decimal-like numbers. Choosing the right type helps the database store, compare, and validate data correctly.`,
+        advanced: `Data types affect storage format, comparison semantics, indexing behavior, and query correctness. A price stored as TEXT cannot be safely summed or compared numerically. Strong typing at the schema level prevents many application-layer bugs.`
       },
       {
-        title: '2. Primary Keys & Auto-Generation',
-        beginner: 'Every row needs a unique ID (Primary Key). In standard SQL, you might write "INTEGER PRIMARY KEY". Real-world PostgreSQL backends often use "SERIAL" (which automatically counts 1, 2, 3...) or "UUID" (which generates an un-guessable string of random characters for better security).',
-        advanced: 'A Primary Key enforces entity integrity via an automatic Unique B-Tree index. While SQLite uses AUTOINCREMENT, PostgreSQL modernizes this with "GENERATED ALWAYS AS IDENTITY" or the classic "SERIAL" pseudo-type to handle automatic sequence assignment.'
+        title: `2. Primary Keys Identify Rows`,
+        beginner: `A primary key uniquely identifies each row. It is like a student ID number. No two rows can have the same primary key, and the database uses it to find records quickly.`,
+        advanced: `Primary keys enforce entity integrity and usually create a unique index automatically. They are essential for foreign key relationships, efficient updates, deletes, and stable pagination cursors.`
       },
       {
-        title: '3. Integrity Constraints',
-        beginner: 'Constraints are strict rules you attach to columns. "NOT NULL" means a field can never be left blank. "UNIQUE" means values (like an email address) can never be duplicated. If a user tries to break a rule, the database rejects the action instantly.',
-        advanced: 'Constraints are evaluated inline during write operations. If an INSERT or UPDATE violates a constraint, PostgreSQL rolls back the entire execution transaction, returning an integrity exception to the backend API.'
+        title: `3. NOT NULL and UNIQUE`,
+        beginner: `NOT NULL means a column cannot be left empty. UNIQUE means no two rows can have the same value in that column. For example, usernames and emails are often UNIQUE.`,
+        advanced: `NOT NULL enforces presence. UNIQUE enforces uniqueness. Both are checked during writes. If a constraint fails, the database rejects the operation and returns an integrity error to the application.`
+      },
+      {
+        title: `4. Constraints Are the Final Guard`,
+        beginner: `Your backend code should validate data, but app code can have bugs. Database constraints are the last line of defense. Even if bad data gets past the API, the database can still stop it.`,
+        advanced: `Database-level constraints provide invariant enforcement independent of application logic. They protect against concurrent writes, multiple services, admin scripts, and future code changes that might forget validation rules.`
       }
     ],
     practical: {
-      title: 'Creating a Secure User Table',
-      intro: 'Your objective is to write a SQL statement to create a new database table named `profiles`. It must store an `id` as an `INTEGER PRIMARY KEY`, a `username` as a `TEXT` column that is both unique and cannot be blank, and an `age` as an integer.',
+      title: `Creating a Secure User Table`,
+      intro: `Your task is to create a profiles table. It must have an id primary key, a username that is unique and cannot be NULL, and an age column.`,
       steps: [
-        'Write `CREATE TABLE profiles (` to begin defining your schema.',
-        'Define your first column: `id INTEGER PRIMARY KEY`.',
-        'Define your second column: `username TEXT UNIQUE NOT NULL` (ensure you separate columns with commas).',
-        'Define your third column: `age INTEGER`.',
-        'Close the definition with a parenthesis and a semicolon: `);`.'
+        `Start with CREATE TABLE profiles (.`,
+        `Define id INTEGER PRIMARY KEY.`,
+        `Define username TEXT UNIQUE NOT NULL.`,
+        `Define age INTEGER.`,
+        `Close the statement with ); and run it. You should see the table created successfully.`
       ],
-      goal: 'Write a schema definition statement creating the "profiles" table enforcing integrity constraints.',
-      starterQuery: 'CREATE TABLE profiles (\n  id INTEGER PRIMARY KEY,\n  ',
-      solutionQuery: 'CREATE TABLE profiles (\n  id INTEGER PRIMARY KEY,\n  username TEXT UNIQUE NOT NULL,\n  age INTEGER\n);',
-      seedSql: '' // We start with a clean empty database for creation exercises
+      goal: `Create a table with primary key, uniqueness, and NOT NULL constraints.`,
+      starterQuery: `CREATE TABLE profiles (\n  id INTEGER PRIMARY KEY,\n  `,
+      solutionQuery: `CREATE TABLE profiles (\n  id INTEGER PRIMARY KEY,\n  username TEXT UNIQUE NOT NULL,\n  age INTEGER\n);`,
+      seedSql: ``
     },
     quiz: [
       {
-        question: 'What happens if a backend application attempts to insert a duplicate email into a column marked as UNIQUE?',
+        question: `What happens if you insert a duplicate value into a UNIQUE column?`,
         options: [
-          'The database automatically renames the value with a trailing number',
-          'The database rejects the write, throws an integrity error to the backend, and halts execution',
-          'The database deletes the older row containing the duplicate value',
-          'The value is stored anyway but marked with a warning flag'
+          `The database adds a number to make it unique`,
+          `The database rejects the write with a constraint error`,
+          `The database deletes the older row`,
+          `The value is saved with a warning`
         ],
         correctIndex: 1,
-        explanation: 'UNIQUE constraints are absolute. Any violating operations are immediately blocked and the transaction is aborted to maintain data integrity.'
+        explanation: `UNIQUE constraints prevent duplicate values. If the rule is violated, the database rejects the operation. It does not silently rename values or delete existing rows.`
       },
       {
-        question: 'Which constraint ensures a specific field can never be left empty by a user?',
+        question: `Which constraint prevents a column from being left empty?`,
         options: [
-          'NOT BLANK',
-          'REQUIRE',
-          'NOT NULL',
-          'STRICT'
+          `NOT BLANK`,
+          `REQUIRE`,
+          `NOT NULL`,
+          `STRICT`
         ],
         correctIndex: 2,
-        explanation: 'The NOT NULL constraint blocks writes that attempt to insert NULL values into the specified column.'
-      }
-    ],
-    milestones: [
-      'Understand how tables are initialized using CREATE TABLE statements.',
-      'Differentiate between basic SQL data types and PostgreSQL types (VARCHAR, JSONB).',
-      'Secure application data integrity using NOT NULL and UNIQUE attributes.',
-      'Understand the role of Primary Keys in identifying distinct backend records.'
-    ]
-  },
-
-  {
-    id: 'sql-06',
-    order: 6,
-    module: 'Relational Architecture & Joins',
-    icon: '🔗',
-    title: 'Relational Links & JOINs',
-    philosophy: 'The magic of a Relational Database is how separate tables link together. Instead of storing a user\'s name, address, and purchase items inside a single massive row (which is a nightmare to update), backends split them into highly optimized, separate tables. When an API needs to reassemble this data for a frontend application, we use SQL JOIN operations to link records perfectly using ID codes.',
-    concepts: [
-      {
-        title: '1. Keys & Database Normalization',
-        beginner: 'To link tables, we use keys. A "Primary Key" is a unique ID inside a table (like User ID #5). A "Foreign Key" is that same ID stored inside a *different* table to mark a relationship (like putting User ID #5 next to a specific order in the Orders table).',
-        advanced: 'Normalization splits attributes across entities to eliminate redundant data. Primary keys guarantee entity integrity, while Foreign Keys establish referential integrity constraints. In PostgreSQL, Foreign Keys physically prevent backends from inserting child records if the parent record does not exist.'
+        explanation: `NOT NULL blocks INSERT or UPDATE operations that would store NULL in the column. NOT BLANK, REQUIRE, and STRICT are not standard SQL constraints for this purpose.`
       },
       {
-        title: '2. The INNER JOIN Command',
-        beginner: 'An INNER JOIN is a query that looks at two tables and finds exact matches between them. If you join a Users table and an Orders table, an INNER JOIN returns only the users who have actually placed an order.',
-        advanced: 'An INNER JOIN computes the intersection of two datasets. The PostgreSQL query planner evaluates the ON condition across both tables (often utilizing Hash Joins or Nested Loops), discarding any row pairings that do not explicitly satisfy the join condition.'
-      },
-      {
-        title: '3. LEFT JOIN Mechanics',
-        beginner: 'Sometimes you want to see a list of ALL users, even if they have not placed any orders yet. A LEFT JOIN returns every single row from your left table, and if there is no match on the right, it simply leaves the order fields empty (showing up as NULL).',
-        advanced: 'A LEFT (OUTER) JOIN guarantees that every record from the left-hand table is preserved in the output. If no relational match exists in the right-hand table, its attributes are projected as Null values. This is crucial for backend APIs building sparse data objects.'
-      }
-    ],
-    practical: {
-      title: 'Linking Orders to Customers',
-      intro: 'We have seeded two tables: `customers` (containing `id` and `name`) and `orders` (containing `id`, `customer_id`, and `amount`). Write a query to list each customer\'s `name` alongside their order `amount`.',
-      steps: [
-        'Select the `name` column from the `customers` table, and the `amount` column from the `orders` table.',
-        'Start with the `customers` table as your source: `FROM customers`.',
-        'Add an `INNER JOIN orders` statement to link the orders table.',
-        'Specify the linking relationship using `ON`: `customers.id = orders.customer_id`.',
-        'End your statement with a semicolon (`;`).'
-      ],
-      goal: 'Link customers and orders using an INNER JOIN to display customer names alongside their order amounts.',
-      starterQuery: '-- Write your SQL query here\nSELECT customers.name, orders.amount FROM customers ',
-      solutionQuery: 'SELECT customers.name, orders.amount FROM customers INNER JOIN orders ON customers.id = orders.customer_id;',
-      seedSql: `
-        CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
-        CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount REAL);
-        INSERT INTO customers VALUES (1, 'Alice');
-        INSERT INTO customers VALUES (2, 'Bob');
-        INSERT INTO customers VALUES (3, 'Charlie');
-        INSERT INTO orders VALUES (101, 1, 150.50);
-        INSERT INTO orders VALUES (102, 2, 89.00);
-        INSERT INTO orders VALUES (103, 1, 45.25);
-      `
-    },
-    quiz: [
-      {
-        question: 'What is the behavior of an INNER JOIN?',
+        question: `What is the main purpose of a primary key?`,
         options: [
-          'It returns only the rows that have matching values in both tables',
-          'It combines all columns from both tables, filling unmatched columns with random numbers',
-          'It returns all rows from the left table, even if there are no matches on the right',
-          'It deletes unmatched records from your hard drive'
+          `To encrypt the row`,
+          `To uniquely identify each row`,
+          `To sort the table automatically`,
+          `To compress the database file`
+        ],
+        correctIndex: 1,
+        explanation: `A primary key uniquely identifies rows and enforces entity integrity. It is also used by relationships, updates, deletes, and many pagination strategies.`
+      },
+      {
+        question: `Why are database constraints more reliable than application validation alone?`,
+        options: [
+          `They run inside the database and protect data even if application code forgets a rule`,
+          `They make the frontend faster`,
+          `They automatically create API routes`,
+          `They remove the need for passwords`
         ],
         correctIndex: 0,
-        explanation: 'An INNER JOIN filters out non-matching records, returning only the intersection where values meet your strict join condition.'
+        explanation: `Constraints enforce rules at the storage layer. Application validation is useful for user experience, but database constraints are the final defense against corrupted or inconsistent data.`
+      }
+    ],
+    milestones: [
+      `Understand how data types shape storage and validation.`,
+      `Use primary keys to uniquely identify rows.`,
+      `Apply NOT NULL and UNIQUE constraints.`,
+      `Treat database constraints as the final source of data integrity.`
+    ]
+  },
+  {
+    id: `sql-06`,
+    order: 6,
+    module: `Relational Architecture & Joins`,
+    icon: `🔗`,
+    title: `Relational Links & JOINs`,
+    philosophy: `The true power of relational databases is not storing data in one giant table. It is splitting data into focused tables and then reconnecting it when needed. Customers live in one table. Orders live in another. JOINs are how backend engineers reassemble those normalized facts into useful API responses.`,
+    concepts: [
+      {
+        title: `1. Primary Keys and Foreign Keys`,
+        beginner: `A primary key is a unique ID for a row, like customer id 1. A foreign key is that same ID stored in another table to create a relationship. For example, an order can have customer_id = 1 to show who placed it.`,
+        advanced: `Foreign keys enforce referential integrity. They guarantee that child rows point to valid parent rows. This prevents orphan records and makes relational joins trustworthy.`
       },
       {
-        question: 'If a backend API needs to fetch all customers, regardless of whether they have an order history or not, which JOIN should you use?',
+        title: `2. INNER JOIN Returns Matches Only`,
+        beginner: `INNER JOIN combines two tables, but only where the relationship exists. If you join customers to orders, you only see customers who actually have orders.`,
+        advanced: `INNER JOIN computes the intersection of two relations based on the join predicate. Rows without matching counterparts are excluded. This is ideal when only related records are meaningful.`
+      },
+      {
+        title: `3. LEFT JOIN Keeps All Left Rows`,
+        beginner: `LEFT JOIN returns every row from the left table, even if there is no match in the right table. If a customer has no orders, the order columns appear as NULL.`,
+        advanced: `LEFT OUTER JOIN preserves the left relation. When no right-side match exists, right-side columns project as NULL. This is useful for finding missing relationships, such as customers with zero orders.`
+      },
+      {
+        title: `4. Join Fanout`,
+        beginner: `If one customer has many orders, joining customers to orders repeats the customer information for each order. This is normal, but you must understand it, especially before using SUM or COUNT.`,
+        advanced: `Join cardinality matters. A one-to-many join can multiply parent rows, causing inflated aggregates. Professional queries often pre-aggregate child rows before joining them to parent tables.`
+      }
+    ],
+    practical: {
+      title: `Linking Orders to Customers`,
+      intro: `We have seeded two tables: customers and orders. Each order has a customer_id. Your task is to list each customer's name alongside their order amount.`,
+      steps: [
+        `Select customers.name and orders.amount.`,
+        `Start from the customers table.`,
+        `Use INNER JOIN to connect the orders table.`,
+        `Join on customers.id = orders.customer_id.`,
+        `Run the query. You should see Alice with 150.50, Bob with 89.00, and Alice again with 45.25.`
+      ],
+      goal: `Use INNER JOIN to connect customers and orders through customer_id.`,
+      starterQuery: `-- Write your SQL query here\nSELECT customers.name, orders.amount FROM customers `,
+      solutionQuery: `SELECT customers.name, orders.amount FROM customers INNER JOIN orders ON customers.id = orders.customer_id;`,
+      seedSql: `CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT); CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount REAL); INSERT INTO customers VALUES (1, 'Alice'); INSERT INTO customers VALUES (2, 'Bob'); INSERT INTO customers VALUES (3, 'Charlie'); INSERT INTO orders VALUES (101, 1, 150.50); INSERT INTO orders VALUES (102, 2, 89.00); INSERT INTO orders VALUES (103, 1, 45.25);`
+    },
+    quiz: [
+      {
+        question: `What does INNER JOIN return?`,
         options: [
-          'INNER JOIN',
-          'LEFT JOIN',
-          'RIGHT JOIN',
-          'CROSS JOIN'
+          `Only rows with matching values in both tables`,
+          `All rows from the left table no matter what`,
+          `All rows from both tables with no condition`,
+          `Only NULL rows`
+        ],
+        correctIndex: 0,
+        explanation: `INNER JOIN returns the intersection of matching rows. If either side lacks a match, the row is excluded. LEFT JOIN would preserve all left rows instead.`
+      },
+      {
+        question: `Which JOIN should you use if you need all customers, including customers without orders?`,
+        options: [
+          `INNER JOIN`,
+          `LEFT JOIN`,
+          `CROSS JOIN`,
+          `GROUP JOIN`
         ],
         correctIndex: 1,
-        explanation: 'A LEFT JOIN keeps every single row from the left table (customers) and populates matching right table attributes (orders) as NULL if there are no matches.'
-      }
-    ],
-    milestones: [
-      'Deconstruct relationships using Primary and Foreign keys.',
-      'Deploy INNER JOIN statements to reconstruct matching relational rows.',
-      'Utilize LEFT OUTER JOIN queries to handle optional relations and identify NULL matches.',
-      'Safely construct clear column references across multiple schemas.'
-    ]
-  },
-  {
-    id: 'sql-07',
-    order: 7,
-    module: 'Database Data Mutation & Schema',
-    icon: '📝',
-    title: 'Database Modifications & Writes',
-    philosophy: 'Reading data is only half the battle. To build actual interactive software—like registering a new user account, changing a password, or deleting an old post—your backend needs to mutate the state of the database. SQL provides explicit commands for inserting, updating, and deleting records safely.',
-    concepts: [
-      {
-        title: '1. Inserting New Rows (INSERT INTO)',
-        beginner: 'To append a brand-new row to a table, use "INSERT INTO", specify the target columns in parentheses, and provide their matching values. Example: "INSERT INTO users (username, status) VALUES (\'john_doe\', \'active\');"',
-        advanced: 'In PostgreSQL, backends often need the newly generated ID immediately after inserting. We achieve this by appending the "RETURNING" clause (e.g., "INSERT INTO users (...) RETURNING id;"). This prevents the backend from having to run a second SELECT query to find the new row.'
+        explanation: `LEFT JOIN keeps every row from the left table. If a customer has no matching order, the order columns become NULL. INNER JOIN would drop customers without orders.`
       },
       {
-        title: '2. Modifying Rows (UPDATE)',
-        beginner: 'To edit rows, use "UPDATE" followed by the table name, write "SET" to assign new values, and use "WHERE" to target specific rows. Be careful! If you omit the WHERE clause, you will accidentally overwrite every single row in your entire table!',
-        advanced: 'An UPDATE statement modifies column attributes. To prevent database corruption when multiple users update the same row concurrently, PostgreSQL runs locking transactions (Row-Exclusive locks) on the target pages while updating values.'
-      },
-      {
-        title: '3. Removing Rows (DELETE)',
-        beginner: 'To permanently wipe a row, use "DELETE FROM table WHERE id = 5". Just like UPDATE, forgetting the WHERE filter will wipe your table clean. Because deleting is permanent, many backends use "Soft Deletes" instead—updating a "deleted_at" column rather than actually running a DELETE command.',
-        advanced: 'DELETE removes pointers to physical rows, marking page space as available for future writes. For ACID transactional safety, PostgreSQL writes to a WAL (Write-Ahead Log) first, ensuring the deletion can be recovered if the server suddenly loses power during the operation.'
-      }
-    ],
-    practical: {
-      title: 'Updating User Account Details',
-      intro: 'We have seeded a `members` table containing columns `id`, `username`, `email`, and `status`. Your task is to write an update query that changes the `email` of the user with `id = 2` to `\'bob_new@email.com\'`.',
-      steps: [
-        'Start with the `UPDATE members` statement.',
-        'Use the `SET` keyword to specify the target column change: `email = \'bob_new@email.com\'`.',
-        'Add a crucial `WHERE` clause to target only the user where `id = 2`.',
-        'Ensure proper semicolon syntax.'
-      ],
-      goal: 'Update Bob\'s email address inside the members table without altering other records.',
-      starterQuery: '-- Write your SQL query here\nUPDATE members ',
-      solutionQuery: "UPDATE members SET email = 'bob_new@email.com' WHERE id = 2;",
-      seedSql: `
-        CREATE TABLE members (id INTEGER PRIMARY KEY, username TEXT, email TEXT, status TEXT);
-        INSERT INTO members VALUES (1, 'alice_smith', 'alice@email.com', 'active');
-        INSERT INTO members VALUES (2, 'bob_jones', 'bob@email.com', 'pending');
-        INSERT INTO members VALUES (3, 'charlie_brown', 'charlie@email.com', 'suspended');
-      `
-    },
-    quiz: [
-      {
-        question: 'What happens if a backend runs an UPDATE query without a WHERE clause?',
+        question: `What is a foreign key?`,
         options: [
-          'The database returns an error and refuses to run the query',
-          'Only the very first row of the table gets updated',
-          'Every single row in that table will be overwritten with the new values',
-          'A new row is created at the bottom of the table'
-        ],
-        correctIndex: 2,
-        explanation: 'Without a WHERE clause to filter records, the UPDATE operation targets and overwrites every single row inside the specified table. This is a common and catastrophic bug.'
-      },
-      {
-        question: 'What is a "Soft Delete" in backend engineering?',
-        options: [
-          'Using the DELETE command but keeping the table structure',
-          'Deleting rows when the server load is low',
-          'Instead of running DELETE, running an UPDATE to set a "deleted_at" timestamp or "is_active = false" flag',
-          'Deleting data from RAM instead of the hard drive'
-        ],
-        correctIndex: 2,
-        explanation: 'A soft delete is a design pattern where data is never physically destroyed using DELETE. Instead, it is updated to appear deleted, preserving historical data for audits.'
-      }
-    ],
-    milestones: [
-      'Write and append clean records using the INSERT statement.',
-      'Surgically adjust data attributes using UPDATE paired with strict WHERE clauses.',
-      'Understand how PostgreSQL handles modifications safely using row locks and WALs.',
-      'Appreciate database transactions and the concept of Soft Deletes.'
-    ]
-  },
-  {
-    id: 'sql-08',
-    order: 8,
-    module: 'Relational Architecture & Joins',
-    icon: '🏗️',
-    title: 'Advanced Queries: Subqueries & CTEs',
-    philosophy: 'As software complexity scales, database queries become massive. Attempting to write complex reporting metrics inside a single nested clump results in illegible, unmaintainable code. To write professional, advanced SQL, backend engineers structure complex logic into sequential step-by-step variables called Common Table Expressions (CTEs).',
-    concepts: [
-      {
-        title: '1. What is a Subquery?',
-        beginner: 'A subquery is simply a query placed inside another query (wrapped in parentheses). If you want to find the most expensive item, you might write: "SELECT name FROM products WHERE price = (SELECT MAX(price) FROM products);". The inside query runs first to calculate the highest price.',
-        advanced: 'Subqueries can be uncorrelated (running once independent of the outer query) or correlated (referencing outer query columns and evaluating row-by-row). PostgreSQL often optimizes subqueries into semi-joins behind the scenes for performance.'
-      },
-      {
-        title: '2. Common Table Expressions (CTEs / WITH Clause)',
-        beginner: 'A CTE acts like a temporary variable that holds the output of a query. By writing "WITH popular_items AS (SELECT ...)", you can then query from "popular_items" in your next query block just like it was a real table! This makes long queries incredibly clean and readable.',
-        advanced: 'The WITH clause defines a Common Table Expression. PostgreSQL evaluates and constructs the temporary relation in memory. CTEs isolate modular calculations, making nested backend reporting queries vastly easier for teams to review and debug.'
-      },
-      {
-        title: '3. Subqueries vs CTEs',
-        beginner: 'Subqueries are written directly inside filters or joins, often burying logic deep inside a query. CTEs are written at the absolute top of your statement. CTEs are heavily preferred in modern backend teams because they allow you to read code sequentially from top-to-bottom.',
-        advanced: 'While modern PostgreSQL optimizes both into similar execution plan branches, CTEs support RECURSIVE declarations. Recursive CTEs allow PostgreSQL to traverse hierarchical tree graphs (like threaded comments or organizational charts) entirely within the database.'
-      }
-    ],
-    practical: {
-      title: 'Filtering Payments via CTEs',
-      intro: 'We have seeded a `payments` table containing `id` and `amount`. Your task is to write a query using a Common Table Expression (CTE) to find all payment records with an amount greater than the overall average payment.',
-      steps: [
-        'Start your query with a CTE named `avg_pay` using the `WITH` keyword: `WITH avg_pay AS (SELECT AVG(amount) AS value FROM payments)`.',
-        'Below your CTE definition, write your main SELECT statement: `SELECT id, amount FROM payments`.',
-        'Add a comma join to bring the CTE relation into context: `FROM payments, avg_pay`.',
-        'Add a `WHERE` filter ensuring `amount > avg_pay.value`.',
-        'Terminate with a semicolon.'
-      ],
-      goal: 'Find all payments larger than the global average transaction size using a CTE.',
-      starterQuery: 'WITH avg_pay AS (\n  SELECT AVG(amount) AS value FROM payments\n)\nSELECT id, amount FROM payments, avg_pay WHERE ',
-      solutionQuery: 'WITH avg_pay AS (\n  SELECT AVG(amount) AS value FROM payments\n)\nSELECT id, amount FROM payments, avg_pay WHERE amount > avg_pay.value;',
-      seedSql: `
-        CREATE TABLE payments (id INTEGER PRIMARY KEY, amount REAL);
-        INSERT INTO payments VALUES (1, 120.00);
-        INSERT INTO payments VALUES (2, 45.50);
-        INSERT INTO payments VALUES (3, 300.00);
-        INSERT INTO payments VALUES (4, 15.00);
-        INSERT INTO payments VALUES (5, 95.00);
-      `
-    },
-    quiz: [
-      {
-        question: 'Which keyword is used to declare a Common Table Expression (CTE) in SQL?',
-        options: [
-          'CTE',
-          'DECLARE',
-          'WITH',
-          'TEMP'
-        ],
-        correctIndex: 2,
-        explanation: 'The WITH keyword is the SQL standard command used to define CTEs at the very beginning of a query statement.'
-      },
-      {
-        question: 'What is a key structural benefit of using a CTE over a deeply nested Subquery?',
-        options: [
-          'CTEs run 100 times faster on every hardware server',
-          'CTEs prevent databases from locking tables',
-          'CTEs organize nested code into a clear, readable top-to-bottom layout for engineering teams',
-          'CTEs automatically translate text columns into numbers'
-        ],
-        correctIndex: 2,
-        explanation: 'CTEs isolate modular subqueries at the top of the file, avoiding deeply nested parentheses and significantly improving maintainability for backend engineers.'
-      }
-    ],
-    milestones: [
-      'Compose nested subqueries inside conditional WHERE operations.',
-      'Structure complex reporting queries using CTE blocks and the WITH statement.',
-      'Differentiate between uncorrelated and correlated query behaviors.',
-      'Optimize multi-step backend pipelines for high-level analytical readability.'
-    ]
-  },
-  {
-    id: 'sql-09',
-    order: 9,
-    module: 'PostgreSQL & Advanced Analytics',
-    icon: '👑',
-    title: 'Analytical Window Functions',
-    philosophy: 'Standard aggregations using GROUP BY are limiting because they collapse all your individual rows into a single summary. But what if a backend dashboard needs to keep all the original rows, while still calculating a running total or a leaderboard rank? To solve this, PostgreSQL and modern databases use Window Functions.',
-    concepts: [
-      {
-        title: '1. What is a Window Function?',
-        beginner: 'A Window Function performs math across a "window" of related rows. Unlike GROUP BY which squashes everything together, Window Functions let you calculate metrics (like averages or ranks) while keeping every single original row in your final output.',
-        advanced: 'Window functions evaluate calculations across partition subsets without collapsing the dataset. They operate on a partitioned window of data, utilizing the OVER clause to define the scope of the calculation context while preserving the physical row count.'
-      },
-      {
-        title: '2. ROW_NUMBER() and RANK()',
-        beginner: 'If you want to assign a sequential number to rows (1, 2, 3), use ROW_NUMBER(). If you want to rank rows based on a value (like highest sales), use RANK(). If two items tie in sales, RANK() gives them the same rank and skips a number for the next slot.',
-        advanced: 'ROW_NUMBER() generates a unique, sequential integer per row within a window partition. RANK() calculates relative positioning. PostgreSQL executes these heavily in memory, making them perfect for leaderboard APIs and complex paginations.'
-      },
-      {
-        title: '3. The OVER and PARTITION BY Clauses',
-        beginner: 'To configure your window function, write "OVER()". Inside those parentheses, you can sort your window using "ORDER BY". You can also split your window into smaller groups using "PARTITION BY" (for example, ranking employees *separately* within each of their departments).',
-        advanced: 'The OVER clause defines the analytical frame. PARTITION BY segments the data rows into isolated sorting pipelines. If PARTITION BY is omitted, PostgreSQL treats the entire queried dataset as a single window partition.'
-      }
-    ],
-    practical: {
-      title: 'Ranking Store Revenues',
-      intro: 'We have seeded a `monthly_sales` table tracking `month`, `revenue`, and `store_id`. Your task is to write a query that lists the columns `month` and `revenue`, along with a new column named `sales_rank` which ranks sales from the highest revenue to the lowest.',
-      steps: [
-        'Select the `month` and `revenue` columns.',
-        'Add the analytical function: `RANK() OVER (ORDER BY revenue DESC)`.',
-        'Alias this calculation column as `sales_rank`.',
-        'Set your target data source to `monthly_sales`.',
-        'End with a semicolon.'
-      ],
-      goal: 'Use a Window Function to rank monthly revenue from highest to lowest without collapsing rows.',
-      starterQuery: '-- Write your SQL query here\nSELECT month, revenue, ',
-      solutionQuery: 'SELECT month, revenue, RANK() OVER (ORDER BY revenue DESC) AS sales_rank FROM monthly_sales;',
-      seedSql: `
-        CREATE TABLE monthly_sales (id INTEGER PRIMARY KEY, month TEXT, revenue REAL);
-        INSERT INTO monthly_sales VALUES (1, 'January', 45000.00);
-        INSERT INTO monthly_sales VALUES (2, 'February', 62000.00);
-        INSERT INTO monthly_sales VALUES (3, 'March', 31000.00);
-        INSERT INTO monthly_sales VALUES (4, 'April', 75000.00);
-      `
-    },
-    quiz: [
-      {
-        question: 'What is the primary operational difference between GROUP BY and Window Functions?',
-        options: [
-          'Window functions can only calculate averages, while GROUP BY can calculate sums',
-          'GROUP BY collapses rows into summary buckets; Window functions retain all original rows while displaying calculations',
-          'GROUP BY can only be used on text columns',
-          'There is no difference; they are exactly identical'
+          `A random password for the database`,
+          `A column that references the primary key of another table`,
+          `A temporary alias`,
+          `A type of index that encrypts data`
         ],
         correctIndex: 1,
-        explanation: 'Window functions calculate analytical statistics across logical partitions without collapsing or reducing the physical row count in the output.'
+        explanation: `A foreign key stores a reference to a parent row, usually its primary key. It creates a relationship between tables and can enforce referential integrity.`
       },
       {
-        question: 'Which clause defines the grouping boundaries inside a Window Function?',
+        question: `What is join fanout?`,
         options: [
-          'GROUP BY',
-          'SPLIT BY',
-          'PARTITION BY',
-          'WINDOW BY'
-        ],
-        correctIndex: 2,
-        explanation: 'PARTITION BY is written inside the OVER() clause to split your window calculation context into distinct subsets.'
-      }
-    ],
-    milestones: [
-      'Differentiate between analytical window partitions and physical aggregations.',
-      'Deploy row numbering sequences using the ROW_NUMBER() generator.',
-      'Rank relative parameters using the RANK() ranking matrix.',
-      'Structure calculation windows using PARTITION BY and ORDER BY within OVER.'
-    ]
-  },
-  {
-    id: 'sql-10',
-    order: 10,
-    module: 'PostgreSQL & Advanced Analytics',
-    icon: '⚡',
-    title: 'Query Optimization & EXPLAIN',
-    philosophy: 'A query that runs instantly on your laptop with 10 rows can take hours and crash a server when run on a production PostgreSQL database with 10 million rows. To write professional-grade backend code, you cannot treat the database as a magic black box. You must learn how to peak inside the engine, read its execution plan, and build high-performance search indexes.',
-    concepts: [
-      {
-        title: '1. Reading Execution Plans (EXPLAIN)',
-        beginner: 'If you want to know how a database is actually executing your query under the hood, you write "EXPLAIN" before your query. This forces the database to print out a map showing exactly how it plans to find your data (like whether it is searching efficiently or scanning the whole table slowly).',
-        advanced: 'EXPLAIN parses and displays the execution path selected by PostgreSQL\'s cost-based optimizer. It reveals node types like Seq Scans, Index Scans, Hash Joins, and estimated startup/total costs based on table statistics.'
-      },
-      {
-        title: '2. Table Scans vs Index Seeks',
-        beginner: 'Imagine looking for a word in a book. A "Table Scan" means reading the entire book cover-to-cover (slow!). An "Index Seek" means looking up the word in the index at the back and jumping straight to the exact page (blazing fast!). We speed up backends by adding Indexes to commonly searched columns.',
-        advanced: 'A Sequential Scan traverses raw data pages linearly (O(N) cost), causing massive CPU and I/O bottlenecks. An Index Scan traverses a balanced B-Tree structure (O(log N) cost) to locate target physical row IDs instantly.'
-      },
-      {
-        title: '3. Creating Indexes (CREATE INDEX)',
-        beginner: 'To make your queries run incredibly fast on a column, write: "CREATE INDEX idx_logs_level ON logs(level);". The database will now build an index in the background to accelerate all future WHERE queries on that column.',
-        advanced: 'CREATE INDEX constructs an external B-Tree index structure pointing to physical rows. While this speeds up SELECT queries dramatically, it introduces a write penalty—every time the backend runs an INSERT, UPDATE, or DELETE, PostgreSQL must also update the index.'
-      }
-    ],
-    practical: {
-      title: 'Explaining a Log Search',
-      intro: 'We have seeded a `logs` table containing `id`, `timestamp`, and `level` (like "INFO", "WARN", "ERROR"). Your task is to write a command to inspect the query plan of a search that finds all ERROR level logs.',
-      steps: [
-        'To view the execution plan, write the keywords `EXPLAIN QUERY PLAN` at the absolute beginning of your statement.',
-        'Directly after those keywords, write your standard search query: `SELECT * FROM logs WHERE level = \'ERROR\';`.',
-        'End the entire line with a clean semicolon.'
-      ],
-      goal: 'Inspect the SQLite execution plan for a conditional search query.',
-      starterQuery: 'EXPLAIN QUERY PLAN ',
-      solutionQuery: "EXPLAIN QUERY PLAN SELECT * FROM logs WHERE level = 'ERROR';",
-      seedSql: `
-        CREATE TABLE logs (id INTEGER PRIMARY KEY, timestamp TEXT, level TEXT);
-        CREATE INDEX idx_logs_level ON logs(level);
-        INSERT INTO logs VALUES (1, '2026-07-15 12:00:00', 'INFO');
-        INSERT INTO logs VALUES (2, '2026-07-15 12:05:00', 'ERROR');
-        INSERT INTO logs VALUES (3, '2026-07-15 12:10:00', 'WARN');
-      `
-    },
-    quiz: [
-      {
-        question: 'What information does the EXPLAIN statement provide to a backend engineer?',
-        options: [
-          'It translates SQL code into Python script blocks',
-          'It displays the step-by-step physical execution path the database engine chose to locate data',
-          'It counts the total lines of code written inside the editor',
-          'It automatically fixes syntax errors in your query'
+          `When a JOIN deletes duplicate rows automatically`,
+          `When one parent row is repeated because it has many matching child rows`,
+          `When a database shuts down because of too many joins`,
+          `When ORDER BY sorts too slowly`
         ],
         correctIndex: 1,
-        explanation: 'EXPLAIN instructs the database optimizer to display its chosen physical execution pathway (scans, index sweeps, sorting methods) without actually modifying data.'
-      },
-      {
-        question: 'What is the runtime complexity of searching an indexed column vs an un-indexed column?',
-        options: [
-          'Indexed columns require O(N) linear time; un-indexed require O(1) constant time',
-          'Both require identical processing time',
-          'Indexed columns utilize balanced B-Trees running in O(log N) logarithmic time; un-indexed columns require O(N) sequential table scans',
-          'Indexed columns require O(N^2) quadratic processing loops'
-        ],
-        correctIndex: 2,
-        explanation: 'Indexes allow relational engines to bypass complete sequential sweeps, shifting the search profile to highly optimized B-Tree lookups.'
+        explanation: `Fanout happens when a one-to-many relationship multiplies rows during a JOIN. This is expected, but it can distort aggregates if you are not careful.`
       }
     ],
     milestones: [
-      'Deconstruct query processing maps using EXPLAIN statements.',
-      'Differentiate physical performance profiles of Sequential Scans vs Index Scans.',
-      'Build custom B-Tree indexing parameters using CREATE INDEX commands.',
-      'Balance query execution speeds against write processing costs in backend architectures.'
+      `Understand how primary keys and foreign keys create relationships.`,
+      `Use INNER JOIN to retrieve only matching records.`,
+      `Use LEFT JOIN to preserve left-table rows and detect missing relationships.`,
+      `Recognize join fanout before aggregating joined data.`
     ]
   },
 
   {
-    id: 'sql-11',
+    id: `sql-07`,
+    order: 7,
+    module: `Database Data Mutation & Schema`,
+    icon: `📝`,
+    title: `Database Modifications & Writes`,
+    philosophy: `Reading data is safe. Writing data is where systems gain power and danger at the same time. A backend must insert new users, update account details, deactivate records, and sometimes delete data permanently. Every write changes state, and state changes must be intentional. Professional engineers treat UPDATE and DELETE as controlled operations, not casual commands.`,
+    concepts: [
+      {
+        title: `1. INSERT INTO`,
+        beginner: `INSERT adds a new row to a table. You name the table, list the columns you want to fill, and provide matching values. For example, you can add a new user with a username and status.`,
+        advanced: `INSERT appends a new tuple to a relation. The engine validates types and constraints, writes the row through the transactional pipeline, and makes it visible according to isolation rules. In many backends, the newly created id is needed immediately for follow-up logic.`
+      },
+      {
+        title: `2. UPDATE with SET and WHERE`,
+        beginner: `UPDATE changes existing rows. SET assigns the new value, and WHERE chooses which rows to change. If you forget WHERE, the database updates every row in the table, which is usually a disaster.`,
+        advanced: `UPDATE modifies column values on existing tuples. Production-safe updates always include precise predicates, ideally primary key or unique key filters. Backend code should also inspect affected row metadata to confirm whether the intended row was actually changed.`
+      },
+      {
+        title: `3. DELETE and Soft Deletes`,
+        beginner: `DELETE removes rows permanently. Because that can be dangerous, many apps use soft deletes instead. A soft delete marks the record as deleted, often with a deleted_at timestamp, without destroying the row.`,
+        advanced: `DELETE removes tuple visibility and creates maintenance work for the storage engine. Soft-delete patterns preserve auditability and allow recovery, but they require every query to respect the deleted flag. Hard deletes are still appropriate when retention policy demands physical removal.`
+      },
+      {
+        title: `4. Safe Mutation Workflow`,
+        beginner: `Before running UPDATE or DELETE, first run a SELECT with the same WHERE clause. This shows you exactly which rows will be affected. If the result looks correct, then run the mutation.`,
+        advanced: `A safe mutation workflow uses preview queries, transactions, and affected-row verification. In critical systems, destructive operations should be scoped by primary key, wrapped in explicit transactions, and logged for auditability.`
+      }
+    ],
+    practical: {
+      title: `Updating User Account Details`,
+      intro: `We have seeded a members table with id, username, email, and status. Your task is to update the email of the user with id = 2 to bob_new@email.com. The update must affect only that one user.`,
+      steps: [
+        `Start with UPDATE members.`,
+        `Use SET to assign the new email value: email = 'bob_new@email.com'.`,
+        `Add WHERE id = 2 so only Bob's row is changed.`,
+        `End with a semicolon.`,
+        `Run the query. You should see a successful write with no error. If you query the table afterward, only user id 2 should have the new email.`
+      ],
+      goal: `Update one member's email safely using UPDATE, SET, and WHERE.`,
+      starterQuery: `-- Write your SQL query here
+UPDATE members `,
+      solutionQuery: `UPDATE members SET email = 'bob_new@email.com' WHERE id = 2;`,
+      seedSql: `CREATE TABLE members (id INTEGER PRIMARY KEY, username TEXT, email TEXT, status TEXT); INSERT INTO members VALUES (1, 'alice_smith', 'alice@email.com', 'active'); INSERT INTO members VALUES (2, 'bob_jones', 'bob@email.com', 'pending'); INSERT INTO members VALUES (3, 'charlie_brown', 'charlie@email.com', 'suspended');`
+    },
+    quiz: [
+      {
+        question: `What happens if you run UPDATE without a WHERE clause?`,
+        options: [
+          `The database refuses to run the query`,
+          `Only the first row is updated`,
+          `Every row in the table is updated`,
+          `A new row is inserted`
+        ],
+        correctIndex: 2,
+        explanation: `Without WHERE, UPDATE has no row filter, so it applies the SET changes to every row. This is one of the most dangerous mistakes in SQL. It does not insert rows or update only the first row.`
+      },
+      {
+        question: `What is a soft delete?`,
+        options: [
+          `Deleting the database server`,
+          `Marking a record as deleted instead of physically removing it`,
+          `Deleting only NULL columns`,
+          `A database backup`
+        ],
+        correctIndex: 1,
+        explanation: `A soft delete preserves the row and marks it as deleted, often with deleted_at or is_active. This supports auditing and recovery. It is not a backup and does not delete the server.`
+      },
+      {
+        question: `What should you do before running a risky UPDATE or DELETE?`,
+        options: [
+          `Run a SELECT with the same WHERE clause to preview affected rows`,
+          `Drop the table`,
+          `Restart the database`,
+          `Remove all indexes`
+        ],
+        correctIndex: 0,
+        explanation: `Previewing the target rows shows what will be changed or removed. Dropping tables, restarting databases, or removing indexes does not make mutation safer and can make things worse.`
+      },
+      {
+        question: `Why is checking affected rows useful after an UPDATE?`,
+        options: [
+          `It tells whether the expected row was actually changed`,
+          `It automatically rolls back the transaction`,
+          `It encrypts the updated data`,
+          `It creates a new table`
+        ],
+        correctIndex: 0,
+        explanation: `If zero rows were affected, the WHERE clause may not have matched, or the value may already have been the same. Affected-row metadata helps APIs decide between success, not found, and no-op results.`
+      }
+    ],
+    milestones: [
+      `Insert new rows using INSERT INTO.`,
+      `Update rows safely with SET and WHERE.`,
+      `Understand hard deletes versus soft deletes.`,
+      `Preview mutations before running them.`
+    ]
+  },
+  {
+    id: `sql-08`,
+    order: 8,
+    module: `Relational Architecture & Joins`,
+    icon: `🏗️`,
+    title: `Advanced Queries: Subqueries & CTEs`,
+    philosophy: `Real backend queries rarely fit into one simple line. They answer questions like: which payments are above average? Which users have orders? Which products are top sellers inside each category? To keep complex SQL readable, engineers break logic into named steps. Subqueries hide steps inside expressions, while Common Table Expressions place steps at the top of the query where humans can read them.`,
+    concepts: [
+      {
+        title: `1. Scalar Subqueries`,
+        beginner: `A subquery is a query inside another query. For example, you can find products whose price is greater than the average price. The inner query calculates the average first, and the outer query uses that result.`,
+        advanced: `A scalar subquery returns a single value and can appear in SELECT, WHERE, or HAVING clauses. The optimizer may execute it once or rewrite it into a join depending on references and engine capabilities.`
+      },
+      {
+        title: `2. Correlated Subqueries`,
+        beginner: `A correlated subquery depends on the outer query. If the inner query says something like “where orders.user_id = users.id,” it may need to run again for each outer row. That can become slow.`,
+        advanced: `Correlated subqueries reference columns from the outer query, creating potential row-by-row evaluation. Some engines decorrelate them into semi-joins, but engineers should inspect execution plans when these queries touch large tables.`
+      },
+      {
+        title: `3. Common Table Expressions`,
+        beginner: `A CTE is like a temporary named result. You write WITH name AS, put a query inside, and then use that name later in the main query. This makes complex SQL feel like reading steps from top to bottom.`,
+        advanced: `The WITH clause defines one or more common table expressions. CTEs improve maintainability by modularizing logic. Depending on the database and version, a CTE may be inlined or materialized, so performance-critical queries should be checked with EXPLAIN.`
+      },
+      {
+        title: `4. CTEs versus Nested Subqueries`,
+        beginner: `Nested subqueries can become deeply stacked and hard to read. CTEs let you name each step separately. When debugging, it is much easier to inspect a CTE than to untangle many nested parentheses.`,
+        advanced: `CTEs are preferred for multi-step analytics because they create readable logical stages. However, readability must be paired with plan awareness. If a CTE becomes an optimization fence in a particular engine, rewriting as a subquery or join may be necessary.`
+      }
+    ],
+    practical: {
+      title: `Filtering Payments via CTEs`,
+      intro: `We have seeded a payments table with id and amount. Your task is to use a CTE named avg_pay to calculate the average payment amount, then return all payments whose amount is greater than that average.`,
+      steps: [
+        `Start with WITH avg_pay AS.`,
+        `Inside the CTE, select AVG(amount) and alias it as value.`,
+        `After the CTE, select id and amount from payments.`,
+        `Bring the CTE into the FROM clause.`,
+        `Filter with WHERE amount > avg_pay.value.`,
+        `Run the query. You should see the payments above the average amount returned.`
+      ],
+      goal: `Use a CTE to calculate the average payment and filter payments above that average.`,
+      starterQuery: `WITH avg_pay AS (
+  SELECT AVG(amount) AS value FROM payments
+)
+SELECT id, amount FROM payments, avg_pay WHERE `,
+      solutionQuery: `WITH avg_pay AS (
+  SELECT AVG(amount) AS value FROM payments
+)
+SELECT id, amount FROM payments, avg_pay WHERE amount > avg_pay.value;`,
+      seedSql: `CREATE TABLE payments (id INTEGER PRIMARY KEY, amount REAL); INSERT INTO payments VALUES (1, 120.00); INSERT INTO payments VALUES (2, 45.50); INSERT INTO payments VALUES (3, 300.00); INSERT INTO payments VALUES (4, 15.00); INSERT INTO payments VALUES (5, 95.00);`
+    },
+    quiz: [
+      {
+        question: `Which keyword starts a Common Table Expression?`,
+        options: [
+          `CTE`,
+          `WITH`,
+          `DECLARE`,
+          `TEMP`
+        ],
+        correctIndex: 1,
+        explanation: `WITH introduces CTE definitions. CTE, DECLARE, and TEMP are not the standard SQL keywords for starting a common table expression.`
+      },
+      {
+        question: `What is a major benefit of CTEs over deeply nested subqueries?`,
+        options: [
+          `They make queries easier to read by naming logical steps`,
+          `They always run faster`,
+          `They remove the need for WHERE`,
+          `They encrypt the query`
+        ],
+        correctIndex: 0,
+        explanation: `CTEs improve clarity by breaking complex logic into named stages. They do not guarantee faster execution, remove filtering needs, or provide encryption.`
+      },
+      {
+        question: `What makes a subquery correlated?`,
+        options: [
+          `It references a column from the outer query`,
+          `It uses ORDER BY`,
+          `It returns more than one column`,
+          `It uses LIMIT`
+        ],
+        correctIndex: 0,
+        explanation: `A correlated subquery depends on values from the outer query. ORDER BY, LIMIT, and column count do not define correlation.`
+      },
+      {
+        question: `Why should engineers inspect execution plans for large CTE-based queries?`,
+        options: [
+          `Because some engines may materialize CTEs instead of merging them into the main query`,
+          `Because CTEs cannot contain SELECT`,
+          `Because CTEs always delete data`,
+          `Because CTEs require JSON columns`
+        ],
+        correctIndex: 0,
+        explanation: `Depending on the engine, CTEs may be treated as optimization boundaries. Inspecting the plan reveals whether the CTE is inlined, materialized, or causing unnecessary work. CTEs do not delete data or require JSON.`
+      }
+    ],
+    milestones: [
+      `Use scalar subqueries to compute values inside larger queries.`,
+      `Recognize correlated subqueries and their performance risks.`,
+      `Structure multi-step logic using WITH and CTEs.`,
+      `Balance readability with execution-plan awareness.`
+    ]
+  },
+  {
+    id: `sql-09`,
+    order: 9,
+    module: `PostgreSQL & Advanced Analytics`,
+    icon: `👑`,
+    title: `Analytical Window Functions`,
+    philosophy: `GROUP BY is powerful, but it collapses rows. Dashboards often need both: the original rows and calculations across related rows. Window functions solve this. They let you compute ranks, running totals, moving averages, and partitions while preserving each original row. This is one of the most important analytical tools in modern backend SQL.`,
+    concepts: [
+      {
+        title: `1. Window Functions Preserve Rows`,
+        beginner: `GROUP BY squeezes many rows into one summary row. A window function calculates a value across related rows but still returns every original row. This is perfect for leaderboards and running totals.`,
+        advanced: `Window functions operate over a window of rows defined by OVER. They do not collapse the result set like GROUP BY. This allows analytical calculations to appear alongside detail rows in a single query.`
+      },
+      {
+        title: `2. ROW_NUMBER, RANK, and DENSE_RANK`,
+        beginner: `ROW_NUMBER gives each row a unique number: 1, 2, 3, 4. RANK handles ties by giving tied rows the same rank and skipping the next number. DENSE_RANK also handles ties but does not skip numbers.`,
+        advanced: `ROW_NUMBER is deterministic when ordered by unique keys. RANK and DENSE_RANK differ in gap behavior after ties. Choosing the correct ranking function matters for pagination, leaderboards, and top-N logic.`
+      },
+      {
+        title: `3. OVER, PARTITION BY, and ORDER BY`,
+        beginner: `OVER defines the window. ORDER BY inside OVER controls the order. PARTITION BY splits the window into groups, like ranking sales separately for each store instead of ranking all stores together.`,
+        advanced: `PARTITION BY creates independent window partitions. ORDER BY defines row order inside each partition. Without PARTITION BY, the entire result set is treated as one partition.`
+      },
+      {
+        title: `4. Frames and Filtering Window Results`,
+        beginner: `A window can include only nearby rows, like the current row and the previous two rows. Also, you usually cannot filter a window function directly with WHERE. You need to wrap the query in a CTE or subquery first.`,
+        advanced: `Frame clauses such as ROWS BETWEEN define moving windows for running totals and moving averages. Because window functions are evaluated after WHERE and GROUP BY, filtering on their output requires a derived table or CTE.`
+      }
+    ],
+    practical: {
+      title: `Ranking Store Revenues`,
+      intro: `We have seeded a monthly_sales table with month and revenue. Your task is to return month, revenue, and a sales_rank column that ranks revenue from highest to lowest.`,
+      steps: [
+        `Select month and revenue.`,
+        `Add RANK() OVER (ORDER BY revenue DESC).`,
+        `Alias the window calculation as sales_rank.`,
+        `Read from monthly_sales.`,
+        `Run the query. You should see April ranked first because it has the highest revenue.`
+      ],
+      goal: `Use a window function to rank monthly revenue without collapsing rows.`,
+      starterQuery: `-- Write your SQL query here
+SELECT month, revenue, `,
+      solutionQuery: `SELECT month, revenue, RANK() OVER (ORDER BY revenue DESC) AS sales_rank FROM monthly_sales;`,
+      seedSql: `CREATE TABLE monthly_sales (id INTEGER PRIMARY KEY, month TEXT, revenue REAL); INSERT INTO monthly_sales VALUES (1, 'January', 45000.00); INSERT INTO monthly_sales VALUES (2, 'February', 62000.00); INSERT INTO monthly_sales VALUES (3, 'March', 31000.00); INSERT INTO monthly_sales VALUES (4, 'April', 75000.00);`
+    },
+    quiz: [
+      {
+        question: `What is the main difference between GROUP BY and window functions?`,
+        options: [
+          `GROUP BY collapses rows; window functions keep original rows`,
+          `Window functions only work with text`,
+          `GROUP BY is faster in every situation`,
+          `Window functions cannot use ORDER BY`
+        ],
+        correctIndex: 0,
+        explanation: `GROUP BY aggregates rows into fewer output rows. Window functions calculate values across rows while preserving the original row count. Window functions can absolutely use ORDER BY inside OVER.`
+      },
+      {
+        question: `What does PARTITION BY do inside OVER?`,
+        options: [
+          `It splits the window into independent groups`,
+          `It deletes duplicate rows`,
+          `It creates a permanent table`,
+          `It converts text into numbers`
+        ],
+        correctIndex: 0,
+        explanation: `PARTITION BY defines separate windows for each group, such as each store or category. It does not delete rows, create tables, or convert types.`
+      },
+      {
+        question: `Why can you usually not filter directly on a window function in WHERE?`,
+        options: [
+          `Window functions are evaluated after WHERE in logical query order`,
+          `Window functions are encrypted`,
+          `WHERE only accepts text values`,
+          `Window functions cannot appear in SELECT`
+        ],
+        correctIndex: 0,
+        explanation: `WHERE filters rows before window calculations are computed. To filter by a window result, wrap the query in a CTE or subquery and filter outside.`
+      },
+      {
+        question: `If two rows tie and you use RANK(), what happens to the next rank?`,
+        options: [
+          `It skips a number`,
+          `It repeats the same number forever`,
+          `It becomes NULL`,
+          `It becomes zero`
+        ],
+        correctIndex: 0,
+        explanation: `RANK gives tied rows the same rank and then skips the next rank value. DENSE_RANK would not skip. ROW_NUMBER would assign unique sequential numbers if ordering is unique.`
+      }
+    ],
+    milestones: [
+      `Understand how window functions differ from GROUP BY.`,
+      `Use ROW_NUMBER, RANK, and DENSE_RANK.`,
+      `Define windows using OVER, PARTITION BY, and ORDER BY.`,
+      `Filter window results safely using CTEs or subqueries.`
+    ]
+  },
+  {
+    id: `sql-10`,
+    order: 10,
+    module: `PostgreSQL & Advanced Analytics`,
+    icon: `⚡`,
+    title: `Query Optimization & EXPLAIN`,
+    philosophy: `A query that feels fast on ten rows can collapse under ten million rows. Backend engineers cannot treat the database as magic. You must understand whether the engine is scanning the whole table, using an index, joining efficiently, or drowning in unnecessary rows. EXPLAIN is your window into the database's decision-making process.`,
+    concepts: [
+      {
+        title: `1. Execution Plans and EXPLAIN`,
+        beginner: `EXPLAIN asks the database to show its plan before running the query for real. It reveals whether the database will scan the whole table, use an index, or join tables in a certain order.`,
+        advanced: `EXPLAIN exposes the cost-based optimizer's chosen plan tree. It shows scan types, join strategies, estimated row counts, and cost estimates. Reading plans is the fastest way to diagnose why a query is slow.`
+      },
+      {
+        title: `2. Sequential Scans versus Index Scans`,
+        beginner: `A sequential scan reads every row from start to finish. That is slow for large tables. An index scan uses a sorted structure to jump near the matching rows, which is much faster for selective queries.`,
+        advanced: `Sequential scans are O(N) and may be acceptable for small tables or broad reads. Index scans use B-Tree traversal, often O(log N), but still require heap access unless the index covers all selected columns.`
+      },
+      {
+        title: `3. Indexes Speed Reads but Slow Writes`,
+        beginner: `An index is like a book's index. It makes finding data faster. But every time you insert, update, or delete rows, the database may also need to update the index. Too many indexes can slow writes.`,
+        advanced: `Indexes improve read selectivity but introduce write amplification. Each additional index increases insertion, update, and maintenance cost. Production indexing should be driven by real query patterns, not guesswork.`
+      },
+      {
+        title: `4. Statistics and Cost-Based Optimization`,
+        beginner: `The database keeps summaries about your data, such as how many rows exist and how common certain values are. It uses these summaries to guess which plan will be fastest.`,
+        advanced: `Cost-based planners depend on table and index statistics. Stale statistics can produce bad estimates, causing wrong join orders or scan choices. Analyzing tables keeps optimizer decisions aligned with actual data distribution.`
+      }
+    ],
+    practical: {
+      title: `Explaining a Log Search`,
+      intro: `We have seeded a logs table with id, timestamp, and level. An index exists on level. Your task is to inspect the execution plan for a query that finds all ERROR logs.`,
+      steps: [
+        `Start with EXPLAIN QUERY PLAN.`,
+        `Write the query: SELECT * FROM logs WHERE level = 'ERROR'.`,
+        `End with a semicolon.`,
+        `Run the command. You should see the database explain how it plans to execute the query, including whether it uses the index.`
+      ],
+      goal: `Use EXPLAIN to inspect how the database executes a filtered log search.`,
+      starterQuery: `EXPLAIN QUERY PLAN `,
+      solutionQuery: `EXPLAIN QUERY PLAN SELECT * FROM logs WHERE level = 'ERROR';`,
+      seedSql: `CREATE TABLE logs (id INTEGER PRIMARY KEY, timestamp TEXT, level TEXT); CREATE INDEX idx_logs_level ON logs(level); INSERT INTO logs VALUES (1, '2026-07-15 12:00:00', 'INFO'); INSERT INTO logs VALUES (2, '2026-07-15 12:05:00', 'ERROR'); INSERT INTO logs VALUES (3, '2026-07-15 12:10:00', 'WARN');`
+    },
+    quiz: [
+      {
+        question: `What does EXPLAIN show?`,
+        options: [
+          `The database's chosen execution plan`,
+          `The user passwords`,
+          `The frontend bundle size`,
+          `The network cable status`
+        ],
+        correctIndex: 0,
+        explanation: `EXPLAIN reveals the plan the optimizer intends to use, including scans, joins, and estimated costs. It does not expose passwords, frontend assets, or hardware cables.`
+      },
+      {
+        question: `Why is an index scan often faster than a sequential scan?`,
+        options: [
+          `It can jump toward matching rows instead of reading every row`,
+          `It deletes unmatched rows permanently`,
+          `It compresses the table`,
+          `It disables transactions`
+        ],
+        correctIndex: 0,
+        explanation: `Indexes allow targeted access to matching rows, often through logarithmic tree traversal. They do not delete rows, compress tables, or disable transactional behavior.`
+      },
+      {
+        question: `What is a downside of adding too many indexes?`,
+        options: [
+          `Writes become slower because indexes must also be maintained`,
+          `The database forgets table schemas`,
+          `SELECT queries become illegal`,
+          `NULL values disappear`
+        ],
+        correctIndex: 0,
+        explanation: `Every index adds maintenance cost during INSERT, UPDATE, and DELETE. Too many indexes can hurt write throughput. They do not erase schemas, block SELECT, or remove NULLs.`
+      },
+      {
+        question: `Why are database statistics important?`,
+        options: [
+          `They help the optimizer estimate row counts and choose better plans`,
+          `They automatically encrypt data`,
+          `They replace primary keys`,
+          `They convert SQL into JavaScript`
+        ],
+        correctIndex: 0,
+        explanation: `Statistics inform the cost-based planner about data distribution. Better estimates lead to better plan choices. Statistics do not encrypt data or replace schema objects.`
+      }
+    ],
+    milestones: [
+      `Read execution plans with EXPLAIN.`,
+      `Understand sequential scans versus index scans.`,
+      `Balance read performance against write cost.`,
+      `Recognize the role of statistics in query planning.`
+    ]
+  },
+  {
+    id: `sql-11`,
     order: 11,
-    module: 'Advanced PostgreSQL & Backend Architecture',
-    icon: '🏦',
-    title: 'ACID Transactions',
-    philosophy: 'In the real world, backend operations often require multiple database changes at once—like transferring money. If you deduct $100 from Alice, but the server crashes before adding it to Bob, that $100 vanishes forever. PostgreSQL solves this using ACID Transactions, ensuring that a batch of queries either fully succeeds together, or completely rolls back as if nothing ever happened.',
+    module: `Advanced PostgreSQL & Backend Architecture`,
+    icon: `🏦`,
+    title: `ACID Transactions`,
+    philosophy: `Some operations must happen as one complete unit. Moving money, creating an order and its line items, or deducting inventory must not partially succeed. If the server crashes halfway through, users must not see broken state. Transactions provide the guarantee: either everything commits, or nothing does.`,
     concepts: [
       {
-        title: '1. BEGIN and COMMIT',
-        beginner: 'By typing "BEGIN;", you tell the database to pause its normal auto-save feature. You can then run multiple UPDATE or INSERT commands safely. Once you are absolutely sure everything worked, you type "COMMIT;" to save all the changes to the hard drive simultaneously.',
-        advanced: 'BEGIN initiates a transaction block, enforcing ACID compliance (Atomicity, Consistency, Isolation, Durability). PostgreSQL acquires necessary row-level locks and logs impending changes to the WAL (Write-Ahead Log) before allowing the final COMMIT operation to permanently alter physical disk pages.'
+        title: `1. BEGIN and COMMIT`,
+        beginner: `BEGIN starts a transaction. Inside it, you can run several SQL commands. COMMIT saves all of them together. If anything fails before COMMIT, the changes can be undone.`,
+        advanced: `BEGIN opens a transactional scope. COMMIT makes changes durable by finalizing WAL records and releasing transactional state. This enforces atomicity and durability within ACID semantics.`
       },
       {
-        title: '2. The ROLLBACK Command',
-        beginner: 'If you are in the middle of a transaction (after typing BEGIN) and realize you made a terrible mistake—like updating the wrong user—you can type "ROLLBACK;". The database instantly wipes away all changes made since the transaction started, restoring the previous state.',
-        advanced: 'ROLLBACK terminates the current transaction block and discards all pending mutations. Backend APIs heavily wrap database operations in try/catch blocks; if a Node.js or Python server catches an error during a multi-query process, it instantly issues a ROLLBACK to maintain database integrity.'
+        title: `2. ROLLBACK`,
+        beginner: `If something goes wrong inside a transaction, ROLLBACK cancels all the changes made since BEGIN. The database returns to the state it was in before the transaction started.`,
+        advanced: `ROLLBACK aborts the transaction and discards uncommitted mutations. Backend frameworks often issue rollback automatically when exceptions occur inside database transaction blocks.`
       },
       {
-        title: '3. Deadlocks and Concurrency',
-        beginner: 'When two users try to buy the absolute last concert ticket at the exact same millisecond, the database acts as a traffic cop. Transactions force one user to wait in line while the other finishes, preventing double-booking.',
-        advanced: 'PostgreSQL uses MVCC (Multi-Version Concurrency Control) to handle thousands of simultaneous transactions. If two transactions attempt to acquire Row-Exclusive locks on the exact same record, one must wait. If they cross-block each other, PostgreSQL detects a "Deadlock" and safely kills one transaction to unfreeze the system.'
+        title: `3. Concurrency, Locks, and Deadlocks`,
+        beginner: `When two users try to change the same row at the same time, the database makes them take turns. If two transactions block each other forever, the database detects a deadlock and cancels one of them.`,
+        advanced: `Concurrency control uses locking and MVCC to preserve consistency. Deadlock detection resolves circular lock waits by aborting a victim transaction. Applications must be prepared to retry safely.`
+      },
+      {
+        title: `4. Idempotency and Retries`,
+        beginner: `Network problems can cause an app to retry a request. If a payment request is retried, you must not charge the customer twice. Idempotency keys and unique constraints help make retries safe.`,
+        advanced: `Transactions alone do not prevent duplicate client submissions. Idempotency keys, unique constraints, and conditional writes make retried operations safe. This is essential for payments, webhooks, and background jobs.`
       }
     ],
     practical: {
-      title: 'A Safe Bank Transfer',
-      intro: 'We have an `accounts` table. Alice (id=1) has $500, and Bob (id=2) has $100. Write a transaction block that transfers $100 from Alice to Bob. (Note: in our browser runner, execute these as a single script block).',
+      title: `A Safe Bank Transfer`,
+      intro: `We have seeded an accounts table. Alice has 500 and Bob has 100. Your task is to transfer 100 from Alice to Bob inside one transaction.`,
       steps: [
-        'Start the transaction block by writing `BEGIN TRANSACTION;`.',
-        'Write an `UPDATE` statement reducing Alice\'s balance by 100 (`balance = balance - 100 WHERE id = 1;`).',
-        'Write a second `UPDATE` statement increasing Bob\'s balance by 100 (`balance = balance + 100 WHERE id = 2;`).',
-        'End the block by permanently saving the changes using `COMMIT;`.'
+        `Start with BEGIN TRANSACTION.`,
+        `Write an UPDATE that subtracts 100 from Alice's balance.`,
+        `Write a second UPDATE that adds 100 to Bob's balance.`,
+        `End with COMMIT.`,
+        `Run the block. If you select from accounts afterward, Alice should have 400 and Bob should have 200.`
       ],
-      goal: 'Execute a multi-step financial transaction safely using BEGIN and COMMIT.',
-      starterQuery: 'BEGIN TRANSACTION;\n-- Update Alice here\n\n-- Update Bob here\n\nCOMMIT;',
-      solutionQuery: 'BEGIN TRANSACTION;\nUPDATE accounts SET balance = balance - 100 WHERE id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE id = 2;\nCOMMIT;',
-      seedSql: `
-        CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER);
-        INSERT INTO accounts VALUES (1, 'Alice', 500);
-        INSERT INTO accounts VALUES (2, 'Bob', 100);
-      `
+      goal: `Execute a two-step balance transfer atomically using BEGIN and COMMIT.`,
+      starterQuery: `BEGIN TRANSACTION;
+-- Update Alice here
+
+-- Update Bob here
+
+COMMIT;`,
+      solutionQuery: `BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;`,
+      seedSql: `CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER); INSERT INTO accounts VALUES (1, 'Alice', 500); INSERT INTO accounts VALUES (2, 'Bob', 100);`
     },
     quiz: [
       {
-        question: 'What is the primary purpose of a database transaction?',
+        question: `What is the main purpose of a transaction?`,
         options: [
-          'To speed up query execution times',
-          'To ensure that a series of multiple database commands either succeed entirely or fail entirely without leaving partial data',
-          'To translate SQL queries into frontend JavaScript',
-          'To back up the database to a cloud server'
+          `To make multiple database changes succeed together or fail together`,
+          `To compress old rows`,
+          `To rename tables automatically`,
+          `To create frontend components`
         ],
-        correctIndex: 1,
-        explanation: 'Transactions guarantee "Atomicity" (the "A" in ACID). A transaction is an all-or-nothing operation, preventing partial data corruption during multi-step processes or server crashes.'
+        correctIndex: 0,
+        explanation: `Transactions provide atomicity. A group of changes commits together or rolls back together. They are not for compression, renaming, or frontend rendering.`
       },
       {
-        question: 'What backend command prevents temporary transaction changes from being permanently saved if an error occurs?',
+        question: `What does ROLLBACK do?`,
         options: [
-          'DELETE',
-          'ABORT',
-          'ROLLBACK',
-          'UNDO'
+          `It cancels uncommitted changes and restores the previous state`,
+          `It permanently saves changes`,
+          `It deletes the database`,
+          `It converts TEXT to INTEGER`
         ],
-        correctIndex: 2,
-        explanation: 'The ROLLBACK command abandons the current transaction block and restores the database to the exact state it was in before the BEGIN command was issued.'
+        correctIndex: 0,
+        explanation: `ROLLBACK aborts the transaction and undoes uncommitted mutations. COMMIT saves changes. ROLLBACK does not delete the database or change column types.`
+      },
+      {
+        question: `What is a dirty read?`,
+        options: [
+          `Reading data that has not been committed yet`,
+          `Reading from a backup file`,
+          `Reading a table with no indexes`,
+          `Reading JSON columns`
+        ],
+        correctIndex: 0,
+        explanation: `A dirty read occurs when one transaction reads uncommitted changes from another transaction. If the other transaction rolls back, the read data was never truly valid.`
+      },
+      {
+        question: `Why are idempotency keys important in backend transactions?`,
+        options: [
+          `They prevent retried requests from creating duplicate effects`,
+          `They make SQL queries shorter`,
+          `They remove the need for indexes`,
+          `They automatically encrypt payloads`
+        ],
+        correctIndex: 0,
+        explanation: `Idempotency keys let servers safely retry operations without duplicating side effects, such as charging a card twice. They do not replace indexes, encryption, or query optimization.`
       }
     ],
     milestones: [
-      'Understand the critical importance of ACID compliance in financial software.',
-      'Control multi-query execution blocks using BEGIN and COMMIT.',
-      'Deploy ROLLBACK strategies within backend API error handling.',
-      'Appreciate how relational databases manage concurrent traffic and prevent double-booking.'
+      `Use BEGIN and COMMIT to group changes atomically.`,
+      `Use ROLLBACK to abort failed operations.`,
+      `Understand concurrency, locks, and deadlocks.`,
+      `Design retry-safe operations with idempotency.`
     ]
   },
   {
-    id: 'sql-12',
+    id: `sql-12`,
     order: 12,
-    module: 'Advanced PostgreSQL & Backend Architecture',
-    icon: '📦',
-    title: 'JSON Data in SQL',
-    philosophy: 'Historically, relational databases required rigid columns, leading developers to flock to NoSQL (like MongoDB) for flexible, unstructured data. PostgreSQL completely changed the industry by introducing JSONB—allowing developers to store perfectly flexible, nested JSON objects right alongside strict relational columns. You get the best of both worlds.',
+    module: `Advanced PostgreSQL & Backend Architecture`,
+    icon: `📦`,
+    title: `JSON Data in SQL`,
+    philosophy: `Relational databases are famous for strict structure, but real applications often need flexibility: user settings, feature flags, webhook payloads, and metadata with unpredictable keys. Modern SQL databases solve this by supporting JSON columns. The professional skill is knowing when JSON is useful and when it becomes a trap that hides queryable facts inside unstructured text.`,
     concepts: [
       {
-        title: '1. The JSON Data Type',
-        beginner: 'Sometimes you don\'t know what data a user will provide. Instead of creating 50 columns for "user_settings" (dark mode, notifications, language), you can store all of it as a single JSON object in one column. Example: {"theme": "dark", "notifications": true}.',
-        advanced: 'PostgreSQL provides the "JSONB" (JSON Binary) data type. Unlike raw text, JSONB is parsed and stored in a binary format upon insertion. This makes write times slightly slower, but allows for blazing-fast indexed querying, nested traversal, and inline document modifications without reading the whole object.'
+        title: `1. JSON Columns for Flexible Data`,
+        beginner: `Sometimes you do not know every field in advance. Instead of creating fifty columns for user settings, you can store one JSON object like theme, alerts, and language in a single column.`,
+        advanced: `JSON columns store semi-structured data inside relational tables. PostgreSQL's JSONB stores parsed binary JSON, enabling efficient querying and indexing. SQLite commonly stores JSON as TEXT and provides JSON functions.`
       },
       {
-        title: '2. Querying Inside JSON',
-        beginner: 'Modern SQL databases let you "reach inside" a JSON column to pull out specific keys. Instead of pulling down the whole massive object, you can write special SQL syntax to ask: "Find all users where the JSON settings column has theme = dark".',
-        advanced: 'In PostgreSQL, engineers use the "->" and "->>" operators to traverse JSON paths. "->" returns a JSON object, while "->>" returns raw text. SQLite (often used in local environments) utilizes the `json_extract()` function to achieve similar path traversals.'
+        title: `2. Extracting JSON Values`,
+        beginner: `You can pull a single value out of JSON. For example, you can ask for the theme value inside a settings column. In SQLite, json_extract(settings, '$.theme') reaches into the JSON and returns that field.`,
+        advanced: `JSON path extraction lets SQL query nested document fields. PostgreSQL uses operators such as -> and ->>, while SQLite uses json_extract. Extracted values can be projected, filtered, or indexed.`
       },
       {
-        title: '3. SQL vs NoSQL Convergence',
-        beginner: 'You no longer have to choose between a strict database (SQL) and a flexible document database (NoSQL). By combining foreign keys with JSON columns, modern applications can safely link data while still allowing for flexible user inputs.',
-        advanced: 'JSONB effectively eliminates the need for separate NoSQL databases in many monolithic architectures. Furthermore, PostgreSQL allows you to create GIN (Generalized Inverted Index) indexes directly on JSON keys, meaning searching through millions of flexible JSON documents is functionally instantaneous.'
+        title: `3. When Not to Use JSON`,
+        beginner: `If you often filter, sort, or join by a field, that field usually deserves its own real column. JSON is convenient, but hiding important data inside JSON can make queries slower and harder to validate.`,
+        advanced: `Frequently queried attributes should usually be relational columns with proper types, constraints, and indexes. JSON is best for optional metadata, variable payloads, and shape-changing data, not for core business entities that require integrity enforcement.`
+      },
+      {
+        title: `4. Indexing JSON`,
+        beginner: `Searching inside JSON can be slow if the database must inspect every row. Databases can speed this up by indexing specific JSON values, just like normal columns.`,
+        advanced: `PostgreSQL can index JSON paths with expression indexes or GIN indexes on JSONB. This enables fast containment and path lookups. Without indexing, JSON predicates may force broad scans.`
       }
     ],
     practical: {
-      title: 'Extracting User Settings',
-      intro: 'We have seeded a `users` table with a standard `id` and a `settings` column containing a JSON string (e.g., `{"theme": "dark", "alerts": true}`). Using SQLite\'s built-in `json_extract` function, find the `id` of the user who has their theme set to "dark".',
+      title: `Extracting User Settings`,
+      intro: `We have seeded a users table with id and settings. The settings column contains JSON strings. Your task is to find the id of the user whose theme is dark.`,
       steps: [
-        'Select the `id` column from the `users` table.',
-        'Add a `WHERE` clause to filter the results.',
-        'Use the extraction function to target the JSON key: `json_extract(settings, \'$.theme\')`.',
-        'Set the extracted value condition to equal `\'dark\'`.',
-        'End with a semicolon.'
+        `Select id from users.`,
+        `Add a WHERE clause.`,
+        `Use json_extract(settings, '$.theme') to read the theme key.`,
+        `Compare it to 'dark'.`,
+        `Run the query. You should see user id 2 returned.`
       ],
-      goal: 'Reach into an unstructured JSON column and filter rows based on a nested JSON key.',
-      starterQuery: '-- Write your SQL query here\nSELECT id FROM users WHERE ',
-      solutionQuery: "SELECT id FROM users WHERE json_extract(settings, '$.theme') = 'dark';",
-      seedSql: `
-        CREATE TABLE users (id INTEGER PRIMARY KEY, settings TEXT);
-        INSERT INTO users VALUES (1, '{"theme": "light", "alerts": false}');
-        INSERT INTO users VALUES (2, '{"theme": "dark", "alerts": true}');
-        INSERT INTO users VALUES (3, '{"theme": "system", "alerts": true}');
-      `
+      goal: `Filter rows based on a value inside a JSON column.`,
+      starterQuery: `-- Write your SQL query here
+SELECT id FROM users WHERE `,
+      solutionQuery: `SELECT id FROM users WHERE json_extract(settings, '$.theme') = 'dark';`,
+      seedSql: `CREATE TABLE users (id INTEGER PRIMARY KEY, settings TEXT); INSERT INTO users VALUES (1, '{"theme": "light", "alerts": false}'); INSERT INTO users VALUES (2, '{"theme": "dark", "alerts": true}'); INSERT INTO users VALUES (3, '{"theme": "system", "alerts": true}');`
     },
     quiz: [
       {
-        question: 'Why do modern backend architectures heavily utilize PostgreSQL\'s JSONB column type?',
+        question: `Why are JSON columns useful in relational databases?`,
         options: [
-          'It automatically translates SQL into JavaScript arrays',
-          'It combines the strict relational integrity of SQL with the flexible, document-based storage of NoSQL',
-          'JSON data uses 0 bytes of storage space',
-          'It is required in order to connect a database to the internet'
+          `They allow flexible, semi-structured data alongside structured relational data`,
+          `They automatically replace primary keys`,
+          `They remove the need for transactions`,
+          `They make every query faster`
         ],
-        correctIndex: 1,
-        explanation: 'JSONB allows developers to store unstructured document data inside a strict relational table, providing ultimate architectural flexibility without sacrificing relational JOIN capabilities.'
+        correctIndex: 0,
+        explanation: `JSON columns provide flexibility for variable-shape data while keeping the rest of the schema relational. They do not replace keys, remove transactional requirements, or guarantee faster queries.`
       },
       {
-        question: 'What does a GIN index on a JSONB column in PostgreSQL achieve?',
+        question: `What does json_extract(settings, '$.theme') do?`,
         options: [
-          'It encrypts the JSON data for security',
-          'It deletes empty JSON keys automatically',
-          'It indexes the nested keys inside the JSON document, allowing for instant high-speed searches',
-          'It converts JSON arrays into standard relational tables'
+          `It returns the value of the theme key inside the settings JSON`,
+          `It deletes the settings column`,
+          `It creates a new table`,
+          `It converts JSON into an image`
         ],
-        correctIndex: 2,
-        explanation: 'A GIN (Generalized Inverted Index) maps all the keys and values buried inside unstructured JSON documents, turning slow table scans into hyper-fast lookups.'
+        correctIndex: 0,
+        explanation: `json_extract reads a JSON path and returns the value at that path. It does not modify schema, create tables, or convert data into images.`
+      },
+      {
+        question: `When should a field usually be a real column instead of JSON?`,
+        options: [
+          `When it is frequently filtered, joined, indexed, or constrained`,
+          `When it contains curly braces`,
+          `When the frontend uses JavaScript`,
+          `When the table has more than ten rows`
+        ],
+        correctIndex: 0,
+        explanation: `Core queryable fields benefit from real columns because they can use types, constraints, indexes, and joins efficiently. The presence of JSON syntax or frontend language does not decide this.`
+      },
+      {
+        question: `What is the benefit of indexing a JSON path in databases like PostgreSQL?`,
+        options: [
+          `It speeds up searches for specific JSON keys or values`,
+          `It permanently converts JSON to relational tables`,
+          `It disables NULL values`,
+          `It removes the need for WHERE clauses`
+        ],
+        correctIndex: 0,
+        explanation: `Indexing JSON paths allows the engine to locate matching documents faster. It does not transform JSON into tables, remove NULLs, or eliminate filtering logic.`
       }
     ],
     milestones: [
-      'Bridge the gap between relational SQL and document-based NoSQL paradigms.',
-      'Understand the performance benefits of PostgreSQL JSONB binary storage.',
-      'Extract nested keys from JSON blobs using native SQL extraction functions.',
-      'Appreciate how unstructured data simplifies modern API payload storage.'
+      `Store flexible semi-structured data using JSON columns.`,
+      `Extract nested JSON values with SQL functions.`,
+      `Recognize when JSON is appropriate and when a column is better.`,
+      `Understand JSON indexing for high-performance querying.`
     ]
   },
+
   {
-    id: 'sql-13',
+    id: `sql-13`,
     order: 13,
-    module: 'Advanced PostgreSQL & Backend Architecture',
-    icon: '🔮',
-    title: 'Virtual Tables (Views)',
-    philosophy: 'Some queries are absolute monsters—spanning 5 tables, 4 CTEs, and massive math calculations. If your API runs this monster query hundreds of times a minute, it will exhaust your server. Backend engineers solve this by creating "Views"—virtual tables that save complex queries as reusable, instantly callable objects.',
+    module: `Advanced PostgreSQL & Backend Architecture`,
+    icon: `🔮`,
+    title: `Virtual Tables (Views)`,
+    philosophy: `As backend systems grow, queries become too complex to repeat everywhere. A report might join five tables, filter by role, aggregate revenue, and rename columns for the API. If every route repeats that logic, the codebase becomes fragile. Views solve this by saving a query as a reusable database object. They create abstraction, simplify access, and can hide sensitive data. But professional engineers must also understand what views do not do: a normal view is not a magic cache.`,
     concepts: [
       {
-        title: '1. Standard Views',
-        beginner: 'A View is basically a saved search. If you write a huge query to find "Top 100 Premium Customers", you can save it by typing "CREATE VIEW top_customers AS...". After that, you can just query "SELECT * FROM top_customers". It acts exactly like a real table, but it updates dynamically!',
-        advanced: 'Standard Views do not store physical data; they store query definitions. Every time an API queries a View, PostgreSQL dynamically executes the underlying query plan. Views act as a powerful abstraction layer, hiding complex database schema logic from frontend reporting tools.'
+        title: `1. Standard Views`,
+        beginner: `A view is like a saved query. Instead of writing the same complicated SELECT again and again, you save it with CREATE VIEW. After that, you can query the view like it is a table.`,
+        advanced: `A standard view stores a query definition, not physical data. When the view is queried, the engine executes the underlying query. Views provide a stable interface over complex schemas and can be versioned like an API contract.`
       },
       {
-        title: '2. Materialized Views (PostgreSQL)',
-        beginner: 'If a standard View calculates data live every time you call it, a "Materialized View" takes a snapshot of the math and actually saves the results to the hard drive. Querying it is incredibly fast, but you must manually refresh it when the original data changes.',
-        advanced: 'Materialized Views compute the query and physically persist the dataset to disk. They are critical for high-volume caching architectures and dashboard analytics. When underlying tables update, engineers must execute a "REFRESH MATERIALIZED VIEW" command (often via a background CRON job) to update the snapshot.'
+        title: `2. Materialized Views`,
+        beginner: `A normal view recalculates every time you ask for it. A materialized view saves the result to disk so it can be read very fast. The tradeoff is that it must be refreshed when the original data changes.`,
+        advanced: `Materialized views persist query results physically. They are useful for dashboards, analytics, and expensive aggregations. The engineering cost is refresh strategy: scheduled jobs, incremental refreshes, or cache invalidation logic.`
       },
       {
-        title: '3. Security via Views',
-        beginner: 'You can use Views to hide sensitive data. If you have an Employees table with salaries and passwords, you can create a View called "public_directory" that only selects names and emails. You can then let other apps read the View without exposing the secret data.',
-        advanced: 'Views provide column-level and row-level obfuscation. By revoking table access and only granting API roles SELECT permissions on the View, backend engineers enforce strict Principle of Least Privilege.'
+        title: `3. Views as Security Boundaries`,
+        beginner: `Views can hide secret columns. If an employees table has salary data, you can create a public view that only shows name and department. Apps can read the view without ever seeing the salary column.`,
+        advanced: `Views support least-privilege access. By granting SELECT on a view instead of the base table, sensitive columns and rows can be excluded from unauthorized roles. This pushes security down to the database layer instead of relying only on API code.`
+      },
+      {
+        title: `4. View Performance and Update Limits`,
+        beginner: `A view does not automatically make queries faster. If the saved query is slow, selecting from the view is still slow. Also, views with joins or aggregates often cannot be updated directly.`,
+        advanced: `Standard views are usually inlined and optimized with the outer query, but complex views may prevent certain optimizations or direct writes. Updatable views are limited by SQL rules. Complex writes may require INSTEAD OF triggers or application logic.`
       }
     ],
     practical: {
-      title: 'Abstracting Complex Data',
-      intro: 'We have an `employees` table. Instead of typing out a filter every time we want to find developers, let\'s save the search. Create a view named `dev_team` that selects all columns from `employees` where the `department` is "Engineering".',
+      title: `Abstracting Complex Data`,
+      intro: `We have seeded an employees table with id, name, and department. Your task is to create a view named dev_team that selects all employees whose department is Engineering.`,
       steps: [
-        'Start with the exact syntax: `CREATE VIEW dev_team AS`.',
-        'Follow it immediately with your standard query: `SELECT * FROM employees WHERE department = \'Engineering\'`.',
-        'End the statement with a semicolon.',
-        'This saves the query into the database structure as a virtual table.'
+        `Start with CREATE VIEW dev_team AS.`,
+        `Write the query: SELECT * FROM employees.`,
+        `Add WHERE department = 'Engineering'.`,
+        `End with a semicolon.`,
+        `Run the statement. You should see the view created successfully. Querying it should return Alice and Charlie.`
       ],
-      goal: 'Create a reusable View abstraction to simplify complex filtering for future API queries.',
-      starterQuery: 'CREATE VIEW dev_team AS\n',
-      solutionQuery: "CREATE VIEW dev_team AS\nSELECT * FROM employees WHERE department = 'Engineering';",
-      seedSql: `
-        CREATE TABLE employees (id INTEGER, name TEXT, department TEXT);
-        INSERT INTO employees VALUES (1, 'Alice', 'Engineering');
-        INSERT INTO employees VALUES (2, 'Bob', 'HR');
-        INSERT INTO employees VALUES (3, 'Charlie', 'Engineering');
-      `
+      goal: `Create a reusable view that filters employees by department.`,
+      starterQuery: `CREATE VIEW dev_team AS
+`,
+      solutionQuery: `CREATE VIEW dev_team AS
+SELECT * FROM employees WHERE department = 'Engineering';`,
+      seedSql: `CREATE TABLE employees (id INTEGER, name TEXT, department TEXT); INSERT INTO employees VALUES (1, 'Alice', 'Engineering'); INSERT INTO employees VALUES (2, 'Bob', 'HR'); INSERT INTO employees VALUES (3, 'Charlie', 'Engineering');`
     },
     quiz: [
       {
-        question: 'What is the structural difference between a Standard View and a Materialized View in PostgreSQL?',
+        question: `What is the main difference between a standard view and a materialized view?`,
         options: [
-          'Standard views are for text; Materialized views are for numbers',
-          'Standard views calculate data live upon query; Materialized views cache physical snapshot data on the disk for instant retrieval',
-          'Standard views can be updated, Materialized views are deleted after one use',
-          'There is no difference, they are just two names for the same thing'
+          `Standard views store text only; materialized views store numbers only`,
+          `Standard views run their query live; materialized views store a physical result that must be refreshed`,
+          `Standard views are temporary; materialized views are deleted after one query`,
+          `There is no difference`
         ],
         correctIndex: 1,
-        explanation: 'Materialized Views persist physical data arrays to the disk to avoid re-running expensive math. Standard views are purely virtual aliases for live SQL queries.'
+        explanation: `Standard views are saved queries that execute when used. Materialized views store the query result physically for faster reads, but require refresh logic when underlying data changes.`
       },
       {
-        question: 'How can Views be used to improve database security?',
+        question: `How can views improve database security?`,
         options: [
-          'They automatically encrypt passwords',
-          'They require users to log in twice',
-          'They can expose safe columns (like names) while entirely omitting sensitive columns (like passwords) from the resulting virtual table',
-          'They prevent the database from being turned off'
+          `They automatically encrypt the whole database`,
+          `They expose safe columns while hiding sensitive columns from unauthorized users`,
+          `They prevent users from logging in`,
+          `They delete old rows automatically`
         ],
-        correctIndex: 2,
-        explanation: 'By granting external services access only to a restricted View rather than the foundational table, you permanently hide restricted columns from unauthorized applications.'
+        correctIndex: 1,
+        explanation: `Views can project only approved columns and rows. Granting access to the view instead of the base table helps enforce least privilege. They do not encrypt the whole database or manage login sessions.`
+      },
+      {
+        question: `Does a standard view store query results on disk?`,
+        options: [
+          `Yes, always`,
+          `No, it stores the query definition and executes it when queried`,
+          `Only if the table has more than 100 rows`,
+          `Only when using ORDER BY`
+        ],
+        correctIndex: 1,
+        explanation: `A standard view is virtual. It does not persist result data by itself. Materialized views are the pattern that stores results physically.`
+      },
+      {
+        question: `Why might a view with JOINs and aggregates not be directly updatable?`,
+        options: [
+          `Because the database cannot decide which base table should receive the write`,
+          `Because JOINs are illegal in views`,
+          `Because all views are read-only forever`,
+          `Because aggregates delete rows`
+        ],
+        correctIndex: 0,
+        explanation: `When a view combines multiple tables or aggregate results, a direct UPDATE or INSERT may not map cleanly to one underlying table. Databases restrict such writes unless special rules or triggers handle them.`
       }
     ],
     milestones: [
-      'Understand how to encapsulate messy, complex query logic into clean Virtual Tables.',
-      'Differentiate between live-evaluating Views and physically cached Materialized Views.',
-      'Deploy Views as a security abstraction layer to hide sensitive column structures.',
-      'Write CREATE VIEW statements to establish reusable database assets.'
+      `Create views to encapsulate complex queries.`,
+      `Understand live views versus materialized snapshots.`,
+      `Use views to hide sensitive data.`,
+      `Recognize that views are abstractions, not automatic performance caches.`
     ]
   },
   {
-    id: 'sql-14',
+    id: `sql-14`,
     order: 14,
-    module: 'Advanced PostgreSQL & Backend Architecture',
-    icon: '🤖',
-    title: 'Database Triggers',
-    philosophy: 'Modern backends need to automate tasks. When a user updates their email, you want to log the old email for security. Instead of writing complex JavaScript to remember to log this on every API route, you can bake a "Trigger" directly into the database. A trigger is a robot that watches for a specific action (like an UPDATE), and automatically runs a second query instantly.',
+    module: `Advanced PostgreSQL & Backend Architecture`,
+    icon: `🤖`,
+    title: `Database Triggers`,
+    philosophy: `Some logic must happen automatically whenever data changes. If an account is deleted, the audit log must record it. If an email changes, the old email should be preserved. Triggers move this automation into the database itself, guaranteeing the rule runs even if an application route forgets. But triggers are powerful, and power requires discipline: hidden automation can become hidden complexity.`,
     concepts: [
       {
-        title: '1. What is a Trigger?',
-        beginner: 'A trigger is a database automation. You define an event (like "BEFORE INSERT" or "AFTER UPDATE" on a specific table), and tell the database exactly what secondary SQL query it should automatically execute whenever that event happens.',
-        advanced: 'Triggers execute procedural functions (like PL/pgSQL in PostgreSQL) in direct response to DML operations. They run within the exact same transaction as the triggering event—meaning if the trigger fails or throws an error, the original user action is safely rolled back.'
+        title: `1. What Is a Trigger?`,
+        beginner: `A trigger is a robot inside the database. You tell it: when INSERT, UPDATE, or DELETE happens on this table, automatically run this SQL. It is useful for logging, validation, and automatic defaults.`,
+        advanced: `Triggers execute procedural logic in response to DML events. They run inside the same transaction as the triggering statement. This gives strong consistency guarantees but adds execution cost and side effects that must be carefully documented.`
       },
       {
-        title: '2. OLD and NEW Context',
-        beginner: 'When you change data, a trigger can see both the past and the future! Inside a trigger, you can use the word "OLD.email" to see what the email used to be, and "NEW.email" to see what the user just changed it to. This is perfect for building audit logs.',
-        advanced: 'The database engine injects special record variables into the trigger\'s execution context. NEW holds the pending row state for INSERT/UPDATE operations, and OLD holds the pre-existing row state for UPDATE/DELETE operations, allowing for complex validation logic.'
+        title: `2. OLD and NEW Row Context`,
+        beginner: `Inside a trigger, you can compare the old data and the new data. OLD.email is what the email used to be. NEW.email is what it is becoming. This is perfect for audit logs.`,
+        advanced: `OLD and NEW are contextual row references. INSERT triggers see NEW. DELETE triggers see OLD. UPDATE triggers see both. This allows triggers to validate transitions, copy history, or reject invalid state changes.`
       },
       {
-        title: '3. Data Validation & Prevention',
-        beginner: 'Triggers aren\'t just for logging. A "BEFORE" trigger can inspect data before it gets saved. If a user tries to change their username to something offensive, the database trigger can catch it and reject the update before it ever touches the hard drive.',
-        advanced: 'BEFORE triggers can mutate the NEW row data mid-flight (e.g., automatically formatting text to lowercase) or raise explicit database exceptions to completely block illegal transactions at the absolute lowest architectural level.'
+        title: `3. BEFORE Triggers for Prevention`,
+        beginner: `A BEFORE trigger runs before the row is saved. It can inspect the data and stop the write if something is wrong. This is like a security guard checking data before it enters the database.`,
+        advanced: `BEFORE triggers can mutate incoming values or raise exceptions to abort the operation. They are useful for normalization, default enrichment, and enforcing rules that standard constraints cannot express cleanly.`
+      },
+      {
+        title: `4. Trigger Costs and Hidden Side Effects`,
+        beginner: `Triggers are automatic, which is helpful, but too many triggers can slow down writes and make behavior hard to understand. If a developer does not know a trigger exists, the database can seem to do mysterious things.`,
+        advanced: `Triggers add overhead to every write and can cascade through multiple tables. Production systems should reserve triggers for cross-cutting data guarantees, not business orchestration that belongs in observable application services.`
       }
     ],
     practical: {
-      title: 'Automating an Audit Log',
-      intro: 'We have an `accounts` table and an empty `audit_logs` table. We want to create an automated SQLite trigger named `log_deletion`. When someone deletes an account, the trigger should automatically INSERT the deleted user\'s ID into the `audit_logs`.',
+      title: `Automating an Audit Log`,
+      intro: `We have seeded an accounts table and an audit_logs table. Your task is to create a trigger named log_deletion. Whenever an account is deleted, the trigger should insert the deleted account id into audit_logs.`,
       steps: [
-        'Write `CREATE TRIGGER log_deletion AFTER DELETE ON accounts`.',
-        'Add the `BEGIN` keyword to start the trigger\'s automated action.',
-        'Write the action: `INSERT INTO audit_logs (account_id) VALUES (OLD.id);`. Note the use of `OLD.id` to capture the deleted data.',
-        'End the trigger block by writing `END;`.'
+        `Start with CREATE TRIGGER log_deletion AFTER DELETE ON accounts.`,
+        `Add BEGIN to open the trigger body.`,
+        `Write INSERT INTO audit_logs (account_id) VALUES (OLD.id).`,
+        `Close the trigger with END;.`,
+        `Run the trigger creation. You should see it created successfully. If you later delete an account, the audit table will receive the deleted id.`
       ],
-      goal: 'Construct a database automation that passively monitors DELETE actions and records them in a secondary log table.',
-      starterQuery: 'CREATE TRIGGER log_deletion AFTER DELETE ON accounts\nBEGIN\n  -- Write your INSERT automation here\n  \nEND;',
-      solutionQuery: 'CREATE TRIGGER log_deletion AFTER DELETE ON accounts\nBEGIN\n  INSERT INTO audit_logs (account_id) VALUES (OLD.id);\nEND;',
-      seedSql: `
-        CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT);
-        CREATE TABLE audit_logs (log_id INTEGER PRIMARY KEY, account_id INTEGER, action_date DATETIME DEFAULT CURRENT_TIMESTAMP);
-        INSERT INTO accounts VALUES (99, 'System Admin');
-      `
+      goal: `Create an automatic audit trigger for deleted accounts.`,
+      starterQuery: `CREATE TRIGGER log_deletion AFTER DELETE ON accounts
+BEGIN
+  -- Write your INSERT automation here
+  
+END;`,
+      solutionQuery: `CREATE TRIGGER log_deletion AFTER DELETE ON accounts
+BEGIN
+  INSERT INTO audit_logs (account_id) VALUES (OLD.id);
+END;`,
+      seedSql: `CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT); CREATE TABLE audit_logs (log_id INTEGER PRIMARY KEY, account_id INTEGER, action_date DATETIME DEFAULT CURRENT_TIMESTAMP); INSERT INTO accounts VALUES (99, 'System Admin');`
     },
     quiz: [
       {
-        question: 'What is the purpose of the OLD and NEW variables inside a database trigger?',
+        question: `What do OLD and NEW represent inside a trigger?`,
         options: [
-          'They define whether the trigger was created a long time ago or recently',
-          'They allow the automation to compare the row\'s pre-existing data (OLD) with the incoming data (NEW) during an update',
-          'They backup old tables to the cloud',
-          'They switch the database between different versions of SQL'
+          `The database version before and after an update`,
+          `The row values before and after a data change`,
+          `The oldest and newest tables in the database`,
+          `The first and last user accounts`
         ],
         correctIndex: 1,
-        explanation: 'OLD and NEW are contextual record variables injected by the database engine, allowing developers to inspect or compare data states as they transition.'
+        explanation: `OLD and NEW provide access to row state during trigger execution. OLD is the previous state, while NEW is the incoming state. They are not database versions or table references.`
       },
       {
-        question: 'What happens if a triggered automation fails (e.g. throws a math error) during an AFTER UPDATE event?',
+        question: `What usually happens if a trigger fails during the same transaction as the main write?`,
         options: [
-          'The trigger fails, but the user\'s update still saves successfully',
-          'The trigger is automatically deleted',
-          'Because triggers run in the same transaction, the failure aborts the entire transaction and the user\'s update is rolled back entirely',
-          'The database automatically fixes the math error'
+          `The main write still succeeds`,
+          `The whole transaction can be aborted and rolled back`,
+          `The database deletes the table`,
+          `The trigger becomes a view`
         ],
-        correctIndex: 2,
-        explanation: 'Triggers execute within the same transactional boundary as the triggering event. If the trigger throws an exception, the entire atomic block is rolled back.'
+        correctIndex: 1,
+        explanation: `Triggers run inside the transaction that caused them. If the trigger raises an error, the database can abort the whole operation, preventing partial or inconsistent writes.`
+      },
+      {
+        question: `What is a good use for a BEFORE trigger?`,
+        options: [
+          `Rejecting invalid data before it is written`,
+          `Rendering frontend components`,
+          `Replacing primary keys automatically`,
+          `Disabling backups`
+        ],
+        correctIndex: 0,
+        explanation: `BEFORE triggers can validate or transform incoming data before it reaches storage. They are not for frontend rendering, removing primary key semantics, or disabling backups.`
+      },
+      {
+        question: `What is a major risk of using too many triggers?`,
+        options: [
+          `They can create hidden side effects and slow down writes`,
+          `They automatically corrupt JSON`,
+          `They make SELECT illegal`,
+          `They remove the need for indexes`
+        ],
+        correctIndex: 0,
+        explanation: `Triggers automate behavior, but hidden automation can surprise developers and increase write cost. They do not corrupt JSON by default, block SELECT, or replace indexes.`
       }
     ],
     milestones: [
-      'Understand event-driven architecture directly inside the database layer.',
-      'Deploy CREATE TRIGGER statements to automate secondary SQL actions.',
-      'Utilize contextual OLD and NEW variables for data auditing.',
-      'Appreciate how BEFORE triggers act as a powerful line of defense for data sanitization.'
+      `Understand event-driven automation inside the database.`,
+      `Use OLD and NEW to inspect row transitions.`,
+      `Use BEFORE triggers to prevent invalid writes.`,
+      `Balance trigger power against observability and write performance.`
     ]
   },
   {
-    id: 'sql-15',
+    id: `sql-15`,
     order: 15,
-    module: 'Advanced PostgreSQL & Backend Architecture',
-    icon: '🔐',
-    title: 'Multi-Tenant & Security',
-    philosophy: 'Imagine building a SaaS application like Shopify. Thousands of different stores share the exact same database. How do you guarantee that Store A can never accidentally view Store B\'s orders? In standard architectures, developers must remember to add "WHERE tenant_id = X" to every single API query. In modern PostgreSQL, we enforce this invisibly using Row-Level Security (RLS).',
+    module: `Advanced PostgreSQL & Backend Architecture`,
+    icon: `🔐`,
+    title: `Multi-Tenant & Security`,
+    philosophy: `Modern SaaS applications serve many customers from one shared backend. Shopify stores thousands of stores. Slack hosts thousands of workspaces. In the database, this creates a dangerous question: how do we guarantee that one tenant never sees another tenant's data? Application filters help, but professional systems push isolation as close to the data as possible. Security should fail closed, not open.`,
     concepts: [
       {
-        title: '1. Multi-Tenant Architecture',
-        beginner: 'Multi-tenancy means multiple customers (tenants) share one database. To make this work, every single table must have a "tenant_id" column. Every time you save data, you tag it with the user\'s company ID, separating the massive pool of data into distinct ownership blocks.',
-        advanced: 'Shared-schema multi-tenancy is the most highly scalable backend architecture, vastly outperforming creating separate databases for every client. However, it places massive responsibility on the application layer to never drop the tenant context during data retrieval.'
+        title: `1. Shared-Schema Multi-Tenancy`,
+        beginner: `Multi-tenancy means many customers share the same database. Each row gets a tenant_id so the system knows which company owns it. This is efficient, but every query must respect the tenant boundary.`,
+        advanced: `Shared-schema multi-tenancy scales better than one database per customer, but it turns tenant isolation into a system-wide invariant. The tenant context must be propagated from authentication through every data access path.`
       },
       {
-        title: '2. Row-Level Security (RLS)',
-        beginner: 'Instead of trusting frontend or backend code to always include the "tenant_id" filter, PostgreSQL lets you set a master rule on the table itself. You activate Row-Level Security, which invisibly filters all queries at the database core. If User A logs in, the database simply pretends User B\'s rows do not exist.',
-        advanced: 'RLS (Row-Level Security) operates at the database kernel level via Policies. Even if a backend developer executes a raw "SELECT * FROM orders", PostgreSQL evaluates the active connection role and silently appends the security policy, completely mitigating catastrophic cross-tenant data leaks.'
+        title: `2. Row-Level Security`,
+        beginner: `Instead of trusting every query to remember WHERE tenant_id = 1, the database can enforce the rule automatically. If a user belongs to tenant 1, the database simply hides rows from other tenants.`,
+        advanced: `Row-Level Security uses database policies to filter rows based on session context. Even if an application query omits an explicit tenant predicate, the policy can still prevent cross-tenant reads. This makes isolation a database-level guarantee.`
       },
       {
-        title: '3. Database Roles & Permissions',
-        beginner: 'Databases shouldn\'t have just one master password. A robust backend creates different "Roles". The public API gets a role that can only SELECT data. The background admin server gets a role that can DELETE data. By separating permissions, a hacker who compromises the public API cannot destroy the database.',
-        advanced: 'GRANT and REVOKE commands define granular access control lists (ACLs). Combined with RLS, connection roles create a zero-trust environment where the database acts as the ultimate security enforcer, fully independent of the application layer framework.'
+        title: `3. Roles and Least Privilege`,
+        beginner: `Your app should not use one all-powerful database user. The public API should get a limited role that can only read and write what it needs. Admin jobs can get stronger roles. This limits damage if credentials leak.`,
+        advanced: `GRANT and REVOKE define fine-grained permissions. Combined with RLS, roles implement zero-trust data access. The database becomes an enforcement layer independent of application bugs or compromised services.`
+      },
+      {
+        title: `4. Tenant Context and Negative Testing`,
+        beginner: `Security tests should not only check what a user can see. They should also check what the user cannot see. If the tenant ID is missing, the system should return nothing, not everything.`,
+        advanced: `Production multi-tenant systems test missing context, wrong context, role escalation, and cross-tenant access. Fail-closed behavior is essential. If absent tenant context defaults to open access, the architecture is unsafe.`
       }
     ],
     practical: {
-      title: 'Simulating Tenant Isolation',
-      intro: 'While SQLite does not support true Row-Level Security, we simulate the concept using strict Views. We have a shared `orders` table. Create a secure view named `my_store_orders` that retrieves all orders, but strictly filters them so `tenant_id = 1`. This isolates the data for Store #1.',
+      title: `Simulating Tenant Isolation`,
+      intro: `SQLite does not have full PostgreSQL Row-Level Security, but we can simulate tenant isolation with a view. We have seeded an orders table with tenant_id values. Your task is to create a view named my_store_orders that only shows orders belonging to tenant 1.`,
       steps: [
-        'Write `CREATE VIEW my_store_orders AS`.',
-        'Write a query selecting everything: `SELECT * FROM orders`.',
-        'Add the critical multi-tenant isolation clause: `WHERE tenant_id = 1`.',
-        'End with a semicolon.'
+        `Start with CREATE VIEW my_store_orders AS.`,
+        `Write SELECT * FROM orders.`,
+        `Add WHERE tenant_id = 1.`,
+        `End with a semicolon.`,
+        `Run the statement. If you query the view, you should see only Coffee Beans and Paper Cups, not the tenant 2 orders.`
       ],
-      goal: 'Simulate database-level multi-tenant isolation by wrapping shared data in a hard-coded security View.',
-      starterQuery: 'CREATE VIEW my_store_orders AS\n',
-      solutionQuery: 'CREATE VIEW my_store_orders AS\nSELECT * FROM orders WHERE tenant_id = 1;',
-      seedSql: `
-        CREATE TABLE orders (id INTEGER PRIMARY KEY, item TEXT, tenant_id INTEGER);
-        INSERT INTO orders VALUES (101, 'Coffee Beans', 1);
-        INSERT INTO orders VALUES (102, 'Espresso Machine', 2);
-        INSERT INTO orders VALUES (103, 'Paper Cups', 1);
-        INSERT INTO orders VALUES (104, 'Industrial Grinder', 2);
-      `
+      goal: `Create a view that isolates one tenant's data from a shared table.`,
+      starterQuery: `CREATE VIEW my_store_orders AS
+`,
+      solutionQuery: `CREATE VIEW my_store_orders AS
+SELECT * FROM orders WHERE tenant_id = 1;`,
+      seedSql: `CREATE TABLE orders (id INTEGER PRIMARY KEY, item TEXT, tenant_id INTEGER); INSERT INTO orders VALUES (101, 'Coffee Beans', 1); INSERT INTO orders VALUES (102, 'Espresso Machine', 2); INSERT INTO orders VALUES (103, 'Paper Cups', 1); INSERT INTO orders VALUES (104, 'Industrial Grinder', 2);`
     },
     quiz: [
       {
-        question: 'What is the primary danger of a Shared-Schema Multi-Tenant architecture without Row-Level Security?',
+        question: `What is the biggest risk of shared-schema multi-tenancy without strong isolation?`,
         options: [
-          'It limits the database to a maximum of 10 users',
-          'If a backend developer forgets to include a "WHERE tenant_id = X" filter in an API route, users could see other companies\' private data',
-          'It forces the database to run in single-thread mode',
-          'It costs significantly more money than single-tenant databases'
+          `The database becomes too small`,
+          `One tenant could accidentally read another tenant's data`,
+          `SQL queries become shorter`,
+          `Indexes stop working`
         ],
         correctIndex: 1,
-        explanation: 'Data leakage is the biggest risk in multi-tenancy. If the application layer drops the isolation context, cross-tenant data exposure occurs instantly.'
+        explanation: `The core risk is cross-tenant data leakage. If application code forgets tenant filtering, users may see data they should never access. This is not related to database size or index failure.`
       },
       {
-        question: 'How does PostgreSQL Row-Level Security (RLS) mitigate data leakage?',
+        question: `How does Row-Level Security reduce tenant data leaks?`,
         options: [
-          'By encrypting the entire hard drive',
-          'By automatically applying security policies at the database kernel level, invisibly filtering data regardless of the backend API query',
-          'By automatically logging off users who query too fast',
-          'By separating different tenants onto completely different physical servers'
+          `It applies security policies inside the database engine itself`,
+          `It encrypts the frontend bundle`,
+          `It deletes all unused tables`,
+          `It converts SQL into NoSQL`
+        ],
+        correctIndex: 0,
+        explanation: `RLS enforces row filters at the database level based on session context. This protects data even if application code makes a mistake. It does not encrypt frontends or convert database models.`
+      },
+      {
+        question: `What should happen if tenant context is missing from a request?`,
+        options: [
+          `Return all rows so the user is not blocked`,
+          `Fail closed and return no data or raise an error`,
+          `Automatically choose the first tenant`,
+          `Restart the server`
         ],
         correctIndex: 1,
-        explanation: 'RLS acts as an absolute fail-safe. It intercepts all incoming queries and silently applies tenant isolation rules before the data is even retrieved, making accidental data leakage practically impossible.'
+        explanation: `Missing tenant context must fail safely. Returning all rows or guessing a tenant creates serious security holes. Secure systems deny access when identity context is absent.`
+      },
+      {
+        question: `Why should multi-tenant systems include negative security tests?`,
+        options: [
+          `To prove that unauthorized tenants cannot access protected rows`,
+          `To make tests run slower`,
+          `To remove the need for authentication`,
+          `To disable logging`
+        ],
+        correctIndex: 0,
+        explanation: `Negative tests verify rejection paths, not just happy paths. Security is proven by showing what cannot be accessed. They do not remove authentication or logging requirements.`
       }
     ],
     milestones: [
-      'Understand the architecture and scale of Shared-Schema Multi-Tenancy.',
-      'Identify the catastrophic risks of application-layer data leakage.',
-      'Appreciate how PostgreSQL Row-Level Security (RLS) acts as a kernel-level fail-safe.',
-      'Use Roles and Views to enforce the Principle of Least Privilege.'
+      `Understand shared-schema multi-tenant architecture.`,
+      `Use tenant_id boundaries to isolate customer data.`,
+      `Understand Row-Level Security as a database-level fail-safe.`,
+      `Design fail-closed behavior and negative security tests.`
     ]
   },
   {
-    id: 'sql-16',
+    id: `sql-16`,
     order: 16,
-    module: 'Database Administration & Scaling',
-    icon: '🧹',
-    title: 'MVCC & Database Maintenance (VACUUM)',
-    philosophy:
-      'Relational databases do not actually overwrite data when you run an UPDATE, nor do they instantly destroy it on DELETE. To allow thousands of users to read and write simultaneously without locking the entire system, PostgreSQL uses MVCC (Multi-Version Concurrency Control). It creates new rows and leaves the old ones behind as "dead tuples." Without regular maintenance, these ghost rows will bloat your storage, destroy query performance, and eventually crash the database.',
+    module: `Database Administration & Scaling`,
+    icon: `🧹`,
+    title: `MVCC & Database Maintenance (VACUUM)`,
+    philosophy: `A database that serves thousands of users cannot freeze the world every time someone updates a row. PostgreSQL solves this with MVCC: readers see a consistent snapshot while writers create new row versions. This brilliance comes with a cost. Old row versions become dead tuples. If nobody cleans them, the database grows bloated, slow, and eventually unstable. Maintenance is not optional in production systems.`,
     concepts: [
       {
-        title: '1. Multi-Version Concurrency Control (MVCC)',
-        beginner:
-          'Imagine two people editing a shared document. Instead of ripping the pencil out of your hand when I want to edit a sentence, the database just makes a copy of the sentence for me to edit, while you keep reading the old one. Once I save, the old sentence is marked as "dead".',
-        advanced:
-          'MVCC provides transaction isolation without read/write locks. Every transaction is assigned a sequential ID (TXID). An UPDATE operation actually inserts a brand-new row with the current TXID and marks the old row\'s xmax value to indicate it expires after this transaction, leaving a "dead tuple" on the physical disk.'
+        title: `1. MVCC and Row Versions`,
+        beginner: `When you update a row, the database often does not erase the old row immediately. It creates a new version and keeps the old version around for readers that still need it. This lets people read and write at the same time without constant locking.`,
+        advanced: `MVCC provides snapshot isolation by maintaining multiple tuple versions. Each transaction sees data according to its snapshot. UPDATE creates a new tuple version while the old version remains visible to older transactions until no longer needed.`
       },
       {
-        title: '2. VACUUM and Dead Tuples',
-        beginner:
-          'Because dead rows are left behind on the hard drive, your database slowly fills up with invisible garbage. Running the VACUUM command is like taking out the trash. It tells the database to find those dead rows and mark their disk space as available for new data.',
-        advanced:
-          'A standard VACUUM scans the table pages, identifies dead tuples invisible to all active transactions, and adds their pointers to the Free Space Map (FSM). It does not shrink the physical file size. A VACUUM FULL aggressively rewrites the entire table heap to reclaim OS-level disk space, but requires an exclusive lock that blocks all API traffic.'
+        title: `2. Dead Tuples and Bloat`,
+        beginner: `Old row versions that nobody needs anymore are called dead tuples. They still take up space. Over time, the table becomes bloated, like a warehouse full of empty boxes. Queries slow down because the database must walk through more junk.`,
+        advanced: `Dead tuples consume heap space and can degrade index efficiency. Bloat increases I/O, buffer cache pressure, and query latency. Monitoring dead tuple counts and table size is essential for write-heavy systems.`
       },
       {
-        title: '3. Transaction ID Wraparound',
-        beginner:
-          'Databases use an internal counter to track changes. If a massive database makes billions of changes, the counter will eventually run out of numbers and reset to zero. If this happens without preparation, the database gets confused about what data is old or new, causing catastrophic data loss.',
-        advanced:
-          'PostgreSQL uses 32-bit transaction IDs. At ~2 billion transactions, the TXID wraps around. PostgreSQL prevents the "wraparound data loss" apocalypse by running a special process called autovacuum which periodically "freezes" old rows, marking them with a special flag indicating they are permanently older than all active transactions.'
+        title: `3. VACUUM and Autovacuum`,
+        beginner: `VACUUM is the database cleanup command. It finds dead rows and marks their space as reusable. In real systems, an automatic background process usually handles this, but engineers still need to understand it.`,
+        advanced: `VACUUM reclaims space for future writes by updating visibility maps and free space maps. Autovacuum runs automatically based on thresholds. High-write tables often need aggressive per-table autovacuum tuning.`
+      },
+      {
+        title: `4. VACUUM versus VACUUM FULL`,
+        beginner: `Normal VACUUM cleans without stopping the world. VACUUM FULL rewrites the entire table to shrink the file, but it can lock the table and block traffic. Use FULL carefully.`,
+        advanced: `Standard VACUUM is non-blocking but does not always shrink the OS file. VACUUM FULL rewrites the relation and reclaims physical space, but requires exclusive access and can cause downtime. It is an emergency tool, not routine maintenance.`
       }
     ],
     practical: {
-      title: 'Reclaiming Disk Space',
-      intro:
-        'In this simulation, we have a sessions table where thousands of users have logged in and out, generating massive amounts of deleted rows (dead tuples). Your task is to execute the database maintenance command to sweep the database, rebuild the internal data structures, and free up the wasted space.',
+      title: `Reclaiming Disk Space`,
+      intro: `We have seeded a sessions table and deleted some rows to simulate dead tuples. Your task is to run the maintenance command that cleans up reusable space.`,
       steps: [
-        'Unlike SELECT or UPDATE, database administration commands are often single keywords.',
-        'Type the command VACUUM; to initiate the garbage collection sweep.',
-        'Note: In production PostgreSQL, you rarely run this manually as a background daemon named autovacuum handles it, but DBAs must know how to trigger it during emergencies.'
+        `In the query editor, write the single command: VACUUM.`,
+        `End with a semicolon.`,
+        `Run the command. You should see successful execution with no error message.`,
+        `Understand that in production PostgreSQL, autovacuum usually performs this work automatically.`
       ],
-      goal: 'Execute the VACUUM command to clear dead tuples and reclaim disk space.',
-      starterQuery: '-- Write your maintenance command here\n',
-      solutionQuery: 'VACUUM;',
-      seedSql: `CREATE TABLE sessions (id INTEGER PRIMARY KEY, user_id INTEGER, token TEXT); INSERT INTO sessions VALUES (1, 101, 'abc'); INSERT INTO sessions VALUES (2, 102, 'def'); INSERT INTO sessions VALUES (3, 103, 'ghi'); -- Simulate dead tuple creation DELETE FROM sessions WHERE id IN (1, 2);`
+      goal: `Execute VACUUM to clean dead tuples and maintain database health.`,
+      starterQuery: `-- Write your maintenance command here
+`,
+      solutionQuery: `VACUUM;`,
+      seedSql: `CREATE TABLE sessions (id INTEGER PRIMARY KEY, user_id INTEGER, token TEXT); INSERT INTO sessions VALUES (1, 101, 'abc'); INSERT INTO sessions VALUES (2, 102, 'def'); INSERT INTO sessions VALUES (3, 103, 'ghi'); DELETE FROM sessions WHERE id IN (1, 2);`
     },
     quiz: [
       {
-        question:
-          'Why does PostgreSQL leave "dead tuples" behind after an UPDATE or DELETE operation?',
+        question: `Why does PostgreSQL keep dead tuples after UPDATE or DELETE?`,
         options: [
-          'Because deleting data instantly would damage the hard drive',
-          'To support MVCC, ensuring other active transactions can still read the old version of the data without being locked out',
-          'Because SQL syntax does not have a permanent delete function',
-          'To automatically back up the data to the cloud'
+          `Because storage is free`,
+          `To support MVCC snapshots for active transactions`,
+          `Because DELETE is not real`,
+          `To speed up frontend rendering`
         ],
         correctIndex: 1,
-        explanation:
-          'MVCC avoids locking the database by keeping the old row (tuple) alive just in case another user is currently running a query that started before the data was changed.'
+        explanation: `MVCC requires old row versions so concurrent transactions can still see consistent snapshots. Dead tuples are not kept for frontend performance, and DELETE is real but version cleanup is delayed.`
       },
       {
-        question:
-          'What is the critical difference between a standard VACUUM and a VACUUM FULL in PostgreSQL?',
+        question: `What does standard VACUUM mainly do?`,
         options: [
-          'VACUUM FULL deletes the entire table; standard VACUUM only deletes empty rows',
-          'VACUUM runs on memory; VACUUM FULL runs on the hard drive',
-          'Standard VACUUM frees space for future database inserts without locking the table; VACUUM FULL rewrites the physical disk file to shrink its size but locks the table entirely',
-          'There is no functional difference'
+          `Deletes the database schema`,
+          `Reclaims space from dead tuples for future use`,
+          `Converts SQL into JSON`,
+          `Disables transactions`
         ],
-        correctIndex: 2,
-        explanation:
-          'Standard VACUUM is safe for production traffic because it just updates the Free Space Map. VACUUM FULL rewrites the table structure completely, locking out your backend API during the process.'
+        correctIndex: 1,
+        explanation: `VACUUM cleans dead tuple visibility and makes space reusable. It does not delete schemas, transform SQL into JSON, or disable ACID transactions.`
+      },
+      {
+        question: `What is autovacuum?`,
+        options: [
+          `A background process that automatically cleans and maintains tables`,
+          `A tool that deletes tables nightly`,
+          `A frontend cache cleaner`,
+          `A password rotation system`
+        ],
+        correctIndex: 0,
+        explanation: `Autovacuum automatically performs maintenance based on table activity. It prevents bloat from accumulating. It does not delete schemas or manage frontend caches.`
+      },
+      {
+        question: `What is a common sign of table bloat?`,
+        options: [
+          `Table size grows while row count stays stable and performance degrades`,
+          `The database becomes too small`,
+          `All queries return zero rows`,
+          `Indexes disappear automatically`
+        ],
+        correctIndex: 0,
+        explanation: `Bloat often appears as increasing storage usage and slower scans without a matching increase in live rows. It does not make queries return zero rows or delete indexes by itself.`
       }
     ],
     milestones: [
-      'Understand the mechanics of Multi-Version Concurrency Control (MVCC).',
-      'Identify database bloat caused by dead tuples during high-write operations.',
-      'Deploy the VACUUM command to maintain database health and Free Space Maps.',
-      'Comprehend the risks of Transaction ID Wraparound in extreme-scale systems.'
+      `Understand how MVCC enables concurrent reads and writes.`,
+      `Recognize dead tuples as the source of database bloat.`,
+      `Use VACUUM and understand autovacuum's role.`,
+      `Know when VACUUM FULL is appropriate and dangerous.`
     ]
   },
   {
-    id: 'sql-17',
+    id: `sql-17`,
     order: 17,
-    module: 'Database Administration & Scaling',
-    icon: '🗄️',
-    title: 'Table Partitioning',
-    philosophy:
-      'When a single table reaches billions of rows—like tracking 5 years of temperature sensors or financial ledgers—basic B-Tree indexes become massively bloated and slow. Deleting old data takes hours. To scale, DBAs use Table Partitioning: secretly slicing one massive logical table into dozens of smaller physical tables (like dividing by month or region) behind the scenes.',
+    module: `Database Administration & Scaling`,
+    icon: `🗄️`,
+    title: `Table Partitioning`,
+    philosophy: `At massive scale, one giant table becomes a liability. Indexes grow too large. Deletes take hours. Maintenance windows become impossible. Partitioning solves this by splitting one logical table into many smaller physical pieces. The application still sees one table, but the database can route queries, archive old data, and scan only relevant partitions. The golden rule: partitioning must match how queries actually filter data.`,
     concepts: [
       {
-        title: '1. What is Declarative Partitioning?',
-        beginner:
-          'Imagine keeping 10 years of tax receipts in one giant cardboard box. Finding one from 2019 is a nightmare. Partitioning is like buying a filing cabinet with a drawer for each year. Your application still just asks the database for "receipts", but the database engine automatically routes the data to the correct drawer.',
-        advanced:
-          'PostgreSQL Declarative Partitioning allows you to define a parent logical table that stores no data itself, and multiple child physical tables (partitions) that inherit the schema. The query planner automatically routes INSERTs to the correct physical heap based on predefined partition bounds.'
+        title: `1. Logical Parent, Physical Children`,
+        beginner: `A partitioned table looks like one table to your app, but underneath it is divided into pieces. For example, a logs table can have one partition for January and another for February.`,
+        advanced: `Declarative partitioning defines a parent relation with no data and child partitions that store rows. The planner routes inserts to the correct partition based on partition bounds and query predicates.`
       },
       {
-        title: '2. Partitioning Strategies (Range, List, Hash)',
-        beginner:
-          'You have to tell the database HOW to divide the data. "Range" splits data by numbers or dates (e.g., Jan, Feb, March). "List" splits data by exact categories (e.g., Store_NY, Store_LA). "Hash" splits data randomly but evenly across a set number of buckets to balance server load.',
-        advanced:
-          'Range partitioning is dominant for time-series data, allowing instant archival (dropping a partition is an O(1) metadata operation, whereas a massive DELETE is an O(N) WAL-heavy operation). Hash partitioning is used for evenly distributing heavily skewed tenant IDs across physical shards.'
+        title: `2. Range, List, and Hash Partitioning`,
+        beginner: `Range partitioning splits data by a range, often dates. List partitioning splits by exact values, like region. Hash partitioning spreads rows evenly across buckets.`,
+        advanced: `Range partitioning is ideal for time-series retention. List partitioning fits categorical tenancy or regional data. Hash partitioning balances load when no natural range or list dominates access patterns.`
       },
       {
-        title: '3. Partition Pruning',
-        beginner:
-          'The biggest speed boost comes from reading. If your backend asks for data from "March 2026", the database looks at your filing cabinet, completely ignores the other 11 drawers, and only searches the March drawer. This saves massive amounts of time.',
-        advanced:
-          'Partition Pruning occurs during the query planning phase. The PostgreSQL optimizer evaluates the WHERE clause against the partition boundary definitions. If the constraints prove a partition cannot contain matching rows, the planner entirely excludes that physical table from the execution node graph.'
+        title: `3. Partition Pruning`,
+        beginner: `If you ask for logs from March, the database can ignore all other months. This is called partition pruning. It is like searching only the correct drawer instead of the whole filing cabinet.`,
+        advanced: `Partition pruning occurs when the planner proves certain partitions cannot contain matching rows. Queries must include the partition key in WHERE clauses for pruning to work effectively.`
+      },
+      {
+        title: `4. Archival and Maintenance`,
+        beginner: `Deleting millions of old rows can be slow. With partitions, you can remove an entire old partition almost instantly. This makes data retention much easier.`,
+        advanced: `Dropping or detaching a partition is a metadata-level operation compared to massive DELETE writes. It avoids WAL amplification, vacuum overhead, and long locks. Automated partition creation and drop policies are essential for time-series systems.`
       }
     ],
     practical: {
-      title: 'Simulating Partition Routing',
-      intro:
-        "While SQLite does not have PostgreSQL's automatic declarative partitioning, DBAs used to simulate it manually (and still do in simpler DBs). We have created two physical child tables: logs_2025 and logs_2026. Your goal is to create a VIEW named all_logs that combines them using UNION ALL, effectively creating a single logical table your API can query.",
+      title: `Simulating Partition Routing`,
+      intro: `SQLite does not provide PostgreSQL declarative partitioning, but we can simulate a unified logical table. We have seeded two physical tables: logs_2025 and logs_2026. Your task is to create a view named all_logs that combines both tables using UNION ALL.`,
       steps: [
-        'Start with CREATE VIEW all_logs AS.',
-        'Write a query to select everything from the first partition: SELECT * FROM logs_2025.',
-        'Add the UNION ALL keyword to glue the next result set to the bottom of the first.',
-        'Write the query for the second partition: SELECT * FROM logs_2026.',
-        'End with a semicolon.'
+        `Start with CREATE VIEW all_logs AS.`,
+        `Write SELECT * FROM logs_2025.`,
+        `Add UNION ALL.`,
+        `Write SELECT * FROM logs_2026.`,
+        `End with a semicolon.`,
+        `Run the statement. Querying all_logs should show both System started and User login.`
       ],
-      goal: 'Construct a unified logical View that spans across multiple physical table partitions.',
-      starterQuery: 'CREATE VIEW all_logs AS\n',
-      solutionQuery:
-        'CREATE VIEW all_logs AS\nSELECT * FROM logs_2025\nUNION ALL\nSELECT * FROM logs_2026;',
+      goal: `Create a unified view that simulates a partitioned logical table.`,
+      starterQuery: `CREATE VIEW all_logs AS
+`,
+      solutionQuery: `CREATE VIEW all_logs AS
+SELECT * FROM logs_2025
+UNION ALL
+SELECT * FROM logs_2026;`,
       seedSql: `CREATE TABLE logs_2025 (id INTEGER PRIMARY KEY, msg TEXT, year INTEGER DEFAULT 2025); CREATE TABLE logs_2026 (id INTEGER PRIMARY KEY, msg TEXT, year INTEGER DEFAULT 2026); INSERT INTO logs_2025 VALUES (1, 'System started', 2025); INSERT INTO logs_2026 VALUES (2, 'User login', 2026);`
     },
     quiz: [
       {
-        question:
-          'What is the massive administrative benefit of using Range Partitioning for time-series logs?',
+        question: `Why is dropping a partition often better than deleting millions of rows?`,
         options: [
-          'It automatically translates timestamps into different timezones',
-          'Instead of running an expensive DELETE query to remove a billion old logs, you can instantly DROP the physical partition table containing that month',
-          'It forces the database to compress text files',
-          'It prevents hackers from reading time-based data'
+          `It can be much faster and avoids heavy write overhead`,
+          `It automatically encrypts the remaining data`,
+          `It converts the table into JSON`,
+          `It removes the need for indexes`
         ],
-        correctIndex: 1,
-        explanation:
-          'Dropping a physical partition is a virtually instantaneous file-system operation (O(1)), bypassing the massive MVCC bloat and transaction log overhead of running a standard DELETE query on billions of rows.'
+        correctIndex: 0,
+        explanation: `Dropping a partition removes a physical segment quickly, while DELETE must process each row and generate write overhead. It does not encrypt data, convert tables, or remove indexing needs.`
       },
       {
-        question: 'What is Partition Pruning?',
+        question: `What is partition pruning?`,
         options: [
-          'When the database automatically deletes old rows based on a timer',
-          'When the database compresses data to save hard drive space',
-          'When the query planner evaluates your WHERE clause and completely skips searching physical partitions that it knows cannot contain your target data',
-          'When a database administrator manually shuts down unused servers'
+          `The database skips partitions that cannot contain matching rows`,
+          `The database deletes duplicate rows automatically`,
+          `The database compresses old partitions`,
+          `The database converts partitions into views`
         ],
-        correctIndex: 2,
-        explanation:
-          'Partition pruning allows the database engine to completely ignore irrelevant physical tables, reducing disk I/O massively compared to scanning a single monolithic table.'
+        correctIndex: 0,
+        explanation: `Pruning allows the planner to ignore irrelevant partitions based on query filters. It does not delete duplicates, compress data, or transform partitions into views.`
+      },
+      {
+        question: `Why must queries usually filter by the partition key?`,
+        options: [
+          `So the database can prune irrelevant partitions`,
+          `So the database can rename the table`,
+          `So NULL values disappear`,
+          `So the frontend can cache data`
+        ],
+        correctIndex: 0,
+        explanation: `If the query does not reference the partition key, the planner may need to scan all partitions. Filtering by the partition key enables pruning and improves performance.`
+      },
+      {
+        question: `Which partition strategy is most natural for timestamp-based logs?`,
+        options: [
+          `Range partitioning by time`,
+          `Hash partitioning by password`,
+          `List partitioning by file extension`,
+          `No partitioning`
+        ],
+        correctIndex: 0,
+        explanation: `Time-series data is commonly partitioned by date or month ranges. This supports pruning and retention policies. Hashing passwords or listing file extensions does not match typical log access patterns.`
       }
     ],
     milestones: [
-      'Understand the physical limitations of monolithic tables at the billion-row scale.',
-      'Differentiate between Range, List, and Hash partitioning architectures.',
-      'Leverage partitioning for O(1) data archival and bulk deletion.',
-      'Appreciate how the query planner utilizes Partition Pruning for extreme performance.'
+      `Understand why monolithic tables struggle at large scale.`,
+      `Compare range, list, and hash partitioning.`,
+      `Use partition pruning to reduce scan volume.`,
+      `Archive old data efficiently by dropping partitions.`
     ]
   },
   {
-    id: 'sql-18',
+    id: `sql-18`,
     order: 18,
-    module: 'Database Administration & Scaling',
-    icon: '🧭',
-    title: 'Advanced Indexing (BRIN, GiST, pgvector)',
-    philosophy:
-      'A standard B-Tree index is perfect for sorting numbers or alphabetizing names. However, B-Trees fail completely if you need to search a map for "restaurants within 5 miles," search millions of documents for a specific paragraph, or find AI similarities. To reach true expert status, DBAs deploy specialized mathematical index structures built for specific data shapes.',
+    module: `Database Administration & Scaling`,
+    icon: `🧭`,
+    title: `Advanced Indexing (BRIN, GiST, pgvector)`,
+    philosophy: `Indexes are not one-size-fits-all. A B-Tree is excellent for exact matches, ranges, and sorting, but it is the wrong tool for geographic proximity, full-text search, or AI similarity search. Expert backend engineers choose index structures based on the shape of the data and the query pattern. The wrong index wastes memory. The right index makes impossible queries practical.`,
     concepts: [
       {
-        title: '1. BRIN (Block Range Indexes)',
-        beginner:
-          'If you have a billion rows of timestamped sensor data, a B-Tree index would be gigantic and consume all your server RAM. A BRIN index is like a cheat sheet. Instead of indexing every single row, it just remembers: "Page 1 contains dates from Jan 1 to Jan 5. Page 2 has Jan 6 to Jan 10." It is incredibly tiny and surprisingly fast.',
-        advanced:
-          'BRIN is designed for naturally correlated massive datasets. It stores the minimum and maximum values for contiguous physical disk blocks (pages). It sacrifices the exact precision of a B-Tree to achieve a footprint that is often 99% smaller, making it the industry standard for Petabyte-scale append-only logs.'
+        title: `1. B-Tree Strengths and Write Cost`,
+        beginner: `A normal index is like a book's index. It helps the database jump to the right place instead of reading every page. But every index also slows down writes a little because it must be updated too.`,
+        advanced: `B-Tree indexes support equality, range, and ordered scans. They are the default index type in many databases. However, each index increases write amplification and maintenance cost, so indexes should be designed from real query patterns.`
       },
       {
-        title: '2. GiST and Spatial Data (PostGIS)',
-        beginner:
-          'You cannot sort a 2D map on a 1D list. If Uber needs to find drivers near you, it uses a GiST index. GiST draws invisible "bounding boxes" around geographic areas. If you are searching in Manhattan, the index immediately discards the bounding box for Brooklyn, narrowing the search instantly.',
-        advanced:
-          'GiST (Generalized Search Tree) allows PostgreSQL to index complex data types like geometric shapes, IP subnets, and overlapping ranges. Paired with the PostGIS extension, it evaluates geometric overlaps (&&), distance boundaries, and polygon intersections at scale.'
+        title: `2. BRIN for Massive Ordered Data`,
+        beginner: `If you have billions of log rows sorted by time, a normal index can become huge. A BRIN index is smaller. It remembers rough ranges for blocks of data, like saying rows 1 to 1000 are from January.`,
+        advanced: `BRIN indexes store summary information for physical block ranges. They work best when data is naturally correlated with physical order, such as append-only timestamp logs. They sacrifice precision for a tiny footprint.`
       },
       {
-        title: '3. AI and pgvector (HNSW)',
-        beginner:
-          'Artificial Intelligence converts concepts (like sentences or images) into massive lists of numbers called vectors. To find "similar" concepts, you must calculate the distance between these lists. Modern databases use special HNSW indexes to map these vectors into 3D space and quickly navigate to the closest matches.',
-        advanced:
-          'The pgvector extension introduces vector types to PostgreSQL. Standard exact-nearest-neighbor (KNN) searches require scanning every row. To scale AI RAG (Retrieval-Augmented Generation) pipelines, DBAs deploy HNSW (Hierarchical Navigable Small World) indexes, an approximate nearest-neighbor graph algorithm that trades a tiny bit of accuracy for massive speed.'
+        title: `3. GiST for Spatial and Complex Data`,
+        beginner: `Maps cannot be searched like alphabetized names. To find nearby drivers or overlapping regions, databases use spatial indexes. GiST helps organize shapes, boxes, and locations.`,
+        advanced: `GiST supports geometric and range-based data types. With extensions like PostGIS, it powers proximity queries, bounding-box overlap, and polygon intersection. It is essential for location-based backends.`
+      },
+      {
+        title: `4. Inverted Indexes and Approximate Search`,
+        beginner: `Full-text search needs a word map: for each word, store where it appears. That is an inverted index. AI similarity search uses a different trick: vector indexes find nearby points in high-dimensional space.`,
+        advanced: `Full-text engines use inverted indexes for term lookup and ranking. Vector extensions use ANN indexes such as HNSW to approximate nearest neighbors. These structures trade exactness for massive speed in search and AI workloads.`
       }
     ],
     practical: {
-      title: 'Full-Text Search Indexing',
-      intro:
-        'While we cannot run a spatial GiST index in this browser, we can simulate another advanced index type: Full-Text Search. A B-Tree cannot quickly find a word buried inside a paragraph. We have created an SQLite FTS5 virtual table (an advanced inverted index) named documents. Find the title of any document that contains the word "database".',
+      title: `Full-Text Search Indexing`,
+      intro: `We have seeded an SQLite FTS5 virtual table named documents. It uses an inverted index for full-text search. Your task is to find the title of the document containing the word database.`,
       steps: [
-        'Select the title column.',
-        'Target the specialized documents table.',
-        'Instead of using WHERE text = ... or a slow LIKE, use the specialized MATCH operator.',
-        "Write your filter as: WHERE documents MATCH 'database'.",
-        'End with a semicolon.'
+        `Select the title column from documents.`,
+        `Use WHERE to filter the documents table.`,
+        `Use the MATCH operator instead of LIKE.`,
+        `Write documents MATCH 'database'.`,
+        `Run the query. You should see SQL Guide returned.`
       ],
-      goal: 'Query an advanced inverted index to perform high-speed full-text substring search.',
-      starterQuery:
-        '-- Write your query here using the MATCH operator\nSELECT title FROM documents WHERE ',
-      solutionQuery:
-        "SELECT title FROM documents WHERE documents MATCH 'database';",
-      seedSql: `-- SQLite specific advanced indexing (FTS5 extension) CREATE VIRTUAL TABLE documents USING fts5(title, content); INSERT INTO documents VALUES ('SQL Guide', 'A database is a fortress of integrity.'); INSERT INTO documents VALUES ('CSS Tips', 'Learn to style web pages beautifully.'); INSERT INTO documents VALUES ('Nodejs Intro', 'Build backend servers easily.');`
+      goal: `Query a full-text index using MATCH instead of slow substring search.`,
+      starterQuery: `-- Write your query here using the MATCH operator
+SELECT title FROM documents WHERE `,
+      solutionQuery: `SELECT title FROM documents WHERE documents MATCH 'database';`,
+      seedSql: `CREATE VIRTUAL TABLE documents USING fts5(title, content); INSERT INTO documents VALUES ('SQL Guide', 'A database is a fortress of integrity.'); INSERT INTO documents VALUES ('CSS Tips', 'Learn to style web pages beautifully.'); INSERT INTO documents VALUES ('Nodejs Intro', 'Build backend servers easily.');`
     },
     quiz: [
       {
-        question:
-          'When should a DBA choose a BRIN index over a standard B-Tree index?',
+        question: `When is a BRIN index often a better choice than a normal B-Tree index?`,
         options: [
-          'When indexing text columns for autocomplete features',
-          'When indexing AI embedding vectors',
-          'When indexing massive, naturally ordered time-series data (like logs) where saving RAM and disk space is prioritized over exact precision',
-          'When the database is hosted on a Windows server'
+          `For massive append-only tables where data is naturally ordered by time`,
+          `For tiny tables with five rows`,
+          `For password encryption`,
+          `For frontend routing`
         ],
-        correctIndex: 2,
-        explanation:
-          "BRIN is heavily utilized on massive append-only tables (like logs or IoT metrics). Because the data is naturally sorted by time, BRIN's block-range summaries can skip 99% of the table while taking up almost zero RAM."
+        correctIndex: 0,
+        explanation: `BRIN shines on huge, naturally ordered datasets like logs or time-series tables. It keeps index size small. It is not for encryption or frontend routing, and tiny tables rarely need specialized indexes.`
       },
       {
-        question:
-          'What is the primary function of a GiST index in a system like PostGIS?',
+        question: `What kind of queries does GiST help with?`,
         options: [
-          'To encrypt user passwords dynamically',
-          'To efficiently query two-dimensional spatial data, overlapping bounding boxes, and geometric shapes',
-          'To translate foreign languages via AI',
-          'To enforce multi-tenant Row-Level Security'
+          `Spatial, geometric, and range-overlap queries`,
+          `Only alphabetical sorting`,
+          `Only integer addition`,
+          `Only JSON pretty printing`
         ],
-        correctIndex: 1,
-        explanation:
-          'GiST (Generalized Search Tree) handles multidimensional data that B-Trees cannot process, making it the backbone of geospatial applications, mapping services, and range-overlap tracking.'
+        correctIndex: 0,
+        explanation: `GiST supports complex data shapes such as geometry and ranges. It is commonly used for geographic search and overlap checks. It is not limited to simple sorting or arithmetic.`
+      },
+      {
+        question: `Why is MATCH better than LIKE for full-text search?`,
+        options: [
+          `It uses an inverted index built for word lookup`,
+          `It deletes duplicate documents`,
+          `It converts text into images`,
+          `It automatically translates languages`
+        ],
+        correctIndex: 0,
+        explanation: `MATCH queries full-text structures that map words to documents. LIKE with wildcards often scans text inefficiently. MATCH does not delete documents or translate content.`
+      },
+      {
+        question: `What tradeoff do approximate vector indexes like HNSW make?`,
+        options: [
+          `They give very fast similarity search while accepting slight approximation`,
+          `They guarantee perfect results but are always slow`,
+          `They remove the need for embeddings`,
+          `They only work with text files`
+        ],
+        correctIndex: 0,
+        explanation: `ANN indexes such as HNSW prioritize speed for nearest-neighbor search. They may return approximate results instead of exact neighbors. They still require embeddings and work with vector data, not just raw text files.`
       }
     ],
     milestones: [
-      'Understand the limitations of B-Tree structures on massive or multidimensional data.',
-      'Deploy BRIN indexes to optimize massive time-series logging tables.',
-      'Appreciate the role of GiST and PostGIS in modern mapping and spatial backends.',
-      'Recognize how pgvector and HNSW indexes power AI similarity search natively inside PostgreSQL.'
+      `Match index types to query patterns.`,
+      `Understand B-Tree write amplification.`,
+      `Use BRIN for large time-series workloads.`,
+      `Understand GiST, inverted indexes, and vector indexes for advanced search.`
+    ]
+  },
+
+  {
+    id: `sql-19`,
+    order: 19,
+    module: `Backend Data Architecture`,
+    icon: `🧱`,
+    title: `Normalization & Schema Design`,
+    philosophy: `A database schema is not just storage; it is the blueprint that protects your application from duplicated, inconsistent, and contradictory data. Professional backend engineers do not merely write queries; they design relationships so that each fact lives in exactly one place. Normalization is the discipline of organizing columns and tables to reduce redundancy, prevent update anomalies, and make future changes safer.`,
+    concepts: [
+      {
+        title: `1. Why Normalization Exists`,
+        beginner: `Imagine storing a customer's address on every single order they ever placed. If that customer moves, you must update every order row. If you miss one, your data disagrees with itself. Normalization prevents this by storing the customer address once and referencing it from orders.`,
+        advanced: `Normalization eliminates update, insert, and delete anomalies by decomposing relations into smaller tables with well-defined keys and dependencies. Instead of repeating mutable facts, the schema stores them once and uses foreign keys to reference them. This reduces write amplification and prevents inconsistent application state.`
+      },
+      {
+        title: `2. First, Second, and Third Normal Form`,
+        beginner: `First Normal Form means each column holds one value, not a list. Second Normal Form means every column depends on the whole primary key, not just part of it. Third Normal Form means non-key columns should not depend on other non-key columns.`,
+        advanced: `1NF enforces atomicity of column values. 2NF removes partial dependencies on composite keys. 3NF removes transitive dependencies, meaning non-key attributes must depend only on the primary key. In production schema design, 3NF is often the baseline for transactional tables.`
+      },
+      {
+        title: `3. Many-to-Many Relationships and Junction Tables`,
+        beginner: `A student can take many courses, and a course can have many students. You cannot store that cleanly in one table. Instead, you create a linking table, often called a junction table, with one row for each enrollment.`,
+        advanced: `A junction table resolves many-to-many relationships by storing pairs of foreign keys. It usually has a composite primary key, such as student_id and course_id, preventing duplicate relationships. Additional relationship metadata, like enrolled_at, can also be stored on the junction table.`
+      },
+      {
+        title: `4. Controlled Denormalization`,
+        beginner: `Sometimes, reading data is more important than perfectly avoiding duplication. For example, an analytics dashboard may need a summary table that is faster to read. That is called denormalization. The dangerous part is letting the duplicated data become stale.`,
+        advanced: `Denormalization intentionally duplicates or precomputes data to improve read performance. It is acceptable when the write path maintains consistency through constraints, triggers, materialized views, or application-level synchronization. Without controlled refresh logic, denormalized tables become a source of silent data corruption.`
+      }
+    ],
+    practical: {
+      title: `Modeling Many-to-Many Enrollments`,
+      intro: `We have seeded two tables: students and courses. Your task is to create a junction table named student_courses that links students to courses. The table must prevent duplicate enrollments for the same student and course pair.`,
+      steps: [
+        `Start with: CREATE TABLE student_courses (.`,
+        `Add a column named student_id with type INTEGER and NOT NULL.`,
+        `Add a column named course_id with type INTEGER and NOT NULL.`,
+        `Add foreign key references to students(id) and courses(id).`,
+        `Add a composite primary key using both student_id and course_id.`,
+        `Close the statement with ); and run it. You should see a new table created with no error output.`
+      ],
+      goal: `Create a junction table that safely models a many-to-many relationship between students and courses.`,
+      starterQuery: `CREATE TABLE student_courses (\n  -- Define columns and constraints here\n`,
+      solutionQuery: `CREATE TABLE student_courses (\n  student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,\n  course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,\n  PRIMARY KEY (student_id, course_id)\n);`,
+      seedSql: `CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL); CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT NOT NULL); INSERT INTO students VALUES (1, 'Alice'); INSERT INTO students VALUES (2, 'Bob'); INSERT INTO courses VALUES (10, 'SQL Foundations'); INSERT INTO courses VALUES (20, 'Backend Architecture');`
+    },
+    quiz: [
+      {
+        question: `What problem does normalization primarily solve?`,
+        options: [
+          `It reduces redundant data and prevents inconsistent updates`,
+          `It encrypts sensitive database columns`,
+          `It automatically creates indexes for every column`,
+          `It compresses disk storage to save cloud costs`
+        ],
+        correctIndex: 0,
+        explanation: `Normalization stores each fact in the appropriate place so updates happen once instead of in many duplicated rows. Encryption is a security concern, indexes are performance structures, and compression is storage optimization; none of those are the primary purpose of normalization.`
+      },
+      {
+        question: `Which structure best models a many-to-many relationship between students and courses?`,
+        options: [
+          `Add a course_id column directly to the students table`,
+          `Add a student_id column directly to the courses table`,
+          `Create a junction table containing student_id and course_id`,
+          `Merge students and courses into one wide table`
+        ],
+        correctIndex: 2,
+        explanation: `A junction table stores each relationship pair as its own row. Putting one foreign key inside the other table only models one-to-many relationships, and merging tables creates duplication and update anomalies.`
+      },
+      {
+        question: `Which situation violates Third Normal Form?`,
+        options: [
+          `A column contains only one value per row`,
+          `A non-key column depends on another non-key column`,
+          `Every row has a unique primary key`,
+          `A foreign key references a parent table`
+        ],
+        correctIndex: 1,
+        explanation: `Third Normal Form requires non-key columns to depend directly on the primary key, not on other non-key columns. Unique keys, atomic values, and foreign keys are normal relational features and do not violate 3NF by themselves.`
+      },
+      {
+        question: `When is denormalization acceptable in professional systems?`,
+        options: [
+          `Whenever developers want to avoid writing JOINs`,
+          `When read performance is critical and consistency is maintained by controlled refresh or write logic`,
+          `When the database has too many tables`,
+          `When the frontend application needs direct database access`
+        ],
+        correctIndex: 1,
+        explanation: `Denormalization is a deliberate performance trade-off. It is acceptable when reads dominate and the system has reliable logic to keep duplicated data consistent. Avoiding JOINs alone is not a safe reason if it creates silent inconsistency.`
+      }
+    ],
+    milestones: [
+      `Understand why normalization prevents duplicated and contradictory data.`,
+      `Recognize the practical meaning of 1NF, 2NF, and 3NF.`,
+      `Model many-to-many relationships using junction tables.`,
+      `Apply denormalization only with controlled consistency mechanisms.`
+    ]
+  },
+  {
+    id: `sql-20`,
+    order: 20,
+    module: `Advanced Query Patterns`,
+    icon: `🧩`,
+    title: `Advanced JOINs & Set Operations`,
+    philosophy: `Basic JOINs connect two different tables, but professional SQL often requires more powerful patterns: joining a table to itself, combining result sets, finding differences between datasets, and generating controlled combinations. Mastering these patterns turns SQL from a simple lookup tool into a full relational reasoning engine.`,
+    concepts: [
+      {
+        title: `1. Self Joins`,
+        beginner: `Sometimes one table contains a relationship to itself. For example, an employees table can have a manager_id column that points to another employee. To show each employee with their manager, you join the employees table to itself using two different table aliases.`,
+        advanced: `A self join treats the same table as two logical relations by assigning aliases. The join condition usually compares a child row's foreign key to the parent row's primary key. Self joins are common for adjacency-list hierarchies, such as employees, categories, or threaded comments.`
+      },
+      {
+        title: `2. CROSS JOIN`,
+        beginner: `A CROSS JOIN combines every row from the first table with every row from the second table. If you have 3 sizes and 4 colors, a CROSS JOIN gives you 12 combinations. It is useful, but dangerous if the tables are large.`,
+        advanced: `CROSS JOIN produces the Cartesian product of two relations. It is useful for generating test matrices, calendar grids, or combinatorial option sets. However, without careful filtering, result size grows multiplicatively and can overwhelm memory and network resources.`
+      },
+      {
+        title: `3. UNION and UNION ALL`,
+        beginner: `UNION stacks the results of two queries on top of each other. UNION removes duplicate rows, while UNION ALL keeps every row. If you do not need duplicates removed, UNION ALL is usually faster.`,
+        advanced: `UNION performs set union and eliminates duplicates, which often requires sorting or hashing. UNION ALL simply appends result sets and avoids duplicate elimination. Both queries must produce compatible column counts and types.`
+      },
+      {
+        title: `4. INTERSECT and EXCEPT`,
+        beginner: `INTERSECT returns only rows that appear in both queries. EXCEPT returns rows from the first query that do not appear in the second query. Think of INTERSECT as “what they share” and EXCEPT as “what is only in the first list.”`,
+        advanced: `INTERSECT computes the relational intersection, while EXCEPT computes the relational difference. These operators are useful for reconciliation, diffing datasets, and identifying missing records. NULL values are treated as equal for set-operation comparison purposes in standard SQL set semantics.`
+      }
+    ],
+    practical: {
+      title: `Displaying Employees and Their Managers`,
+      intro: `We have seeded an employees table where each employee may have a manager_id pointing to another employee. Your task is to write a self join that shows each employee's name next to their manager's name. If an employee has no manager, display No Manager.`,
+      steps: [
+        `Select e.name and alias it as employee.`,
+        `Use COALESCE(m.name, 'No Manager') and alias it as manager.`,
+        `Start from employees e.`,
+        `LEFT JOIN employees m using the condition e.manager_id = m.id.`,
+        `Run the query. You should see every employee listed, including the top-level person with No Manager.`
+      ],
+      goal: `Use a self join to reconstruct an organizational hierarchy from a single employees table.`,
+      starterQuery: `-- Write your self join here\nSELECT `,
+      solutionQuery: `SELECT e.name AS employee, COALESCE(m.name, 'No Manager') AS manager\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.id;`,
+      seedSql: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT NOT NULL, manager_id INTEGER); INSERT INTO employees VALUES (1, 'Diana', NULL); INSERT INTO employees VALUES (2, 'Bob', 1); INSERT INTO employees VALUES (3, 'Grace', 2); INSERT INTO employees VALUES (4, 'Evan', 3);`
+    },
+    quiz: [
+      {
+        question: `Why are aliases required when joining a table to itself?`,
+        options: [
+          `They let the database treat the same table as two separate logical sources`,
+          `They encrypt the table name from external users`,
+          `They automatically improve JOIN performance`,
+          `They convert NULL values into empty strings`
+        ],
+        correctIndex: 0,
+        explanation: `A self join needs two distinct relation names so columns can be qualified as child columns and parent columns. Aliases do not encrypt data, do not automatically improve performance, and do not change NULL behavior.`
+      },
+      {
+        question: `What is the main difference between UNION and UNION ALL?`,
+        options: [
+          `UNION works only with numbers; UNION ALL works only with text`,
+          `UNION removes duplicate rows; UNION ALL keeps all rows including duplicates`,
+          `UNION ALL sorts results automatically; UNION does not`,
+          `UNION ALL requires matching table names; UNION does not`
+        ],
+        correctIndex: 1,
+        explanation: `UNION performs duplicate elimination, while UNION ALL simply concatenates compatible result sets. Sorting is controlled by ORDER BY, and neither operator requires the underlying table names to match.`
+      },
+      {
+        question: `What result does a CROSS JOIN produce?`,
+        options: [
+          `Only matching rows based on a shared key`,
+          `All rows from the left table and NULLs from the right table`,
+          `Every possible combination of rows from both tables`,
+          `A temporary view stored permanently on disk`
+        ],
+        correctIndex: 2,
+        explanation: `CROSS JOIN returns the Cartesian product: each row from the first table paired with every row from the second table. It does not require a matching condition and does not create a permanent view.`
+      },
+      {
+        question: `What does EXCEPT return in SQL?`,
+        options: [
+          `Rows that appear in both queries`,
+          `Rows from the first query that do not appear in the second query`,
+          `Rows from the second query that do not appear in the first query`,
+          `All rows from both queries with duplicates removed`
+        ],
+        correctIndex: 1,
+        explanation: `EXCEPT returns the difference from the first result set minus the second result set. INTERSECT returns shared rows, and UNION combines result sets rather than subtracting them.`
+      }
+    ],
+    milestones: [
+      `Use self joins to model hierarchical relationships inside one table.`,
+      `Understand when CROSS JOIN is useful and when it is dangerous.`,
+      `Combine result sets using UNION and UNION ALL.`,
+      `Compare datasets using INTERSECT and EXCEPT.`
+    ]
+  },
+  {
+    id: `sql-21`,
+    order: 21,
+    module: `Advanced Query Patterns`,
+    icon: `🌳`,
+    title: `Recursive CTEs & Hierarchical Data`,
+    philosophy: `Many real-world datasets are trees: organizational charts, comment threads, file systems, product categories, and dependency graphs. Ordinary JOINs cannot walk an unknown number of levels. Recursive Common Table Expressions give SQL the ability to repeat a query step until the entire branch or tree has been traversed.`,
+    concepts: [
+      {
+        title: `1. The Anchor and Recursive Members`,
+        beginner: `A recursive CTE has two parts. The first part chooses the starting row, like one employee. The second part repeatedly finds the next related row, like that employee's manager, until there are no more rows to find.`,
+        advanced: `A recursive CTE consists of an anchor query and a recursive query combined with UNION or UNION ALL. The anchor seeds the working table. The recursive member joins the working table back to the base table, producing new rows until the recursive member returns an empty set.`
+      },
+      {
+        title: `2. Traversing Hierarchies`,
+        beginner: `If each employee has a manager_id, you can start with one employee and keep joining to the manager until you reach the top boss. This lets you display the full management chain for any person.`,
+        advanced: `Recursive CTEs are commonly used with adjacency-list models, where each row contains a parent reference. The recursive query joins child rows to parent rows and can accumulate depth, paths, or totals as it walks the hierarchy.`
+      },
+      {
+        title: `3. Building Paths and Depth`,
+        beginner: `While walking up a tree, you can carry extra information. For example, you can build a text path like “Evan > Grace > Bob > Diana” or count how many levels you climbed.`,
+        advanced: `Recursive CTEs can project accumulated state columns, such as path strings, depth counters, or running sums. This avoids client-side traversal and keeps graph-walking logic declarative inside the database engine.`
+      },
+      {
+        title: `4. Safety: Termination, Limits, and Cycles`,
+        beginner: `If data contains a loop, like Alice manages Bob and Bob manages Alice, a recursive query could run forever. Real systems prevent this by limiting depth or detecting rows that have already been visited.`,
+        advanced: `Recursive CTEs must terminate. In production, engineers add depth limits, use UNION to suppress duplicates, or maintain visited-path logic to prevent cycles. Indexes on parent foreign keys reduce recursive lookup cost.`
+      }
+    ],
+    practical: {
+      title: `Walking Up an Organizational Chart`,
+      intro: `We have seeded an employees table with manager_id values. Your task is to use a recursive CTE to start with employee id 4 and walk upward through managers until reaching the employee with no manager. The final output should be the full management chain path.`,
+      steps: [
+        `Use WITH RECURSIVE to create a CTE named chain.`,
+        `Make the anchor query select the employee where id = 4.`,
+        `Include a path column that starts with the employee name.`,
+        `In the recursive member, join employees to chain using employees.id = chain.manager_id.`,
+        `Append each manager name to the path.`,
+        `Select the final path where manager_id IS NULL. You should see a path from Evan up to Diana.`
+      ],
+      goal: `Use a recursive CTE to traverse an employee hierarchy from a child employee up to the top-level manager.`,
+      starterQuery: `WITH RECURSIVE chain(id, name, manager_id, path) AS (\n  -- Anchor and recursive members here\n)\nSELECT path FROM chain WHERE manager_id IS NULL;`,
+      solutionQuery: `WITH RECURSIVE chain(id, name, manager_id, path) AS (\n  SELECT id, name, manager_id, name\n  FROM employees\n  WHERE id = 4\n  UNION ALL\n  SELECT e.id, e.name, e.manager_id, c.path || ' > ' || e.name\n  FROM employees e\n  JOIN chain c ON e.id = c.manager_id\n)\nSELECT path FROM chain WHERE manager_id IS NULL;`,
+      seedSql: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT NOT NULL, manager_id INTEGER); INSERT INTO employees VALUES (1, 'Diana', NULL); INSERT INTO employees VALUES (2, 'Bob', 1); INSERT INTO employees VALUES (3, 'Grace', 2); INSERT INTO employees VALUES (4, 'Evan', 3);`
+    },
+    quiz: [
+      {
+        question: `What are the two main parts of a recursive CTE?`,
+        options: [
+          `A CREATE part and a DROP part`,
+          `An anchor query and a recursive query`,
+          `A WHERE part and a HAVING part`,
+          `A primary key and a foreign key`
+        ],
+        correctIndex: 1,
+        explanation: `Recursive CTEs need an anchor to define the starting rows and a recursive member that repeatedly joins back to the working result. CREATE/DROP, WHERE/HAVING, and keys are unrelated to the structural definition of recursion.`
+      },
+      {
+        question: `What naturally stops a recursive CTE from continuing forever?`,
+        options: [
+          `The database automatically stops after one row`,
+          `The recursive member returns no new rows`,
+          `The COMMIT command closes the recursion`,
+          `The ORDER BY clause finalizes the loop`
+        ],
+        correctIndex: 1,
+        explanation: `Recursion stops when the recursive query produces an empty result set. COMMIT, ORDER BY, and row limits do not define recursive termination by themselves.`
+      },
+      {
+        question: `Why should the parent column, such as manager_id, usually be indexed?`,
+        options: [
+          `It encrypts hierarchical data`,
+          `It helps the database quickly locate parent rows during recursive joins`,
+          `It automatically removes duplicate employees`,
+          `It converts text paths into integers`
+        ],
+        correctIndex: 1,
+        explanation: `Recursive joins repeatedly look up parent rows. An index on the parent foreign key allows the engine to find parents quickly instead of scanning the whole table on each recursive step.`
+      },
+      {
+        question: `What risk is introduced if hierarchical data contains a cycle?`,
+        options: [
+          `The recursive query may loop excessively or infinitely unless protected`,
+          `The table automatically deletes itself`,
+          `The database converts the cycle into NULL values`,
+          `The primary key becomes duplicated automatically`
+        ],
+        correctIndex: 0,
+        explanation: `A cycle means the recursive member can keep finding related rows forever. Engineers guard against this with depth limits, cycle detection, or duplicate suppression. Cycles do not delete tables or automatically duplicate primary keys.`
+      }
+    ],
+    milestones: [
+      `Understand the anchor and recursive members of a recursive CTE.`,
+      `Traverse adjacency-list hierarchies using SQL.`,
+      `Accumulate paths or depth while walking recursive data.`,
+      `Protect recursive queries from infinite loops and poor performance.`
+    ]
+  },
+  {
+    id: `sql-22`,
+    order: 22,
+    module: `Data Integrity & Constraints`,
+    icon: `🔒`,
+    title: `CHECK, Foreign Keys & Safe Deletes`,
+    philosophy: `A professional database does not merely store data; it refuses bad data. Constraints are the database's immune system. They stop invalid values, protect relationships between tables, and define what should happen when parent records are deleted. When integrity is enforced at the database layer, the entire backend becomes safer.`,
+    concepts: [
+      {
+        title: `1. CHECK Constraints`,
+        beginner: `A CHECK constraint is like a bouncer. It checks a rule before allowing a row to be saved. For example, an order total should never be negative, so you can require total >= 0.`,
+        advanced: `A CHECK constraint defines a boolean predicate that must evaluate to true or unknown for every row. If the predicate fails, the write is rejected. CHECK constraints are ideal for domain-level validation such as non-negative amounts, valid ranges, and allowed states.`
+      },
+      {
+        title: `2. Foreign Key Referential Actions`,
+        beginner: `When a parent row is deleted, the database must know what to do with related child rows. For example, if a customer is deleted, should their orders be deleted too, blocked, or set to anonymous? Foreign key actions define this behavior.`,
+        advanced: `Foreign keys can define referential actions such as CASCADE, SET NULL, RESTRICT, and NO ACTION. CASCADE deletes child rows automatically. SET NULL clears the foreign key. RESTRICT prevents deletion if children exist. Choosing the correct action is a critical data-modeling decision.`
+      },
+      {
+        title: `3. Table-Level Constraints`,
+        beginner: `Some rules involve more than one column. For example, a reservation might need to be unique for a room and a date together. Instead of putting the rule on one column, you define it at the table level.`,
+        advanced: `Table-level constraints can reference multiple columns and are declared after column definitions. Composite primary keys, composite unique constraints, and multi-column CHECK constraints allow the schema to express complex business rules directly.`
+      },
+      {
+        title: `4. Integrity Failures Are Safety Features`,
+        beginner: `If the database rejects your INSERT or UPDATE, that is usually good. It means the database stopped bad data from entering. Backend code should handle these errors cleanly instead of bypassing the rules.`,
+        advanced: `Constraint violations are transactional guardrails. In strict systems, a failed constraint aborts the statement or transaction, preventing partial corruption. Backend APIs should catch integrity errors and translate them into meaningful validation responses.`
+      }
+    ],
+    practical: {
+      title: `Creating an Order Table with Protective Constraints`,
+      intro: `We have seeded a customers table. Your task is to create an orders table with three rules: every order must reference a customer, deleting a customer should cascade to their orders, and the order total must never be negative.`,
+      steps: [
+        `Start with: CREATE TABLE orders (.`,
+        `Define id INTEGER PRIMARY KEY.`,
+        `Define customer_id INTEGER NOT NULL and reference customers(id).`,
+        `Add ON DELETE CASCADE to the customer_id foreign key.`,
+        `Define total REAL with CHECK (total >= 0).`,
+        `Close with ); and run the statement. You should see the table created successfully.`
+      ],
+      goal: `Create a constrained orders table that enforces referential integrity and prevents negative totals.`,
+      starterQuery: `CREATE TABLE orders (\n  -- Define columns and constraints here\n`,
+      solutionQuery: `CREATE TABLE orders (\n  id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,\n  total REAL CHECK (total >= 0)\n);`,
+      seedSql: `CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT NOT NULL); INSERT INTO customers VALUES (1, 'Alice'); INSERT INTO customers VALUES (2, 'Bob');`
+    },
+    quiz: [
+      {
+        question: `What does a CHECK constraint do?`,
+        options: [
+          `It validates rows against a rule before allowing the write`,
+          `It automatically creates an index on the column`,
+          `It converts NULL values into default values`,
+          `It grants read access to external applications`
+        ],
+        correctIndex: 0,
+        explanation: `CHECK constraints enforce a boolean rule on row values. They are not indexes, they do not transform NULLs, and they do not manage permissions.`
+      },
+      {
+        question: `What happens when a parent row is deleted with ON DELETE CASCADE?`,
+        options: [
+          `Child rows are automatically deleted`,
+          `Child rows are converted to empty strings`,
+          `The deletion is blocked forever`,
+          `The database creates a backup table automatically`
+        ],
+        correctIndex: 0,
+        explanation: `CASCADE propagates deletion to dependent child rows. RESTRICT or NO ACTION would block the delete, while SET NULL would clear the foreign key instead of deleting children.`
+      },
+      {
+        question: `Which referential action prevents deleting a parent row if child rows still reference it?`,
+        options: [
+          `CASCADE`,
+          `RESTRICT`,
+          `SET NULL`,
+          `UNION`
+        ],
+        correctIndex: 1,
+        explanation: `RESTRICT blocks deletion when related child rows exist. CASCADE deletes children, SET NULL clears the child reference, and UNION is a set operation unrelated to foreign keys.`
+      },
+      {
+        question: `Where are multi-column constraints usually defined?`,
+        options: [
+          `At the table level, after the column definitions`,
+          `Inside the frontend JavaScript only`,
+          `Inside the database connection string`,
+          `Only inside temporary views`
+        ],
+        correctIndex: 0,
+        explanation: `Multi-column constraints, such as composite primary keys or multi-column checks, are declared at the table level. Frontend validation is helpful but cannot replace database-enforced integrity.`
+      }
+    ],
+    milestones: [
+      `Use CHECK constraints to enforce domain rules.`,
+      `Understand foreign key actions such as CASCADE and RESTRICT.`,
+      `Model safe deletion behavior between parent and child tables.`,
+      `Treat constraint violations as protective failures, not annoyances.`
+    ]
+  },
+  {
+    id: `sql-23`,
+    order: 23,
+    module: `Auditing & Temporal Data`,
+    icon: `🕰️`,
+    title: `Temporal Data & Audit Trails`,
+    philosophy: `In serious backend systems, knowing what changed is as important as knowing what is true. Users update profiles, orders change status, and administrators modify sensitive records. Audit trails and temporal patterns let engineers answer: who changed what, when did it change, and what was the previous value?`,
+    concepts: [
+      {
+        title: `1. Timestamps and Default Values`,
+        beginner: `Every important record should have timestamps. A created_at column records when the row was born. An updated_at column records when it last changed. Databases can fill these automatically.`,
+        advanced: `Temporal columns should use consistent time representations, preferably UTC. DEFAULT CURRENT_TIMESTAMP or equivalent database functions reduce reliance on application code and make the storage layer self-documenting.`
+      },
+      {
+        title: `2. Audit Tables`,
+        beginner: `An audit table is like a diary for your database. Instead of changing the original record and forgetting the old value, the system writes a history row whenever something important changes.`,
+        advanced: `Audit tables store historical state outside the live row. They are usually append-only and may record the entity id, old values, new values, actor identifier, and timestamp. Append-only design protects the audit trail from tampering.`
+      },
+      {
+        title: `3. Trigger-Based Auditing`,
+        beginner: `A trigger can watch for UPDATE or DELETE actions. When a row changes, the trigger automatically copies the old data into the audit table. This means developers do not have to remember to log every change manually.`,
+        advanced: `Database triggers execute within the same transaction as the data modification. This guarantees that if the main write succeeds, the audit write succeeds too, and if the transaction fails, both are rolled back together.`
+      },
+      {
+        title: `4. Valid Time Versus Transaction Time`,
+        beginner: `There are two kinds of time. Transaction time is when the database recorded the change. Valid time is when the change was supposed to become true in the real world. For example, a subscription may be recorded today but start next month.`,
+        advanced: `Transaction-time modeling records when facts were known to the database. Valid-time modeling records when facts are true in the business domain. Full bi-temporal systems track both, enabling historical queries such as “what did we believe on a given date?”`
+      }
+    ],
+    practical: {
+      title: `Automatically Logging Document Changes`,
+      intro: `We have seeded a documents table and an empty documents_history table. Your task is to create a trigger named documents_update_history. Whenever a document is updated, the trigger should insert the old title and new title into documents_history.`,
+      steps: [
+        `Write: CREATE TRIGGER documents_update_history.`,
+        `Specify: AFTER UPDATE ON documents.`,
+        `Open the trigger body with BEGIN.`,
+        `Insert into documents_history using OLD.id, OLD.title, and NEW.title.`,
+        `Use CURRENT_TIMESTAMP for changed_at.`,
+        `Close with END; and run the trigger. You should see the trigger created with no error.`
+      ],
+      goal: `Create an automated audit trigger that records document title changes into a history table.`,
+      starterQuery: `CREATE TRIGGER documents_update_history AFTER UPDATE ON documents BEGIN\n  -- Insert audit row here\nEND;`,
+      solutionQuery: `CREATE TRIGGER documents_update_history AFTER UPDATE ON documents BEGIN\n  INSERT INTO documents_history (doc_id, old_title, new_title, changed_at)\n  VALUES (OLD.id, OLD.title, NEW.title, CURRENT_TIMESTAMP);\nEND;`,
+      seedSql: `CREATE TABLE documents (id INTEGER PRIMARY KEY, title TEXT NOT NULL, body TEXT); CREATE TABLE documents_history (id INTEGER PRIMARY KEY, doc_id INTEGER NOT NULL, old_title TEXT, new_title TEXT, changed_at DATETIME); INSERT INTO documents VALUES (1, 'Draft Policy', 'Initial content');`
+    },
+    quiz: [
+      {
+        question: `Why use an audit table instead of only updating the live row?`,
+        options: [
+          `It preserves historical values and changes over time`,
+          `It automatically makes queries faster`,
+          `It removes the need for primary keys`,
+          `It converts relational data into JSON`
+        ],
+        correctIndex: 0,
+        explanation: `Audit tables keep history that would otherwise be overwritten. They do not automatically improve query speed, replace primary keys, or transform data into JSON.`
+      },
+      {
+        question: `What does CURRENT_TIMESTAMP usually provide?`,
+        options: [
+          `The database server's current date and time`,
+          `A random identifier`,
+          `The last backup time`,
+          `The total row count of the table`
+        ],
+        correctIndex: 0,
+        explanation: `CURRENT_TIMESTAMP provides the current date and time value from the database engine. It is commonly used for created_at and changed_at audit columns.`
+      },
+      {
+        question: `Inside an UPDATE trigger, what does OLD represent?`,
+        options: [
+          `The row values before the update`,
+          `The row values after the update`,
+          `The database version number`,
+          `The oldest row in the entire table`
+        ],
+        correctIndex: 0,
+        explanation: `OLD provides access to the row's previous values during UPDATE or DELETE operations. NEW provides the incoming values during INSERT or UPDATE operations.`
+      },
+      {
+        question: `Why should audit logs usually be append-only?`,
+        options: [
+          `So historical records cannot be silently rewritten or destroyed`,
+          `So the database can delete old logs automatically`,
+          `So the audit table can replace the main table`,
+          `So the frontend can edit history freely`
+        ],
+        correctIndex: 0,
+        explanation: `Append-only logs protect trustworthiness. If audit rows can be edited or deleted, the audit trail no longer proves what happened. Automatic deletion and frontend editing would weaken the audit guarantee.`
+      }
+    ],
+    milestones: [
+      `Use timestamps to record creation and modification time.`,
+      `Design audit tables for historical tracking.`,
+      `Use triggers to automatically capture changes.`,
+      `Understand the difference between transaction time and valid time.`
+    ]
+  },
+  {
+    id: `sql-24`,
+    order: 24,
+    module: `Search & Information Retrieval`,
+    icon: `🔎`,
+    title: `Full-Text Search & Relevance Ranking`,
+    philosophy: `Users expect search to feel instant and intelligent. Typing a word into a search box should return relevant documents, not force the database to read every paragraph in every row. Full-text search systems solve this by building specialized indexes around words, not just rows.`,
+    concepts: [
+      {
+        title: `1. Why LIKE Is Not Enough`,
+        beginner: `Using LIKE with wildcards is like searching a library by reading every page of every book. If the search word can appear anywhere, the database often has to check every row. That becomes very slow as data grows.`,
+        advanced: `Predicates such as LIKE '%term%' are generally not index-friendly because the leading wildcard prevents normal B-Tree traversal. Full-text search requires tokenization, inverted indexes, and ranking rather than simple substring scans.`
+      },
+      {
+        title: `2. Inverted Indexes`,
+        beginner: `An inverted index is like a giant word map. For each word, it stores a list of documents or rows where that word appears. When you search for “database,” the engine jumps directly to the rows that contain that word.`,
+        advanced: `An inverted index maps terms to postings lists containing document identifiers and positional information. This transforms text search from sequential scanning into targeted lookup, making large document collections practical to query.`
+      },
+      {
+        title: `3. MATCH and Tokenized Search`,
+        beginner: `Full-text tables often use a special MATCH operator. Instead of asking “does this text contain these letters?”, MATCH asks “does this document contain these words or phrases?” That is faster and more useful.`,
+        advanced: `Full-text engines tokenize input into terms, normalize language variants, and support MATCH queries for words, phrases, prefixes, and boolean expressions. The query interface is higher-level than string comparison and aligned with user search intent.`
+      },
+      {
+        title: `4. Relevance Ranking`,
+        beginner: `Search results should show the best matches first. A relevance score estimates how useful each result is. Documents with the search word more often, or in important places, may rank higher.`,
+        advanced: `Relevance functions such as bm25 estimate match quality using term frequency, inverse document frequency, and document length. Ranking turns full-text search from a filtering operation into a user-facing search experience.`
+      }
+    ],
+    practical: {
+      title: `Searching Articles with Full-Text Indexing`,
+      intro: `We have seeded an FTS5 virtual table named articles with title and body columns. Your task is to find articles that match the word database and order them by relevance score.`,
+      steps: [
+        `Select title from the articles table.`,
+        `Also select bm25(articles) and alias it as score.`,
+        `Filter with WHERE articles MATCH 'database'.`,
+        `Order the results by score.`,
+        `Run the query. You should see the SQL Guide article returned because its content mentions database.`
+      ],
+      goal: `Use full-text MATCH and relevance ranking to search documents efficiently.`,
+      starterQuery: `-- Write your full-text query here\nSELECT `,
+      solutionQuery: `SELECT title, bm25(articles) AS score\nFROM articles\nWHERE articles MATCH 'database'\nORDER BY score;`,
+      seedSql: `CREATE VIRTUAL TABLE articles USING fts5(title, body); INSERT INTO articles VALUES ('SQL Guide', 'A database is a fortress of integrity.'); INSERT INTO articles VALUES ('CSS Tips', 'Learn to style web pages beautifully.'); INSERT INTO articles VALUES ('Node Intro', 'Build backend servers easily.');`
+    },
+    quiz: [
+      {
+        question: `Why is LIKE '%word%' often slow on large text columns?`,
+        options: [
+          `The leading wildcard usually prevents efficient index use and forces broad scanning`,
+          `It deletes rows while searching`,
+          `It converts text into numbers automatically`,
+          `It requires a full database restart`
+        ],
+        correctIndex: 0,
+        explanation: `A leading wildcard makes it difficult for normal indexes to narrow the search, so the engine may scan many rows. It does not delete data, convert text to numbers, or restart the database.`
+      },
+      {
+        question: `What does an inverted index store?`,
+        options: [
+          `A mapping from words to the documents or rows containing them`,
+          `A backup copy of the entire database`,
+          `Only numeric aggregates`,
+          `Encrypted user passwords`
+        ],
+        correctIndex: 0,
+        explanation: `Inverted indexes map terms to locations where those terms occur. This is the core structure behind efficient full-text search. They are not backups, numeric aggregates, or password stores.`
+      },
+      {
+        question: `What is the purpose of the MATCH operator in full-text search?`,
+        options: [
+          `It queries tokenized text using word-level search semantics`,
+          `It creates a new physical table`,
+          `It renames columns dynamically`,
+          `It converts NULL into empty strings`
+        ],
+        correctIndex: 0,
+        explanation: `MATCH searches full-text structures using terms and phrases rather than raw substring comparison. It does not create tables, rename columns, or transform NULL values.`
+      },
+      {
+        question: `What does a ranking function such as bm25 help with?`,
+        options: [
+          `Ordering search results by estimated relevance`,
+          `Encrypting search logs`,
+          `Assigning primary keys`,
+          `Compressing old rows`
+        ],
+        correctIndex: 0,
+        explanation: `bm25 estimates how relevant each document is for a query, allowing results to be ordered from most to least useful. It is not related to encryption, primary keys, or compression.`
+      }
+    ],
+    milestones: [
+      `Understand why substring search does not scale for text-heavy applications.`,
+      `Learn how inverted indexes power full-text search.`,
+      `Use MATCH to query tokenized document tables.`,
+      `Rank results by relevance instead of returning arbitrary matches.`
+    ]
+  },
+  {
+    id: `sql-25`,
+    order: 25,
+    module: `Performance Engineering`,
+    icon: `🧯`,
+    title: `Query Anti-Patterns & Performance Refactoring`,
+    philosophy: `Most database performance problems are not caused by the database being weak; they are caused by queries preventing the database from using its strengths. Professional engineers learn to recognize anti-patterns: queries that look innocent but destroy index usage, bloat payloads, or create thousands of unnecessary round trips.`,
+    concepts: [
+      {
+        title: `1. Non-SARGable Predicates`,
+        beginner: `If you wrap an indexed column inside a function, the database may not be able to use the index. For example, searching by YEAR(created_at) is like asking the library to find books by shaking every shelf. It is better to compare the column directly to a range.`,
+        advanced: `A predicate is SARGable when the query engine can seek directly through an index. Applying functions or expressions to indexed columns, such as LOWER(email) or DATE(created_at), often prevents index seeks. Rewrite predicates as direct range or equality conditions.`
+      },
+      {
+        title: `2. SELECT * Bloat`,
+        beginner: `SELECT * grabs every column, even columns your app does not need. This wastes memory, network bandwidth, and sometimes prevents the database from using smaller covering indexes.`,
+        advanced: `SELECT * increases payload size, couples application code to schema changes, and can defeat covering-index optimizations. Explicit column projection improves stability, network efficiency, and sometimes allows index-only scans.`
+      },
+      {
+        title: `3. The N+1 Query Problem`,
+        beginner: `The N+1 problem happens when your app asks for a list, then runs one extra query for each item. If you load 100 users and then run 100 separate queries for their orders, you created 101 queries when one or two could have worked.`,
+        advanced: `N+1 access patterns occur when parent records are fetched first and related records are fetched individually in a loop. Backend engineers eliminate this with JOINs, batched IN queries, eager loading, or dataloader patterns.`
+      },
+      {
+        title: `4. Keyset Pagination Over Deep OFFSET`,
+        beginner: `OFFSET pagination is like skipping 100,000 people in a line by counting every single one before you. Keyset pagination is like using a bookmark: continue after the last id or timestamp you already saw.`,
+        advanced: `Deep OFFSET forces the engine to generate and discard many rows. Keyset pagination uses a stable ordering column, such as id or created_at, with a WHERE clause like WHERE id > last_seen_id. This is more stable and dramatically faster for deep pages.`
+      }
+    ],
+    practical: {
+      title: `Refactoring a Timestamp Search`,
+      intro: `We have seeded a logs table with an indexed timestamp column. A beginner might search using a function on the timestamp. Your task is to write an index-friendly range query that finds all logs from July 15, 2026.`,
+      steps: [
+        `Select id and level from logs.`,
+        `Do not wrap timestamp in a function.`,
+        `Use a range: timestamp >= '2026-07-15'.`,
+        `Also require timestamp < '2026-07-16'.`,
+        `Run the query. You should see the ERROR and WARN logs from that day returned.`
+      ],
+      goal: `Replace function-based filtering with an index-friendly timestamp range.`,
+      starterQuery: `-- Refactor the filter into an index-friendly range\nSELECT id, level FROM logs WHERE `,
+      solutionQuery: `SELECT id, level FROM logs\nWHERE timestamp >= '2026-07-15'\n  AND timestamp < '2026-07-16';`,
+      seedSql: `CREATE TABLE logs (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, level TEXT NOT NULL); CREATE INDEX idx_logs_timestamp ON logs(timestamp); INSERT INTO logs VALUES (1, '2026-07-15 09:00:00', 'INFO'); INSERT INTO logs VALUES (2, '2026-07-15 09:05:00', 'ERROR'); INSERT INTO logs VALUES (3, '2026-07-15 09:10:00', 'WARN'); INSERT INTO logs VALUES (4, '2026-07-16 08:00:00', 'INFO');`
+    },
+    quiz: [
+      {
+        question: `Why is WHERE YEAR(created_at) = 2026 usually a performance anti-pattern?`,
+        options: [
+          `It applies a function to the indexed column, which can prevent index seeks`,
+          `It automatically deletes older rows`,
+          `It forces the database to create a new table`,
+          `It converts integers into text`
+        ],
+        correctIndex: 0,
+        explanation: `Wrapping a column in a function often prevents the optimizer from using an index directly. A better pattern is a range condition such as created_at >= '2026-01-01' AND created_at < '2027-01-01'.`
+      },
+      {
+        question: `Why is SELECT * often discouraged in production backend code?`,
+        options: [
+          `It can fetch unnecessary columns, increase payload size, and make code fragile`,
+          `It always disables foreign keys`,
+          `It prevents the use of transactions`,
+          `It automatically locks the whole database`
+        ],
+        correctIndex: 0,
+        explanation: `SELECT * returns more data than needed and couples code to every schema change. It does not disable foreign keys, prevent transactions, or lock the database by itself.`
+      },
+      {
+        question: `What is the N+1 query problem?`,
+        options: [
+          `Fetching a list and then issuing a separate query for each item's related data`,
+          `Running too many DELETE statements`,
+          `Using more than one JOIN in a query`,
+          `Creating too many indexes on one table`
+        ],
+        correctIndex: 0,
+        explanation: `N+1 means one query fetches N parent records, then N additional queries fetch related records one by one. The fix is usually batching, JOINs, or eager loading.`
+      },
+      {
+        question: `Why is keyset pagination preferred over deep OFFSET pagination?`,
+        options: [
+          `It continues from a known position and avoids scanning and discarding many rows`,
+          `It automatically encrypts page tokens`,
+          `It removes the need for ORDER BY`,
+          `It stores pages in the browser cache`
+        ],
+        correctIndex: 0,
+        explanation: `Keyset pagination uses a stable cursor, such as WHERE id > last_seen_id, avoiding the cost of generating and throwing away offset rows. It still requires ordering and does not encrypt tokens or remove the need for ORDER BY.`
+      }
+    ],
+    milestones: [
+      `Recognize queries that prevent index usage.`,
+      `Avoid SELECT * and project only required columns.`,
+      `Detect and fix N+1 query access patterns.`,
+      `Prefer keyset pagination over expensive deep offsets.`
     ]
   }
 ];
