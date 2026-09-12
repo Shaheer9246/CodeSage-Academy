@@ -22,6 +22,7 @@ import { Switch } from '@/components/ui/switch';
 import { resetGuestLessons } from '@/lib/guestGate';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
+import { downloadBlobFile } from '@/lib/downloadHelper';
 import AvatarPicker, { getStoredAvatar } from '@/components/AvatarPicker';
 import {
   TRACK_META,
@@ -140,12 +141,17 @@ const SettingsPage = () => {
       }, null, 2));
       zip.file('README.txt', 'CodeSage workspace export — generated from Settings.');
       const blob = await zip.generateAsync({ type: 'blob' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `codesage-workspace-${Date.now()}.zip`; a.click();
-      URL.revokeObjectURL(url);
-      toast.success('Workspace exported.');
-    } catch { toast.error('Export failed.'); }
+      const filename = `codesage-workspace-${Date.now()}.zip`;
+      const success = downloadBlobFile(blob, filename);
+      if (success) {
+        toast.success('Workspace exported.');
+      } else {
+        toast.error('Unable to download file. Please check browser permissions.');
+      }
+    } catch (err) {
+      console.error('Workspace export error:', err);
+      toast.error('Export failed.');
+    }
   };
 
   const handleBuyFreeze = async () => {
