@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ShieldAlert, Search, RefreshCw, Users, Flame, Zap,
   GraduationCap, ChevronDown, ChevronRight, Mail, Calendar, Database, Trash2,
-  Bell, MessageSquare, Send, Edit2, Reply, Check, X, ShieldCheck
+  Bell, MessageSquare, Send, Edit2, Reply, Check, X, ShieldCheck,
+  BookOpen, Award, Briefcase, Target, Layers, FileCode, CheckCircle2,
+  KeyRound, Tag, Clock, Pause, Play
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,8 +99,25 @@ export default function Admin() {
   const PAGE_SIZE = 50;
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [registryLessonCount, setRegistryLessonCount] = useState(454);
   const [search, setSearch] = useState('');
+  const [inactiveFilter, setInactiveFilter] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // --- Helper to calculate user last active date and inactivity duration in days ---
+  const getUserLastActiveDate = useCallback((u: AdminUser): Date | null => {
+    const ts = u.last_sign_in_at || (u.last_active_date ? `${u.last_active_date}T00:00:00Z` : null) || u.joined_at || u.created_at;
+    if (!ts) return null;
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? null : d;
+  }, []);
+
+  const getInactiveDays = useCallback((u: AdminUser): number | null => {
+    const d = getUserLastActiveDate(u);
+    if (!d) return null;
+    const diffMs = Date.now() - d.getTime();
+    return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  }, [getUserLastActiveDate]);
 
   // --- Announcements State ---
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -124,22 +143,80 @@ export default function Admin() {
   useEffect(() => { document.title = 'Admin Console · CodeSage'; }, []);
 
   /* ---------------------------- Load Users ---------------------------- */
-  const load = async (opts?: { search?: string; page?: number }) => {
+  const load = async (opts?: { search?: string; page?: number; inactiveDays?: number | null }) => {
     const s = opts?.search ?? search;
     const p = opts?.page ?? page;
+    const inact = opts?.inactiveDays !== undefined ? opts.inactiveDays : inactiveFilter;
     setLoading(true); setError('');
-    const [{ data, error: err }, countRes] = await Promise.all([
-      supabase.rpc('admin_list_users', { _search: s || null, _limit: PAGE_SIZE, _offset: p * PAGE_SIZE }),
-      supabase.rpc('admin_user_count', { _search: s || null }),
-    ]);
+
+    let listRes: any;
+    let countRes: any;
+
+    try {
+      // 1. Try invoking with _inactive_days argument if backend supports it
+      const [primaryList, primaryCount, regRes] = await Promise.all([
+        (supabase.rpc as any)('admin_list_users', {
+          _search: s || null,
+          _limit: PAGE_SIZE,
+          _offset: p * PAGE_SIZE,
+          _inactive_days: inact,
+        }),
+        (supabase.rpc as any)('admin_user_count', {
+          _search: s || null,
+          _inactive_days: inact,
+        }),
+        supabase.from('lesson_registry').select('*', { count: 'exact', head: true }),
+      ]);
+
+      listRes = primaryList;
+      countRes = primaryCount;
+
+      // 2. Fallback to 3-arg version if Supabase SQL hasn't been upgraded yet
+      if (listRes?.error && listRes.error.message?.includes('Could not find the function')) {
+        const [fallbackList, fallbackCount] = await Promise.all([
+          supabase.rpc('admin_list_users', {
+            _search: s || null,
+            _limit: PAGE_SIZE,
+            _offset: p * PAGE_SIZE,
+          }),
+          supabase.rpc('admin_user_count', {
+            _search: s || null,
+          }),
+        ]);
+        listRes = fallbackList;
+        countRes = fallbackCount;
+      }
+
+      if (regRes.count !== null && regRes.count !== undefined) {
+        setRegistryLessonCount(regRes.count);
+      }
+    } catch (e: any) {
+      setError(e.message || 'Failed to load user roster');
+      setLoading(false);
+      return;
+    }
+
     setLoading(false);
-    if (err) {
-      setError(err.message?.includes('Admin') ? 'Admin access required for this account.' : err.message);
+    if (listRes?.error) {
+      setError(listRes.error.message?.includes('Admin') ? 'Admin access required for this account.' : listRes.error.message);
       setAuthed(false);
       return;
     }
-    setRows((data as unknown as AdminUser[]) || []);
-    if (!countRes.error) setTotal(Number(countRes.data) || 0);
+
+    let loadedRows = (listRes.data as unknown as AdminUser[]) || [];
+
+    // Client-side fallback filter if database RPC didn't filter it natively
+    if (inact !== null) {
+      loadedRows = loadedRows.filter(u => {
+        const days = getInactiveDays(u);
+        return days !== null && days >= inact;
+      });
+    }
+
+    setRows(loadedRows);
+    if (!countRes?.error && countRes?.data !== null) {
+      setTotal(inact !== null ? loadedRows.length : (Number(countRes.data) || 0));
+    }
     setAuthed(true);
   };
 
@@ -157,12 +234,21 @@ export default function Admin() {
     /* eslint-disable-next-line */
   }, [query]);
 
-  const totals = useMemo(() => ({
-    users: total,
-    lessons: rows.reduce((a, r) => a + (r.lessons_done || 0), 0),
-    xp: rows.reduce((a, r) => a + (r.xp || 0), 0),
-    active: rows.filter(r => r.enrollments.some(e => e.status === 'active')).length,
-  }), [rows, total]);
+  const totals = useMemo(() => {
+    const inactive7d = rows.filter(r => {
+      const d = getInactiveDays(r);
+      return d !== null && d >= 7;
+    }).length;
+
+    return {
+      users: total,
+      registryLessons: registryLessonCount,
+      lessonsDone: rows.reduce((a, r) => a + (r.lessons_done || 0), 0),
+      xp: rows.reduce((a, r) => a + (r.xp || 0), 0),
+      activeTracks: rows.reduce((acc, r) => acc + ((r.enrollments || []).filter(e => e.status === 'active').length), 0),
+      inactive7d,
+    };
+  }, [rows, total, registryLessonCount, getInactiveDays]);
 
   const handleDeleteUser = async (userId: string, userIdentifier: string) => {
     const confirmed = window.confirm(`Are you sure you want to delete user "${userIdentifier}"? This cannot be undone.`);
@@ -190,6 +276,43 @@ export default function Admin() {
 
     setRows(prev => prev.filter(u => u.id !== userId));
     if (openId === userId) setOpenId(null);
+  };
+
+  const [updatingTrack, setUpdatingTrack] = useState<string | null>(null);
+
+  const handleUpdateEnrollmentStatus = async (userId: string, track: string, newStatus: 'active' | 'paused' | 'ended') => {
+    setUpdatingTrack(`${userId}-${track}`);
+    try {
+      // 1. Attempt admin RPC first
+      const { error: rpcErr } = await supabase.rpc('admin_update_user_enrollment' as any, {
+        _user_id: userId,
+        _track: track,
+        _status: newStatus,
+      });
+
+      if (rpcErr) {
+        // Fallback to direct table update if RPC not yet created
+        const { error: directErr } = await supabase
+          .from('enrollments')
+          .update({ status: newStatus })
+          .eq('user_id', userId)
+          .eq('track', track);
+        if (directErr) throw directErr;
+      }
+
+      setRows(prev => prev.map(u => {
+        if (u.id !== userId) return u;
+        const updatedEnrollments = (u.enrollments || []).map(e => e.track === track ? { ...e, status: newStatus } : e);
+        return { ...u, enrollments: updatedEnrollments };
+      }));
+
+      toast.success(`Track "${trackLabel(track)}" updated to "${newStatus}"`);
+    } catch (err: any) {
+      console.error('Failed to update track status', err);
+      toast.error(err?.message || 'Failed to update track status');
+    } finally {
+      setUpdatingTrack(null);
+    }
   };
 
   /* ---------------------- Load Announcements ---------------------- */
@@ -254,7 +377,11 @@ export default function Admin() {
 
   const handleDeleteAnnouncement = async (id: string) => {
     if (!window.confirm('Delete this announcement? This will remove it for all users.')) return;
-    const { error: err } = await supabase.from('announcements').delete().eq('id', id);
+    let err = (await supabase.rpc('admin_delete_announcement', { _id: id })).error;
+    if (err) {
+      const direct = await supabase.from('announcements').delete().eq('id', id);
+      err = direct.error;
+    }
     if (err) {
       toast.error(`Delete failed: ${err.message}`);
       return;
@@ -394,12 +521,13 @@ export default function Admin() {
         </div>
 
         {/* Global Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 mb-6">
           {[
-            { icon: Users, label: 'students', value: totals.users },
-            { icon: GraduationCap, label: 'lessons in DB', value: totals.lessons },
-            { icon: Zap, label: 'total XP', value: totals.xp },
-            { icon: Flame, label: 'active tracks', value: totals.active },
+            { icon: Users, label: 'registered students', value: totals.users },
+            { icon: Database, label: 'curriculum lessons', value: totals.registryLessons },
+            { icon: GraduationCap, label: 'lessons completed (paged)', value: totals.lessonsDone },
+            { icon: Zap, label: 'student XP (paged)', value: totals.xp.toLocaleString() },
+            { icon: Clock, label: 'inactive ≥ 7d (paged)', value: totals.inactive7d },
           ].map(s => (
             <div key={s.label} className="bg-card/40 border border-border/40 rounded-xl p-3">
               <s.icon className="w-4 h-4 text-primary mb-1.5" />
@@ -448,15 +576,69 @@ export default function Admin() {
         {/* ========================================================================= */}
         {activeTab === 'users' && (
           <div>
-            <div className="relative mb-4">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="search name, email, username or student ID..."
-                className="w-full bg-black/25 border border-border/50 rounded-lg pl-9 pr-3 py-2.5 text-sm font-mono focus:outline-none focus:border-primary/60"
-              />
+            <div className="flex flex-col sm:flex-row gap-2.5 mb-4">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="search name, email, username or student ID..."
+                  className="w-full bg-black/25 border border-border/50 rounded-lg pl-9 pr-3 py-2.5 text-sm font-mono focus:outline-none focus:border-primary/60"
+                />
+              </div>
+
+              {/* Inactivity Duration Filter */}
+              <div className="flex items-center gap-2">
+                <div className="relative flex items-center">
+                  <Clock className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
+                  <select
+                    value={inactiveFilter === null ? 'all' : String(inactiveFilter)}
+                    onChange={e => {
+                      const val = e.target.value === 'all' ? null : Number(e.target.value);
+                      setInactiveFilter(val);
+                      setPage(0);
+                      void load({ search, page: 0, inactiveDays: val });
+                    }}
+                    className="bg-black/25 border border-border/50 rounded-lg pl-9 pr-8 py-2.5 text-xs font-mono text-foreground focus:outline-none focus:border-primary/60 cursor-pointer appearance-none"
+                  >
+                    <option value="all">Activity: All Students</option>
+                    <option value="1">Inactive ≥ 1 Day</option>
+                    <option value="2">Inactive ≥ 2 Days</option>
+                    <option value="3">Inactive ≥ 3 Days</option>
+                    <option value="7">Inactive ≥ 7 Days (1 Week)</option>
+                    <option value="14">Inactive ≥ 14 Days (2 Weeks)</option>
+                    <option value="30">Inactive ≥ 30 Days (1 Month)</option>
+                    <option value="60">Inactive ≥ 60 Days (2 Months)</option>
+                    <option value="90">Inactive ≥ 90 Days (3 Months)</option>
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground absolute right-2.5 pointer-events-none" />
+                </div>
+
+                {inactiveFilter !== null && (
+                  <button
+                    onClick={() => {
+                      setInactiveFilter(null);
+                      setPage(0);
+                      void load({ search, page: 0, inactiveDays: null });
+                    }}
+                    className="text-xs font-mono text-muted-foreground hover:text-foreground p-2.5 border border-border/40 rounded-lg hover:bg-secondary/40"
+                    title="Clear inactivity filter"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
+
+            {inactiveFilter !== null && (
+              <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 text-xs font-mono text-amber-300 mb-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Showing students inactive for at least <strong>{inactiveFilter} day{inactiveFilter > 1 ? 's' : ''}</strong></span>
+                </div>
+                <span className="text-[11px] opacity-80">{rows.length} students matched</span>
+              </div>
+            )}
 
             {error && <p className="text-xs text-destructive mb-3">{error}</p>}
 
@@ -471,6 +653,7 @@ export default function Admin() {
                     return { key: k, label: TRACK_LESSON_LABELS[k], n, total: ids.length };
                   })
                   .filter(t => t.n > 0);
+                const daysInactive = getInactiveDays(u);
 
                 return (
                   <div key={u.id} className="bg-card/40 border border-border/40 rounded-xl overflow-hidden">
@@ -488,9 +671,58 @@ export default function Admin() {
                             )}
                             <span className="text-xs text-muted-foreground font-mono truncate">{u.email}</span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                            lvl {u.level ?? 1} · {u.xp ?? 0} xp · {u.lessons_done} lessons · {u.enrollments?.length || 0} tracks
-                          </p>
+                          <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                            {(() => {
+                              const activeCount = (u.enrollments || []).filter(e => e.status?.toLowerCase() === 'active').length;
+                              const pausedCount = (u.enrollments || []).filter(e => e.status?.toLowerCase() === 'paused').length;
+                              const endedCount = (u.enrollments || []).filter(e => ['ended', 'completed'].includes(e.status?.toLowerCase())).length;
+                              const totalTracks = u.enrollments?.length || 0;
+                              return (
+                                <>
+                                  <p className="text-[11px] text-muted-foreground font-mono">
+                                    lvl {u.level ?? 1} · {u.xp ?? 0} xp · {u.lessons_done} lessons
+                                  </p>
+                                  <span className="text-[11px] font-mono text-muted-foreground">·</span>
+                                  <span className={`text-[11px] font-mono ${activeCount > 2 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-medium'}`}>
+                                    {activeCount} active
+                                  </span>
+                                  {pausedCount > 0 && (
+                                    <span className="text-[11px] font-mono text-amber-400/90">
+                                      · {pausedCount} paused
+                                    </span>
+                                  )}
+                                  {endedCount > 0 && (
+                                    <span className="text-[11px] font-mono text-blue-400/90">
+                                      · {endedCount} ended
+                                    </span>
+                                  )}
+                                  {totalTracks > 0 && (
+                                    <span className="text-[11px] font-mono text-muted-foreground">
+                                      ({totalTracks} total)
+                                    </span>
+                                  )}
+                                  {activeCount > 2 && (
+                                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                      ⚠ {activeCount} Active (&gt;2 limit)
+                                    </span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                            {daysInactive !== null && (
+                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono border ${
+                                daysInactive === 0
+                                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                  : daysInactive <= 2
+                                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                  : daysInactive <= 7
+                                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                  : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                              }`}>
+                                {daysInactive === 0 ? '● Active today' : `Inactive ${daysInactive}d`}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -511,26 +743,215 @@ export default function Admin() {
                     </div>
 
                     {open && (
-                      <div className="border-t border-border/30 p-4 bg-black/10 space-y-4">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          <Field label="Joined" value={fmt(u.joined_at || u.created_at)} icon={Calendar} />
-                          <Field label="Last Active" value={fmtTime(u.last_sign_in_at)} icon={Mail} />
-                          <Field label="Streak" value={`${u.streak_count ?? 0} days`} icon={Flame} />
+                      <div className="border-t border-border/30 p-4 bg-black/15 space-y-4">
+                        {/* 1. Key Metrics & Progress Quick Strip */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+                          <Field label="Level & XP" value={`Lvl ${u.level ?? 1} (${(u.xp ?? 0).toLocaleString()} XP)`} icon={Zap} />
                           <Field label="Sage Coins" value={`${u.sage_coins ?? 0} ◈`} icon={Database} />
+                          <Field label="Daily Streak" value={`${u.streak_count ?? 0} days`} icon={Flame} />
+                          <Field label="Lessons Done" value={`${u.lessons_done} completed`} icon={GraduationCap} />
+                          <Field label="Tests Passed" value={`${u.tests_done} tests`} icon={Award} />
+                          <Field label="Suggestions" value={`${u.suggestions_count ?? 0} posted`} icon={MessageSquare} />
                         </div>
 
+                        {/* 2. Onboarding & Personal Profile */}
+                        <Block title="Student Profile & Onboarding Background">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <Field label="Full Name" value={u.name || '—'} />
+                            <Field label="Username" value={u.username || '—'} />
+                            <Field label="Student ID" value={u.student_id || 'Not assigned'} />
+                            <Field label="Inactivity" value={daysInactive === null ? 'Unknown' : daysInactive === 0 ? 'Active today' : `${daysInactive} days inactive`} icon={Clock} />
+                            <Field label="Email Status" value={u.email_confirmed_at ? '✓ Verified' : 'Pending verification'} icon={Mail} />
+                            <Field label="Studying / College" value={u.studying || 'Not specified'} icon={BookOpen} />
+                            <Field label="Job / Employment" value={u.has_job || 'Not specified'} icon={Briefcase} />
+                            <Field label="Experience Level" value={u.experience_level || 'Beginner'} icon={Target} />
+                            <Field label="Date of Birth" value={u.dob || '—'} icon={Calendar} />
+                            <Field label="Learning Goal" value={u.goal || 'Not specified'} />
+                            <Field label="Account Joined" value={fmt(u.joined_at || u.created_at)} icon={Calendar} />
+                            <Field label="Last Active / Sign In" value={fmtTime(u.last_sign_in_at || (u.last_active_date ? `${u.last_active_date}T00:00:00Z` : null))} icon={Mail} />
+                            <Field label="Promo Codes" value={u.promo_codes && u.promo_codes.length > 0 ? u.promo_codes.join(', ') : 'None'} icon={Tag} />
+                          </div>
+                        </Block>
+
+                        {/* 3. Enrolled Tracks */}
+                        {(() => {
+                          const activeCount = (u.enrollments || []).filter(e => e.status?.toLowerCase() === 'active').length;
+                          const pausedCount = (u.enrollments || []).filter(e => e.status?.toLowerCase() === 'paused').length;
+                          const endedCount = (u.enrollments || []).filter(e => ['ended', 'completed'].includes(e.status?.toLowerCase())).length;
+                          return (
+                            <Block title={`Enrolled Tracks (${u.enrollments?.length || 0} total · ${activeCount} active${pausedCount > 0 ? `, ${pausedCount} paused` : ''}${endedCount > 0 ? `, ${endedCount} ended` : ''})`}>
+                              {u.enrollments && u.enrollments.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                                  {u.enrollments.map((e, idx) => {
+                                    const trackKey = e.track as LessonTrackKey;
+                                    const trackIds = TRACK_LESSON_IDS[trackKey] || [];
+                                    const completedInTrack = trackIds.filter(id => done.has(id)).length;
+                                    const pct = trackIds.length > 0 ? Math.round((completedInTrack / trackIds.length) * 100) : 0;
+                                    const statusLower = (e.status || '').toLowerCase();
+                                    const isUpdatingThis = updatingTrack === `${u.id}-${e.track}`;
+
+                                    return (
+                                      <div key={idx} className="bg-secondary/30 border border-border/40 rounded-lg p-2.5 space-y-2">
+                                        <div className="flex items-center justify-between gap-1">
+                                          <span className="font-semibold text-xs font-mono text-foreground truncate" title={trackLabel(e.track)}>
+                                            {trackLabel(e.track)}
+                                          </span>
+                                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-medium shrink-0 ${
+                                            statusLower === 'active'
+                                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                              : statusLower === 'paused'
+                                              ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                                              : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                                          }`}>
+                                            {statusLower === 'active' ? '● Active' : statusLower === 'paused' ? '⏸ Paused' : '✓ Ended'}
+                                          </span>
+                                        </div>
+
+                                        <div className="flex items-center justify-between text-[11px] text-muted-foreground font-mono">
+                                          <span>Enrolled: {fmt(e.enrolled_at)}</span>
+                                          <span className="font-bold text-foreground">{completedInTrack}/{trackIds.length} ({pct}%)</span>
+                                        </div>
+
+                                        <div className="w-full h-1.5 bg-secondary/80 rounded-full overflow-hidden">
+                                          <div className={`h-full rounded-full transition-all ${
+                                            statusLower === 'active' ? 'bg-primary' : statusLower === 'paused' ? 'bg-amber-500' : 'bg-muted-foreground'
+                                          }`} style={{ width: `${pct}%` }} />
+                                        </div>
+
+                                        {/* Admin Quick Action Buttons */}
+                                        <div className="pt-1 border-t border-border/30 flex items-center justify-end gap-1.5 text-[10px] font-mono">
+                                          {statusLower === 'active' ? (
+                                            <>
+                                              <button
+                                                type="button"
+                                                disabled={isUpdatingThis}
+                                                onClick={() => handleUpdateEnrollmentStatus(u.id, e.track, 'paused')}
+                                                className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-colors flex items-center gap-1 disabled:opacity-50"
+                                                title="Pause this course"
+                                              >
+                                                <Pause className="w-2.5 h-2.5" /> Pause
+                                              </button>
+                                              <button
+                                                type="button"
+                                                disabled={isUpdatingThis}
+                                                onClick={() => handleUpdateEnrollmentStatus(u.id, e.track, 'ended')}
+                                                className="px-2 py-0.5 rounded bg-secondary hover:bg-secondary/80 text-muted-foreground transition-colors disabled:opacity-50"
+                                                title="Mark this course as ended"
+                                              >
+                                                End
+                                              </button>
+                                            </>
+                                          ) : statusLower === 'paused' ? (
+                                            <>
+                                              <button
+                                                type="button"
+                                                disabled={isUpdatingThis}
+                                                onClick={() => handleUpdateEnrollmentStatus(u.id, e.track, 'active')}
+                                                className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors flex items-center gap-1 disabled:opacity-50"
+                                                title="Reactivate this course"
+                                              >
+                                                <Play className="w-2.5 h-2.5" /> Activate
+                                              </button>
+                                              <button
+                                                type="button"
+                                                disabled={isUpdatingThis}
+                                                onClick={() => handleUpdateEnrollmentStatus(u.id, e.track, 'ended')}
+                                                className="px-2 py-0.5 rounded bg-secondary hover:bg-secondary/80 text-muted-foreground transition-colors disabled:opacity-50"
+                                                title="Mark this course as ended"
+                                              >
+                                                End
+                                              </button>
+                                            </>
+                                          ) : (
+                                            <button
+                                              type="button"
+                                              disabled={isUpdatingThis}
+                                              onClick={() => handleUpdateEnrollmentStatus(u.id, e.track, 'active')}
+                                              className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors flex items-center gap-1 disabled:opacity-50"
+                                              title="Reactivate this course"
+                                            >
+                                              <Play className="w-2.5 h-2.5" /> Activate
+                                            </button>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <p className="text-xs text-muted-foreground italic">No formal track enrollments recorded.</p>
+                              )}
+                            </Block>
+                          );
+                        })()}
+
+                        {/* 4. Lesson Progress by Track */}
                         {perTrack.length > 0 && (
-                          <Block title="Lesson Progress by Track">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          <Block title="Curriculum Completion Across Tracks">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                               {perTrack.map(t => (
                                 <div key={t.key} className="bg-secondary/30 rounded p-2 text-[11px] font-mono">
-                                  <span className="text-muted-foreground block truncate">{t.label}</span>
-                                  <span className="text-foreground font-bold">{t.n} / {t.total}</span>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-muted-foreground truncate">{t.label}</span>
+                                    <span className="text-foreground font-bold">{t.n} / {t.total}</span>
+                                  </div>
+                                  <div className="w-full h-1 bg-secondary/80 rounded-full overflow-hidden">
+                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.round((t.n / t.total) * 100)}%` }} />
+                                  </div>
                                 </div>
                               ))}
                             </div>
                           </Block>
                         )}
+
+                        {/* 5. Completed Lessons List */}
+                        <Block title={`Completed Lessons (${(u.completed_lessons || []).length})`}>
+                          {u.completed_lessons && u.completed_lessons.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
+                              {u.completed_lessons.map((lid) => (
+                                <span
+                                  key={lid}
+                                  className="text-[10px] font-mono bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded"
+                                >
+                                  {lid}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-muted-foreground italic">No completed lessons yet.</p>
+                          )}
+                        </Block>
+
+                        {/* 6. Completed Tests & Badges */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <Block title={`Completed Tests / Exams (${(u.completed_tests || []).length})`}>
+                            {u.completed_tests && u.completed_tests.length > 0 ? (
+                              <div className="flex flex-wrap gap-1.5">
+                                {u.completed_tests.map((tid) => (
+                                  <span key={tid} className="text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded">
+                                    {tid}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground italic">No tests taken yet.</p>
+                            )}
+                          </Block>
+
+                          <Block title={`Badges & Achievements (${(u.badges || []).length})`}>
+                            {u.badges && u.badges.length > 0 ? (
+                              <div className="flex flex-wrap gap-1.5">
+                                {u.badges.map((b) => (
+                                  <span key={b} className="text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <Award className="w-2.5 h-2.5" /> {b}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground italic">No badges unlocked yet.</p>
+                            )}
+                          </Block>
+                        </div>
                       </div>
                     )}
                   </div>
