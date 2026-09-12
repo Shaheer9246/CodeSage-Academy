@@ -7,6 +7,8 @@ import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
 import { useIsMobile } from '@/hooks/use-mobile';
 import JSZip from 'jszip';
+import { downloadTextFile } from '@/lib/downloadHelper';
+import { toast } from 'sonner';
 
 interface FileItem { id: string; name: string; lang: string; content: string; }
 interface RecentSnapshot { id: string; name: string; date: string; html: string; css: string; js: string; }
@@ -133,12 +135,19 @@ const Playground = () => {
   }, []);
 
   const handleExport = () => {
-    const fullHtml = `<!DOCTYPE html><html><head><style>${currentCss}</style></head><body>${currentHtml.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<head>[\s\S]*?<\/head>|<\/?body[^>]*>/gi, '')}<script>${currentJs}</script></body></html>`;
-    const blob = new Blob([fullHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `codesage-${Date.now()}.html`; a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const fullHtml = `<!DOCTYPE html><html><head><style>${currentCss}</style></head><body>${currentHtml.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<head>[\s\S]*?<\/head>|<\/?body[^>]*>/gi, '')}<script>${currentJs}</script></body></html>`;
+      const filename = `codesage-${Date.now()}.html`;
+      const success = downloadTextFile(fullHtml, filename, 'text/html');
+      if (success) {
+        toast.success(`Exported ${filename}`);
+      } else {
+        toast.error('Unable to download file. Please check browser permissions.');
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('Unable to download file.');
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -266,12 +275,19 @@ const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   const exportRecent = (snap: RecentSnapshot) => {
-    const fullHtml = `<!DOCTYPE html><html><head><style>${snap.css}</style></head><body>${snap.html}<script>${snap.js}</script></body></html>`;
-    const blob = new Blob([fullHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `${snap.name.replace(/\s/g, '-')}.html`; a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const fullHtml = `<!DOCTYPE html><html><head><style>${snap.css}</style></head><body>${snap.html}<script>${snap.js}</script></body></html>`;
+      const filename = `${snap.name.replace(/\s/g, '-')}.html`;
+      const success = downloadTextFile(fullHtml, filename, 'text/html');
+      if (success) {
+        toast.success(`Exported ${filename}`);
+      } else {
+        toast.error('Unable to download file.');
+      }
+    } catch (err) {
+      console.error('Export recent error:', err);
+      toast.error('Unable to download file.');
+    }
   };
 
   const deleteRecent = (id: string) => {
