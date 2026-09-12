@@ -203,7 +203,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       ref={iframeRef}
       className="w-full h-full border-0 bg-[#0f0a2e]"
       style={{ backgroundColor: '#0f0a2e' }}
-      sandbox="allow-scripts allow-modals allow-same-origin"
+      sandbox="allow-scripts allow-modals allow-same-origin allow-downloads"
       title="Preview"
     />
   );
