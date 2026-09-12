@@ -259,10 +259,9 @@ const CExpertLessonPage = () => {
               </div>
 
               {/* C Workspace Integration */}
-              <div className="h-[500px] min-h-[400px]">
+              <div className="h-[520px] min-h-[420px] glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
                 <CWorkspace
-                  starterCode={lesson.starterCode}
-                  initialCode={lesson.initialCode}
+                  key={lesson.id}
                   practical={lesson.practical}
                   requiresLocalTerminal={!!lesson.terminalNotice}
                   embedded={false}
