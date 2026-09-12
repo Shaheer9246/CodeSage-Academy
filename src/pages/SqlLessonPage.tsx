@@ -272,12 +272,24 @@ const SqlLessonPage = () => {
   if (!isGuest && !isSqlLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/sql-learn" replace />;
 
   const quiz = lesson.quiz ?? [];
-  const correctCount = useMemo(
-    () => quiz.filter((q: any, i: number) => answers[i] === q.correctIndex).length,
-    [quiz, answers]
-  );
-  const totalQuizLength = quiz.length;
-  const passed = correctCount >= Math.min(3, totalQuizLength);
+const correctCount = useMemo(
+  () => quiz.filter((q: any, i: number) => answers[i] === q.correctIndex).length,
+  [quiz, answers]
+);
+
+const totalQuizLength = quiz.length;
+
+const passThreshold =
+  totalQuizLength === 0
+    ? 0
+    : Math.max(1, Math.ceil(totalQuizLength * 0.75));
+
+const passPercentage =
+  totalQuizLength === 0
+    ? 0
+    : Math.round((correctCount / totalQuizLength) * 100);
+
+const passed = correctCount >= passThreshold;
   const allAnswered = quiz.every((_: any, i: number) => answers[i] !== undefined);
   
   const stageIndex = STAGES.findIndex(s => s.key === stage);
@@ -504,7 +516,9 @@ const SqlLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score {Math.min(3, totalQuizLength)}/{totalQuizLength} to finish this lesson.</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Score {passThreshold}/{totalQuizLength} to pass. You need at least 75%.
+                      </p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_: any, i: number) => (
@@ -588,7 +602,9 @@ const SqlLessonPage = () => {
                       <span className="text-muted-foreground text-lg"> / {totalQuizLength}</span>
                     </p>
                     <p className={`text-sm font-display font-semibold mt-1 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
-                      {passed ? '🎉 Lesson passed!' : 'Almost there — review and retry'}
+                         {passed
+                      ? `🎉 Lesson passed! You scored ${passPercentage}%.`
+                      : `Almost there — you scored ${passPercentage}%. You need ${passThreshold}/${totalQuizLength} to pass.`}
                     </p>
                     {!passed && (
                       <button
