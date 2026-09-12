@@ -1,5 +1,3 @@
-// PART 1 OF 3: Real-World Execution (RealFreelance) Track - Lessons 1 to 5
-// Rewritten for "Last Level" Depth, 75% Quiz Logic Compatibility, and Elite B2B Methodologies.
 
 import type { NetworkingLesson } from './networkingLessons';
 
@@ -752,8 +750,393 @@ export const REAL_FREELANCE_LESSONS_PART_1: RealFreelanceLesson[] = [
       'Protect your cognitive bandwidth by firing abusive clients via the Tactical Refund.',
     ],
   },
+
+  {
+    id: 'real-free-11',
+    module: 'Module 2: Real-World Execution',
+    order: 11,
+    title: 'Building Your SOPs (Standard Operating Procedures)',
+    icon: '📋',
+    philosophy: 'If you are doing a task the exact same way for the fifth time without a system, you are wasting cognitive bandwidth. SOPs are the blueprints of a scalable business. They transition you from a chaotic "maker" trapped in the daily grind to an "architect" who builds machines that run without them.',
+    concepts: [
+      {
+        title: '1. The "Truck Factor" (Knowledge Silos)',
+        beginner: 'If you get sick or hit by a truck, does your business stop completely? If all the passwords and steps are only in your head, you have a "Truck Factor" of one. You need to write them down so someone else can take over.',
+        advanced: 'The "Truck Factor" (or Bus Factor) measures your business\'s vulnerability to knowledge silos. If critical operational knowledge resides exclusively in your working memory, you cannot scale, take a vacation, or hire help. Documenting SOPs externalizes your intellect, transforming fragile human memory into resilient, transferable organizational assets.',
+      },
+      {
+        title: '2. The Loom + AI Stack (Frictionless Documentation)',
+        beginner: 'Do not write 20-page manuals that no one will read. Just record your screen while you do the task, talk out loud, and use AI to turn your video into a written checklist.',
+        advanced: 'Text-based documentation suffers from high creation friction and rapid decay. Deploy the "Loom + AI" stack: Record a screen-share execution of the task while narrating your decision tree. Feed the transcript to an LLM to generate a structured markdown checklist. This creates high-fidelity, low-friction SOPs in minutes rather than hours.',
+      },
+      {
+        title: '3. The "Trigger-Action-Output" Framework',
+        beginner: 'Every instruction should be simple: What starts the task? What do you actually click or do? What is the final result?',
+        advanced: 'Structure every SOP using the atomic "Trigger-Action-Output" (TAO) framework. Trigger: The event that initiates the process (e.g., "Stripe webhook received"). Action: The exact keystrokes or API calls required. Output: The verifiable end state (e.g., "Notion database updated"). This removes ambiguity and ensures deterministic execution by junior staff or AI agents.',
+      },
+      {
+        title: '4. Iterative Patching (SOPs as Code)',
+        beginner: 'If a client gets confused or a step fails, treat it like a bug in your code. Go back and fix the instruction manual immediately.',
+        advanced: 'Treat SOPs like living code repositories, not static PDFs. When a subcontractor fails a task or a client asks a redundant question, you have discovered a "bug" in your documentation. Execute an immediate "patch" to the SOP. Continuous iterative refactoring of your systems is what separates a fragile hustle from a robust enterprise.',
+      },
+    ],
+    practical: {
+      title: 'Record and Deploy Your First Atomic SOP',
+      intro: 'Systematize one critical bottleneck in your business today using the frictionless documentation stack.',
+      steps: [
+        'Identify your most annoying, repetitive admin task (e.g., setting up a new Notion Client Portal or running a Lighthouse audit).',
+        'Open Loom and hit record. Execute the task perfectly while narrating your internal decision tree out loud ("I click here because X, and I avoid Y because...").',
+        'What you will see: A raw video asset. Why it matters: You have captured your tacit knowledge without the friction of typing.',
+        'Copy the video transcript and paste it into an AI prompt: "Convert this transcript into a strict Trigger-Action-Output checklist."',
+        'Paste the resulting checklist into your central "Systems" database (Notion/Obsidian) alongside the embedded Loom video.',
+      ],
+      goal: 'Reclaim mental bandwidth by offloading your core processes into deterministic, transferable systems.',
+    },
+    quiz: [
+      {
+        question: 'What is the fastest, most modern method for creating a high-fidelity Standard Operating Procedure (SOP)?',
+        options: ['Writing a 50-page technical manual in Microsoft Word', 'Recording a screen-share Loom video while doing the task and using AI to transcribe it into a checklist', 'Hiring an expensive technical writer to shadow you', 'Memorizing the steps and teaching them verbally'],
+        correctIndex: 1,
+        explanation: 'Correct: The "Loom + AI" stack eliminates the high friction of writing while capturing the nuance of your decision tree, which AI then structures into a readable format. Why others are wrong: Writing manuals takes too long. Technical writers are expensive and miss tacit knowledge. Memorization does not scale and creates knowledge silos.',
+      },
+      {
+        question: 'Which tasks in your freelance business should be turned into an SOP?',
+        options: ['Only highly creative, one-off design projects', 'Only tasks you do once a year for tax purposes', 'Any repetitive task you execute more than twice (e.g., Onboarding, Invoicing, Deployments)', 'None; freelancing requires spontaneous, custom problem solving every time'],
+        correctIndex: 2,
+        explanation: 'Correct: The rule of thumb is "if you do it three times, systematize it." Repetitive tasks drain cognitive bandwidth and are prone to human error; SOPs automate the execution. Why others are wrong: Creative work requires frameworks, not rigid SOPs. Yearly tasks are too rare to justify the setup time. Spontaneity does not scale.',
+      },
+      {
+        question: 'What does the "Truck Factor" (or Bus Factor) measure in a business?',
+        options: ['The physical shipping costs of hardware', 'The vulnerability of knowledge silos; how many people must vanish for the business to halt', 'The server capacity required to handle traffic', 'A metric for measuring website conversion rates'],
+        correctIndex: 1,
+        explanation: 'Correct: The Truck Factor measures operational fragility. If you are the only one who knows how to deploy the code or access the servers, your Truck Factor is 1, making the business highly vulnerable. Why others are wrong: It is a metaphor for human capital risk, not logistics, servers, or marketing metrics.',
+      },
+      {
+        question: 'When should an SOP be updated or "patched"?',
+        options: ['Never; once written, it is a permanent legal document', 'Only once a year during a formal company review', 'Immediately, whenever a process breaks down, a subcontractor fails, or a client gets confused', 'Only when you hire a new CEO to run the company'],
+        correctIndex: 2,
+        explanation: 'Correct: SOPs are living code. A client question or a failed task is a "bug report" indicating the documentation is flawed. Patching it immediately prevents the same failure from happening twice. Why others are wrong: Static SOPs decay rapidly as software and workflows change.',
+      },
+    ],
+    keyTakeaways: [
+      'Systematize the repetitive to free up cognitive bandwidth for high-leverage creative work.',
+      'Use the Loom + AI stack to eliminate the friction of writing documentation.',
+      'Externalize your knowledge to increase your Truck Factor and eliminate silos.',
+      'Treat client friction and team mistakes as bug reports for your SOPs.',
+    ],
+  },
+  {
+    id: 'real-free-12',
+    module: 'Module 2: Real-World Execution',
+    order: 12,
+    title: 'Scaling: Hiring Your First Subcontractor',
+    icon: '🤝',
+    philosophy: 'You can only grind so many hours before you burn out. To break the income ceiling, you must transition from a solo player to a guild leader. Scaling is not about working harder; it is about buying back your time by delegating low-leverage tasks to a specialized support squad.',
+    concepts: [
+      {
+        title: '1. The $20/hr vs $200/hr Audit (Opportunity Cost)',
+        beginner: 'If you charge $100 an hour, but you spend 5 hours organizing files or doing basic CSS tweaks, you are actually losing money. Pay someone $20 an hour to do the boring stuff so you can do the $100/hr stuff.',
+        advanced: 'Conduct a ruthless Opportunity Cost Audit. Track your time for a week and categorize tasks by their market rate. If you are a $200/hr senior architect spending time on $20/hr data entry or basic QA, you are actively destroying your own profit margins. Delegate the bottom 30% of your task list to buy back time for high-leverage revenue generation.',
+      },
+      {
+        title: '2. The Paid "Trial Quest" (Risk Mitigation)',
+        beginner: 'Never give a new hire the keys to your biggest client\'s website on day one. Give them a small, fake project for $50 to see if they are actually good and communicate well.',
+        advanced: 'Never risk live client infrastructure on an unvetted subcontractor. Deploy a paid "Trial Quest"—a small, isolated, $50-$100 micro-project (e.g., "Build this specific React component" or "Format this Notion database"). This tests their technical execution, communication latency, and adherence to SOPs without exposing your core business to catastrophic risk.',
+      },
+      {
+        title: '3. Asynchronous Delegation (Ticket-Based Management)',
+        beginner: 'Do not sit on Zoom calls all day explaining tasks. Put the task in a checklist, assign it, and let them do it on their own time.',
+        advanced: 'Micromanagement via Slack destroys deep work for both you and the contractor. Manage via asynchronous ticketing systems (Linear, Trello, or Notion). Assign a task, attach the Loom SOP from Lesson 11, and define the "Definition of Done." If your SOP is robust, the contractor should be able to execute flawlessly without a single synchronous meeting.',
+      },
+      {
+        title: '4. White-Label Margins (Arbitrage Economics)',
+        beginner: 'If you pay a junior developer $30 an hour, you must charge the client $90 an hour. The extra $60 pays you for finding the client, checking the work, and taking the risk.',
+        advanced: 'You are now operating as an agency, engaging in labor arbitrage. The margin between the subcontractor\'s rate and the client\'s rate is not "greed"; it is your compensation for Customer Acquisition Cost (CAC), Quality Assurance (QA), project management, and holding the ultimate liability. Never pass the raw contractor rate to the client.',
+      },
+    ],
+        practical: {
+      title: 'Run the Delegation Audit & Trial Quest',
+      intro: 'Identify exactly what you need to outsource and safely test your first candidate without risking a live client.',
+      steps: [
+        'Track every hour of your work this week using a tool like Toggl or Clockify.',
+        'At the end of the week, highlight every task that required zero creative thinking, strategic planning, or senior-level skill.',
+        'Calculate how many hours those low-leverage tasks took. What you will see: 10-20 hours of lost high-value time. Why it matters: This is the exact amount of time you need to buy back.',
+        'Draft a job description for a junior developer or virtual assistant to take over exactly those highlighted hours.',
+        'Post a gig on Upwork for a $50 "Trial Quest" (e.g., "Build a single React component based on this Figma file").',
+        'Hire 3 different candidates for the Trial Quest. Grade them on speed, code quality, and communication before giving them real work.',
+      ],
+      goal: 'Visualize your lost leverage and safely onboard your first subcontractor using a risk-free trial.',
+    },
+    quiz: [
+      {
+        question: 'What is the most logical way to decide what to outsource first?',
+        options: ['Outsource the most important client meetings', 'Outsource low-leverage ($20/hr) tasks so you can focus on high-leverage ($200/hr) tasks', 'Outsource the things you enjoy doing the most', 'Flip a coin'],
+        correctIndex: 1,
+        explanation: 'Correct: This is an Opportunity Cost Audit. If you spend senior-level time on junior-level tasks, you are actively destroying your profit margins. Delegate the bottom 30%. Why others are wrong: You should never outsource high-leverage client relationships or tasks you are uniquely best at until the very end.',
+      },
+      {
+        question: 'How should you evaluate a new subcontractor safely?',
+        options: ['Give them the login to your main client database on day one', 'Trust their portfolio and give them a massive project', 'Assign a small, paid "Trial Quest" isolated from real clients to test their actual execution', 'Interview them for 5 hours'],
+        correctIndex: 2,
+        explanation: 'Correct: A paid Trial Quest tests their technical execution, communication latency, and adherence to SOPs without exposing your core business to catastrophic risk. Why others are wrong: Giving live client access to an unvetted hire is a massive security and reputation risk.',
+      },
+      {
+        question: 'What is the secret to managing a subcontractor without micromanaging?',
+        options: ['Calling them every 30 minutes', 'Using clear SOPs and asynchronous ticketing systems (Trello/Linear)', 'Working in the exact same room as them', 'Screaming at them'],
+        correctIndex: 1,
+        explanation: 'Correct: If your SOPs are robust, the contractor should be able to execute flawlessly without a single synchronous meeting. Async management protects deep work for both of you. Why others are wrong: Constant meetings and micromanagement destroy the very leverage you are trying to buy.',
+      },
+      {
+        question: 'Why do you charge the client more than you pay the subcontractor?',
+        options: ['Because it is a scam', 'To cover your overhead, QA management time, and the risk you hold as the agency owner', 'Because the subcontractor is always wrong', 'Because taxes are 100%'],
+        correctIndex: 1,
+        explanation: 'Correct: The margin is your compensation for Customer Acquisition Cost (CAC), Quality Assurance (QA), project management, and holding the ultimate liability. You are selling the result, not raw labor. Why others are wrong: It is standard agency arbitrage, not a scam. The subcontractor might be great, but you hold the client relationship.',
+      },
+    ],
+    keyTakeaways: [
+      'Your time is mathematically too valuable for admin work; run an Opportunity Cost Audit.',
+      'Always test new hires with a paid, isolated Trial Quest to mitigate risk.',
+      'Good management relies on robust SOPs and async ticketing, not constant chatting.',
+      'Profit margin is the reward for managing the client, QA, and taking the risk.',
+    ],
+  },
+  {
+    id: 'real-free-13',
+    module: 'Module 2: Real-World Execution',
+    order: 13,
+    title: 'Strategic Partnerships & White-Label Arbitrage',
+    icon: '🕸️',
+    philosophy: 'Cold outreach is hunting with a spear. Partnerships are building a net. Stop chasing clients one by one and start aligning with the agencies and consultants who already have your ideal clients locked in their vaults. Let them bring you the kills in exchange for a wholesale margin.',
+    concepts: [
+      {
+        title: '1. The Agency Overflow Valve',
+        beginner: 'Big marketing agencies often win projects that require coding or technical skills they don\'t have in-house. You become their secret, reliable "overflow" team when they are too busy.',
+        advanced: 'Position yourself as a specialized, reliable overflow valve for generalist digital agencies. When they win a massive enterprise contract but lack the internal WebGL, Rust, or Headless CMS capacity, you step in as their white-label technical partner, eliminating their need to hire full-time niche engineers.',
+      },
+      {
+        title: '2. Complementary Vectors',
+        beginner: 'Team up with people who do what you don\'t. If you are a backend coder, partner with a high-end UI designer. You share leads and offer a complete package.',
+        advanced: 'Form symbiotic partnerships with non-competing experts (e.g., a Brand Strategist partnering with a Headless Shopify Developer). By bundling your services, you elevate both of your perceived values and can pitch $50k comprehensive transformations instead of $10k isolated tasks.',
+      },
+      {
+        title: '3. White-Label Economics',
+        beginner: 'You do the work, the agency puts their logo on it and takes the credit. You get steady cash without ever having to do sales or talk to the client.',
+        advanced: 'White-labeling allows you to arbitrage your specialized labor through non-technical agencies at a "wholesale" rate. You eliminate your own Customer Acquisition Cost (CAC) entirely. The agency marks up your rate 2x or 3x to the end client, but you gain a predictable pipeline of high-tier work with zero marketing spend.',
+      },
+      {
+        title: '4. The Referral Treaty',
+        beginner: 'Make a formal deal with other freelancers: "If you send me a client I can\'t help, I\'ll send them to you, and we pay each other a 10% finder\'s fee."',
+        advanced: 'Structure formal rev-share agreements and SLA guarantees to build institutional trust with partner founders. A documented "Referral Treaty" turns casual acquaintances into a highly motivated, distributed sales force that actively hunts for your specific micro-monopoly.',
+      },
+    ],
+    practical: {
+      title: 'Map and Pitch 5 B2B Partners',
+      intro: 'Stop hunting alone. Build a net by identifying 5 non-competing agencies or consultants who serve your exact Ideal Customer Profile (ICP).',
+      steps: [
+        'Identify 5 targets: Look for Brand Design Agencies, SEO Firms, or Marketing Consultants who serve your niche but lack your specific technical execution skills.',
+        'Audit their public work: Find a recent project of theirs that clearly suffered because they lacked your specialized technical skill (e.g., a beautiful site that loads terribly).',
+        'Draft a "Partner Pitch" email: "Loved your recent rebrand for X. I\'m a specialized [Your Niche] developer. I often see agencies like yours win bigger retainers when they can offer [Your Skill] in-house. Open to a 10-min chat about being your white-label overflow partner?"',
+        'What you will see: A shift from begging for work to offering a B2B strategic alliance. Why it matters: You are speaking to them as a peer, not a subordinate.',
+        'Prepare a "Wholesale Rate Card" specifically for partners, showing them the margin they will make by marking up your services.',
+      ],
+      goal: 'Establish 2 active agency partnerships that feed you a steady stream of zero-CAC, high-tier projects.',
+    },
+    quiz: [
+      {
+        question: 'What is the primary financial advantage of "White-Labeling" your services for an agency?',
+        options: ['You get to charge the end-client triple your normal rate', 'You completely eliminate your Customer Acquisition Cost (CAC) and marketing spend', 'You legally own the intellectual property of the final product', 'You never have to write code again'],
+        correctIndex: 1,
+        explanation: 'Correct: The agency handles all sales, marketing, and client management. You trade a portion of the top-line revenue for a guaranteed pipeline of work with zero acquisition costs. Why others are wrong: You do not charge the end-client directly (the agency does). You do not own the IP. You still write the code.',
+      },
+      {
+        question: 'Why are "Complementary Vectors" (e.g., a Designer + a Developer) so powerful?',
+        options: ['It allows you to split the taxes evenly', 'It allows you to bundle services and pitch comprehensive transformations instead of isolated tasks', 'It ensures you never have to talk to the client', 'It makes your portfolio look colorful'],
+        correctIndex: 1,
+        explanation: 'Correct: Clients prefer to hire one unified team to solve a massive business problem rather than managing five separate freelancers. Bundling elevates your perceived value and allows you to capture larger budgets. Why others are wrong: It doesn\'t affect taxes or eliminate client communication. It\'s about strategic positioning.',
+      },
+      {
+        question: 'How do you position yourself to a busy marketing agency?',
+        options: ['As a junior freelancer looking for an internship', 'As a specialized, reliable "overflow valve" that allows them to say "yes" to bigger enterprise contracts', 'As a competitor trying to steal their clients', 'As a generalist who can do a little bit of everything'],
+        correctIndex: 1,
+        explanation: 'Correct: Agencies are terrified of turning down big money because they lack a niche skill. By positioning as an overflow valve, you become a revenue-enabler, not an expense. Why others are wrong: Agencies do not hire juniors for enterprise overflow. You are not a competitor if your skills are complementary. Generalists do not solve their specific bottlenecks.',
+      },
+      {
+        question: 'What is a "Referral Treaty"?',
+        options: ['A legal document preventing your clients from leaving', 'A structured rev-share agreement that turns peers into a distributed sales force', 'A government tax form for freelancers', 'A promise to work for free on weekends'],
+        correctIndex: 1,
+        explanation: 'Correct: A formalized rev-share agreement (e.g., 10% finder\'s fee) incentivizes other trusted professionals to actively hunt for leads that fit your exact micro-monopoly. Why others are wrong: It is a B2B partnership tool, not a client-retention legal trap or a tax form.',
+      },
+    ],
+    keyTakeaways: [
+      'Stop hunting with a spear; build a net through strategic B2B partnerships.',
+      'White-labeling eliminates your CAC and provides a predictable pipeline of enterprise work.',
+      'Bundle complementary skills to pitch massive, comprehensive transformations.',
+      'Formalize referral treaties to turn peers into a highly motivated sales force.',
+    ],
+  },
+  {
+    id: 'real-free-14',
+    module: 'Module 2: Real-World Execution',
+    order: 14,
+    title: 'Post-Launch Telemetry & CRO',
+    icon: '📈',
+    philosophy: 'Amateurs celebrate the launch. Professionals know the launch is just the starting gun for data collection. The real gold is mined in the post-launch optimization loop, where you use telemetry to print money for your clients, transitioning from a "vendor" to an indispensable "strategic board member."',
+    concepts: [
+      {
+        title: '1. Launch is Day Zero (Telemetry Setup)',
+        beginner: 'Putting the website online is not the finish line. It is the moment you finally start getting real data on how actual humans use it.',
+        advanced: 'Shift from a "deliverable" mindset to an "iterative growth" mindset. Before launch, embed robust telemetry (Hotjar, Microsoft Clarity, GA4 funnels). The launch merely establishes the baseline metrics; true engineering value begins when you analyze user behavior flows, rage-clicks, and drop-off points.',
+      },
+      {
+        title: '2. The Friction Audit',
+        beginner: 'Watch recordings of real people trying to use the site. When they get confused or click the wrong thing, that is a "friction point" you need to fix.',
+        advanced: 'Conduct a heuristic Friction Audit using session recordings. Identify cognitive overload, latency bottlenecks, and UI dead-ends. By systematically reducing friction in the user funnel, you directly impact the client\'s Customer Acquisition Cost (CAC) and Lifetime Value (LTV).',
+      },
+      {
+        title: '3. The A/B Testing Mindset',
+        beginner: 'Instead of arguing about which button color is better, show both to different visitors and let the math decide.',
+        advanced: 'Implement statistical significance testing to validate hypotheses. Moving from "gut feeling" design to data-driven engineering removes emotion from the boardroom. When you present A/B test results, you are no longer offering subjective opinions; you are presenting mathematical inevitabilities.',
+      },
+      {
+        title: '4. The Quarterly ROI Report',
+        beginner: 'Meet with the client every 3 months to show them how much money your tweaks made them, and plan the next moves.',
+        advanced: 'Transition from a "vendor" to a "strategic board member" by presenting quarterly ROI reports and roadmap pivots based on analytics. This embeds you so deeply into their operational planning that firing you becomes mathematically and strategically impossible.',
+      },
+    ],
+    practical: {
+      title: 'Pitch the Post-Launch CRO Sprint',
+      intro: 'Stop handing over the keys and walking away. Construct a "Phase 2: Data & Optimization" proposal to pitch 30 days after every launch.',
+      steps: [
+        'Install Microsoft Clarity (it\'s free and powerful) on the project before launch day.',
+        'Wait 30 days post-launch to gather a statistically significant baseline of user behavior data.',
+        'Record a Loom video analyzing the telemetry: Point out exactly where users are rage-clicking, dropping off, or encountering latency.',
+        'Draft a "CRO Sprint" proposal: "I found 3 friction points in your checkout. I propose a 2-week sprint to A/B test solutions, aiming to increase conversion by 15%."',
+        'What you will see: The client realizing you care about their revenue, not just their code. Why it matters: You have shifted from a cost-center to a profit-center.',
+      ],
+      goal: 'Embed yourself into the client\'s long-term growth strategy, making your services indispensable and mathematically justified.',
+    },
+    quiz: [
+      {
+        question: 'Why do elite freelancers view the "Launch" as Day Zero rather than the finish line?',
+        options: ['Because they need an excuse to charge the client more money', 'Because the launch merely establishes baseline telemetry; true value begins with iterative optimization', 'Because the code is never actually finished', 'Because clients always hate the first version'],
+        correctIndex: 1,
+        explanation: 'Correct: You cannot optimize what you cannot measure. The launch provides the real-world user data required to systematically improve the asset\'s ROI. Why others are wrong: It is not about making excuses or clients hating the work; it is about shifting to a data-driven growth mindset.',
+      },
+      {
+        question: 'How does a "Friction Audit" justify your high fees?',
+        options: ['It makes the website look much prettier', 'It directly impacts the client\'s bottom line by reducing friction and increasing revenue without extra ad spend', 'It allows you to use more expensive servers', 'It reduces the amount of code you have to write'],
+        correctIndex: 1,
+        explanation: 'Correct: Removing friction directly improves the client\'s financial metrics (lowering CAC, increasing LTV). When your work mathematically prints money for the client, your fee becomes an investment, not an expense. Why others are wrong: CRO is about funnel mechanics and psychology, not just aesthetics or server hardware.',
+      },
+      {
+        question: 'What is the primary psychological benefit of using "A/B Testing" with clients?',
+        options: ['It proves you are better at design than they are', 'It removes emotion and ego from the boardroom by replacing opinions with mathematical inevitabilities', 'It guarantees the website will never crash', 'It allows you to secretly charge them for two websites'],
+        correctIndex: 1,
+        explanation: 'Correct: A/B testing shifts the conversation from subjective arguments ("I don\'t like this color") to objective data ("Version B increased conversions by 14% with statistical significance"). Why others are wrong: It is a tool for objective decision-making, not an ego trip or a secret billing tactic.',
+      },
+      {
+        question: 'What is the ultimate goal of the "Quarterly ROI Report"?',
+        options: ['To ask the client for a referral', 'To transition from a disposable "vendor" to an indispensable "strategic board member"', 'To show off your new software tools', 'To apologize for bugs that happened during the quarter'],
+        correctIndex: 1,
+        explanation: 'Correct: By presenting quarterly ROI reports and data-driven roadmaps, you embed yourself into their executive planning. You become a partner in their growth, making the thought of replacing you unthinkable. Why others are wrong: It is a high-level strategic positioning tool, not a customer service apology tour.',
+      },
+    ],
+    keyTakeaways: [
+      'Launch is Day Zero. Real value is created in the post-launch optimization loop.',
+      'Use Telemetry (Clarity/Hotjar) to find friction and justify your fees.',
+      'Use A/B testing to replace subjective boardroom arguments with mathematical data.',
+      'Embed yourself in their quarterly planning to become an indispensable strategic partner.',
+    ],
+  },
+  {
+    id: 'real-free-15',
+    module: 'Module 2: Real-World Execution',
+    order: 15,
+    title: 'Productized Service Execution',
+    icon: '🏭',
+    philosophy: 'Custom scoping is a trap that leads to endless haggling and scope creep. Productization is the factory. By turning your service into a rigid, fixed-price "menu item" with automated delivery, you decouple your revenue from your time and build a scalable machine.',
+    concepts: [
+      {
+        title: '1. The "Menu" Architecture',
+        beginner: 'Instead of asking "What do you want me to build?", hand them a menu: "I do exactly these 3 things, for these exact prices. Pick one."',
+        advanced: 'Productized services eliminate proposal haggling and accelerate the sales cycle. By strictly defining the deliverables, tech stack, and timeline upfront, you shift the client\'s psychological decision from "Should I hire this person?" to "Which package should I buy?"',
+      },
+      {
+        title: '2. The Automated Intake Gate',
+        beginner: 'If they buy a package, they must fill out a strict form with all their passwords and text before you start.',
+        advanced: 'Deploy a mandatory, gated intake form (via Typeform or Tally) that triggers only *after* payment. If the client cannot provide the required assets or API keys in the structured fields, the project clock does not start. This completely eliminates "asset-chasing" downtime.',
+      },
+      {
+        title: '3. The "No-Custom-Work" Boundary',
+        beginner: 'If they ask for something not on the menu, you politely say no, or tell them to buy a different menu item.',
+        advanced: 'The core value of productization is the "No-Custom-Work" boundary. When a client requests a deviation, deploy the script: "This package is optimized for X. Custom deviations break our assembly line and require a custom hourly contract. Shall we proceed with the standard package?"',
+      },
+      {
+        title: '4. The Tech Stack Assembly Line',
+        beginner: 'Use tools to automatically send them the welcome packet and invoice the moment they click "Buy".',
+        advanced: 'Integrate Stripe Checkout with Zapier and Notion. When a payment clears, Zapier automatically generates the Notion Client Portal, sends the Intake Form, and schedules the Kickoff email. You are building a SaaS-like onboarding flow for a service business.',
+      },
+    ],
+    practical: {
+      title: 'Build Your First Productized Checkout Flow',
+      intro: 'Turn one of your most common freelance tasks into a fixed-price, automated product.',
+      steps: [
+        'Identify your most repetitive task (e.g., "Lighthouse Speed Optimization" or "Landing Page Build").',
+        'Define the strict boundaries: Exactly what is included, what tech stack you will use, and what is strictly OUT of scope.',
+        'Set up a Stripe Payment Link for a fixed price (e.g., $1,500).',
+        'Create a Tally.so intake form that asks for all necessary assets (logos, copy, hosting access).',
+        'Use Zapier: Trigger -> "New Stripe Payment" -> Action -> "Send Email with Tally Form Link & Notion Portal".',
+      ],
+      goal: 'Create a service that you can sell and onboard with zero manual administrative effort.',
+    },
+    quiz: [
+      {
+        question: 'What is the primary psychological shift that Productized Services create for the buyer?',
+        options: ['It makes them feel like they are hiring a massive corporation', 'It shifts their decision from "Should I hire this person?" to "Which package should I buy?"', 'It allows them to negotiate the price down easily', 'It forces them to sign a 5-year contract'],
+        correctIndex: 1,
+        explanation: 'Correct: By presenting a fixed menu, you eliminate the ambiguity of custom scoping. The client assumes the price and scope are fixed, bypassing the grueling negotiation phase. Why others are wrong: It does not encourage negotiation (it prevents it). It is not about faking a corporation or forcing long-term legal locks.',
+      },
+      {
+        question: 'Why is a "Gated Intake Form" critical for productized services?',
+        options: ['It looks more professional than an email', 'It prevents the project clock from starting until all assets are provided, eliminating asset-chasing downtime', 'It automatically writes the code for you', 'It prevents the client from asking questions'],
+        correctIndex: 1,
+        explanation: 'Correct: In an assembly line, you cannot build without raw materials. The gated form ensures you have 100% of the required assets before you begin, protecting your profit margins from delays. Why others are wrong: It is an operational bottleneck-preventer, not just a cosmetic tool.',
+      },
+      {
+        question: 'How should you handle a client who buys a productized service but asks for custom deviations?',
+        options: ['Do it for free to keep them happy', 'Politely enforce the "No-Custom-Work" boundary and offer it as a separate hourly contract', 'Cancel the project and refund them immediately', 'Complain to them about how hard it is'],
+        correctIndex: 1,
+        explanation: 'Correct: Custom deviations break the assembly line and destroy the leverage of productization. Enforcing the boundary protects your margins while still offering a path forward (hourly billing). Why others are wrong: Doing it for free destroys the business model. Canceling is unnecessary if they are willing to pay hourly for custom work.',
+      },
+      {
+        question: 'What is the ultimate goal of automating the onboarding via Zapier and Stripe?',
+        options: ['To fire all your clients', 'To decouple your revenue from your administrative time, creating a SaaS-like scalable machine', 'To avoid paying taxes', 'To make your website load faster'],
+        correctIndex: 1,
+        explanation: 'Correct: Automation removes you from the administrative loop. You can sell 10 packages in a day and the onboarding happens flawlessly without you typing a single email, achieving true leverage. Why others are wrong: It has nothing to do with taxes, website speed, or firing clients.',
+      },
+    ],
+    keyTakeaways: [
+      'Custom scoping is a trap; productization is a scalable factory.',
+      'Shift the buyer\'s psychology from "negotiation" to "selection."',
+      'Gate your intake process to eliminate asset-chasing downtime.',
+      'Automate the assembly line with Stripe, Zapier, and Notion.',
+    ],
+  }
 ];
 
-// Helper functions for Part 1
-export const getRealFreelanceLessonByIdPart1 = (id: string): RealFreelanceLesson | undefined =>
-  REAL_FREELANCE_LESSONS_PART_1.find(l => l.id === id);
+// ── FINAL COMBINED HELPER FUNCTIONS ─────────────────────────────────────
+// Combine all 3 parts to create the full 15-lesson Masterclass array.
+export const ALL_REAL_FREELANCE_LESSONS: RealFreelanceLesson[] = [
+  ...REAL_FREELANCE_LESSONS_PART_1,
+  ...REAL_FREELANCE_LESSONS_PART_2,
+  ...REAL_FREELANCE_LESSONS_PART_3,
+];
+
+export const getRealFreelanceLessonById = (id: string): RealFreelanceLesson | undefined =>
+  ALL_REAL_FREELANCE_LESSONS.find(l => l.id === id);
+
+export const isRealFreelanceLessonUnlocked = (id: string, completedLessons: string[]): boolean => {
+  const idx = ALL_REAL_FREELANCE_LESSONS.findIndex(l => l.id === id);
+  if (idx <= 0) return true;
+  return completedLessons.includes(ALL_REAL_FREELANCE_LESSONS[idx - 1].id);
+};
