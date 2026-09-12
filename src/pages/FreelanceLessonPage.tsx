@@ -39,7 +39,11 @@ const FreelanceLessonPage = () => {
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
+  
+  // 🎯 75% PASSING RULE IMPLEMENTATION
+  const passingScore = Math.ceil(quiz.length * 0.75);
+  const passed = correctCount >= passingScore;
+  
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
@@ -263,7 +267,8 @@ const FreelanceLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      {/* 🎯 DYNAMIC 75% SCORE TEXT */}
+                      <p className="text-[11px] text-muted-foreground">Score {passingScore}/{quiz.length} to finish this lesson.</p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
