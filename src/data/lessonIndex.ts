@@ -38,7 +38,8 @@ export type LessonTrackKey =
   | 'cpp'
   | 'cppexpert'
   | 'c'
-  | 'cexpert';
+  | 'cexpert'
+  | 'cx';
 
 const ids = (arr: { id: string }[]) => arr.map(l => l.id);
 
@@ -61,6 +62,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   cppexpert: ids(CPP_EXPERT_LESSONS),
   c: ids(C_LESSONS),
   cexpert: ids(C_EXPERT_LESSONS),
+  cx: ids(C_EXPERT_LESSONS),
 };
 
 export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
@@ -82,6 +84,7 @@ export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
   cppexpert: 'C++ Expert',
   c: 'C',
   cexpert: 'C Expert',
+  cx: 'C Expert',
 };
 
 export const LESSON_TRACK_KEYS = Object.keys(TRACK_LESSON_IDS) as LessonTrackKey[];
