@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Play,
   RotateCcw,
@@ -140,7 +140,12 @@ function cToJs(code: string): string {
 
   js = removeComments(js);
 
-  // Remove preprocessor directives
+  // Transform object-like #define NAME VALUE to const NAME = VALUE;
+  js = js.replace(/^\s*#define\s+([A-Za-z_]\w*)\s+([^\r\n]+)$/gm, (_m, name, val) => {
+    return `const ${name} = ${val.trim().replace(/;+$/, '')};`;
+  });
+
+  // Remove remaining preprocessor directives like #include, #ifdef, etc.
   js = js.replace(/^\s*#.*$/gm, '');
 
   // Transform functions
@@ -159,8 +164,34 @@ function cToJs(code: string): string {
   js = js.replace(/\bgetchar\s*\(\s*\)/g, "(await __read('%c'))");
   js = js.replace(/\bNULL\b/g, 'null');
   js = js.replace(/\bsizeof\s*\(\s*[^)]*\)/g, '8');
+  js = js.replace(/\bstrlen\s*\(\s*([^)]+)\s*\)/g, '($1).length');
+  js = js.replace(/\babs\s*\(/g, 'Math.abs(');
+  js = js.replace(/\bsqrt\s*\(/g, 'Math.sqrt(');
+  js = js.replace(/\bpow\s*\(/g, 'Math.pow(');
+  js = js.replace(/\b\([a-zA-Z_*\s]+\)\s*malloc\s*\([^)]*\)/g, '[]');
+  js = js.replace(/\bmalloc\s*\([^)]*\)/g, '[]');
+  js = js.replace(/\bfree\s*\([^)]*\)\s*;/g, ';');
 
   return js;
+}
+
+function getInitialCode(starterCode?: string, initialCode?: string, practical?: CWorkspaceProps['practical']): string {
+  if (initialCode) return initialCode;
+  if (starterCode) return starterCode;
+
+  if (practical?.steps) {
+    for (const step of practical.steps) {
+      const match = step.match(/(#include\s*<[^>]+>[\s\S]+?(?:return\s+0;?\s*}|}))/);
+      if (match) {
+        return match[1]
+          .replace(/\\n/g, '\n')
+          .replace(/\bthen\s+/g, '\n')
+          .trim();
+      }
+    }
+  }
+
+  return DEFAULT_STARTER;
 }
 
 function formatC(fmt: string, args: any[]): string {
@@ -203,8 +234,12 @@ const CWorkspace = ({
   onCodeChange,
   embedded = false,
   requiresLocalTerminal = false,
+  practical,
 }: CWorkspaceProps) => {
-  const initial = initialCode ?? starterCode ?? DEFAULT_STARTER;
+  const initial = useMemo(
+    () => getInitialCode(starterCode, initialCode, practical),
+    [starterCode, initialCode, practical]
+  );
 
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([
