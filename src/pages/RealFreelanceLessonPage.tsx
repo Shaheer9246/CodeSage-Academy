@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
-import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom'; // Added useSearchParams
+import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { REAL_FREELANCE_LESSONS, getRealFreelanceLessonById, isRealFreelanceLessonUnlocked } from '@/data/realfreelanceLesson';
@@ -18,11 +18,10 @@ const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = 
 ];
 
 const RealFreelanceLessonPage = () => {
-  const { id } = useParams<{ id: string }>(); // Correctly captures the :id from /rf-lesson/:id
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, completeLesson } = useUser();
   
-  // Added search params logic to preserve navigation context (prevents 404/wrong redirects)
   const [sp] = useSearchParams();
   const from = sp.get('from');
   const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/real-freelance?from=dashboard' : '/real-freelance';
@@ -44,7 +43,11 @@ const RealFreelanceLessonPage = () => {
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passed = correctCount >= 3;
+  
+  // 🎯 75% PASSING RULE IMPLEMENTATION
+  const passingScore = Math.ceil(quiz.length * 0.75);
+  const passed = correctCount >= passingScore;
+  
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
   const stageIndex = STAGES.findIndex(s => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
@@ -61,7 +64,6 @@ const RealFreelanceLessonPage = () => {
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
-      // Updated to preserve the 'from' context, matching PythonLessonPage
       navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
@@ -72,7 +74,7 @@ const RealFreelanceLessonPage = () => {
       <header className="sticky top-0 z-30 backdrop-blur-xl bg-background/85 border-b border-border/30">
         <div className="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-3">
           <button
-            onClick={() => navigate(backTo)} // Updated to use dynamic backTo
+            onClick={() => navigate(backTo)}
             className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-secondary/50 transition-colors"
             aria-label="Back"
           >
@@ -269,7 +271,8 @@ const RealFreelanceLessonPage = () => {
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score 3/4 to finish this lesson.</p>
+                      {/* 🎯 DYNAMIC 75% SCORE TEXT */}
+                      <p className="text-[11px] text-muted-foreground">Score {passingScore}/{quiz.length} to finish this lesson.</p>
                     </div>
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
@@ -436,7 +439,7 @@ const RealFreelanceLessonPage = () => {
           </button>
         ) : (
           <button
-            onClick={() => navigate(backTo)} // Updated to use dynamic backTo
+            onClick={() => navigate(backTo)}
             className="w-full bg-secondary text-foreground font-display font-semibold text-sm py-3.5 rounded-2xl hover:opacity-90"
           >
             Back to track
@@ -473,7 +476,7 @@ const RealFreelanceLessonPage = () => {
             </button>
           ) : (
             <button
-              onClick={() => navigate(backTo)} // Updated to use dynamic backTo
+              onClick={() => navigate(backTo)}
               className="bg-secondary text-foreground font-display font-semibold text-sm py-2 px-6 rounded-full hover:opacity-90"
             >
               Back to track
