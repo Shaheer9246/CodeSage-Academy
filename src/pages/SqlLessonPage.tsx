@@ -22,12 +22,20 @@ const loadSqlJs = (): Promise<any> => {
   sqlLoadPromise = new Promise((resolve, reject) => {
     const init = async (initSqlJs: any) => {
       try {
+        // Try local bundled wasm first, fallback to CDN if unavailable
         cachedSQL = await initSqlJs({
-          locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+          locateFile: (file: string) => `/sql/${file}`
         });
         resolve(cachedSQL);
-      } catch (err) {
-        reject(err);
+      } catch (localErr) {
+        try {
+          cachedSQL = await initSqlJs({
+            locateFile: (file: string) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+          });
+          resolve(cachedSQL);
+        } catch (err) {
+          reject(err);
+        }
       }
     };
 
@@ -36,10 +44,18 @@ const loadSqlJs = (): Promise<any> => {
       return;
     }
     const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
+    script.src = '/sql/sql-wasm.js';
     script.async = true;
     script.onload = () => init((window as any).initSqlJs);
-    script.onerror = () => reject(new Error('Failed to load local database driver.'));
+    script.onerror = () => {
+      // Fallback to CDN script if local path fails
+      const cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
+      cdnScript.async = true;
+      cdnScript.onload = () => init((window as any).initSqlJs);
+      cdnScript.onerror = () => reject(new Error('Failed to load local database driver.'));
+      document.body.appendChild(cdnScript);
+    };
     document.body.appendChild(script);
   });
 
@@ -267,17 +283,17 @@ const SqlLessonPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isValidated, setIsValidated] = useState<boolean>(false);
 
+  const quiz = lesson?.quiz ?? [];
+  const correctCount = useMemo(
+    () => quiz.filter((q: any, i: number) => answers[i] === q.correctIndex).length,
+    [quiz, answers]
+  );
+
   if (!user && !isGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/sql-learn" replace />;
   if (!isGuest && !isSqlLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/sql-learn" replace />;
 
-  const quiz = lesson.quiz ?? [];
-const correctCount = useMemo(
-  () => quiz.filter((q: any, i: number) => answers[i] === q.correctIndex).length,
-  [quiz, answers]
-);
-
-const totalQuizLength = quiz.length;
+  const totalQuizLength = quiz.length;
 
 const passThreshold =
   totalQuizLength === 0
