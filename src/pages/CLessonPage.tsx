@@ -3,6 +3,7 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getCLessonById, isCLessonUnlocked } from '@/data/cLessons';
+import CWorkspace from '@/components/CWorkspace';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
@@ -211,7 +212,7 @@ const CLessonPage = () => {
               </section>
 
               {/* Assignment Box: Goal + Steps (Scrollable) */}
-              <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[60vh] overflow-y-auto">
+              <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[38vh] overflow-y-auto">
                 <div className="mb-4">
                   <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
                     <Lightbulb className="w-3 h-3" /> Goal
@@ -254,6 +255,16 @@ const CLessonPage = () => {
                     })}
                   </ol>
                 </div>
+              </div>
+
+              {/* C Workspace (Monaco C Editor + Live In-Browser Terminal) */}
+              <div className="h-[520px] min-h-[420px] glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
+                <CWorkspace
+                  key={lesson.id}
+                  practical={lesson.practical}
+                  requiresLocalTerminal={!!lesson.terminalNotice}
+                  embedded={false}
+                />
               </div>
             </div>
           )}
