@@ -1172,7 +1172,7 @@ export const INTERMEDIATE_AI_LESSONS: AILesson[] = [
   ],
   practical: {
     title: 'Sub-Question Array Splitter',
-    intro: "Let's build a basic query decomposition router. Given a string containing multiple questions separated by a pipe character `|` (e.g., `"What is RAG? | How does it work?"`), split them into a clean array and trim whitespace.",
+    intro: "Let's build a basic query decomposition router. Given a string containing multiple questions separated by a pipe character `|` (e.g., 'What is RAG? | How does it work?'), split them into a clean array and trim whitespace.",
     steps: [
       "Use the `.split('|')` method on the `rawQuery` string.",
       "Use the `.map()` function to iterate over the resulting array.",
@@ -1509,7 +1509,7 @@ export const INTERMEDIATE_AI_LESSONS: AILesson[] = [
   ],
   practical: {
     title: 'Semantic Cache Threshold Checker',
-    intro: "Let's write a cache-routing gate. Given a `similarityScore` (between 0 and 1) and a `cacheThreshold` (e.g., 0.95), return `"HIT"` if the score meets or exceeds the threshold, otherwise return `"MISS"`.",
+    intro: "Let's write a cache-routing gate. Given a `similarityScore` (between 0 and 1) and a `cacheThreshold` (e.g., 0.95), return 'HIT' if the score meets or exceeds the threshold, otherwise return 'MISS'.",
     steps: [
       "Check if `similarityScore` is greater than or equal to `cacheThreshold`.",
       "If true, return the string `\"HIT\"`.",
