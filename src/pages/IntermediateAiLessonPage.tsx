@@ -2,10 +2,23 @@ import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { getIntermediateAiLessonById, isIntermediateAiLessonUnlocked } from '@/data/intermediateAiLesson';
 import {
-  ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
-  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
+  getIntermediateAiLessonById,
+  isIntermediateAiLessonUnlocked
+} from '@/data/intermediateAiLesson';
+import {
+  ArrowLeft,
+  BookOpen,
+  FlaskConical,
+  ClipboardCheck,
+  Check,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  GraduationCap,
+  Sparkles,
+  Lightbulb,
+  type LucideIcon
 } from 'lucide-react';
 import AiPracticalTerminal from '@/components/AiPracticalTerminal';
 
@@ -15,11 +28,15 @@ const renderStepText = (text: string) => {
   return text.split(/(`[^`]+`)/g).map((part, i) => {
     if (part.startsWith('`') && part.endsWith('`')) {
       return (
-        <code key={i} className="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono">
+        <code
+          key={i}
+          className="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono"
+        >
           {part.slice(1, -1)}
         </code>
       );
     }
+
     return part;
   });
 };
@@ -35,15 +52,15 @@ const IntermediateAiLessonPage = () => {
   const navigate = useNavigate();
   const [sp] = useSearchParams();
   const from = sp.get('from');
+
   const backTo =
     from === 'roadmap'
       ? '/roadmap'
       : from === 'dashboard'
-      ? '/intermediate-ai?from=dashboard'
-      : '/intermediate-ai';
+        ? '/intermediate-ai?from=dashboard'
+        : '/intermediate-ai';
 
   const { user, completeLesson } = useUser();
-
   const lesson = id ? getIntermediateAiLessonById(id) : undefined;
 
   const [stage, setStage] = useState<Stage>('concept');
@@ -57,15 +74,19 @@ const IntermediateAiLessonPage = () => {
   const { isGuest: __pgGuest } = useGuestLessonGate('intermediate-ai', id);
 
   const quiz = lesson?.quiz ?? [];
+
   const correctCount = useMemo(
     () => quiz.filter((q, i) => answers[i] === q.correctIndex).length,
     [quiz, answers]
   );
-  const passThreshold = quiz.length;
+
+  const passThreshold = Math.ceil(quiz.length * 0.75);
   const passed = correctCount >= passThreshold;
   const allAnswered = quiz.every((_, i) => answers[i] !== undefined);
-  const stageIndex = STAGES.findIndex(s => s.key === stage);
+
+  const stageIndex = STAGES.findIndex((s) => s.key === stage);
   const stepsDone = Object.values(doneSteps).filter(Boolean).length;
+
   const journey = Math.round(
     ((stageIndex + (stage === 'quiz' && submitted && passed ? 1 : 0)) / STAGES.length) * 100
   );
@@ -83,6 +104,7 @@ const IntermediateAiLessonPage = () => {
 
   const handleSubmit = () => {
     setSubmitted(true);
+
     if (passed) {
       if (user) completeLesson(lesson.id);
       setTimeout(() => navigate('/complete/' + lesson.id), 800);
@@ -101,18 +123,22 @@ const IntermediateAiLessonPage = () => {
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
+
           <div className="flex-1 min-w-0">
             <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-[0.18em] truncate">
               {lesson.module}
             </p>
+
             <h1 className="font-display font-bold text-sm text-foreground truncate flex items-center gap-1.5">
               <span>{lesson.icon}</span> {lesson.title}
             </h1>
           </div>
+
           <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
             <Sparkles className="w-3 h-3" /> +5 XP · +2 ◈
           </div>
         </div>
+
         <div className="h-0.5 bg-secondary/40">
           <div
             className="h-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-500"
@@ -128,6 +154,7 @@ const IntermediateAiLessonPage = () => {
             {STAGES.map((s, i) => {
               const active = stage === s.key;
               const done = i < stageIndex || (s.key === 'quiz' && submitted && passed);
+
               return (
                 <button
                   key={s.key}
@@ -140,14 +167,22 @@ const IntermediateAiLessonPage = () => {
                 >
                   <span
                     className={`w-6 h-6 rounded-lg grid place-items-center shrink-0 border text-[10px] font-mono ${
-                      done ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400' : 'border-current/30 bg-background/40'
+                      done
+                        ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400'
+                        : 'border-current/30 bg-background/40'
                     }`}
                   >
                     {done ? <Check className="w-3 h-3" /> : <s.icon className="w-3 h-3" />}
                   </span>
+
                   <span className="min-w-0">
-                    <span className="block text-xs font-display font-semibold leading-tight">{s.label}</span>
-                    <span className="hidden md:block text-[10px] opacity-70 leading-tight">{s.hint}</span>
+                    <span className="block text-xs font-display font-semibold leading-tight">
+                      {s.label}
+                    </span>
+
+                    <span className="hidden md:block text-[10px] opacity-70 leading-tight">
+                      {s.hint}
+                    </span>
                   </span>
                 </button>
               );
@@ -159,9 +194,16 @@ const IntermediateAiLessonPage = () => {
         <main className="flex-1 min-w-0">
           {stage === 'concept' && (
             <div className="space-y-5 animate-fade-in">
+              {/* ── Mission Brief ───────────────────────────── */}
               <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
-                <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">Mission brief</p>
-                <p className="text-sm md:text-base text-foreground leading-relaxed">{lesson.philosophy}</p>
+                <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2">
+                  Mission brief
+                </p>
+
+                <p className="text-sm md:text-base text-foreground leading-relaxed">
+                  {lesson.philosophy}
+                </p>
+
                 <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl" />
               </section>
 
@@ -169,13 +211,16 @@ const IntermediateAiLessonPage = () => {
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">
                   Breakdown · {lesson.concepts.length} ideas
                 </p>
+
                 <div className="flex p-0.5 rounded-full border border-border/40 bg-card/60">
-                  {(['beginner', 'advanced'] as const).map(v => (
+                  {(['beginner', 'advanced'] as const).map((v) => (
                     <button
                       key={v}
                       onClick={() => setConceptView(v)}
                       className={`px-3 py-1 rounded-full text-[10px] font-display font-semibold capitalize transition-all ${
-                        conceptView === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                        conceptView === v
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground'
                       }`}
                     >
                       {v}
@@ -187,9 +232,11 @@ const IntermediateAiLessonPage = () => {
               {/* Accordion spine */}
               <div className="relative pl-5">
                 <span className="absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/50 via-border/40 to-transparent" />
+
                 <div className="space-y-2.5">
                   {lesson.concepts.map((c, i) => {
                     const open = openConcept === i;
+
                     return (
                       <div key={i} className="relative">
                         <span
@@ -197,19 +244,31 @@ const IntermediateAiLessonPage = () => {
                             open ? 'bg-primary border-primary' : 'bg-background border-border'
                           }`}
                         />
+
                         <button
                           onClick={() => setOpenConcept(open ? -1 : i)}
                           className={`w-full text-left glass-card rounded-2xl px-4 py-3 border transition-all ${
-                            open ? 'border-primary/35' : 'border-border/25 hover:border-primary/20'
+                            open
+                              ? 'border-primary/35'
+                              : 'border-border/25 hover:border-primary/20'
                           }`}
                         >
                           <span className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono text-primary">{String(i + 1).padStart(2, '0')}</span>
-                            <span className="flex-1 font-display font-bold text-sm text-foreground">{c.title}</span>
+                            <span className="text-[10px] font-mono text-primary">
+                              {String(i + 1).padStart(2, '0')}
+                            </span>
+
+                            <span className="flex-1 font-display font-bold text-sm text-foreground">
+                              {c.title}
+                            </span>
+
                             <ChevronRight
-                              className={`w-4 h-4 text-muted-foreground transition-transform ${open ? 'rotate-90' : ''}`}
+                              className={`w-4 h-4 text-muted-foreground transition-transform ${
+                                open ? 'rotate-90' : ''
+                              }`}
                             />
                           </span>
+
                           {open && (
                             <p className="text-xs text-muted-foreground leading-relaxed mt-2.5 animate-fade-in">
                               {conceptView === 'beginner' ? c.beginner : c.advanced}
@@ -232,43 +291,70 @@ const IntermediateAiLessonPage = () => {
                 <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
                   <FlaskConical className="w-3 h-3" /> Practical lab
                 </p>
-                <h2 className="font-display font-bold text-base md:text-lg text-foreground mb-1">{lesson.practical.title}</h2>
-                <p className="text-xs text-muted-foreground leading-relaxed">{lesson.practical.intro}</p>
+
+                <h2 className="font-display font-bold text-base md:text-lg text-foreground mb-1">
+                  {lesson.practical.title}
+                </h2>
+
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {lesson.practical.intro}
+                </p>
               </section>
 
-              {/* Assignment Box: Goal + Steps (Scrollable) */}
+              {/* Assignment Box: Goal + Steps */}
               <div className="glass-card rounded-2xl p-4 border border-border/30 max-h-[40vh] overflow-y-auto">
                 <div className="mb-4">
                   <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
                     <Lightbulb className="w-3 h-3" /> Goal
                   </p>
-                  <p className="text-sm text-foreground leading-relaxed">{lesson.practical.goal}</p>
+
+                  <p className="text-sm text-foreground leading-relaxed">
+                    {lesson.practical.goal}
+                  </p>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-3 sticky top-0 bg-background/0 backdrop-blur-none z-10 pb-2 border-b border-border/10">
-                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Steps</p>
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                      Steps
+                    </p>
+
                     <span className="text-[10px] font-mono text-primary">
                       {stepsDone}/{lesson.practical?.steps?.length ?? 0}
                     </span>
                   </div>
+
                   <ol className="space-y-2">
                     {(lesson.practical?.steps ?? []).map((step, i) => {
                       const done = !!doneSteps[i];
+
                       return (
                         <li key={i}>
                           <button
-                            onClick={() => setDoneSteps(p => ({ ...p, [i]: !p[i] }))}
+                            onClick={() => setDoneSteps((p) => ({ ...p, [i]: !p[i] }))}
                             className={`w-full flex gap-3 text-left rounded-xl px-3 py-2.5 border transition-all ${
-                              done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/20 hover:border-primary/20'
+                              done
+                                ? 'border-emerald-500/30 bg-emerald-500/5'
+                                : 'border-border/20 hover:border-primary/20'
                             }`}
                           >
-                            <span className={`w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-mono border ${
-                              done ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400' : 'border-border/50 text-muted-foreground'
-                            }`}>
+                            <span
+                              className={`w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-mono border ${
+                                done
+                                  ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400'
+                                  : 'border-border/50 text-muted-foreground'
+                              }`}
+                            >
                               {done ? <Check className="w-3 h-3" /> : i + 1}
                             </span>
-                            <span className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+
+                            <span
+                              className={`text-xs leading-relaxed flex-1 ${
+                                done
+                                  ? 'text-muted-foreground line-through'
+                                  : 'text-foreground'
+                              }`}
+                            >
                               {renderStepText(step)}
                             </span>
                           </button>
@@ -288,16 +374,24 @@ const IntermediateAiLessonPage = () => {
             </div>
           )}
 
+          {/* ── QUIZ STAGE ─────────────────────────── */}
           {stage === 'quiz' && (
             <div className="space-y-4 animate-fade-in">
               {!submitted ? (
                 <>
                   <section className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 to-transparent p-5 flex items-center gap-3">
                     <GraduationCap className="w-5 h-5 text-primary shrink-0" />
+
                     <div className="flex-1">
-                      <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
-                      <p className="text-[11px] text-muted-foreground">Score {passThreshold}/{quiz.length} to finish this lesson.</p>
+                      <p className="text-sm font-display font-bold text-foreground">
+                        Mastery check
+                      </p>
+
+                      <p className="text-[11px] text-muted-foreground">
+                        Score {passThreshold}/{quiz.length} to finish this lesson.
+                      </p>
                     </div>
+
                     <div className="flex gap-1.5">
                       {quiz.map((_, i) => (
                         <button
@@ -307,8 +401,8 @@ const IntermediateAiLessonPage = () => {
                             i === qIndex
                               ? 'bg-primary scale-125'
                               : answers[i] !== undefined
-                              ? 'bg-primary/50'
-                              : 'bg-secondary'
+                                ? 'bg-primary/50'
+                                : 'bg-secondary'
                           }`}
                           aria-label={`Question ${i + 1}`}
                         />
@@ -321,18 +415,24 @@ const IntermediateAiLessonPage = () => {
                       <p className="text-[10px] font-mono text-muted-foreground mb-2 uppercase tracking-[0.18em]">
                         Question {qIndex + 1} of {quiz.length}
                       </p>
+
                       <p className="text-sm md:text-base font-display font-semibold text-foreground mb-4">
                         {quiz[qIndex].question}
                       </p>
+
                       <div className="space-y-2">
                         {quiz[qIndex].options.map((opt, oi) => {
                           const selected = answers[qIndex] === oi;
+
                           return (
                             <button
                               key={oi}
                               onClick={() => {
-                                setAnswers(p => ({ ...p, [qIndex]: oi }));
-                                if (qIndex < quiz.length - 1) setTimeout(() => setQIndex(qIndex + 1), 220);
+                                setAnswers((p) => ({ ...p, [qIndex]: oi }));
+
+                                if (qIndex < quiz.length - 1) {
+                                  setTimeout(() => setQIndex(qIndex + 1), 220);
+                                }
                               }}
                               className={`w-full text-left text-xs md:text-sm px-3.5 py-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                                 selected
@@ -342,11 +442,14 @@ const IntermediateAiLessonPage = () => {
                             >
                               <span
                                 className={`w-5 h-5 rounded-md grid place-items-center text-[10px] font-mono shrink-0 border ${
-                                  selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border/50'
+                                  selected
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-border/50'
                                 }`}
                               >
                                 {String.fromCharCode(65 + oi)}
                               </span>
+
                               <span className="flex-1">{opt}</span>
                             </button>
                           );
@@ -356,14 +459,15 @@ const IntermediateAiLessonPage = () => {
                       <div className="flex items-center justify-between mt-4">
                         <button
                           disabled={qIndex === 0}
-                          onClick={() => setQIndex(q => q - 1)}
+                          onClick={() => setQIndex((q) => q - 1)}
                           className="text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 flex items-center gap-1"
                         >
                           <ChevronLeft className="w-3.5 h-3.5" /> Back
                         </button>
+
                         <button
                           disabled={qIndex >= quiz.length - 1}
-                          onClick={() => setQIndex(q => q + 1)}
+                          onClick={() => setQIndex((q) => q + 1)}
                           className="text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 flex items-center gap-1"
                         >
                           Skip <ChevronRight className="w-3.5 h-3.5" />
@@ -379,12 +483,22 @@ const IntermediateAiLessonPage = () => {
                       {correctCount}
                       <span className="text-muted-foreground text-lg"> / {quiz.length}</span>
                     </p>
-                    <p className={`text-sm font-display font-semibold mt-1 ${passed ? 'text-emerald-400' : 'text-amber-400'}`}>
+
+                    <p
+                      className={`text-sm font-display font-semibold mt-1 ${
+                        passed ? 'text-emerald-400' : 'text-amber-400'
+                      }`}
+                    >
                       {passed ? '🎉 Lesson passed!' : 'Almost there — review and retry'}
                     </p>
+
                     {!passed && (
                       <button
-                        onClick={() => { setAnswers({}); setSubmitted(false); setQIndex(0); }}
+                        onClick={() => {
+                          setAnswers({});
+                          setSubmitted(false);
+                          setQIndex(0);
+                        }}
                         className="mt-4 bg-primary text-primary-foreground text-xs font-semibold px-5 py-2 rounded-xl"
                       >
                         Retry quiz
@@ -395,23 +509,37 @@ const IntermediateAiLessonPage = () => {
                   {quiz.map((q, qi) => {
                     const sel = answers[qi];
                     const ok = sel === q.correctIndex;
+
                     return (
-                      <div key={qi} className={`glass-card rounded-2xl p-4 border ${ok ? 'border-emerald-500/25' : 'border-red-500/25'}`}>
+                      <div
+                        key={qi}
+                        className={`glass-card rounded-2xl p-4 border ${
+                          ok ? 'border-emerald-500/25' : 'border-red-500/25'
+                        }`}
+                      >
                         <p className="text-sm font-display font-semibold text-foreground mb-2 flex items-start gap-2">
                           {ok ? (
                             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                           ) : (
                             <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                           )}
+
                           {q.question}
                         </p>
+
                         <div className="space-y-1.5">
                           {q.options.map((opt, oi) => {
                             const isCorrect = oi === q.correctIndex;
                             const chosen = sel === oi;
+
                             let cls = 'border-border/20 text-muted-foreground';
-                            if (isCorrect) cls = 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300';
-                            else if (chosen) cls = 'border-red-500/40 bg-red-500/10 text-red-300';
+
+                            if (isCorrect) {
+                              cls = 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300';
+                            } else if (chosen) {
+                              cls = 'border-red-500/40 bg-red-500/10 text-red-300';
+                            }
+
                             return (
                               <div key={oi} className={`text-xs px-3 py-2 rounded-lg border ${cls}`}>
                                 {opt}
@@ -419,6 +547,7 @@ const IntermediateAiLessonPage = () => {
                             );
                           })}
                         </div>
+
                         {q.explanation && (
                           <p className="text-[11px] text-muted-foreground mt-3 italic border-l-2 border-primary/30 pl-3">
                             💡 {q.explanation}
@@ -435,7 +564,7 @@ const IntermediateAiLessonPage = () => {
       </div>
 
       {/* ── Sticky action dock ──────────────────────── */}
-      {/* Mobile: inline button at end of content */}
+      {/* Mobile */}
       <div className="md:hidden mt-6 mb-4 space-y-3">
         {stageIndex > 0 && (
           <button
@@ -451,7 +580,8 @@ const IntermediateAiLessonPage = () => {
             onClick={() => handleStageChange(STAGES[stageIndex + 1].key)}
             className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 flex items-center justify-center gap-2"
           >
-            {stage === 'concept' ? 'Enter the lab' : 'Take the quiz'} <ChevronRight className="w-4 h-4" />
+            {stage === 'concept' ? 'Enter the lab' : 'Take the quiz'}{' '}
+            <ChevronRight className="w-4 h-4" />
           </button>
         ) : !submitted ? (
           <button
@@ -459,7 +589,9 @@ const IntermediateAiLessonPage = () => {
             onClick={handleSubmit}
             className="w-full bg-primary text-primary-foreground font-display font-semibold text-sm py-3.5 rounded-2xl neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {allAnswered ? 'Submit quiz' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+            {allAnswered
+              ? 'Submit quiz'
+              : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
           </button>
         ) : (
           <button
@@ -471,7 +603,7 @@ const IntermediateAiLessonPage = () => {
         )}
       </div>
 
-      {/* Desktop: floating pill button */}
+      {/* Desktop */}
       <div className="hidden md:flex fixed bottom-8 inset-x-0 z-30 justify-center pointer-events-none">
         <div className="flex items-center gap-3 pointer-events-auto bg-background/80 backdrop-blur-xl border border-border/30 rounded-full px-4 py-2 shadow-lg">
           {stageIndex > 0 && (
@@ -488,7 +620,8 @@ const IntermediateAiLessonPage = () => {
               onClick={() => handleStageChange(STAGES[stageIndex + 1].key)}
               className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
             >
-              {stage === 'concept' ? 'Enter the lab' : 'Take the quiz'} <ChevronRight className="w-4 h-4" />
+              {stage === 'concept' ? 'Enter the lab' : 'Take the quiz'}{' '}
+              <ChevronRight className="w-4 h-4" />
             </button>
           ) : !submitted ? (
             <button
@@ -496,7 +629,9 @@ const IntermediateAiLessonPage = () => {
               onClick={handleSubmit}
               className="bg-primary text-primary-foreground font-display font-semibold text-sm py-2 px-6 rounded-full neon-glow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {allAnswered ? 'Submit quiz' : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
+              {allAnswered
+                ? 'Submit quiz'
+                : `Answer all (${Object.keys(answers).length}/${quiz.length})`}
             </button>
           ) : (
             <button
