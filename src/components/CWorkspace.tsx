@@ -5,7 +5,6 @@ import {
   Trash2,
   Terminal,
   Loader2,
-  AlertTriangle,
   Cpu,
 } from 'lucide-react';
 import CodeEditor from './CodeEditor';
@@ -15,7 +14,6 @@ interface CWorkspaceProps {
   initialCode?: string;
   onCodeChange?: (code: string) => void;
   embedded?: boolean;
-  requiresLocalTerminal?: boolean;
   practical?: {
     title: string;
     intro: string;
@@ -233,7 +231,6 @@ const CWorkspace = ({
   initialCode,
   onCodeChange,
   embedded = false,
-  requiresLocalTerminal = false,
   practical,
 }: CWorkspaceProps) => {
   const initial = useMemo(
@@ -243,15 +240,10 @@ const CWorkspace = ({
 
   const [code, setCode] = useState(initial);
   const [lines, setLines] = useState<Line[]>([
-    requiresLocalTerminal
-      ? {
-          kind: 'sys',
-          text: '$ This practical requires a real C toolchain and/or OS-level features. Please compile and run it locally using GCC/Clang in your CMD/Terminal.',
-        }
-      : {
-          kind: 'sys',
-          text: '$ C Browser Lab (lightweight simulator) — press ▶ Run Code to start.',
-        },
+    {
+      kind: 'sys',
+      text: '$ C Browser Lab — Ready. Press ▶ Run to execute.',
+    },
   ]);
   const [running, setRunning] = useState(false);
   const [showTerminal, setShowTerminal] = useState(true);
@@ -270,20 +262,15 @@ const CWorkspace = ({
     if (embedded && initialCode !== undefined) {
       setCode(initialCode);
       setLines([
-        requiresLocalTerminal
-          ? {
-              kind: 'sys',
-              text: '$ This practical requires local GCC/Clang execution.',
-            }
-          : {
-              kind: 'sys',
-              text: '$ C Browser Lab — Ready.',
-            },
+        {
+          kind: 'sys',
+          text: '$ C Browser Lab — Ready.',
+        },
       ]);
       setRunning(false);
       setPendingInput(null);
     }
-  }, [initialCode, embedded, requiresLocalTerminal]);
+  }, [initialCode, embedded]);
 
   useEffect(() => {
     if (termRef.current) {
@@ -378,7 +365,7 @@ const CWorkspace = ({
   };
 
   const runCode = async () => {
-    if (running || requiresLocalTerminal) return;
+    if (running) return;
 
     if (!embedded) setShowTerminal(true);
 
@@ -388,7 +375,7 @@ const CWorkspace = ({
     try {
       if (HEAVY_SYSTEM_REGEX.test(code)) {
         throw new Error(
-          'This program uses OS/system-level APIs. Please compile and run it locally using GCC/Clang.'
+          'This program uses OS/system-level APIs (fork, socket, pthread, etc.) that cannot run in browser. This is a safety feature.'
         );
       }
 
@@ -464,28 +451,18 @@ return typeof __exitCode === 'number' ? __exitCode : 0;
             Terminal
           </button>
 
-          {requiresLocalTerminal ? (
-            <div
-              className="flex items-center gap-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-lg"
-              title="This practical requires a real C compiler/system environment. Run in your local CMD/Terminal."
-            >
-              <AlertTriangle className="w-3 h-3" />
-              Local CMD Required
-            </div>
-          ) : (
-            <button
-              onClick={runCode}
-              disabled={running}
-              className="flex items-center gap-1 bg-primary text-primary-foreground text-[11px] font-semibold px-2.5 py-1 rounded-lg neon-glow disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {running ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
-              ) : (
-                <Play className="w-3 h-3" />
-              )}
-              {running ? 'Running…' : 'Run Code'}
-            </button>
-          )}
+          <button
+            onClick={runCode}
+            disabled={running}
+            className="flex items-center gap-1 bg-primary text-primary-foreground text-[11px] font-semibold px-2.5 py-1 rounded-lg neon-glow disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {running ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Play className="w-3 h-3" />
+            )}
+            {running ? 'Running…' : 'Run'}
+          </button>
 
           <button
             onClick={resetCode}
