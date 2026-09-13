@@ -6,7 +6,7 @@ import { getCLessonById, isCLessonUnlocked } from '@/data/cLessons';
 import CWorkspace from '@/components/CWorkspace';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
-  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
+  Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Terminal, Code2, type LucideIcon
 } from 'lucide-react';
 
 type Stage = 'concept' | 'practical' | 'quiz';
@@ -257,6 +257,29 @@ const CLessonPage = () => {
                 </div>
               </div>
 
+              {/* ── LOCAL TERMINAL NOTICE (New UI) ── */}
+              {lesson.terminalNotice && (
+                <div className="glass-card rounded-2xl p-4 border border-amber-500/20 bg-amber-500/5 flex gap-4 items-start animate-fade-in">
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 shrink-0 border border-amber-500/20">
+                    <Terminal className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-display font-bold text-amber-100 mb-1 flex items-center gap-2">
+                      Local Environment Required
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">ADVANCED</span>
+                    </h3>
+                    <p className="text-xs text-amber-200/70 leading-relaxed mb-3">
+                      This lesson uses system-level features (like file I/O, memory management, or OS APIs) that cannot run in the browser sandbox. 
+                      Please copy the code below into <strong className="text-amber-100">VS Code</strong> or your local terminal to compile and run it.
+                    </p>
+                    <div className="flex items-center gap-2 text-[11px] font-mono text-amber-400/80 bg-black/30 px-3 py-2 rounded-lg border border-white/5 w-fit">
+                      <Code2 className="w-3.5 h-3.5 opacity-60" />
+                      <span className="text-amber-500/60">$</span> gcc main.c -o main && ./main
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* C Workspace (Monaco C Editor + Live In-Browser Terminal) */}
               <div className="h-[520px] min-h-[420px] glass-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
                 <CWorkspace
@@ -417,7 +440,7 @@ const CLessonPage = () => {
         </main>
       </div>
 
-      {/* ── Sticky action dock ──────────────────────── */}
+      {/* ── Sticky action dock ─────────────────────── */}
       {/* Mobile: inline button at end of content */}
       <div className="md:hidden mt-6 mb-4 space-y-3">
         {stageIndex > 0 && (
