@@ -1341,8 +1341,6 @@ export const INTERMEDIATE_AI_LESSONS: AILesson[] = [
     },
     {
       question: 'What triggers an Agentic RAG system to perform a "Query Rewrite"?',
-      beginner: 'When the user types too fast.',
-      advanced: 'When the internal Grader node determines that the initially retrieved documents have a low relevance score for the original query.',
       options: [
         'When the user types too fast.',
         'When the internal Grader node determines that the initially retrieved documents have a low relevance score.',
