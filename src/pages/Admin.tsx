@@ -377,7 +377,7 @@ export default function Admin() {
 
   const handleDeleteAnnouncement = async (id: string) => {
     if (!window.confirm('Delete this announcement? This will remove it for all users.')) return;
-    let err = (await supabase.rpc('admin_delete_announcement', { _id: id })).error;
+    let err = (await (supabase.rpc as any)('admin_delete_announcement', { _id: id })).error;
     if (err) {
       const direct = await supabase.from('announcements').delete().eq('id', id);
       err = direct.error;

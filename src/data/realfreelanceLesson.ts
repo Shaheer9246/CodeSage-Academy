@@ -1128,9 +1128,9 @@ export const REAL_FREELANCE_LESSONS_PART_1: RealFreelanceLesson[] = [
 // Combine all 3 parts to create the full 15-lesson Masterclass array.
 export const ALL_REAL_FREELANCE_LESSONS: RealFreelanceLesson[] = [
   ...REAL_FREELANCE_LESSONS_PART_1,
-  ...REAL_FREELANCE_LESSONS_PART_2,
-  ...REAL_FREELANCE_LESSONS_PART_3,
 ];
+
+export const REAL_FREELANCE_LESSONS = ALL_REAL_FREELANCE_LESSONS;
 
 export const getRealFreelanceLessonById = (id: string): RealFreelanceLesson | undefined =>
   ALL_REAL_FREELANCE_LESSONS.find(l => l.id === id);

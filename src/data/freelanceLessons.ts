@@ -478,21 +478,9 @@ export const FREELANCE_LESSONS_PART_1: FreelanceLesson[] = [
       'Raise rates annually and fire the bottom 20% of clients to protect your margins.',
     ],
   },
+];
 
 // PART 2 OF 2: Freelance & Clients Module (Lessons 7-12)
-// Expanded for "Last Level" Depth, RealFreelance Methodologies, and Comprehensive Quiz Explanations.
-
-import type { NetworkingLesson } from './networkingLessons';
-
-export type FreelanceLesson = NetworkingLesson & {
-  quiz: Array<{
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string; 
-  }>;
-};
-
 export const FREELANCE_LESSONS_PART_2: FreelanceLesson[] = [
   {
     id: 'free-7',
@@ -980,3 +968,8 @@ export const isFreelanceLessonUnlocked = (id: string, completedLessons: string[]
   if (idx <= 0) return true;
   return completedLessons.includes(allLessons[idx - 1].id);
 };
+
+export const FREELANCE_LESSONS: FreelanceLesson[] = [
+  ...FREELANCE_LESSONS_PART_1,
+  ...FREELANCE_LESSONS_PART_2,
+];
