@@ -968,3 +968,8 @@ export const isFreelanceLessonUnlocked = (id: string, completedLessons: string[]
   if (idx <= 0) return true;
   return completedLessons.includes(allLessons[idx - 1].id);
 };
+
+export const FREELANCE_LESSONS: FreelanceLesson[] = [
+  ...FREELANCE_LESSONS_PART_1,
+  ...FREELANCE_LESSONS_PART_2,
+];
