@@ -1,5 +1,6 @@
 -- Community Leaderboard RPC function
--- Optimized for ultra-low bandwidth: returns only top 30 active learners with public profile fields.
+-- Optimized for ultra-low bandwidth: returns only top 30 active learners.
+-- NEW: Prioritizes Streak first, then XP, to reward daily consistency (Duolingo-style).
 CREATE OR REPLACE FUNCTION public.get_community_leaderboard()
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -24,7 +25,8 @@ BEGIN
       COALESCE(array_length(p.completed_lessons, 1), 0) AS lessons_count
     FROM public.profiles p
     WHERE COALESCE(p.xp, 0) > 0 OR COALESCE(p.streak_count, 0) > 0
-    ORDER BY COALESCE(p.xp, 0) DESC, COALESCE(p.streak_count, 0) DESC, p.created_at ASC
+    -- 🔥 NEW PRIORITY: 1. Streak (DESC), 2. XP (DESC), 3. Account Age (ASC for fairness)
+    ORDER BY COALESCE(p.streak_count, 0) DESC, COALESCE(p.xp, 0) DESC, p.created_at ASC
     LIMIT 30
   ) t;
   
