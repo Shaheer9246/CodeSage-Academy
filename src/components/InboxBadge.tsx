@@ -7,6 +7,14 @@ interface InboxBadgeProps {
   className?: string;
 }
 
+// In-memory single-flight deduplication & shared state across desktop and mobile badge instances
+let inFlightInboxPromise: Promise<number> | null = null;
+const badgeListeners = new Set<(count: number) => void>();
+
+function notifyInboxBadge(count: number) {
+  badgeListeners.forEach(listener => listener(count));
+}
+
 export default function InboxBadge({ className }: InboxBadgeProps) {
   const { user } = useUser();
 
@@ -26,41 +34,63 @@ export default function InboxBadge({ className }: InboxBadgeProps) {
     const cacheKey = `codesage_badge_unread_${user.id}`;
     const timeKey = `codesage_badge_time_${user.id}`;
 
-    // Throttle: at most one server check per 15 minutes (unless forced).
+    // Throttle: at most one server check per 30 minutes (unless forced by an inbox event).
     if (!force) {
       const last = Number(localStorage.getItem(timeKey) || 0);
-      if (Date.now() - last < 15 * 60 * 1000) {
-        setUnread(Number(localStorage.getItem(cacheKey) || 0));
+      if (Date.now() - last < 30 * 60 * 1000) {
+        const cachedCount = Number(localStorage.getItem(cacheKey) || 0);
+        setUnread(cachedCount);
+        notifyInboxBadge(cachedCount);
         return;
       }
     }
-    try { localStorage.setItem(timeKey, String(Date.now())); } catch { /* ignore */ }
 
-    const [{ data: ann }, { data: reads }] = await Promise.all([
-      supabase.from('announcements').select('id'),
-      supabase.from('announcement_reads').select('announcement_id').eq('user_id', user!.id),
-    ]);
-    const seen = new Set(((reads || []) as { announcement_id: string }[]).map(r => r.announcement_id));
-    const total = ((ann || []) as { id: string }[]).filter(a => !seen.has(a.id)).length;
-    setUnread(total);
-    try { localStorage.setItem(cacheKey, String(total)); } catch { /* ignore */ }
+    // Reuse in-flight promise if another instance (e.g. mobile/desktop nav) is already querying
+    if (inFlightInboxPromise) {
+      const total = await inFlightInboxPromise;
+      setUnread(total);
+      return;
+    }
+
+    inFlightInboxPromise = (async () => {
+      try {
+        try { localStorage.setItem(timeKey, String(Date.now())); } catch { /* ignore */ }
+
+        const [{ data: ann }, { data: reads }] = await Promise.all([
+          supabase.from('announcements').select('id'),
+          supabase.from('announcement_reads').select('announcement_id').eq('user_id', user!.id),
+        ]);
+        const seen = new Set(((reads || []) as { announcement_id: string }[]).map(r => r.announcement_id));
+        const total = ((ann || []) as { id: string }[]).filter(a => !seen.has(a.id)).length;
+        try { localStorage.setItem(cacheKey, String(total)); } catch { /* ignore */ }
+        notifyInboxBadge(total);
+        return total;
+      } finally {
+        inFlightInboxPromise = null;
+      }
+    })();
+
+    const count = await inFlightInboxPromise;
+    setUnread(count);
   }, [user?.id]);
+
+  useEffect(() => {
+    const handleUpdate = (count: number) => setUnread(count);
+    badgeListeners.add(handleUpdate);
+    return () => {
+      badgeListeners.delete(handleUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     if (!user?.id) return;
     refresh();
+
     const onRead = () => refresh(true);
     window.addEventListener('inbox:read', onRead);
 
-    // Unique channel name per mount: prevents the
-    // "cannot add postgres_changes callbacks after subscribe()" crash
-    // when React remounts this component quickly.
-        // Silent check every 5 minutes instead of an always-on live channel
-    const timer = window.setInterval(() => refresh(true), 5 * 60 * 1000);
-
     return () => {
       window.removeEventListener('inbox:read', onRead);
-      window.clearInterval(timer);
     };
   }, [user?.id, refresh]);
 
