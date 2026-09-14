@@ -44,8 +44,8 @@ const CURRICULUM_MODULES: Module[] = [
   },
   { 
     icon: Cpu, 
-    title: 'Systems & C++', 
-    desc: 'Memory management, DSA, Performance tuning', 
+    title: 'Systems & C / C++', 
+    desc: 'Pointers, memory management, DSA, performance tuning', 
     tag: 'SYS', 
     color: 'text-blue-400 border-blue-400/30 bg-blue-400/5' 
   },
