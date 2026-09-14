@@ -445,17 +445,16 @@ export async function enroll(track: TrackId): Promise<Enrollment> {
 
       if (error) throw error;
 
-      const { data: stats } = await supabase
-        .from('track_stats')
-        .select('*')
-        .eq('track', track)
-        .maybeSingle();
-     if (stats) {
-        // Use Math.max to prevent database replication lag from rolling back 
-        // the local count after a fresh enrollment.
-        counts[track] = Math.max(counts[track] ?? 0, stats.enrolled_count);
-        emit();
-      }
+      // Update local and cached stats count without firing a redundant database select
+      const statsCacheKey = 'codesage:track_stats_cache';
+      try {
+        const cached = JSON.parse(localStorage.getItem(statsCacheKey) || '[]');
+        if (Array.isArray(cached)) {
+          const item = cached.find((s: any) => s.track === track);
+          if (item) item.enrolled_count = Math.max(item.enrolled_count || 0, counts[track] || 0);
+          localStorage.setItem(statsCacheKey, JSON.stringify(cached));
+        }
+      } catch { /* ignore */ }
     } catch (err) {
       // A timeout does not always mean failure — the write may have landed.
       // Ask the server what the truth is before rolling the UI back.
