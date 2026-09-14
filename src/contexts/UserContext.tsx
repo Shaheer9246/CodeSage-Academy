@@ -252,11 +252,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       dailyXpDate: todayKey(),
     });
 
-    // Check localStorage cache freshness (5 minutes) to prevent redundant database egress
+    // Check localStorage cache freshness (30 minutes) to prevent redundant database egress.
+    // RPCs (award_lesson, complete_test, spend_coins, update_streak) update the profile immediately,
+    // so background cache can safely be long-lived without showing stale data.
     const cached = readCachedProfile();
     const cachedTime = Number(localStorage.getItem('cached_profile_time') || 0);
     const now = Date.now();
-    if (cached && cached.id === authUser.id && (now - cachedTime < 5 * 60 * 1000)) {
+    if (cached && cached.id === authUser.id && (now - cachedTime < 30 * 60 * 1000)) {
       setUser(cached);
       return;
     }
