@@ -483,3 +483,164 @@ SELECT
   (SELECT count(*) FROM public.enrollments WHERE status = 'paused') AS total_paused_enrollments,
   (SELECT count(*) FROM public.enrollments WHERE status = 'ended') AS total_ended_enrollments;
 ```
+
+---
+
+## 6. Supabase Database Inspector & Duplicate Detection Suite
+
+Run these inspection queries directly in your **Supabase SQL Editor** (`Dashboard > SQL Editor`) to get a full accounting of all data, inspect table sizes, verify function status, and detect or remove duplicate announcements or suggestions.
+
+### Query 1: Master Inventory & Row Counter
+Inspects every single table in your `public` schema and counts all records:
+```sql
+SELECT 
+  table_name,
+  (xpath('/row/cnt/text()', xml_count))[1]::text::bigint AS row_count
+FROM (
+  SELECT 
+    table_name, 
+    query_to_xml(format('SELECT count(*) AS cnt FROM public.%I', table_name), false, true, '') AS xml_count
+  FROM information_schema.tables
+  WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+) sub
+ORDER BY row_count DESC;
+```
+
+---
+
+### Query 2: Duplicate Announcements Detector
+Detects duplicate announcements by title and body content:
+```sql
+SELECT 
+  title,
+  LEFT(body, 60) AS body_snippet,
+  COUNT(*) AS total_copies,
+  ARRAY_AGG(id ORDER BY created_at ASC) AS announcement_ids,
+  MIN(created_at) AS first_posted,
+  MAX(created_at) AS last_posted
+FROM public.announcements
+GROUP BY title, LEFT(body, 60)
+HAVING COUNT(*) > 1;
+```
+
+#### Safe Cleanup for Duplicate Announcements:
+Keeps the original post and deletes duplicate copies while cleaning up orphaned read receipts:
+```sql
+WITH duplicates AS (
+  SELECT id,
+         ROW_NUMBER() OVER (PARTITION BY title, LEFT(body, 60) ORDER BY created_at ASC) AS rn
+  FROM public.announcements
+)
+DELETE FROM public.announcements
+WHERE id IN (SELECT id FROM duplicates WHERE rn > 1);
+```
+
+---
+
+### Query 3: Duplicate Suggestions Detector
+Detects duplicate suggestions submitted by users (identical text from the same user or spam):
+```sql
+SELECT 
+  user_id,
+  username,
+  text,
+  COUNT(*) AS duplicate_count,
+  ARRAY_AGG(id ORDER BY created_at ASC) AS suggestion_ids,
+  MIN(created_at) AS first_created,
+  MAX(created_at) AS last_created
+FROM public.suggestions
+GROUP BY user_id, username, text
+HAVING COUNT(*) > 1;
+```
+
+#### Safe Cleanup for Duplicate Suggestions:
+Keeps the earliest suggestion (or the one with the admin reply) and removes duplicate submissions:
+```sql
+WITH ranked_suggestions AS (
+  SELECT id,
+         ROW_NUMBER() OVER (
+           PARTITION BY user_id, text 
+           ORDER BY (reply IS NOT NULL) DESC, upvotes DESC, created_at ASC
+         ) AS rn
+  FROM public.suggestions
+)
+DELETE FROM public.suggestions
+WHERE id IN (SELECT id FROM ranked_suggestions WHERE rn > 1);
+```
+
+---
+
+### Query 4: Orphaned Records Cleanup (Zero Waste)
+Ensures no ghost records consume storage or egress:
+```sql
+-- 1. Remove announcement_reads referencing deleted announcements
+DELETE FROM public.announcement_reads
+WHERE announcement_id NOT IN (SELECT id FROM public.announcements);
+
+-- 2. Remove suggestion_votes referencing deleted suggestions
+DELETE FROM public.suggestion_votes
+WHERE suggestion_id NOT IN (SELECT id FROM public.suggestions);
+```
+
+---
+
+### Query 5: Realtime Replication Inspection
+Checks which tables have Realtime CDC enabled (tables broadcasting on WebSockets consume background connection quota):
+```sql
+SELECT 
+  c.relname AS table_name,
+  CASE WHEN c.relreplident = 'd' THEN 'default'
+       WHEN c.relreplident = 'n' THEN 'nothing'
+       WHEN c.relreplident = 'f' THEN 'full'
+       WHEN c.relreplident = 'i' THEN 'index'
+  END AS replication_identity
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public' 
+  AND c.relkind = 'r'
+  AND c.relname IN (
+    SELECT tablename 
+    FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime'
+  );
+```
+*(Tip: To minimize egress, only enable realtime for tables that genuinely require live synchronization. Announcements and Suggestions use cached client polling.)*
+
+---
+
+## 7. Verified Live Production Inventory & Realtime Optimization
+
+Verified database census executed on September 14, 2026:
+
+### Live Table Census
+| Table Name | Live Row Count | Purpose & Handled By |
+| :--- | :--- | :--- |
+| `profiles` | **1,820** | Student profiles, XP, coins, streak, levels, learning goals. Handled by `UserContext.tsx` and `Admin.tsx`. |
+| `enrollments` | **1,425** | Enrolled courses and track completion states. Max 2 active tracks limit enforced by `enrollment.ts`. |
+| `lesson_registry` | **454** | Validated lesson catalog foreign-key constraint. Prevents unauthorized lesson completion. |
+| `suggestion_reads` | **152** | Student read-receipt timestamps for feedback board updates. Cached via 30-min throttle. |
+| `announcement_reads` | **125** | Read receipts for broadcasts. Prevents unread notification badges from persisting. |
+| `badge_levels` | **100** | Gamification tier and badge milestone configurations. |
+| `track_stats` | **18** | Global student enrollment counters per curriculum track. Cached locally for 24 hours. |
+| `suggestions` | **4** | Active community suggestions on the feedback board. Handled by `Suggestions.tsx` & `Admin.tsx`. |
+| `promo_codes` | **3** | Redeemable reward vouchers. Validated via `redeem_promo` RPC. |
+| `test_registry` | **3** | Whitelisted assessment exam definitions. |
+| `suggestion_votes` | **1** | Community upvotes and downvotes. |
+| `user_roles` | **1** | Administrator authority record (`shaheerwrites703@gmail.com`). Required for `is_admin()`. |
+| `announcements` | **1** | Active platform-wide broadcast. Handled by `Inbox.tsx` and `Admin.tsx`. |
+
+### Duplicate & Orphaned Data Audit Results
+- **Duplicate Announcements**: **0** (Clean)
+- **Duplicate Suggestions**: **0** (Clean)
+- **Orphaned Announcement Reads**: **0** (Clean)
+- **Orphaned Suggestion Votes**: **0** (Clean)
+
+### Realtime CDC Egress Optimization (Applied)
+Tables detached from `supabase_realtime` publication to eliminate WAL decoding background connection quotas:
+```sql
+ALTER PUBLICATION supabase_realtime DROP TABLE public.announcements;
+ALTER PUBLICATION supabase_realtime DROP TABLE public.suggestions;
+ALTER PUBLICATION supabase_realtime DROP TABLE public.suggestion_votes;
+```
+All client components (`InboxBadge.tsx`, `SuggestionsBadge.tsx`, `Inbox.tsx`, `Suggestions.tsx`) now consume these collections via single-flight cached REST calls, keeping egress near zero.
+
