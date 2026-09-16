@@ -3,41 +3,64 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Target, AlertTriangle, CheckCircle2, RotateCcw, 
-  ChevronRight, ChevronDown, Sparkles, BookOpen 
+  Sparkles, BookOpen, Layers, Award
 } from 'lucide-react';
 import { getSkillHealthSummary, type QuizAttempt } from '@/lib/quizStorage';
 import { getLessonDetails } from '@/data/lessonIndex';
 
 interface SkillHealthCardProps {
   isGuest?: boolean;
+  completedLessonIds?: string[];
 }
 
-export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => {
+export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest, completedLessonIds }) => {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(false);
+  const [filterTab, setFilterTab] = useState<'all' | 'weak' | 'mastered'>('all');
 
-  // Read quiz attempts and diagnostic state
+  // Read quiz attempts and diagnostic state, including any completed lessons
   const summary = useMemo(() => {
-    return getSkillHealthSummary();
-  }, []);
+    return getSkillHealthSummary(completedLessonIds);
+  }, [completedLessonIds]);
 
-  // Enrich weak attempts with real lesson metadata
-  const weakItems = useMemo(() => {
-    return summary.weakAttempts.map(attempt => {
+  // Enrich all attempts with lesson metadata
+  const allItems = useMemo(() => {
+    const attempts = summary.recentAttempts.length > 0 ? summary.recentAttempts : [];
+    // Combine all attempts (weak + strong, sorted by timestamp descending)
+    const combinedMap = new Map<string, QuizAttempt>();
+    summary.weakAttempts.forEach(a => combinedMap.set(a.lessonId, a));
+    summary.strongAttempts.forEach(a => {
+      if (!combinedMap.has(a.lessonId)) combinedMap.set(a.lessonId, a);
+    });
+    summary.recentAttempts.forEach(a => {
+      if (!combinedMap.has(a.lessonId)) combinedMap.set(a.lessonId, a);
+    });
+
+    const list = Array.from(combinedMap.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    return list.map(attempt => {
       const details = getLessonDetails(attempt.lessonId);
+      const isWeak = attempt.percentage < 80 || (attempt.missedIndices && attempt.missedIndices.length > 0);
       return {
         attempt,
         title: details?.title || attempt.lessonTitle || `Lesson ${attempt.lessonId}`,
         trackLabel: details?.trackLabel || 'Course Lesson',
         url: details?.url || `/lesson/${attempt.lessonId}?from=dashboard`,
+        isWeak,
       };
     });
-  }, [summary.weakAttempts]);
+  }, [summary]);
 
-  // Don't render for guests who haven't signed in
   if (isGuest) return null;
 
-  // Determine skill health badge & color
+  const weakCount = allItems.filter(i => i.isWeak).length;
+  const masteredCount = allItems.filter(i => !i.isWeak).length;
+
+  const displayedItems = allItems.filter(item => {
+    if (filterTab === 'weak') return item.isWeak;
+    if (filterTab === 'mastered') return !item.isWeak;
+    return true;
+  });
+
   const getRatingBadge = (score: number) => {
     if (score >= 90) return { label: 'Mastery', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
     if (score >= 75) return { label: 'Proficient', color: 'text-sky-400 bg-sky-500/10 border-sky-500/20' };
@@ -53,7 +76,6 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => 
       animate={{ opacity: 1, y: 0 }}
       className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-border/50 bg-secondary/15 relative overflow-hidden"
     >
-      {/* Decorative subtle ambient backdrop */}
       <div className="absolute top-0 right-0 w-64 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header section */}
@@ -65,7 +87,7 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => 
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm sm:text-base font-bold font-display text-foreground">
-                Skill Diagnostics & Weak Areas
+                Skill Diagnostics & Quiz Scores
               </h3>
               {summary.totalQuizzesTaken > 0 && (
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${badge.color}`}>
@@ -75,7 +97,7 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => 
             </div>
             <p className="text-[11px] text-muted-foreground">
               {summary.totalQuizzesTaken > 0 
-                ? `Detailed performance tracking across ${summary.totalQuizzesTaken} lesson quiz assessment${summary.totalQuizzesTaken > 1 ? 's' : ''}`
+                ? `Tracking across ${summary.totalQuizzesTaken} completed assessment${summary.totalQuizzesTaken > 1 ? 's' : ''}`
                 : 'Complete lesson quizzes to generate your personalized skill diagnostics'}
             </p>
           </div>
@@ -91,8 +113,8 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => 
             </div>
             <div className="text-right">
               <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Weak Spots</p>
-              <p className={`text-base sm:text-lg font-bold font-mono leading-none mt-0.5 ${summary.weakAttempts.length > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                {summary.weakAttempts.length}
+              <p className={`text-base sm:text-lg font-bold font-mono leading-none mt-0.5 ${weakCount > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {weakCount}
               </p>
             </div>
           </div>
@@ -102,7 +124,6 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => 
       {/* Main Content */}
       <div className="mt-3 relative z-10">
         {summary.totalQuizzesTaken === 0 ? (
-          // Empty State
           <div className="py-5 px-4 text-center rounded-xl bg-secondary/20 border border-border/30">
             <div className="w-8 h-8 rounded-full bg-primary/10 mx-auto grid place-items-center mb-2">
               <Sparkles className="w-4 h-4 text-primary" />
@@ -112,141 +133,144 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest }) => 
               When you complete the quiz step at the end of any lesson, your scores, test accuracy, and any missed concepts will automatically appear here.
             </p>
           </div>
-        ) : summary.weakAttempts.length === 0 ? (
-          // All skills strong celebration
-          <div className="py-4 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-              <div>
-                <p className="text-xs font-bold text-emerald-300">All Examined Skills Strong! 🎉</p>
-                <p className="text-[11px] text-emerald-400/80">
-                  You've passed your quizzes with high accuracy. No weak areas detected in your completed tests.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-[11px] font-mono font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 shrink-0"
-            >
-              <span>{expanded ? 'Hide History' : 'View Scores'}</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
-            </button>
-          </div>
         ) : (
-          // Weak areas identified
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-amber-400 flex items-center gap-1.5 font-semibold">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                <span>Recommended for Review ({weakItems.length})</span>
-              </p>
-              {weakItems.length > 2 && (
+          <div className="space-y-3">
+            {/* Filter Tabs */}
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-secondary/30 border border-border/30">
                 <button
-                  type="button"
-                  onClick={() => setExpanded(!expanded)}
-                  className="text-[10px] font-mono text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  onClick={() => setFilterTab('all')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-all flex items-center gap-1.5 ${
+                    filterTab === 'all'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
                 >
-                  <span>{expanded ? 'Show Less' : `Show All (${weakItems.length})`}</span>
-                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+                  <Layers className="w-3 h-3" />
+                  <span>All Quizzes ({allItems.length})</span>
+                </button>
+                <button
+                  onClick={() => setFilterTab('weak')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-all flex items-center gap-1.5 ${
+                    filterTab === 'weak'
+                      ? 'bg-amber-500 text-black font-bold shadow-sm'
+                      : 'text-muted-foreground hover:text-amber-400'
+                  }`}
+                >
+                  <AlertTriangle className="w-3 h-3" />
+                  <span>Weak Spots ({weakCount})</span>
+                </button>
+                <button
+                  onClick={() => setFilterTab('mastered')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-all flex items-center gap-1.5 ${
+                    filterTab === 'mastered'
+                      ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                      : 'text-muted-foreground hover:text-emerald-400'
+                  }`}
+                >
+                  <Award className="w-3 h-3" />
+                  <span>Mastered ({masteredCount})</span>
+                </button>
+              </div>
+
+              {weakCount > 0 && filterTab !== 'weak' && (
+                <button
+                  onClick={() => setFilterTab('weak')}
+                  className="text-[10px] font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+                >
+                  <AlertTriangle className="w-3 h-3" />
+                  <span>{weakCount} quiz need{weakCount > 1 ? '' : 's'} review</span>
                 </button>
               )}
             </div>
 
-            {/* List of weak area items */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-              {(expanded ? weakItems : weakItems.slice(0, 2)).map(({ attempt, title, trackLabel, url }) => (
-                <div
-                  key={attempt.lessonId}
-                  className="rounded-xl p-3 bg-secondary/30 border border-amber-500/20 hover:border-amber-500/40 transition-all flex flex-col justify-between gap-2.5"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
-                        {trackLabel}
-                      </span>
-                      <span className="text-[10px] font-mono font-bold text-amber-400">
-                        {attempt.percentage}% Score ({attempt.correctCount}/{attempt.totalQuestions})
-                      </span>
+            {/* List of quiz items */}
+            {displayedItems.length === 0 ? (
+              <div className="py-6 text-center text-xs text-muted-foreground border border-border/20 rounded-xl bg-secondary/10">
+                {filterTab === 'weak' 
+                  ? '🎉 No weak spots detected! All examined lessons passed with high scores.'
+                  : 'No quizzes found in this category.'}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                {displayedItems.map(({ attempt, title, trackLabel, url, isWeak }) => (
+                  <div
+                    key={attempt.lessonId}
+                    className={`rounded-xl p-3 border transition-all flex flex-col justify-between gap-2.5 ${
+                      isWeak 
+                        ? 'bg-secondary/30 border-amber-500/30 hover:border-amber-500/50' 
+                        : 'bg-secondary/20 border-border/40 hover:border-emerald-500/30'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase border ${
+                          isWeak 
+                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        }`}>
+                          {trackLabel}
+                        </span>
+                        <span className={`text-[10px] font-mono font-bold ${
+                          isWeak ? 'text-amber-400' : 'text-emerald-400'
+                        }`}>
+                          {attempt.percentage}% Score ({attempt.correctCount}/{attempt.totalQuestions})
+                        </span>
+                      </div>
+
+                      <h4 className="text-xs font-bold text-foreground font-display truncate">
+                        {title}
+                      </h4>
+
+                      {/* Missed questions brief or pass celebration */}
+                      {isWeak ? (
+                        attempt.missedQuestionsSummary && attempt.missedQuestionsSummary.length > 0 ? (
+                          <p className="text-[10px] text-muted-foreground line-clamp-1 mt-1">
+                            <strong className="text-amber-400 font-medium">Missed:</strong> {attempt.missedQuestionsSummary[0]}
+                            {attempt.missedQuestionsSummary.length > 1 ? ` (+${attempt.missedQuestionsSummary.length - 1} more)` : ''}
+                          </p>
+                        ) : (
+                          <p className="text-[10px] text-muted-foreground mt-1">
+                            {attempt.missedIndices?.length || 1} question(s) missed. Needs review.
+                          </p>
+                        )
+                      ) : (
+                        <p className="text-[10px] text-emerald-400/80 flex items-center gap-1 mt-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span>All assessment questions answered correctly.</span>
+                        </p>
+                      )}
                     </div>
-                    <h4 className="text-xs font-bold text-foreground font-display truncate">
-                      {title}
-                    </h4>
 
-                    {/* Missed questions brief */}
-                    {attempt.missedQuestionsSummary && attempt.missedQuestionsSummary.length > 0 ? (
-                      <p className="text-[10px] text-muted-foreground line-clamp-1 mt-1">
-                        <strong className="text-amber-400/90 font-medium">Missed:</strong> {attempt.missedQuestionsSummary[0]}
-                        {attempt.missedQuestionsSummary.length > 1 ? ` (+${attempt.missedQuestionsSummary.length - 1} more)` : ''}
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        {attempt.missedIndices?.length || 1} question(s) need review to achieve mastery.
-                      </p>
-                    )}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/20">
+                      <button
+                        onClick={() => navigate(`/complete/${attempt.lessonId}?from=dashboard`)}
+                        className="text-[10px] text-muted-foreground hover:text-foreground font-mono flex items-center gap-1 transition-colors"
+                      >
+                        <BookOpen className="w-3 h-3" />
+                        <span>Review Answers</span>
+                      </button>
+                      <button
+                        onClick={() => navigate(url)}
+                        className={`inline-flex items-center gap-1 text-[10px] font-bold font-mono px-2.5 py-1 rounded-lg border transition-all ${
+                          isWeak 
+                            ? 'text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/25' 
+                            : 'text-primary hover:text-foreground bg-primary/10 hover:bg-primary/20 border-primary/25'
+                        }`}
+                      >
+                        <RotateCcw className="w-2.5 h-2.5" />
+                        <span>{isWeak ? 'Retake Quiz' : 'Revisit Lesson'}</span>
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-border/20">
-                    <button
-                      onClick={() => navigate(`/complete/${attempt.lessonId}?from=dashboard`)}
-                      className="text-[10px] text-muted-foreground hover:text-foreground font-mono flex items-center gap-1 transition-colors"
-                    >
-                      <BookOpen className="w-3 h-3" />
-                      <span>Review Test</span>
-                    </button>
-                    <button
-                      onClick={() => navigate(url)}
-                      className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 hover:text-amber-300 font-mono px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
-                    >
-                      <RotateCcw className="w-2.5 h-2.5" />
-                      <span>Retake Quiz</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
-
-        {/* Expandable History Drawer when all are strong */}
-        <AnimatePresence>
-          {expanded && summary.weakAttempts.length === 0 && summary.strongAttempts.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-3 pt-3 border-t border-border/20 space-y-2 overflow-hidden"
-            >
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                Mastered Quizzes
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {summary.strongAttempts.map(attempt => {
-                  const details = getLessonDetails(attempt.lessonId);
-                  return (
-                    <div
-                      key={attempt.lessonId}
-                      className="p-2.5 rounded-lg bg-secondary/20 border border-border/30 flex items-center justify-between text-xs"
-                    >
-                      <div className="min-w-0 pr-2">
-                        <p className="font-semibold text-foreground truncate text-[11px]">
-                          {details?.title || attempt.lessonTitle || attempt.lessonId}
-                        </p>
-                        <p className="text-[9px] text-muted-foreground font-mono">
-                          {details?.trackLabel || 'Lesson'}
-                        </p>
-                      </div>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold shrink-0">
-                        {attempt.percentage}%
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </motion.div>
   );
 };
+
 export default SkillHealthCard;
