@@ -18,7 +18,12 @@ import {
   ChevronDown,
   Terminal,
   ShieldCheck,
-  Flame
+  Flame,
+  Bot,
+  ShoppingBag,
+  Zap,
+  Calendar,
+  Crown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import GlobalTranslatorWidget from '@/components/GlobalTranslatorWidget';
@@ -27,20 +32,28 @@ const ADMIN_EMAIL = 'zainrao.dev@gmail.com';
 
 const FAQ_ITEMS = [
   {
+    q: 'Is CodeSage completely free to use?',
+    a: 'Yes! CodeSage is 100% free. You have unrestricted access to all 18 full curriculum tracks, the in-browser Monaco code runner, diagnostic quizzes, algorithmic challenges, and the interactive playground. A CodeSage PRO tier will be introduced soon for advanced capabilities like the personal AI Teacher and Developer Marketplace.'
+  },
+  {
     q: 'How does track enrollment work? Why is there a 2-track limit?',
     a: 'CodeSage allows enrollment in up to 2 active tracks simultaneously. This limit is intentionally designed using cognitive load principles—focusing your daily practice on 1 or 2 areas leads to significantly higher retention and curriculum completion than spreading effort thin across dozens of tracks. You can switch, pause, or resume tracks anytime in Settings.'
   },
   {
     q: 'How are lessons structured? Why do some tracks have quizzes and others don’t?',
-    a: 'Frontend Development (HTML, CSS, JavaScript, React) is 100% interactive coding—you write and test live code in the Monaco editor with real-time browser preview and challenge verification. Other tracks (such as Python, SQL, AI Fundamentals, Systems C/C++, Java) blend conceptual deep-dives, interactive code sandboxes, and end-of-lesson diagnostic quizzes to test retention.'
+    a: 'Frontend Development (HTML, CSS, JavaScript, React) is 100% hands-on coding—you write and test live code directly in the Monaco editor with instant browser preview and challenge verification. Other tracks (such as Python, SQL, AI Fundamentals, Systems C/C++, Java) blend conceptual deep-dives, interactive code sandboxes, and end-of-lesson diagnostic quizzes to test retention.'
   },
   {
-    q: 'Where can I see the questions I got wrong?',
-    a: 'Head to Settings → Lessons-Based Track Progress. Expand any enrolled track to see lesson-by-lesson metrics. If you answered any questions incorrectly, they are highlighted with the exact question text, options, and a direct "Retake Quiz" button to reinforce your understanding.'
+    q: 'Where can I see which quiz questions I got wrong?',
+    a: 'Head to Settings → Lessons-Based Track Progress. Expand any enrolled track to see lesson-by-lesson metrics. If you answered any questions incorrectly, they are highlighted with the exact question text, options, and a direct "Retake Quiz" button to practice and master that concept.'
+  },
+  {
+    q: 'Can I practice coding freely without taking a lesson?',
+    a: 'Yes! Head to the Playground (/playground). You can create and edit multi-file HTML/CSS/JS projects with live visual preview, or run Python and SQL scripts in a distraction-free sandbox. You can even export your code as a .ZIP file.'
   },
   {
     q: 'How do XP, Levels, and Sage Coins work?',
-    a: 'Completing lessons, maintaining daily streaks, and solving challenges awards XP and Sage Coins. As your XP grows, your developer rank levels up (from Novice to Architect). Sage Coins can be redeemed for cosmetics, profile perks, and streak freezes in the shop.'
+    a: 'Completing lessons, maintaining daily streaks, and solving challenges awards XP and Sage Coins. As your XP grows, your developer rank levels up (from Novice to Architect). Sage Coins can be redeemed for profile perks and streak freezes.'
   },
   {
     q: 'What happens if I miss a day? How do Daily Streaks work?',
@@ -51,8 +64,20 @@ const FAQ_ITEMS = [
     a: 'Yes! If you are logged in with an account, all your completed lessons, lifetime XP, level, coins, and streak count are continuously synced to our Supabase cloud database. You can also download a local offline JSON backup anytime under Settings → Account.'
   },
   {
-    q: 'Can I earn verifiable certificates?',
-    a: 'Yes. Once you finish a curriculum track, you can take a comprehensive assessment under the Exams & Certifications section (/exams) to validate your mastery and receive a certificate badge.'
+    q: 'Do you offer certificates right now?',
+    a: 'Certificates are currently in active development and not issued yet. In the meantime, you can test and prove your mastery across all languages and difficulty tiers through the milestone tests and exams in the Exams section (/exams).'
+  },
+  {
+    q: 'What are Coding Challenges and the Code Crawler game?',
+    a: 'Coding Challenges (/challenges) offer bite-sized algorithmic puzzles to test speed and problem-solving. Code Crawler (/games/crawler) is an arcade terminal game where you solve code hurdles to navigate a bot through a digital dungeon.'
+  },
+  {
+    q: 'Can I use CodeSage on mobile phones and tablets?',
+    a: 'Yes! CodeSage is designed to be fully responsive with dedicated mobile navigation. While conceptual reading and quizzes work great on phones, hands-on Monaco coding in Frontend and Systems tracks is best experienced on tablets or desktop keyboards.'
+  },
+  {
+    q: 'How do I report an incorrect quiz question or ask a private question?',
+    a: 'You can email the administrator directly at zainrao.dev@gmail.com, or submit a note via the Community Suggestions Box.'
   }
 ];
 
@@ -74,6 +99,7 @@ export default function TopUtilityBar() {
   const navigate = useNavigate();
   const [isFaqOpen, setIsFaqOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(0);
 
@@ -127,15 +153,18 @@ export default function TopUtilityBar() {
               <span>About</span>
             </button>
 
-            {/* Suggestions Button */}
+            {/* Free Tier & PRO in 2 Days Button */}
             <button
               type="button"
-              onClick={() => navigate('/suggestions')}
-              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent hover:border-border/40 transition-all"
-              title="Open Community Suggestions Box"
+              onClick={() => setIsPlanModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all shadow-sm"
+              title="View Membership Plans: Free Tier active & PRO features in 2 days"
             >
-              <MessageSquarePlus className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Suggestions</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span>Free</span>
+              <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-primary/20 text-primary border border-primary/30 uppercase tracking-tight hidden sm:inline">
+                PRO in 2 Days
+              </span>
             </button>
           </div>
         </div>
@@ -400,8 +429,8 @@ export default function TopUtilityBar() {
                   <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
                     <Award className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-foreground block">Certifications & Exams:</strong>
-                      Comprehensive tests at /exams to validate your technical competence.
+                      <strong className="text-foreground block">Milestone Exams & Skill Tests:</strong>
+                      Comprehensive assessments at /exams to benchmark your technical competence.
                     </div>
                   </div>
                 </div>
@@ -439,6 +468,206 @@ export default function TopUtilityBar() {
                 className="px-4 py-2 rounded-xl text-xs font-semibold bg-secondary/60 hover:bg-secondary border border-border/50 text-foreground transition-colors font-sans"
               >
                 Close About
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== FREE & PRO PLANS MODAL ==================== */}
+      {isPlanModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-in fade-in duration-150"
+          onClick={() => setIsPlanModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[90vh] bg-card border border-border/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-border/40 flex items-start justify-between bg-card/80">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Crown className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold font-display text-foreground flex items-center gap-2">
+                    <span>CodeSage Membership Plans</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30 font-semibold">
+                      Roadmap Update
+                    </span>
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    Current active tier and preview of the upcoming PRO rollout
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPlanModalOpen(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+                aria-label="Close Plans"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-sm">
+              {/* Release Schedule Notification Banner */}
+              <div className="p-4 rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 via-secondary/20 to-amber-500/15 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs sm:text-sm font-bold font-display text-foreground">
+                    Next Major Rollout (2-Day Release Window)
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                    <strong className="text-primary">Tomorrow:</strong> We are launching our interactive <span className="text-foreground font-semibold">AI Teacher</span> to help you debug code and understand concepts in real time.
+                    <br />
+                    <strong className="text-amber-400">In 2 Days:</strong> The full <span className="text-foreground font-semibold">Developer Marketplace</span> &amp; <span className="text-foreground font-semibold">CodeSage PRO</span> tier unlock!
+                  </p>
+                </div>
+              </div>
+
+              {/* Plans Comparison Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {/* Free Plan Card */}
+                <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/40 bg-emerald-500/[0.04] flex flex-col justify-between space-y-4 relative">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-xs font-bold font-mono uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        Current Plan
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+                        ACTIVE
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold font-display text-foreground">
+                      Free Forever
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Full access to core computer science education at zero cost.
+                    </p>
+
+                    <div className="mt-4 space-y-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>All 18 Curriculum Tracks unlocked</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>In-browser Monaco code editor</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Diagnostic quizzes &amp; mistake review</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Interactive Multi-File Playground</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Community forums &amp; Daily Streaks</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Cloud sync &amp; local offline JSON backup</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-emerald-500/20">
+                    <span className="text-[11px] font-mono text-emerald-400 font-semibold block text-center">
+                      Included with every student account
+                    </span>
+                  </div>
+                </div>
+
+                {/* PRO Plan Card (Upcoming) */}
+                <div className="p-4 sm:p-5 rounded-2xl border border-primary/40 bg-primary/[0.04] flex flex-col justify-between space-y-4 relative">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-xs font-bold font-mono uppercase tracking-wider text-primary flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" />
+                        Upcoming Tier
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/40 font-bold">
+                        LAUNCHING IN 2 DAYS
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold font-display text-foreground flex items-center gap-2">
+                      <span>CodeSage PRO</span>
+                      <Crown className="w-4 h-4 text-amber-400" />
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Power-user engineering tools, AI mentorship, and ecosystem access.
+                    </p>
+
+                    <div className="mt-4 space-y-2 text-xs text-foreground/90">
+                      <div className="flex items-start gap-2 p-2 rounded-lg bg-background/50 border border-border/40">
+                        <Bot className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-foreground block font-semibold">
+                            AI Teacher (Coming Tomorrow!):
+                          </strong>
+                          <span className="text-muted-foreground text-[11px]">
+                            Live AI coding mentor right inside lessons for instant debugging and code analysis.
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 p-2 rounded-lg bg-background/50 border border-border/40">
+                        <ShoppingBag className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-foreground block font-semibold">
+                            Developer Marketplace (In 2 Days!):
+                          </strong>
+                          <span className="text-muted-foreground text-[11px]">
+                            Download and share student templates, starter kits, and customized editor themes.
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs pl-1">
+                        <Zap className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>High-priority sandbox execution</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs pl-1">
+                        <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>Exclusive PRO badge and community flair</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-primary/20">
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-primary/20 border border-primary/30 text-primary opacity-80 cursor-default flex items-center justify-center gap-1.5"
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Arriving in 2 Days · Stay Tuned!</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-3.5 px-5 border-t border-border/40 bg-card/70 flex justify-between items-center text-[11px] text-muted-foreground font-mono">
+              <span>CodeSage Membership Roadmap</span>
+              <button
+                type="button"
+                onClick={() => setIsPlanModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-secondary/60 hover:bg-secondary border border-border/50 text-foreground transition-colors font-sans"
+              >
+                Close
               </button>
             </div>
           </div>
