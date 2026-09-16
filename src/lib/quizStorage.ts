@@ -1,3 +1,5 @@
+import { getLessonDetails } from '@/data/lessonIndex';
+
 export interface QuizAttempt {
   lessonId: string;
   lessonTitle?: string;
@@ -63,9 +65,12 @@ export function saveLessonQuizAttempt(
   const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 100;
   const passed = percentage >= 70;
 
+  const resolvedDetails = getLessonDetails(lessonId);
+  const finalTitle = lessonTitle || resolvedDetails?.title;
+
   const attempt: QuizAttempt = {
     lessonId,
-    lessonTitle,
+    lessonTitle: finalTitle,
     answers,
     totalQuestions,
     correctCount,
@@ -81,6 +86,11 @@ export function saveLessonQuizAttempt(
     sessionStorage.setItem('codesage_last_quiz', JSON.stringify(attempt));
     localStorage.setItem(`codesage_quiz_${lessonId}`, JSON.stringify(attempt));
     localStorage.setItem('codesage_last_quiz', JSON.stringify(attempt));
+    localStorage.setItem('codesage_last_active_lesson', lessonId);
+
+    if (resolvedDetails?.trackKey) {
+      localStorage.setItem('codesage_last_active_track', resolvedDetails.trackKey);
+    }
   } catch (e) {
     console.warn('Could not save quiz attempt to storage:', e);
   }
@@ -112,8 +122,10 @@ export function getLessonQuizAttempt(lessonId: string): QuizAttempt | null {
 
 /**
  * Retrieves all recorded quiz attempts across all lessons.
+ * Optionally supplements with completed lesson IDs from user profile so past completed
+ * lessons without explicit quiz snapshots are recognized as completed/mastered.
  */
-export function getAllQuizAttempts(): QuizAttempt[] {
+export function getAllQuizAttempts(completedLessonIds?: string[]): QuizAttempt[] {
   const attempts: QuizAttempt[] = [];
   const seenIds = new Set<string>();
 
@@ -146,6 +158,27 @@ export function getAllQuizAttempts(): QuizAttempt[] {
         }
       }
     }
+
+    // Supplement with completed lessons if passed
+    if (completedLessonIds && Array.isArray(completedLessonIds)) {
+      for (const lessonId of completedLessonIds) {
+        if (!seenIds.has(lessonId)) {
+          seenIds.add(lessonId);
+          const details = getLessonDetails(lessonId);
+          attempts.push({
+            lessonId,
+            lessonTitle: details?.title || `Lesson ${lessonId}`,
+            answers: {},
+            totalQuestions: 1,
+            correctCount: 1,
+            percentage: 100,
+            passed: true,
+            missedIndices: [],
+            timestamp: Date.now() - 3600000,
+          });
+        }
+      }
+    }
   } catch (e) {
     console.warn('Could not read all quiz attempts:', e);
   }
@@ -156,8 +189,8 @@ export function getAllQuizAttempts(): QuizAttempt[] {
 /**
  * Computes an aggregated diagnostic summary of quiz performance and weak areas.
  */
-export function getSkillHealthSummary(): SkillHealthSummary {
-  const attempts = getAllQuizAttempts();
+export function getSkillHealthSummary(completedLessonIds?: string[]): SkillHealthSummary {
+  const attempts = getAllQuizAttempts(completedLessonIds);
 
   if (attempts.length === 0) {
     return {
