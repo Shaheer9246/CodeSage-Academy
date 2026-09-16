@@ -3,83 +3,110 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Target, AlertTriangle, CheckCircle2, RotateCcw, 
-  Sparkles, BookOpen, Layers, Award
+  Sparkles, BookOpen, ChevronDown, ChevronRight, GraduationCap, ArrowRight
 } from 'lucide-react';
 import { getSkillHealthSummary, type QuizAttempt } from '@/lib/quizStorage';
-import { getLessonDetails } from '@/data/lessonIndex';
+import { 
+  TRACK_LESSON_IDS, 
+  completedCountFor, 
+  getLessonDetails, 
+  type LessonTrackKey 
+} from '@/data/lessonIndex';
+import { TRACK_META, TrackId, isEnrolled } from '@/lib/enrollment';
 
 interface SkillHealthCardProps {
   isGuest?: boolean;
   completedLessonIds?: string[];
 }
 
-export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest, completedLessonIds }) => {
+export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest, completedLessonIds = [] }) => {
   const navigate = useNavigate();
-  const [filterTab, setFilterTab] = useState<'all' | 'weak' | 'mastered'>('all');
+  const [expandedTracks, setExpandedTracks] = useState<Record<string, boolean>>({});
 
-  // Read quiz attempts and diagnostic state, including any completed lessons
+  // Read full quiz attempts
   const summary = useMemo(() => {
     return getSkillHealthSummary(completedLessonIds);
   }, [completedLessonIds]);
 
-  // Enrich all attempts with lesson metadata
-  const allItems = useMemo(() => {
-    const attempts = summary.recentAttempts.length > 0 ? summary.recentAttempts : [];
-    // Combine all attempts (weak + strong, sorted by timestamp descending)
-    const combinedMap = new Map<string, QuizAttempt>();
-    summary.weakAttempts.forEach(a => combinedMap.set(a.lessonId, a));
-    summary.strongAttempts.forEach(a => {
-      if (!combinedMap.has(a.lessonId)) combinedMap.set(a.lessonId, a);
-    });
-    summary.recentAttempts.forEach(a => {
-      if (!combinedMap.has(a.lessonId)) combinedMap.set(a.lessonId, a);
-    });
+  // Map all quiz attempts by lesson ID
+  const quizMap = useMemo(() => {
+    const map = new Map<string, QuizAttempt>();
+    summary.recentAttempts.forEach(a => map.set(a.lessonId, a));
+    summary.weakAttempts.forEach(a => map.set(a.lessonId, a));
+    summary.strongAttempts.forEach(a => map.set(a.lessonId, a));
+    return map;
+  }, [summary]);
 
-    const list = Array.from(combinedMap.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  // Group tracks with enrollment status and lesson/quiz progress
+  const trackCards = useMemo(() => {
+    const trackKeys = Object.keys(TRACK_META) as TrackId[];
 
-    return list.map(attempt => {
-      const details = getLessonDetails(attempt.lessonId);
-      const isWeak = attempt.percentage < 80 || (attempt.missedIndices && attempt.missedIndices.length > 0);
+    const list = trackKeys.map(trackId => {
+      const meta = TRACK_META[trackId];
+      const lessonKey = trackId as unknown as LessonTrackKey;
+      const lessonIds = TRACK_LESSON_IDS[lessonKey] || [];
+      const totalLessons = lessonIds.length;
+      const completed = completedCountFor(lessonKey, completedLessonIds);
+      const enrolled = isEnrolled(trackId) || completed > 0;
+      const progressPct = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
+
+      // Find all quizzes in this track
+      const trackQuizzes: { attempt: QuizAttempt; details: ReturnType<typeof getLessonDetails>; isWeak: boolean }[] = [];
+      let totalScoreSum = 0;
+      let quizCount = 0;
+
+      for (const lid of lessonIds) {
+        const attempt = quizMap.get(lid);
+        if (attempt) {
+          const details = getLessonDetails(lid);
+          const isWeak = attempt.percentage < 80 || (attempt.missedIndices && attempt.missedIndices.length > 0);
+          trackQuizzes.push({ attempt, details, isWeak });
+          totalScoreSum += attempt.percentage;
+          quizCount++;
+        }
+      }
+
+      const avgQuizScore = quizCount > 0 ? Math.round(totalScoreSum / quizCount) : null;
+      const weakQuizCount = trackQuizzes.filter(q => q.isWeak).length;
+
       return {
-        attempt,
-        title: details?.title || attempt.lessonTitle || `Lesson ${attempt.lessonId}`,
-        trackLabel: details?.trackLabel || 'Course Lesson',
-        url: details?.url || `/lesson/${attempt.lessonId}?from=dashboard`,
-        isWeak,
+        trackId,
+        label: meta?.label || trackId,
+        short: meta?.short || trackId,
+        route: meta?.route || '/dashboard',
+        enrolled,
+        totalLessons,
+        completed,
+        progressPct,
+        trackQuizzes,
+        avgQuizScore,
+        weakQuizCount,
       };
     });
-  }, [summary]);
+
+    // Sort: Enrolled/active tracks first, then tracks with completions, then alphabetical
+    return list.sort((a, b) => {
+      if (a.enrolled !== b.enrolled) return a.enrolled ? -1 : 1;
+      if (b.completed !== a.completed) return b.completed - a.completed;
+      return a.label.localeCompare(b.label);
+    });
+  }, [completedLessonIds, quizMap]);
 
   if (isGuest) return null;
 
-  const weakCount = allItems.filter(i => i.isWeak).length;
-  const masteredCount = allItems.filter(i => !i.isWeak).length;
-
-  const displayedItems = allItems.filter(item => {
-    if (filterTab === 'weak') return item.isWeak;
-    if (filterTab === 'mastered') return !item.isWeak;
-    return true;
-  });
-
-  const getRatingBadge = (score: number) => {
-    if (score >= 90) return { label: 'Mastery', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
-    if (score >= 75) return { label: 'Proficient', color: 'text-sky-400 bg-sky-500/10 border-sky-500/20' };
-    if (score >= 60) return { label: 'Reviewing', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
-    return { label: 'Needs Practice', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+  const toggleExpand = (trackId: string) => {
+    setExpandedTracks(prev => ({
+      ...prev,
+      [trackId]: !prev[trackId],
+    }));
   };
 
-  const badge = getRatingBadge(summary.averageScore);
+  const enrolledTracksCount = trackCards.filter(t => t.enrolled).length;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-border/50 bg-secondary/15 relative overflow-hidden"
-    >
-      <div className="absolute top-0 right-0 w-64 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 pb-3 border-b border-border/30">
+    <div className="w-full glass-card rounded-2xl p-5 lg:p-6 border border-border/40 space-y-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/30">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 grid place-items-center shrink-0">
             <Target className="w-5 h-5 text-primary" />
@@ -87,18 +114,14 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest, compl
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm sm:text-base font-bold font-display text-foreground">
-                Skill Diagnostics & Quiz Scores
+                Track Progress & Skill Diagnostics
               </h3>
-              {summary.totalQuizzesTaken > 0 && (
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${badge.color}`}>
-                  {badge.label}
-                </span>
-              )}
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                {enrolledTracksCount} Enrolled
+              </span>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              {summary.totalQuizzesTaken > 0 
-                ? `Tracking across ${summary.totalQuizzesTaken} completed assessment${summary.totalQuizzesTaken > 1 ? 's' : ''}`
-                : 'Complete lesson quizzes to generate your personalized skill diagnostics'}
+              Track-by-track breakdown of curriculum progress, quiz mastery, and diagnostics
             </p>
           </div>
         </div>
@@ -106,170 +129,212 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest, compl
         {summary.totalQuizzesTaken > 0 && (
           <div className="flex items-center gap-4 shrink-0">
             <div className="text-right">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Avg Accuracy</p>
-              <p className="text-base sm:text-lg font-bold font-mono text-primary leading-none mt-0.5">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Quiz Accuracy</p>
+              <p className="text-base font-bold font-mono text-primary leading-none mt-0.5">
                 {summary.averageScore}%
               </p>
             </div>
             <div className="text-right">
               <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Weak Spots</p>
-              <p className={`text-base sm:text-lg font-bold font-mono leading-none mt-0.5 ${weakCount > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                {weakCount}
+              <p className={`text-base font-bold font-mono leading-none mt-0.5 ${summary.weakAttempts.length > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {summary.weakAttempts.length}
               </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Main Content */}
-      <div className="mt-3 relative z-10">
-        {summary.totalQuizzesTaken === 0 ? (
-          <div className="py-5 px-4 text-center rounded-xl bg-secondary/20 border border-border/30">
-            <div className="w-8 h-8 rounded-full bg-primary/10 mx-auto grid place-items-center mb-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-            </div>
-            <p className="text-xs font-semibold text-foreground">No Quiz Attempts Recorded Yet</p>
-            <p className="text-[11px] text-muted-foreground max-w-md mx-auto mt-1">
-              When you complete the quiz step at the end of any lesson, your scores, test accuracy, and any missed concepts will automatically appear here.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {/* Filter Tabs */}
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-secondary/30 border border-border/30">
-                <button
-                  onClick={() => setFilterTab('all')}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-all flex items-center gap-1.5 ${
-                    filterTab === 'all'
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Layers className="w-3 h-3" />
-                  <span>All Quizzes ({allItems.length})</span>
-                </button>
-                <button
-                  onClick={() => setFilterTab('weak')}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-all flex items-center gap-1.5 ${
-                    filterTab === 'weak'
-                      ? 'bg-amber-500 text-black font-bold shadow-sm'
-                      : 'text-muted-foreground hover:text-amber-400'
-                  }`}
-                >
-                  <AlertTriangle className="w-3 h-3" />
-                  <span>Weak Spots ({weakCount})</span>
-                </button>
-                <button
-                  onClick={() => setFilterTab('mastered')}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-all flex items-center gap-1.5 ${
-                    filterTab === 'mastered'
-                      ? 'bg-emerald-500 text-black font-bold shadow-sm'
-                      : 'text-muted-foreground hover:text-emerald-400'
-                  }`}
-                >
-                  <Award className="w-3 h-3" />
-                  <span>Mastered ({masteredCount})</span>
-                </button>
-              </div>
+      {/* Track Accordion List */}
+      <div className="space-y-2.5">
+        {trackCards.map(track => {
+          const isExpanded = !!expandedTracks[track.trackId];
 
-              {weakCount > 0 && filterTab !== 'weak' && (
-                <button
-                  onClick={() => setFilterTab('weak')}
-                  className="text-[10px] font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
-                >
-                  <AlertTriangle className="w-3 h-3" />
-                  <span>{weakCount} quiz need{weakCount > 1 ? '' : 's'} review</span>
-                </button>
-              )}
-            </div>
+          return (
+            <div
+              key={track.trackId}
+              className={`rounded-xl border transition-all overflow-hidden ${
+                track.enrolled
+                  ? 'bg-secondary/20 border-primary/25 hover:border-primary/40'
+                  : 'bg-secondary/10 border-border/30 hover:border-border/50'
+              }`}
+            >
+              {/* Accordion Header Row */}
+              <button
+                type="button"
+                onClick={() => toggleExpand(track.trackId)}
+                className="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors hover:bg-secondary/20"
+              >
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="shrink-0 text-muted-foreground">
+                    {isExpanded ? (
+                      <ChevronDown className="w-4 h-4 text-primary" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-xs sm:text-sm font-bold font-display text-foreground truncate">
+                        {track.label}
+                      </h4>
+                      {track.enrolled ? (
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
+                          Enrolled
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-secondary/50 text-muted-foreground border border-border/40">
+                          Not Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground font-mono mt-0.5">
+                      {track.completed} of {track.totalLessons} lessons completed ({track.progressPct}%)
+                    </p>
+                  </div>
+                </div>
 
-            {/* List of quiz items */}
-            {displayedItems.length === 0 ? (
-              <div className="py-6 text-center text-xs text-muted-foreground border border-border/20 rounded-xl bg-secondary/10">
-                {filterTab === 'weak' 
-                  ? '🎉 No weak spots detected! All examined lessons passed with high scores.'
-                  : 'No quizzes found in this category.'}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                {displayedItems.map(({ attempt, title, trackLabel, url, isWeak }) => (
-                  <div
-                    key={attempt.lessonId}
-                    className={`rounded-xl p-3 border transition-all flex flex-col justify-between gap-2.5 ${
-                      isWeak 
-                        ? 'bg-secondary/30 border-amber-500/30 hover:border-amber-500/50' 
-                        : 'bg-secondary/20 border-border/40 hover:border-emerald-500/30'
-                    }`}
+                {/* Right side teaser pill */}
+                <div className="flex items-center gap-3 shrink-0">
+                  {track.avgQuizScore !== null && (
+                    <div className="hidden sm:block text-right">
+                      <span className="text-[9px] font-mono text-muted-foreground uppercase block">Avg Quiz</span>
+                      <span className={`text-xs font-mono font-bold ${
+                        track.avgQuizScore >= 80 ? 'text-emerald-400' : 'text-amber-400'
+                      }`}>
+                        {track.avgQuizScore}%
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-xs font-mono text-primary font-bold">
+                    {track.progressPct}%
+                  </span>
+                </div>
+              </button>
+
+              {/* Accordion Expanded Panel */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="border-t border-border/20 p-3.5 sm:p-4 bg-background/50 space-y-3.5"
                   >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase border ${
-                          isWeak 
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
-                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        }`}>
-                          {trackLabel}
-                        </span>
-                        <span className={`text-[10px] font-mono font-bold ${
-                          isWeak ? 'text-amber-400' : 'text-emerald-400'
-                        }`}>
-                          {attempt.percentage}% Score ({attempt.correctCount}/{attempt.totalQuestions})
-                        </span>
+                    {/* Progress bar */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
+                        <span>Curriculum Progress</span>
+                        <span>{track.completed} / {track.totalLessons} Lessons ({track.progressPct}%)</span>
+                      </div>
+                      <div className="h-2 bg-secondary/50 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-primary to-accent-blue rounded-full transition-all duration-500"
+                          style={{ width: `${track.progressPct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Quiz breakdown in this track */}
+                    <div className="space-y-2 pt-1">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-[11px] font-bold font-display uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <BookOpen className="w-3 h-3 text-primary" />
+                          Track Assessments & Quiz Scores ({track.trackQuizzes.length})
+                        </h5>
+                        {track.avgQuizScore !== null && (
+                          <span className="text-[10px] font-mono text-foreground">
+                            Track Accuracy: <strong className="text-primary">{track.avgQuizScore}%</strong>
+                          </span>
+                        )}
                       </div>
 
-                      <h4 className="text-xs font-bold text-foreground font-display truncate">
-                        {title}
-                      </h4>
-
-                      {/* Missed questions brief or pass celebration */}
-                      {isWeak ? (
-                        attempt.missedQuestionsSummary && attempt.missedQuestionsSummary.length > 0 ? (
-                          <p className="text-[10px] text-muted-foreground line-clamp-1 mt-1">
-                            <strong className="text-amber-400 font-medium">Missed:</strong> {attempt.missedQuestionsSummary[0]}
-                            {attempt.missedQuestionsSummary.length > 1 ? ` (+${attempt.missedQuestionsSummary.length - 1} more)` : ''}
+                      {track.trackQuizzes.length === 0 ? (
+                        <div className="py-3 px-3 rounded-lg bg-secondary/20 text-center border border-border/20">
+                          <p className="text-[11px] text-muted-foreground">
+                            No quizzes completed in this track yet. Take quizzes at the end of each lesson to see your scores and diagnostic review here.
                           </p>
-                        ) : (
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            {attempt.missedIndices?.length || 1} question(s) missed. Needs review.
-                          </p>
-                        )
+                        </div>
                       ) : (
-                        <p className="text-[10px] text-emerald-400/80 flex items-center gap-1 mt-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-                          <span>All assessment questions answered correctly.</span>
-                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {track.trackQuizzes.map(({ attempt, details, isWeak }) => (
+                            <div
+                              key={attempt.lessonId}
+                              className={`p-2.5 rounded-lg border text-xs flex flex-col justify-between gap-2 ${
+                                isWeak
+                                  ? 'bg-amber-500/5 border-amber-500/25'
+                                  : 'bg-secondary/20 border-border/30'
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center justify-between gap-1 mb-1">
+                                  <span className="text-[10px] font-semibold text-foreground truncate">
+                                    {details?.title || attempt.lessonTitle || `Lesson ${attempt.lessonId}`}
+                                  </span>
+                                  <span className={`text-[10px] font-mono font-bold shrink-0 ${
+                                    isWeak ? 'text-amber-400' : 'text-emerald-400'
+                                  }`}>
+                                    {attempt.percentage}%
+                                  </span>
+                                </div>
+                                {isWeak ? (
+                                  <p className="text-[10px] text-amber-400/90 flex items-center gap-1">
+                                    <AlertTriangle className="w-3 h-3 shrink-0" />
+                                    <span>Needs review ({attempt.missedIndices?.length || 1} missed)</span>
+                                  </p>
+                                ) : (
+                                  <p className="text-[10px] text-emerald-400/80 flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3 shrink-0" />
+                                    <span>Mastered ({attempt.correctCount}/{attempt.totalQuestions})</span>
+                                  </p>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between pt-1.5 border-t border-border/20">
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(`/complete/${attempt.lessonId}?from=settings`)}
+                                  className="text-[10px] font-mono text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+                                >
+                                  Review
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(details?.url || `/lesson/${attempt.lessonId}?from=settings`)}
+                                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border transition-all ${
+                                    isWeak
+                                      ? 'text-amber-400 bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20'
+                                      : 'text-primary bg-primary/10 border-primary/20 hover:bg-primary/20'
+                                  }`}
+                                >
+                                  {isWeak ? 'Retake' : 'Revisit'}
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-border/20">
+                    {/* Action button to roadmap */}
+                    <div className="pt-2 flex justify-end">
                       <button
-                        onClick={() => navigate(`/complete/${attempt.lessonId}?from=dashboard`)}
-                        className="text-[10px] text-muted-foreground hover:text-foreground font-mono flex items-center gap-1 transition-colors"
+                        type="button"
+                        onClick={() => navigate(track.route)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold font-display px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 border border-primary/25 transition-all"
                       >
-                        <BookOpen className="w-3 h-3" />
-                        <span>Review Answers</span>
-                      </button>
-                      <button
-                        onClick={() => navigate(url)}
-                        className={`inline-flex items-center gap-1 text-[10px] font-bold font-mono px-2.5 py-1 rounded-lg border transition-all ${
-                          isWeak 
-                            ? 'text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/25' 
-                            : 'text-primary hover:text-foreground bg-primary/10 hover:bg-primary/20 border-primary/25'
-                        }`}
-                      >
-                        <RotateCcw className="w-2.5 h-2.5" />
-                        <span>{isWeak ? 'Retake Quiz' : 'Revisit Lesson'}</span>
+                        <span>Open {track.short} Roadmap</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
