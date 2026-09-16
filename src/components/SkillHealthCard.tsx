@@ -328,31 +328,47 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({
                           </p>
                         </div>
                         <div className="bg-background/60 rounded-lg p-2 border border-border/20">
-                          <p className="text-[9px] text-muted-foreground uppercase font-mono">Quiz Accuracy</p>
+                          <p className="text-[9px] text-muted-foreground uppercase font-mono">
+                            {track.trackId === 'frontend' ? 'Format' : 'Quiz Accuracy'}
+                          </p>
                           <p className={`text-sm font-bold font-mono mt-0.5 ${
-                            track.avgQuizScore !== null
+                            track.trackId === 'frontend'
+                              ? 'text-primary'
+                              : track.avgQuizScore !== null
                               ? track.avgQuizScore >= 80 ? 'text-emerald-400' : 'text-amber-400'
                               : 'text-muted-foreground'
                           }`}>
-                            {track.avgQuizScore !== null ? `${track.avgQuizScore}%` : 'Pending'}
+                            {track.trackId === 'frontend'
+                              ? 'Hands-on Code'
+                              : track.avgQuizScore !== null
+                              ? `${track.avgQuizScore}%`
+                              : 'Pending'}
                           </p>
                         </div>
                         <div className="col-span-2 sm:col-span-1 bg-background/60 rounded-lg p-2 border border-border/20">
-                          <p className="text-[9px] text-muted-foreground uppercase font-mono">Quizzes Taken</p>
+                          <p className="text-[9px] text-muted-foreground uppercase font-mono">
+                            {track.trackId === 'frontend' ? 'Challenges Solved' : 'Quizzes Taken'}
+                          </p>
                           <p className="text-sm font-bold font-mono text-foreground mt-0.5">
-                            {track.trackQuizzes.length}
+                            {track.trackId === 'frontend' ? track.completed : track.trackQuizzes.length}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* THING 2: Lesson-by-Lesson Progress & Mistake Review */}
+                    {/* THING 2: Lesson-by-Lesson Progress & Mistake / Code Review */}
                     <div className="space-y-2.5 pt-1">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                          {track.trackId === 'frontend' ? (
+                            <BookOpen className="w-3.5 h-3.5 text-primary" />
+                          ) : (
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                          )}
                           <span className="text-xs font-bold font-display uppercase tracking-wider text-foreground">
-                            2. Lesson Progress & Mistakes Review
+                            {track.trackId === 'frontend'
+                              ? '2. Lesson Progress & Code Challenges'
+                              : '2. Lesson Progress & Mistakes Review'}
                           </span>
                         </div>
                         <span className="text-[10px] font-mono text-muted-foreground">
@@ -363,7 +379,7 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({
                       {track.lessonProgressList.length === 0 ? (
                         <div className="py-4 px-3 rounded-xl bg-secondary/15 border border-border/20 text-center space-y-2">
                           <p className="text-xs text-muted-foreground">
-                            No lessons completed or quizzes taken in {track.short} yet.
+                            No lessons completed in {track.short} yet.
                           </p>
                           <button
                             type="button"
@@ -377,8 +393,9 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({
                       ) : (
                         <div className="space-y-2.5">
                           {track.lessonProgressList.map(lesson => {
+                            const isFrontend = track.trackId === 'frontend';
                             const attempt = lesson.attempt;
-                            const hasMistakes = lesson.hasMistakes && lesson.mistakes.length > 0;
+                            const hasMistakes = !isFrontend && lesson.hasMistakes && lesson.mistakes.length > 0;
 
                             return (
                               <div
@@ -386,7 +403,7 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({
                                 className={`rounded-xl border p-3 transition-all space-y-2 ${
                                   hasMistakes
                                     ? 'bg-amber-500/5 border-amber-500/30'
-                                    : attempt
+                                    : isFrontend || attempt
                                     ? 'bg-emerald-500/5 border-emerald-500/25'
                                     : 'bg-secondary/15 border-border/30'
                                 }`}
@@ -398,7 +415,11 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({
                                       <span className="text-xs font-bold text-foreground truncate">
                                         Lesson {lesson.lessonNumber}: {lesson.title}
                                       </span>
-                                      {attempt ? (
+                                      {isFrontend ? (
+                                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                          Challenge Solved ✓
+                                        </span>
+                                      ) : attempt ? (
                                         <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-semibold ${
                                           hasMistakes
                                             ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
@@ -420,20 +441,27 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({
                                       type="button"
                                       onClick={() => navigate(lesson.url)}
                                       className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg transition-all ${
-                                        hasMistakes
+                                        isFrontend
+                                          ? 'bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20'
+                                          : hasMistakes
                                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
                                           : attempt
                                           ? 'bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20'
                                           : 'bg-primary text-primary-foreground hover:opacity-90'
                                       }`}
                                     >
-                                      {hasMistakes ? 'Retake Quiz →' : attempt ? 'Review Lesson' : 'Take Quiz →'}
+                                      {isFrontend ? 'Review Code →' : hasMistakes ? 'Retake Quiz →' : attempt ? 'Review Lesson' : 'Take Quiz →'}
                                     </button>
                                   </div>
                                 </div>
 
-                                {/* Mistakes list if any */}
-                                {hasMistakes ? (
+                                {/* Details / Mistakes list if any */}
+                                {isFrontend ? (
+                                  <p className="text-[10px] text-emerald-400/90 flex items-center gap-1">
+                                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                    <span>Interactive code challenge completed and validated in the editor.</span>
+                                  </p>
+                                ) : hasMistakes ? (
                                   <div className="bg-background/70 rounded-lg p-2.5 border border-amber-500/20 space-y-1.5">
                                     <p className="text-[10px] font-bold font-mono text-amber-400 uppercase tracking-wider flex items-center gap-1">
                                       <span>Mistakes on this lesson ({lesson.mistakes.length}):</span>
