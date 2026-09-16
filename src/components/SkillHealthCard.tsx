@@ -12,7 +12,7 @@ import {
   getLessonDetails, 
   type LessonTrackKey 
 } from '@/data/lessonIndex';
-import { TRACK_META, TrackId, isEnrolled } from '@/lib/enrollment';
+import { TRACK_META, TrackId, isEnrolled, isActive } from '@/lib/enrollment';
 
 interface SkillHealthCardProps {
   isGuest?: boolean;
@@ -47,7 +47,7 @@ export const SkillHealthCard: React.FC<SkillHealthCardProps> = ({ isGuest, compl
       const lessonIds = TRACK_LESSON_IDS[lessonKey] || [];
       const totalLessons = lessonIds.length;
       const completed = completedCountFor(lessonKey, completedLessonIds);
-      const enrolled = isEnrolled(trackId) || completed > 0;
+      const enrolled = isActive(trackId) || isEnrolled(trackId);
       const progressPct = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
 
       // Find all quizzes in this track
