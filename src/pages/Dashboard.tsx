@@ -434,7 +434,7 @@ const Dashboard = () => {
             <div>
               <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground mb-3 pl-1">Your Tracks</p>
               <div className="space-y-2">
-                {myTracks.slice(0, 3).map(({ track, done, total, pct }) => (
+                {myTracks.slice(0, 2).map(({ track, done, total, pct }) => (
                   <button 
                     key={track.id} 
                     onClick={go(track.path)}
@@ -720,7 +720,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* YOUR TRACKS - Mobile Only */}
+                    {/* YOUR TRACKS - Mobile Only */}
           {!isGuest && myTracks.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               className="lg:hidden glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
