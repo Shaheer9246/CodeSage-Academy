@@ -139,7 +139,10 @@ export default function CommunityPage() {
       }
 
       let fetchedData: LeaderboardUser[] = [];
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_community_leaderboard');
+      // Not in the generated types yet — cast through the untyped RPC signature.
+      const { data: rpcData, error: rpcError } = await (supabase.rpc as unknown as (
+        fn: string,
+      ) => Promise<{ data: unknown; error: unknown }>)('get_community_leaderboard');
       
       if (!rpcError && Array.isArray(rpcData) && rpcData.length > 0) {
         fetchedData = (rpcData as RpcLeaderboardRow[]).map((item) => ({

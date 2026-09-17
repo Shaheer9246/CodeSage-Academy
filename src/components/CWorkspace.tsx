@@ -233,6 +233,7 @@ const CWorkspace = ({
   initialCode,
   onCodeChange,
   embedded = false,
+  requiresLocalTerminal = false,
   practical,
 }: CWorkspaceProps) => {
   const initial = useMemo(
