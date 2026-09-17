@@ -14,6 +14,8 @@ interface CWorkspaceProps {
   initialCode?: string;
   onCodeChange?: (code: string) => void;
   embedded?: boolean;
+  /** Shows a notice that this lab needs a local compiler/terminal. */
+  requiresLocalTerminal?: boolean;
   practical?: {
     title: string;
     intro: string;
@@ -231,6 +233,7 @@ const CWorkspace = ({
   initialCode,
   onCodeChange,
   embedded = false,
+  requiresLocalTerminal = false,
   practical,
 }: CWorkspaceProps) => {
   const initial = useMemo(
@@ -431,6 +434,11 @@ return typeof __exitCode === 'number' ? __exitCode : 0;
           : 'glass-card border border-primary/20 rounded-2xl'
       }`}
     >
+      {requiresLocalTerminal && (
+        <div className="px-3 py-1.5 text-[10px] font-mono text-amber-400/90 bg-amber-500/10 border-b border-amber-500/20">
+          This lab uses tools beyond the in-browser simulator — run it locally with your installed compiler to complete it fully.
+        </div>
+      )}
       {/* Toolbar */}
       <div className="flex items-center justify-between px-3 py-2 bg-secondary/40 border-b border-border/30 shrink-0">
         <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">

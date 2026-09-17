@@ -108,3 +108,70 @@ export function isTrackCompleted(track: LessonTrackKey, completed: string[]): bo
   const set = new Set(completed);
   return list.every(id => set.has(id));
 }
+
+// --- Lesson lookup ----------------------------------------------------------
+// Route prefix for each track's lesson page (see App.tsx routes).
+const TRACK_LESSON_ROUTE: Record<LessonTrackKey, string> = {
+  frontend: '/lesson',
+  networking: '/n-lesson',
+  fullstack: '/fs-lesson',
+  freelance: '/f-lesson',
+  'real-freelance': '/rf-lesson',
+  python: '/py-lesson',
+  pythonexpert: '/pyx-lesson',
+  local: '/local-lesson',
+  sql: '/sql-lesson',
+  'ai-fundamentals': '/ai-lesson',
+  'intermediate-ai': '/iai-lesson',
+  three3d: '/three-lesson',
+  java: '/java-lesson',
+  javaexpert: '/javax-lesson',
+  cpp: '/cpp-lesson',
+  cppexpert: '/cppx-lesson',
+  c: '/c-lesson',
+  cexpert: '/cx-lesson',
+  cx: '/cx-lesson',
+};
+
+export interface LessonDetails {
+  id: string;
+  title: string;
+  lessonNumber: number;
+  track: LessonTrackKey;
+  trackLabel: string;
+  url: string;
+}
+
+const LESSON_TITLES = new Map<string, string>();
+const registerTitles = (arr: { id: string; title?: string }[]) => {
+  for (const l of arr) if (l?.id && !LESSON_TITLES.has(l.id)) LESSON_TITLES.set(l.id, l.title || l.id);
+};
+
+[
+  getAllLessons(),
+  NETWORKING_LESSONS, FULLSTACK_LESSONS, FREELANCE_LESSONS, REAL_FREELANCE_LESSONS,
+  PYTHON_LESSONS, PYTHON_EXPERT_LESSONS, LOCAL_LESSONS, SQL_LESSONS,
+  AI_LESSONS, INTERMEDIATE_AI_LESSONS, THREE3D_LESSONS,
+  JAVA_LESSONS, JAVA_EXPERT_LESSONS, C_LESSONS, C_EXPERT_LESSONS,
+  CPP_LESSONS, CPP_EXPERT_LESSONS,
+].forEach(arr => registerTitles(arr as { id: string; title?: string }[]));
+
+const LESSON_DETAILS = new Map<string, LessonDetails>();
+for (const track of LESSON_TRACK_KEYS) {
+  if (track === 'cx') continue; // alias of cexpert
+  TRACK_LESSON_IDS[track].forEach((id, idx) => {
+    if (LESSON_DETAILS.has(id)) return;
+    LESSON_DETAILS.set(id, {
+      id,
+      title: LESSON_TITLES.get(id) || `Lesson ${idx + 1}`,
+      lessonNumber: idx + 1,
+      track,
+      trackLabel: TRACK_LESSON_LABELS[track],
+      url: `${TRACK_LESSON_ROUTE[track]}/${id}`,
+    });
+  });
+}
+
+export function getLessonDetails(lessonId: string): LessonDetails | undefined {
+  return LESSON_DETAILS.get(lessonId);
+}

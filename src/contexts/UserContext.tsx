@@ -37,6 +37,8 @@ export interface UserProfile {
   dailyXp: number;
   /** ISO date (YYYY-MM-DD) the daily energy was last refilled. */
   dailyXpDate: string | null;
+  /** Public student ID (ID-CSA-xxxx), assigned server-side. */
+  studentId?: string | null;
 }
 
 interface UserContextType {
@@ -106,6 +108,7 @@ type DbProfileRow = {
   has_seen_tour?: boolean | null;
   daily_xp?: number | null;
   daily_xp_date?: string | null;
+  student_id?: string | null;
 };
 
 type DbProfileUpdate = Partial<{
@@ -159,6 +162,7 @@ function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
     streakFreezeUntil: row.streak_freeze_until || null,
     dailyXp: row.daily_xp ?? DAILY_XP,
     dailyXpDate: row.daily_xp_date || null,
+    studentId: row.student_id || null,
   };
 }
 
