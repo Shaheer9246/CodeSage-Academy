@@ -1,0 +1,374 @@
+import { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, Send, MessageSquare, Edit2, Save, X, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { useUser } from '@/contexts/UserContext';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Suggestion {
+  id: string;
+  username: string;
+  text: string;
+  reply: string | null;
+  reply_at: string | null;
+  created_at: string;
+  updated_at: string;
+  upvotes: number;
+  downvotes: number;
+  is_mine: boolean;
+  user_vote?: 'up' | 'down' | null;
+}
+
+const PROMPTS = [
+  "What feature do you wish CodeSage had?",
+  "What feels confusing or hard to use?",
+  "Found a bug? Describe what happened.",
+  "What lesson topic would you love to see next?",
+];
+
+const Suggestions = () => {
+  const navigate = useNavigate();
+  const { user } = useUser();
+  const [text, setText] = useState('');
+  const [items, setItems] = useState<Suggestion[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+  const [postedToday, setPostedToday] = useState(false);
+
+  const sb = supabase as unknown as {
+    from: (t: string) => any;
+  };
+
+  const refresh = useCallback(async () => {
+    const cacheKey = 'codesage_suggestions_feed';
+    const cacheTimeKey = 'codesage_suggestions_feed_time';
+    const now = Date.now();
+    const cachedTime = Number(localStorage.getItem(cacheTimeKey) || 0);
+    const cachedData = localStorage.getItem(cacheKey);
+
+    // If cached less than 15 minutes ago, serve instantly from localStorage with ZERO egress
+    if (cachedData && now - cachedTime < 15 * 60 * 1000) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setItems(parsed);
+        if (user) {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          setPostedToday(parsed.some((s: any) => s.is_mine && new Date(s.created_at) >= today));
+        }
+        return;
+      } catch {}
+    }
+
+    const { data: suggestionsData, error: suggestionsError } = await sb
+      .from('suggestions_public')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(60);
+
+    if (suggestionsError) { console.error(suggestionsError); return; }
+
+    let userVotes: Record<string, 'up' | 'down'> = {};
+
+    if (user) {
+      const { data: votesData } = await sb
+        .from('suggestion_votes')
+        .select('suggestion_id, vote_type')
+        .eq('user_id', user.id);
+
+      if (votesData) {
+        userVotes = votesData.reduce((acc: Record<string, 'up' | 'down'>, curr: any) => {
+          acc[curr.suggestion_id] = curr.vote_type as 'up' | 'down';
+          return acc;
+        }, {} as Record<string, 'up' | 'down'>);
+      }
+    }
+
+    const itemsWithVotes = (suggestionsData || []).map((s: any) => ({
+      ...s,
+      upvotes: s.upvotes || 0,
+      downvotes: s.downvotes || 0,
+      is_mine: !!s.is_mine,
+      user_vote: userVotes[s.id] || null,
+    })) as Suggestion[];
+
+    setItems(itemsWithVotes);
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(itemsWithVotes));
+      localStorage.setItem(cacheTimeKey, String(now));
+    } catch {}
+
+    if (user) {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const mine = itemsWithVotes.some(s =>
+        s.is_mine && new Date(s.created_at) >= today
+      );
+      setPostedToday(mine);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    if (user) {
+      const markAsRead = async () => {
+        const key = `codesage_suggestions_read_${user.id}`;
+        const today = new Date().toISOString().slice(0, 10);
+        if (localStorage.getItem(key) === today) return;
+
+        const { error } = await supabase.rpc('mark_suggestions_read');
+        if (error) {
+          console.error('Failed to mark suggestions as read:', error);
+          return;
+        }
+        try { localStorage.setItem(key, today); } catch { /* ignore */ }
+        window.dispatchEvent(new Event('suggestions:read'));
+      };
+      markAsRead();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user || items.length === 0) return;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const mine = items.some(s => s.is_mine && new Date(s.created_at) >= today);
+    setPostedToday(mine);
+  }, [items, user]);
+
+  const submit = async () => {
+    if (!user) { toast.error('Sign in to leave a suggestion'); return; }
+    if (!text.trim()) return;
+    if (postedToday) { toast.error('You already submitted a suggestion today ✨'); return; }
+    
+    const { error } = await supabase.from('suggestions').insert({
+      user_id: user.id, username: user.username || 'anonymous',
+      text: text.trim().slice(0, 500),
+    });
+    if (error) { toast.error(error.message); return; }
+    setText(''); 
+    toast.success('Thanks for your feedback! 💚');
+    // Invalidate local cache and refresh
+    localStorage.removeItem('codesage_suggestions_feed_time');
+    refresh();
+  };
+
+  const startEdit = (s: Suggestion) => { setEditingId(s.id); setEditText(s.text); };
+  const cancelEdit = () => { setEditingId(null); setEditText(''); };
+  const saveEdit = async (id: string) => {
+    if (!editText.trim()) return;
+    const { error } = await supabase.from('suggestions')
+      .update({ text: editText.trim().slice(0, 500) }).eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    cancelEdit(); 
+    toast.success('Updated');
+    localStorage.removeItem('codesage_suggestions_feed_time');
+    refresh();
+  };
+
+  const deleteOwn = async (id: string) => {
+    const { error } = await supabase.from('suggestions').delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Deleted');
+    setItems(prev => prev.filter(s => s.id !== id));
+    setPostedToday(false);
+    localStorage.removeItem('codesage_suggestions_feed_time');
+    refresh();
+  };
+
+  const handleVote = async (suggestionId: string, type: 'up' | 'down') => {
+    if (!user) {
+      toast.error('You must be logged in to vote.');
+      return;
+    }
+
+    const currentSuggestion = items.find(s => s.id === suggestionId);
+    if (!currentSuggestion) return;
+
+    const existingVote = currentSuggestion.user_vote;
+    let newUpvotes = currentSuggestion.upvotes;
+    let newDownvotes = currentSuggestion.downvotes;
+    let newVoteState: 'up' | 'down' | null = type;
+
+    if (existingVote === type) {
+      if (type === 'up') newUpvotes = Math.max(0, newUpvotes - 1);
+      else newDownvotes = Math.max(0, newDownvotes - 1);
+      newVoteState = null;
+    } else {
+      if (type === 'up') {
+        newUpvotes += 1;
+        if (existingVote === 'down') newDownvotes = Math.max(0, newDownvotes - 1);
+      } else {
+        newDownvotes += 1;
+        if (existingVote === 'up') newUpvotes = Math.max(0, newUpvotes - 1);
+      }
+    }
+
+    setItems(prev => prev.map(s => s.id === suggestionId ? {
+      ...s,
+      upvotes: newUpvotes,
+      downvotes: newDownvotes,
+      user_vote: newVoteState
+    } : s));
+
+    try {
+      if (newVoteState === null) {
+        await sb.from('suggestion_votes').delete().eq('suggestion_id', suggestionId).eq('user_id', user.id);
+      } else {
+        await sb.from('suggestion_votes').upsert({
+          suggestion_id: suggestionId,
+          user_id: user.id,
+          vote_type: type
+        }, { onConflict: 'suggestion_id,user_id' });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to register vote.');
+      refresh();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
+      <div className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-primary/3 blur-[120px] pointer-events-none" />
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 max-w-lg mx-auto p-4 sm:p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/dashboard')} className="text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-bold font-display"><span className="text-primary neon-text">Suggestions</span></h1>
+        </div>
+
+        <div className="glass-card p-5 rounded-2xl space-y-3">
+          <h3 className="text-sm font-display font-semibold text-foreground flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-primary" /> Tell us what you think
+          </h3>
+          <div className="space-y-1">
+            {PROMPTS.map((p, i) => (
+              <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">• {p}</p>
+            ))}
+          </div>
+          <textarea
+            value={text}
+            onChange={e => setText(e.target.value.slice(0, 500))}
+            placeholder={postedToday ? "You already posted today — come back tomorrow ✨" : "Type your suggestion..."}
+            disabled={postedToday} rows={4} maxLength={500}
+            className="w-full bg-secondary/30 border border-border/40 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none font-sans disabled:opacity-50"
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-muted-foreground font-mono">{text.length}/500</span>
+            <button onClick={submit} disabled={!text.trim() || postedToday}
+              className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-display font-semibold hover:neon-glow transition-all disabled:opacity-50">
+              <Send className="w-4 h-4" /> Submit
+            </button>
+          </div>
+        </div>
+
+        {items.length === 0 ? (
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <MessageSquare className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+            <p className="text-sm font-display font-semibold text-foreground">No suggestions yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Be the first to share your thoughts!</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {items.map(s => {
+              const isMine = s.is_mine;
+              const isEditing = editingId === s.id;
+
+              return (
+                <div key={s.id} className="glass-card p-4 rounded-2xl space-y-2 border border-primary/10">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] text-primary font-mono">@{s.username || 'anon'}</p>
+                        {isMine && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">you</span>}
+                      </div>
+                      {isEditing ? (
+                        <textarea value={editText} onChange={e => setEditText(e.target.value.slice(0, 500))}
+                          rows={3} maxLength={500}
+                          className="w-full mt-1 bg-secondary/40 border border-primary/30 rounded-lg px-2.5 py-1.5 text-sm text-foreground focus:outline-none focus:border-primary/60 resize-none" />
+                      ) : (
+                        <p className="text-sm text-foreground whitespace-pre-wrap break-words">{s.text}</p>
+                      )}
+                      
+                      {!isEditing && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <button
+                            onClick={() => handleVote(s.id, 'up')}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-mono transition-all ${
+                              s.user_vote === 'up'
+                                ? 'bg-primary/20 border-primary text-primary neon-glow'
+                                : 'bg-secondary/20 border-border/40 text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                            <span>{s.upvotes}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleVote(s.id, 'down')}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-mono transition-all ${
+                              s.user_vote === 'down'
+                                ? 'bg-destructive/20 border-destructive text-destructive'
+                                : 'bg-secondary/20 border-border/40 text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                            <span>{s.downvotes}</span>
+                          </button>
+                        </div>
+                      )}
+
+                      <p className="text-[9px] text-muted-foreground mt-2">
+                        {new Date(s.created_at).toLocaleString()}
+                        {s.updated_at && s.updated_at !== s.created_at && ' · edited'}
+                      </p>
+                    </div>
+                    {isMine && !isEditing && (
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => startEdit(s)} className="text-muted-foreground hover:text-primary p-1" title="Edit">
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => { if (confirm('Delete your suggestion?')) deleteOwn(s.id); }}
+                          className="text-muted-foreground hover:text-destructive p-1" title="Delete">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {isEditing && (
+                    <div className="flex gap-2">
+                      <button onClick={() => saveEdit(s.id)} className="flex items-center gap-1 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-[11px] font-semibold">
+                        <Save className="w-3 h-3" /> Save
+                      </button>
+                      <button onClick={cancelEdit} className="flex items-center gap-1 bg-secondary text-foreground px-3 py-1 rounded-lg text-[11px]">
+                        <X className="w-3 h-3" /> Cancel
+                      </button>
+                    </div>
+                  )}
+
+                  {s.reply && (
+                    <div className="pl-3 border-l-2 border-primary/40 bg-primary/5 rounded-r-lg p-2.5 mt-2">
+                      <p className="text-[10px] text-primary font-semibold flex items-center gap-1">
+                        Admin reply
+                      </p>
+                      <p className="text-xs text-foreground mt-0.5 whitespace-pre-wrap break-words">{s.reply}</p>
+                      {s.reply_at && <p className="text-[9px] text-muted-foreground mt-1">{new Date(s.reply_at).toLocaleString()}</p>}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+};
+
+export default Suggestions;
