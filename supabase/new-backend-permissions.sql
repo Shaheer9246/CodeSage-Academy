@@ -10,7 +10,14 @@ REVOKE USAGE ON SCHEMA public FROM anon;
 
 -- 2. Table privileges -------------------------------------------------------
 -- User-facing tables the app reads/writes as a signed-in user.
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles            TO authenticated;
+-- profiles: column-restricted writes only (mirrors migration 20260910090240).
+-- XP, coins, level, badges, completions, unlocked sections and promo codes stay RPC-only.
+REVOKE INSERT, UPDATE ON public.profiles FROM authenticated;
+GRANT SELECT ON public.profiles TO authenticated;
+GRANT INSERT (id, username, name, studying, has_job, dob, goal, experience_level, dark_mode, has_seen_tour)
+  ON public.profiles TO authenticated;
+GRANT UPDATE (username, name, studying, has_job, dob, goal, experience_level, dark_mode, has_seen_tour)
+  ON public.profiles TO authenticated;
 GRANT SELECT, INSERT, UPDATE         ON public.enrollments         TO authenticated;
 GRANT SELECT, UPDATE                 ON public.announcements       TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.announcement_reads  TO authenticated;
