@@ -945,7 +945,15 @@ CREATE POLICY "Authenticated can read track stats" ON public.track_stats FOR SEL
 GRANT USAGE ON SCHEMA public TO authenticated, service_role;
 REVOKE USAGE ON SCHEMA public FROM anon;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles           TO authenticated;
+-- profiles: column-restricted writes only. XP, coins, level, badges, completed_lessons,
+-- completed_tests, unlocked_sections, promo_codes, streak and student_id must ONLY change
+-- through validated SECURITY DEFINER RPCs (mirrors migration 20260910090240).
+REVOKE INSERT, UPDATE ON public.profiles FROM authenticated;
+GRANT SELECT ON public.profiles TO authenticated;
+GRANT INSERT (id, username, name, studying, has_job, dob, goal, experience_level, dark_mode, has_seen_tour)
+  ON public.profiles TO authenticated;
+GRANT UPDATE (username, name, studying, has_job, dob, goal, experience_level, dark_mode, has_seen_tour)
+  ON public.profiles TO authenticated;
 GRANT SELECT, INSERT, UPDATE         ON public.enrollments        TO authenticated;
 GRANT SELECT, UPDATE                 ON public.announcements      TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.announcement_reads TO authenticated;
