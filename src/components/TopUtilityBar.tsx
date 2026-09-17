@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   HelpCircle,
   Info,
-  MessageSquarePlus,
   Mail,
   Copy,
   Check,
@@ -33,11 +31,39 @@ const ADMIN_EMAIL = 'zainrao.dev@gmail.com';
 const FAQ_ITEMS = [
   {
     q: 'Is CodeSage completely free to use?',
-    a: 'Yes! CodeSage is 100% free. You have unrestricted access to all 18 full curriculum tracks, the in-browser Monaco code runner, diagnostic quizzes, algorithmic challenges, and the interactive playground. A CodeSage PRO tier will be introduced soon for advanced capabilities like the personal AI Teacher and Developer Marketplace.'
+    a: 'Yes! CodeSage is 100% free. You have unrestricted access to all 18 full curriculum tracks, the in-browser Monaco code runner, diagnostic quizzes, algorithmic challenges, and the interactive playground. A CodeSage PRO tier will be introduced in 2 days for advanced capabilities like the personal AI Teacher (launching tomorrow) and Developer Marketplace.'
+  },
+  {
+    q: 'Do you offer certificates right now?',
+    a: 'No, we do not have any certificates yet. Certificates are not issued at this time. Once our certificate verification engine is officially released, you will be able to earn verified certificates for completed tracks. In the meantime, you can test and prove your mastery across all languages and difficulty tiers through the milestone tests and exams in the Exams section (/exams).'
+  },
+  {
+    q: 'What is my Global Student ID and where do I find it?',
+    a: 'Every student receives a unique deterministic Global Student ID (e.g. CS-XXXX-XXXX) generated upon registration. This single global identifier stays consistent across all your enrolled tracks, quizzes, community posts, and future certificate verification. You can view it in Settings → Profile and on your enrollment ID card.'
+  },
+  {
+    q: 'How do I know when I have Completed a track?',
+    a: 'When you finish every single lesson in an enrolled track, the track is automatically tagged as "Completed 🏆"! This tag is visible across your Dashboard, the Continue Learning section, and Settings → My Enrollments. You can continue reviewing lessons and re-taking quizzes anytime even after completion.'
+  },
+  {
+    q: 'What is the AI Teacher and when will it be available?',
+    a: 'The AI Teacher is launching tomorrow! It is an intelligent coding mentor integrated directly into lesson pages. It helps you understand difficult concepts, points out syntax mistakes in your code, gives tailored hints without spoiling solutions, and answers questions as you code.'
+  },
+  {
+    q: 'What is the Developer Marketplace and when does it arrive?',
+    a: 'The Developer Marketplace will launch in 2 days along with the CodeSage PRO tier. It allows students and engineers to discover, share, and install custom coding templates, starter projects, specialized problem sets, and custom editor themes.'
+  },
+  {
+    q: 'What is the difference between the Free and upcoming PRO plan?',
+    a: 'CodeSage core learning will ALWAYS remain 100% Free: all 18 curriculum tracks, Monaco code editor, diagnostic quizzes, playground, challenges, and exams. The PRO plan (launching in 2 days) provides power-user enhancements including unlimited AI Teacher mentorship, Marketplace downloads, priority code execution, and special community flair.'
   },
   {
     q: 'How does track enrollment work? Why is there a 2-track limit?',
     a: 'CodeSage allows enrollment in up to 2 active tracks simultaneously. This limit is intentionally designed using cognitive load principles—focusing your daily practice on 1 or 2 areas leads to significantly higher retention and curriculum completion than spreading effort thin across dozens of tracks. You can switch, pause, or resume tracks anytime in Settings.'
+  },
+  {
+    q: 'Can I switch or unenroll from a track without losing my progress?',
+    a: 'Absolutely! You can pause or unenroll from any track in Settings at any time. All of your completed lesson checkmarks, quiz answers, and earned XP are permanently stored. When you re-enroll or resume the track later, all your progress remains intact.'
   },
   {
     q: 'How are lessons structured? Why do some tracks have quizzes and others don’t?',
@@ -52,6 +78,10 @@ const FAQ_ITEMS = [
     a: 'Yes! Head to the Playground (/playground). You can create and edit multi-file HTML/CSS/JS projects with live visual preview, or run Python and SQL scripts in a distraction-free sandbox. You can even export your code as a .ZIP file.'
   },
   {
+    q: 'How does code execution work? Is it safe and private?',
+    a: 'HTML, CSS, and JavaScript run directly in an isolated browser iframe sandbox with real-time DOM rendering. Python and SQL execute locally using client-side WebAssembly runtimes. Your code never leaves your computer for third-party queuing, ensuring private, safe, and lightning-fast execution.'
+  },
+  {
     q: 'How do XP, Levels, and Sage Coins work?',
     a: 'Completing lessons, maintaining daily streaks, and solving challenges awards XP and Sage Coins. As your XP grows, your developer rank levels up (from Novice to Architect). Sage Coins can be redeemed for profile perks and streak freezes.'
   },
@@ -64,10 +94,6 @@ const FAQ_ITEMS = [
     a: 'Yes! If you are logged in with an account, all your completed lessons, lifetime XP, level, coins, and streak count are continuously synced to our Supabase cloud database. You can also download a local offline JSON backup anytime under Settings → Account.'
   },
   {
-    q: 'Do you offer certificates right now?',
-    a: 'Certificates are currently in active development and not issued yet. In the meantime, you can test and prove your mastery across all languages and difficulty tiers through the milestone tests and exams in the Exams section (/exams).'
-  },
-  {
     q: 'What are Coding Challenges and the Code Crawler game?',
     a: 'Coding Challenges (/challenges) offer bite-sized algorithmic puzzles to test speed and problem-solving. Code Crawler (/games/crawler) is an arcade terminal game where you solve code hurdles to navigate a bot through a digital dungeon.'
   },
@@ -76,8 +102,8 @@ const FAQ_ITEMS = [
     a: 'Yes! CodeSage is designed to be fully responsive with dedicated mobile navigation. While conceptual reading and quizzes work great on phones, hands-on Monaco coding in Frontend and Systems tracks is best experienced on tablets or desktop keyboards.'
   },
   {
-    q: 'How do I report an incorrect quiz question or ask a private question?',
-    a: 'You can email the administrator directly at zainrao.dev@gmail.com, or submit a note via the Community Suggestions Box.'
+    q: 'How do I report a bug or ask a question?',
+    a: 'You can email the administrator directly at zainrao.dev@gmail.com anytime. We review all feedback and questions personally.'
   }
 ];
 
@@ -96,7 +122,6 @@ const CURRICULUM_TRACKS = [
 ];
 
 export default function TopUtilityBar() {
-  const navigate = useNavigate();
   const [isFaqOpen, setIsFaqOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
@@ -153,17 +178,17 @@ export default function TopUtilityBar() {
               <span>About</span>
             </button>
 
-            {/* Free Tier & PRO in 2 Days Button */}
+            {/* Free & Pro in 2 Days Button */}
             <button
               type="button"
               onClick={() => setIsPlanModalOpen(true)}
               className="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all shadow-sm"
-              title="View Membership Plans: Free Tier active & PRO features in 2 days"
+              title="View Membership Plans: Free Tier active & PRO arriving in 2 days"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span>Free</span>
-              <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-primary/20 text-primary border border-primary/30 uppercase tracking-tight hidden sm:inline">
-                PRO in 2 Days
+              <span>Free & Pro</span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 uppercase tracking-tight hidden sm:inline">
+                In 2 Days
               </span>
             </button>
           </div>
@@ -281,25 +306,6 @@ export default function TopUtilityBar() {
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Send Email</span>
                   </a>
-                </div>
-
-                {/* Suggestions Box Button */}
-                <div className="pt-2 border-t border-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span>Want to suggest a new feature or lesson?</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsFaqOpen(false);
-                      navigate('/suggestions');
-                    }}
-                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 transition-all shadow-sm"
-                  >
-                    <MessageSquarePlus className="w-3.5 h-3.5" />
-                    <span>Open Suggestions Box →</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -436,26 +442,23 @@ export default function TopUtilityBar() {
                 </div>
               </div>
 
-              {/* Suggestions Box Direct Action */}
+              {/* Direct Support Inquiries */}
               <div className="p-4 rounded-xl border border-border/40 bg-secondary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h4 className="text-xs font-bold text-foreground font-display">
-                    Have feedback or want to request a topic?
+                    Have questions or feedback?
                   </h4>
                   <p className="text-[11px] text-muted-foreground">
-                    We review community suggestions to build the future roadmap.
+                    Direct inquiries and bug reports are welcomed at {ADMIN_EMAIL}.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAboutOpen(false);
-                    navigate('/suggestions');
-                  }}
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary transition-all shrink-0"
+                <a
+                  href={`mailto:${ADMIN_EMAIL}?subject=CodeSage%20Inquiry`}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary transition-all shrink-0 inline-flex items-center gap-1.5"
                 >
-                  Visit Suggestions Box →
-                </button>
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Contact Admin</span>
+                </a>
               </div>
             </div>
 
