@@ -88,8 +88,8 @@ export function saveLessonQuizAttempt(
     localStorage.setItem('codesage_last_quiz', JSON.stringify(attempt));
     localStorage.setItem('codesage_last_active_lesson', lessonId);
 
-    if (resolvedDetails?.trackKey) {
-      localStorage.setItem('codesage_last_active_track', resolvedDetails.trackKey);
+    if (resolvedDetails?.track) {
+      localStorage.setItem('codesage_last_active_track', resolvedDetails.track);
     }
   } catch (e) {
     console.warn('Could not save quiz attempt to storage:', e);
