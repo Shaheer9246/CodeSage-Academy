@@ -162,6 +162,7 @@ function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
     streakFreezeUntil: row.streak_freeze_until || null,
     dailyXp: row.daily_xp ?? DAILY_XP,
     dailyXpDate: row.daily_xp_date || null,
+    studentId: row.student_id || null,
   };
 }
 
