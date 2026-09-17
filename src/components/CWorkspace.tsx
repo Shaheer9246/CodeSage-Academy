@@ -14,6 +14,8 @@ interface CWorkspaceProps {
   initialCode?: string;
   onCodeChange?: (code: string) => void;
   embedded?: boolean;
+  /** Shows a notice that this lab needs a local compiler/terminal. */
+  requiresLocalTerminal?: boolean;
   practical?: {
     title: string;
     intro: string;
