@@ -8,7 +8,6 @@ import {
   RefreshCw, AlertTriangle, Database, CheckCircle2, Sparkles, type LucideIcon 
 } from 'lucide-react';
 import { SQL_LESSONS, isSqlLessonUnlocked } from '@/data/sqlLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -317,12 +316,11 @@ const passed = correctCount >= passThreshold;
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz, lesson?.title);
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('SQL Target Mastered! +1 XP · +2 Coins 🎉');
       const fromQs = from ? `?from=${from}` : '';
-      navigate(`/complete/${lesson.id}${fromQs}`, { state: { answers } });
+      navigate(`/complete/${lesson.id}${fromQs}`);
     }
   };
 
