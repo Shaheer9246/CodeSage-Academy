@@ -3,7 +3,6 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getNetworkingLessonById, isNetworkingLessonUnlocked } from '@/data/networkingLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
@@ -58,10 +57,9 @@ const NetworkingLessonPage = () => {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) completeLesson(lesson.id);
-      setTimeout(() => navigate('/complete/' + lesson.id, { state: { answers } }), 800);
+      setTimeout(() => navigate('/complete/' + lesson.id), 800);
     }
   };
 
