@@ -4,7 +4,6 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getThree3dLessonById, isThree3dLessonUnlocked } from '@/data/three3dLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Eye, Code2, type LucideIcon
@@ -72,11 +71,10 @@ const Three3dLessonPage = () => {
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('3D Lesson complete! +1 XP · +2 Coins 🎉');
-      navigate('/complete/' + lesson.id, { state: { answers } });
+      navigate('/complete/' + lesson.id);
     }
   };
 
