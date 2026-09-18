@@ -4,7 +4,6 @@ import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getLocalLessonById, isLocalLessonUnlocked } from '@/data/localLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Eye, Code2, type LucideIcon
@@ -75,11 +74,10 @@ const LocalLessonPage = () => {
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
-      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`, { state: { answers } });
+      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
 
