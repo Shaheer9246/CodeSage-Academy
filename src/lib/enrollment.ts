@@ -21,7 +21,7 @@ export type TrackId =
   | 'c'
   | 'cx';
 
-export type EnrollmentStatus = 'active' | 'paused' | 'ended' | 'completed';
+export type EnrollmentStatus = 'active' | 'paused' | 'ended';
 
 export interface Enrollment {
   track: TrackId;
@@ -213,7 +213,6 @@ export const TRACK_META: Record<
 let mem: Enrollment[] = [];
 let counts: Partial<Record<TrackId, number>> = {};
 let currentUserId: string | null = null;
-let currentStudentId: string | null = null;
 
 try {
   const raw = localStorage.getItem(LOCAL_CACHE);
@@ -288,11 +287,9 @@ async function verifyServerStatus(track: TrackId): Promise<EnrollmentStatus | nu
 
 
 export async function hydrateEnrollments(
-  userId: string | null,
-  studentId?: string | null
+  userId: string | null
 ): Promise<void> {
   currentUserId = userId;
-  currentStudentId = studentId || null;
   if (!userId) {
     mem = [];
     try {
@@ -317,8 +314,8 @@ export async function hydrateEnrollments(
     }
 
     const [{ data: enr }, { data: fetchedStats }] = await Promise.all([
-      supabase.from('enrollments').select('track, status, enrolled_at').eq('user_id', userId),
-      cachedStats ? Promise.resolve({ data: cachedStats }) : supabase.from('track_stats').select('track, enrolled_count'),
+      supabase.from('enrollments').select('*').eq('user_id', userId),
+      cachedStats ? Promise.resolve({ data: cachedStats }) : supabase.from('track_stats').select('*'),
     ]);
 
     const stats = fetchedStats || [];
@@ -342,7 +339,6 @@ export async function hydrateEnrollments(
         // Convert to lowercase to avoid any DB status capitalization issues breaking counts
         status: (r.status?.toLowerCase() as EnrollmentStatus) || 'active',
         enrolledAt: new Date(r.enrolled_at).getTime() || Date.now(),
-        studentId: currentStudentId || undefined,
       }));
 
     counts = {};
@@ -415,23 +411,21 @@ export function getStudentCount(track: TrackId): number {
 }
 
 
-export async function enroll(track: TrackId, studentId?: string): Promise<Enrollment> {
+export async function enroll(track: TrackId): Promise<Enrollment> {
   if (!isActive(track) && activeCount() >= 2) {
     throw new Error(
       'Action restricted: Maximum limit of 2 active courses reached.'
     );
   }
 
-  const assignedStudentId = studentId || currentStudentId || undefined;
   const existing = mem.find(e => e.track === track);
   const oldStatus = existing?.status;
   const wasCounted = !!existing && existing.status !== 'ended';
 
   if (existing) {
     existing.status = 'active';
-    if (assignedStudentId) existing.studentId = assignedStudentId;
   } else {
-    mem.push({ track, status: 'active', enrolledAt: Date.now(), studentId: assignedStudentId });
+    mem.push({ track, status: 'active', enrolledAt: Date.now() });
   }
 
   if (!wasCounted) {
@@ -556,37 +550,6 @@ export async function resume(track: TrackId): Promise<void> {
 
 export async function end(track: TrackId): Promise<void> {
   await updateStatus(track, 'ended');
-}
-
-export async function markTrackCompleted(track: TrackId): Promise<void> {
-  const e = mem.find(x => x.track === track);
-  if (e) {
-    e.status = 'completed';
-    emit();
-  }
-  if (currentUserId) {
-    try {
-      await supabase.rpc('update_enrollment_status', {
-        _track: track,
-        _status: 'completed',
-      });
-    } catch {
-      try {
-        await supabase
-          .from('enrollments')
-          .update({ status: 'completed' })
-          .eq('user_id', currentUserId)
-          .eq('track', track);
-      } catch {
-        /* ignore */
-      }
-    }
-  }
-}
-
-export function isTrackStatusCompleted(track: TrackId): boolean {
-  const e = getEnrollment(track);
-  return !!e && e.status?.toLowerCase() === 'completed';
 }
 
 export function onEnrollmentChange(cb: () => void): () => void {
