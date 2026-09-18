@@ -6,7 +6,6 @@ import {
   getIntermediateAiLessonById,
   isIntermediateAiLessonUnlocked
 } from '@/data/intermediateAiLesson';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft,
   BookOpen,
@@ -105,11 +104,10 @@ const IntermediateAiLessonPage = () => {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
 
     if (passed) {
       if (user) completeLesson(lesson.id);
-      setTimeout(() => navigate('/complete/' + lesson.id, { state: { answers } }), 800);
+      setTimeout(() => navigate('/complete/' + lesson.id), 800);
     }
   };
 
