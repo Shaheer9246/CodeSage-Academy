@@ -118,6 +118,31 @@ export const ROMAN_URDU_DICTIONARY: Record<string, string> = {
   "Console Output": "Console Output",
   "Reset Code": "Code Reset Karein",
   "Submit Answer": "Jawab Submit Karein",
+  "Course Syllabus & Outcomes": "Course Ka Syllabus Aur Nateeja",
+  "Syllabus & Outcomes": "Syllabus Aur Nateeja",
+  "Mission brief": "Mission Ki Wazahat (Mission Brief)",
+  "Breakdown": "Tafseel (Breakdown)",
+  "Mastery check": "Samajh Ka Imtihaan (Mastery Check)",
+  "Check Code": "Code Check Karein",
+  "Check My Code": "Mera Code Check Karein",
+  "Start Challenge": "Challenge Shuru Karein",
+  "Challenge Active": "Challenge Jaari Hai",
+  "Enter the lab": "Lab Mein Dakhil Hon",
+  "Take the test": "Quiz Test Dein",
+  "Pass the quiz": "Quiz Pass Karein",
+  "Read & understand": "Parhein Aur Samjhein",
+  "Write the code": "Code Likhein",
+  "Show Hint": "Ishaara (Hint) Dekhein",
+  "Hide Hint": "Ishaara Chupayein",
+  "Live Preview": "Live Preview (Asal Nateeja)",
+  "Code Editor": "Code Editor",
+  "1. Concept": "1. Concept (Nazriya)",
+  "2. Lab": "2. Lab (Amali Kaam)",
+  "3. Test": "3. Test (Imtihaan)",
+  "Submit test": "Test Submit Karein",
+  "Retry test": "Test Dobara Dein",
+  "Great job! Challenge completed! 🎉": "Shabash! Challenge Mukammal Ho Gaya! 🎉",
+  "Not quite right. Check hints and try again.": "Bilkul theek nahi. Ishaara dekh kar dobara koshish karein.",
 
   // UI & Navigation
   "Dashboard": "Dashboard",
@@ -250,6 +275,20 @@ const injectGoogleTranslateStyles = () => {
   document.head.appendChild(style);
 };
 
+let googlePollTimer: ReturnType<typeof setInterval> | null = null;
+let targetGoogleLang: string | null = null;
+
+const applyGoogleTranslateToCombo = (langCode: string): boolean => {
+  const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+  if (select) {
+    select.value = langCode;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    select.dispatchEvent(new Event('input', { bubbles: true }));
+    return true;
+  }
+  return false;
+};
+
 // Dynamically load Google Translate Script
 const loadGoogleTranslateScript = () => {
   if (document.getElementById('google-translate-script')) return;
@@ -284,6 +323,10 @@ const loadGoogleTranslateScript = () => {
         },
         'google_translate_element'
       );
+
+      if (targetGoogleLang && targetGoogleLang !== 'en') {
+        setTimeout(() => applyGoogleTranslateToCombo(targetGoogleLang!), 350);
+      }
     }
   };
 
@@ -296,29 +339,41 @@ const loadGoogleTranslateScript = () => {
 
 // Trigger Google Translate dropdown or cookie
 const triggerGoogleTranslate = (langCode: string) => {
+  targetGoogleLang = langCode;
+  if (googlePollTimer) {
+    clearInterval(googlePollTimer);
+    googlePollTimer = null;
+  }
+
   if (langCode === 'en' || !langCode) {
     // Clear cookies
-    const hostname = window.location.hostname;
     document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${hostname}; path=/;`;
-    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
-    if (select) {
-      select.value = 'en';
-      select.dispatchEvent(new Event('change'));
-    }
+    const hostname = window.location.hostname;
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${hostname};`;
+    applyGoogleTranslateToCombo('en');
     return;
   }
 
-  // Set cookies for Google translate
-  const hostname = window.location.hostname;
+  // Set cookies for Google translate (both /en/ and /auto/)
   document.cookie = `googtrans=/en/${langCode}; path=/;`;
-  document.cookie = `googtrans=/en/${langCode}; domain=${hostname}; path=/;`;
+  document.cookie = `googtrans=/auto/${langCode}; path=/;`;
 
-  const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
-  if (select) {
-    select.value = langCode;
-    select.dispatchEvent(new Event('change'));
+  // Immediately try to apply
+  if (applyGoogleTranslateToCombo(langCode)) {
+    return;
   }
+
+  // If combo not ready yet, poll for it
+  let attempts = 0;
+  googlePollTimer = setInterval(() => {
+    attempts++;
+    if (applyGoogleTranslateToCombo(langCode) || attempts > 25) {
+      if (googlePollTimer) {
+        clearInterval(googlePollTimer);
+        googlePollTimer = null;
+      }
+    }
+  }, 200);
 };
 
 export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -387,11 +442,15 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, []);
 
-  // Set Language with Pro gating
+  // Set Language - seamless instant switch with auto VIP access
   const setLanguage = useCallback((lang: LanguageCode): boolean => {
-    if (lang !== 'en' && !isPro) {
-      setProModalOpen(true);
-      return false;
+    if (!isPro && lang !== 'en') {
+      setIsProState(true);
+      try {
+        localStorage.setItem('codesage_is_pro', 'true');
+      } catch (e) {
+        console.warn(e);
+      }
     }
     setCurrentLanguageState(lang);
     try {
