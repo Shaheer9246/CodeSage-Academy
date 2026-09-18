@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   HelpCircle,
   Info,
@@ -21,10 +22,15 @@ import {
   ShoppingBag,
   Zap,
   Calendar,
-  Crown
+  Crown,
+  Search,
+  CheckCircle2,
+  ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import GlobalTranslatorWidget from '@/components/GlobalTranslatorWidget';
+import { COURSE_CURRICULUM } from '@/data/courseCurriculumGuide';
+import CourseOverviewModal from '@/components/CourseOverviewModal';
 
 const ADMIN_EMAIL = 'zainrao.dev@gmail.com';
 
@@ -122,11 +128,16 @@ const CURRICULUM_TRACKS = [
 ];
 
 export default function TopUtilityBar() {
+  const navigate = useNavigate();
   const [isFaqOpen, setIsFaqOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(0);
+  const [aboutActiveTab, setAboutActiveTab] = useState<'guide' | 'overview'>('guide');
+  const [guideFilter, setGuideFilter] = useState<string>('all');
+  const [guideSearch, setGuideSearch] = useState<string>('');
+  const [selectedCourseDetail, setSelectedCourseDetail] = useState<string | null>(null);
 
   const handleCopyEmail = async () => {
     try {
@@ -331,21 +342,21 @@ export default function TopUtilityBar() {
           onClick={() => setIsAboutOpen(false)}
         >
           <div
-            className="w-full max-w-2xl max-h-[88vh] bg-card border border-border/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+            className="w-full max-w-3xl max-h-[90vh] bg-card border border-border/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-border/40 flex items-start justify-between bg-card/80">
+            <div className="p-4 sm:p-5 border-b border-border/40 flex items-start justify-between bg-card/90">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
                   <Terminal className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-bold font-display text-foreground">
-                    About CodeSage
+                    About CodeSage & Curriculum Guide
                   </h2>
                   <p className="text-xs text-muted-foreground">
-                    Comprehensive computer science & software engineering training platform
+                    Directory of all 18 engineering tracks, what each contains, and verified learning outcomes
                   </p>
                 </div>
               </div>
@@ -359,112 +370,274 @@ export default function TopUtilityBar() {
               </button>
             </div>
 
+            {/* Modal Tabs Header */}
+            <div className="flex border-b border-border/40 bg-secondary/15 px-4 sm:px-6">
+              <button
+                type="button"
+                onClick={() => setAboutActiveTab('guide')}
+                className={`flex items-center gap-2 py-3 px-3 text-xs font-semibold font-display border-b-2 transition-all ${
+                  aboutActiveTab === 'guide'
+                    ? 'border-primary text-primary bg-primary/5'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/20'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Curriculum Guide & Outcomes</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-primary/15 text-primary border border-primary/25">
+                  18 Tracks
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAboutActiveTab('overview')}
+                className={`flex items-center gap-2 py-3 px-3 text-xs font-semibold font-display border-b-2 transition-all ${
+                  aboutActiveTab === 'overview'
+                    ? 'border-primary text-primary bg-primary/5'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/20'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Platform & Methodology</span>
+              </button>
+            </div>
+
             {/* Modal Scrollable Content */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-sm">
-              {/* Mission Statement */}
-              <div className="p-4 rounded-xl bg-secondary/20 border border-border/40 space-y-2">
-                <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-primary">
-                  The Vision & Philosophy
-                </h3>
-                <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
-                  CodeSage bridges the gap between passive video tutorials and production engineering. We combine hands-on in-browser coding environments, diagnostic quizzes that isolate student misconceptions, and deep curriculum tracks ranging from high-level web frameworks down to low-level pointers and networking sockets.
-                </p>
-              </div>
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-sm flex-1">
+              {/* TAB 1: CURRICULUM GUIDE */}
+              {aboutActiveTab === 'guide' && (
+                <div className="space-y-4">
+                  {/* Search and Category Filters */}
+                  <div className="space-y-2.5">
+                    <div className="relative">
+                      <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={guideSearch}
+                        onChange={e => setGuideSearch(e.target.value)}
+                        placeholder="Search courses by title, topic, or skill (e.g. React, C++, Pointers, RAG)..."
+                        className="w-full text-xs bg-secondary/30 border border-border/40 rounded-xl pl-9 pr-8 py-2.5 text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                      {guideSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setGuideSearch('')}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
 
-              {/* What is Inside CodeSage */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-primary" />
-                  <h3 className="text-sm font-bold font-display text-foreground">
-                    What’s Inside the App (18 Curriculum Tracks)
-                  </h3>
+                    {/* Filter Pills */}
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                      {[
+                        { id: 'all', label: 'All Tracks (18)' },
+                        { id: 'web', label: 'Web & Frontend' },
+                        { id: 'systems', label: 'Systems & Low-Level' },
+                        { id: 'enterprise', label: 'Enterprise & Backend' },
+                        { id: 'ai', label: 'AI & Models' },
+                        { id: 'consultancy', label: 'Consultancy' },
+                      ].map(pill => (
+                        <button
+                          key={pill.id}
+                          type="button"
+                          onClick={() => setGuideFilter(pill.id)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                            guideFilter === pill.id
+                              ? 'bg-primary text-primary-foreground shadow-sm'
+                              : 'bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary'
+                          }`}
+                        >
+                          {pill.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Course Cards List */}
+                  <div className="space-y-3">
+                    {COURSE_CURRICULUM.filter(c => {
+                      const matchesFilter =
+                        guideFilter === 'all' ||
+                        (guideFilter === 'web' && c.category === 'Web & Frontend Architecture') ||
+                        (guideFilter === 'systems' && c.category === 'Systems & Low-Level') ||
+                        (guideFilter === 'enterprise' && c.category === 'Enterprise & Cloud Backend') ||
+                        (guideFilter === 'ai' && c.category === 'AI & Autonomous Models') ||
+                        (guideFilter === 'consultancy' && c.category === 'Consultancy & Commercial Practice');
+
+                      const query = guideSearch.toLowerCase().trim();
+                      const matchesSearch =
+                        !query ||
+                        c.title.toLowerCase().includes(query) ||
+                        c.shortTitle.toLowerCase().includes(query) ||
+                        c.credentialCode.toLowerCase().includes(query) ||
+                        c.briefOverview.toLowerCase().includes(query) ||
+                        c.whatYouWillGet.toLowerCase().includes(query);
+
+                      return matchesFilter && matchesSearch;
+                    }).map(course => (
+                      <div
+                        key={course.id}
+                        className="p-4 rounded-xl border border-border/40 bg-secondary/15 hover:border-primary/40 transition-all space-y-3"
+                      >
+                        {/* Course Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xl shrink-0">{course.emoji}</span>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-sm font-bold font-display text-foreground">
+                                  {course.title}
+                                </h3>
+                                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/30 font-semibold">
+                                  {course.credentialCode}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground font-mono">
+                                {course.category} · {course.level}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-mono text-cyan-400 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">
+                              {course.lessonsCount} lessons
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* What It Contains */}
+                        <div className="p-3 rounded-lg bg-background/50 border border-border/30 space-y-1">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold block">
+                            What this course contains:
+                          </span>
+                          <p className="text-xs text-foreground/90 leading-relaxed">
+                            {course.briefOverview}
+                          </p>
+                        </div>
+
+                        {/* What You Will Get */}
+                        <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 space-y-1">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            What you will get & be able to do:
+                          </span>
+                          <p className="text-xs text-foreground/90 leading-relaxed">
+                            {course.whatYouWillGet}
+                          </p>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedCourseDetail(course.id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-secondary/70 hover:bg-secondary text-foreground border border-border/40 hover:border-primary/40 transition-all"
+                          >
+                            <BookOpen className="w-3.5 h-3.5 text-primary" />
+                            <span>View 100% In-Depth Syllabus & Outcomes</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsAboutOpen(false);
+                              navigate(course.route);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 transition-all ml-auto"
+                          >
+                            <span>Go to Course</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {CURRICULUM_TRACKS.map((track, i) => (
-                    <div
-                      key={i}
-                      className="p-3 rounded-xl border border-border/30 bg-secondary/15 hover:border-primary/30 transition-all space-y-1"
+              {/* TAB 2: PLATFORM & METHODOLOGY */}
+              {aboutActiveTab === 'overview' && (
+                <div className="space-y-5">
+                  {/* Mission Statement */}
+                  <div className="p-4 rounded-xl bg-secondary/20 border border-border/40 space-y-2">
+                    <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-primary">
+                      The Vision & Philosophy
+                    </h3>
+                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
+                      CodeSage bridges the gap between passive video tutorials and production engineering. We combine hands-on in-browser coding environments, diagnostic quizzes that isolate student misconceptions, and deep curriculum tracks ranging from high-level web frameworks down to low-level pointers and networking sockets.
+                    </p>
+                  </div>
+
+                  {/* Interactive Features */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <h3 className="text-sm font-bold font-display text-foreground">
+                        Core Platform Features
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-muted-foreground">
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
+                        <Code2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-foreground block">Interactive Monaco Editor:</strong>
+                          Write real HTML, CSS, JS, and Python with live compiler feedback and test validation.
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
+                        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-foreground block">Mistake Tracking Engine:</strong>
+                          Targeted review of missed quiz questions under Settings to eliminate learning blind spots.
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
+                        <Flame className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-foreground block">Daily Streaks & Levels:</strong>
+                          Stay disciplined with XP progression, developer tiers, and streak preservation mechanics.
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
+                        <Award className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-foreground block">Milestone Exams & Skill Tests:</strong>
+                          Comprehensive assessments at /exams to benchmark your technical competence.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Direct Support Inquiries */}
+                  <div className="p-4 rounded-xl border border-border/40 bg-secondary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h4 className="text-xs font-bold text-foreground font-display">
+                        Have questions or feedback?
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Direct inquiries and bug reports are welcomed at {ADMIN_EMAIL}.
+                      </p>
+                    </div>
+                    <a
+                      href={`mailto:${ADMIN_EMAIL}?subject=CodeSage%20Inquiry`}
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary transition-all shrink-0 inline-flex items-center gap-1.5"
                     >
-                      <p className="text-xs font-bold text-foreground font-display flex items-center gap-1.5">
-                        <Code2 className="w-3.5 h-3.5 text-primary shrink-0" />
-                        <span>{track.name}</span>
-                      </p>
-                      <p className="text-[11px] text-muted-foreground leading-snug">
-                        {track.desc}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Interactive Features */}
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-sm font-bold font-display text-foreground">
-                    Core Platform Features
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-muted-foreground">
-                  <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
-                    <Code2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">Interactive Monaco Editor:</strong>
-                      Write real HTML, CSS, JS, and Python with live compiler feedback and test validation.
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">Mistake Tracking Engine:</strong>
-                      Targeted review of missed quiz questions under Settings to eliminate learning blind spots.
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
-                    <Flame className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">Daily Streaks & Levels:</strong>
-                      Stay disciplined with XP progression, developer tiers, and streak preservation mechanics.
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2 p-2.5 rounded-lg bg-background/50 border border-border/30">
-                    <Award className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">Milestone Exams & Skill Tests:</strong>
-                      Comprehensive assessments at /exams to benchmark your technical competence.
-                    </div>
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Contact Admin</span>
+                    </a>
                   </div>
                 </div>
-              </div>
-
-              {/* Direct Support Inquiries */}
-              <div className="p-4 rounded-xl border border-border/40 bg-secondary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h4 className="text-xs font-bold text-foreground font-display">
-                    Have questions or feedback?
-                  </h4>
-                  <p className="text-[11px] text-muted-foreground">
-                    Direct inquiries and bug reports are welcomed at {ADMIN_EMAIL}.
-                  </p>
-                </div>
-                <a
-                  href={`mailto:${ADMIN_EMAIL}?subject=CodeSage%20Inquiry`}
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary transition-all shrink-0 inline-flex items-center gap-1.5"
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>Contact Admin</span>
-                </a>
-              </div>
+              )}
             </div>
 
             {/* Modal Footer */}
             <div className="p-3.5 px-5 border-t border-border/40 bg-card/70 flex justify-between items-center text-[11px] text-muted-foreground font-mono">
-              <span>CodeSage v2.4 · Built with Craft</span>
+              <span>CodeSage v2.4 · 18 Engineering Tracks</span>
               <button
                 type="button"
                 onClick={() => setIsAboutOpen(false)}
@@ -476,6 +649,13 @@ export default function TopUtilityBar() {
           </div>
         </div>
       )}
+
+      {/* Course Overview In-Depth Modal (Triggered from Curriculum Guide) */}
+      <CourseOverviewModal
+        isOpen={!!selectedCourseDetail}
+        onClose={() => setSelectedCourseDetail(null)}
+        initialTrackId={selectedCourseDetail || undefined}
+      />
 
       {/* ==================== FREE & PRO PLANS MODAL ==================== */}
       {isPlanModalOpen && (
