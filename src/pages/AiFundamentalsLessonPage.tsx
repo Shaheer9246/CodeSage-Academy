@@ -3,7 +3,6 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getAiLessonById, isAiLessonUnlocked } from '@/data/aiFundamentalsLesson';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft,
   BookOpen,
@@ -80,11 +79,10 @@ const AiFundamentalsLessonPage = () => {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
 
     if (passed) {
       if (user) completeLesson(lesson.id);
-      setTimeout(() => navigate('/complete/' + lesson.id, { state: { answers } }), 800);
+      setTimeout(() => navigate('/complete/' + lesson.id), 800);
     }
   };
 
