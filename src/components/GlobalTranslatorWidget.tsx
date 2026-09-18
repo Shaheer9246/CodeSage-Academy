@@ -39,7 +39,7 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [promoCodeInput, setPromoCodeInput] = useState('');
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Lesson pages already have the translator docked in the sticky header
@@ -367,12 +367,11 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
       >
         {isMinimized ? (
           <button
-            onClick={() => setIsMinimized(false)}
+            onClick={() => { setIsMinimized(false); setDropdownOpen(true); }}
             title="Open Translator"
-            className="flex items-center gap-1 bg-card/90 border border-primary/30 backdrop-blur-xl px-2.5 py-1.5 rounded-full shadow-lg hover:border-primary/60 transition-all text-xs text-foreground group"
+            className="flex items-center justify-center bg-card/90 border border-primary/30 backdrop-blur-xl p-2.5 rounded-full shadow-lg hover:border-primary/60 transition-all text-primary group"
           >
-            <span className="text-sm">{activeLang.flag}</span>
-            <Globe className="w-3.5 h-3.5 text-primary group-hover:rotate-45 transition-transform" />
+            <Globe className="w-5 h-5 group-hover:rotate-45 transition-transform" />
           </button>
         ) : (
           <div className="flex items-center bg-card/85 border border-border/40 backdrop-blur-xl rounded-full p-1 pl-2.5 shadow-xl hover:border-primary/40 transition-all">
