@@ -9,7 +9,7 @@ import {
   pause as pauseTrack, end as endTrack,
   onEnrollmentChange
 } from '@/lib/enrollment';
-import { useUser, cleanStudentId } from '@/contexts/UserContext';
+import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
 import { isTrackCompleted as isTrackDone, LessonTrackKey } from '@/data/lessonIndex';
 
@@ -135,7 +135,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
 
     setIsSubmitting(true);
     try {
-      const rec = await enroll(track, user?.studentId);
+      const rec = await enroll(track);
       onEnrolled?.(track);
       toast.success(`Successfully enrolled in ${meta?.label || 'track'}!`);
       onClose();
@@ -165,8 +165,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
         {step === 'idcard' && (
           <IdCardStep
             track={track}
-            name={user?.name || user?.username || 'New Student'}
-            studentId={cleanStudentId(user?.studentId, user?.id || '')}
+            name={user?.name || 'New Student'}
             onCarryOn={doEnroll}
             onBack={onClose}
             isSubmitting={isSubmitting}
@@ -307,21 +306,16 @@ function PrereqStep({
 }
 
 function IdCardStep({
-  track, name, studentId, onCarryOn, onBack, isSubmitting
+  track, name, onCarryOn, onBack, isSubmitting
 }: {
   track: TrackId;
   name: string;
-  studentId: string;
   onCarryOn: () => void;
   onBack: () => void;
   isSubmitting: boolean;
 }) {
   const meta = TRACK_META[track];
-  // Extract number suffix from global student ID (e.g. "7842" from "CS-7842" or "ID-CSA-0042")
-  const numSuffix = studentId.replace(/^(CS-|ID-CSA-)/i, '').replace(/[^a-zA-Z0-9]/g, '') || '1001';
-  // Distinct per-track enrollment credential code (e.g. CS-FE-7842, CS-PY-7842, CS-CPP-7842)
-  const trackCredentialId = `${meta?.idPrefix || 'CS'}-${numSuffix}`;
-
+  const previewId = useMemo(() => `${meta?.idPrefix || 'CS'}-${Math.floor(100000 + Math.random() * 900000)}`, [track]);
   return (
     <>
       <DialogHeader>
@@ -329,32 +323,21 @@ function IdCardStep({
           <GraduationCap className="w-5 h-5 text-primary" /> Welcome aboard!
         </DialogTitle>
         <DialogDescription className="text-xs leading-relaxed">
-          You're about to enroll in <span className="text-primary font-semibold">{meta?.label || 'Track'}</span>. Here's your official track enrollment card – linked to your student profile 🎓
+          You're about to enroll in <span className="text-primary font-semibold">{meta?.label || 'Track'}</span>. Here's your student card – keep it in your pocket 🎓
         </DialogDescription>
       </DialogHeader>
       <div className="mt-2 rounded-2xl p-4 border border-primary/40 bg-gradient-to-br from-primary/10 via-background to-accent-blue/10 neon-glow">
         <div className="flex items-center gap-3">
           <div className="w-14 h-14 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-2xl">🎓</div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">Track Credential</p>
-              <span className="text-[9px] font-mono bg-primary/15 text-primary px-2 py-0.5 rounded-full border border-primary/30">
-                {meta?.short || 'Active'}
-              </span>
-            </div>
+          <div className="min-w-0">
+            <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">CodeSage Student ID</p>
             <p className="text-sm font-display font-bold text-foreground truncate">{name}</p>
-            <p className="text-xs text-primary font-mono font-bold tracking-wide mt-0.5">{trackCredentialId}</p>
+            <p className="text-[11px] text-primary font-mono">{previewId}</p>
           </div>
         </div>
-        <div className="border-t border-border/30 mt-3 pt-2 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] text-muted-foreground font-display">Enrolling Course</p>
-            <p className="text-xs font-display font-semibold text-foreground">{meta?.label || 'Track'}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] text-muted-foreground font-display">Global Student ID</p>
-            <p className="text-xs font-mono font-bold text-foreground">{studentId}</p>
-          </div>
+        <div className="border-t border-border/30 mt-3 pt-2">
+          <p className="text-[10px] text-muted-foreground font-display">Track</p>
+          <p className="text-xs font-display font-semibold text-foreground">{meta?.label || 'Track'}</p>
         </div>
       </div>
       <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
