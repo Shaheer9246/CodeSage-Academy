@@ -4,7 +4,6 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 import { getFreelanceLessonById, isFreelanceLessonUnlocked } from '@/data/freelanceLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
@@ -58,11 +57,10 @@ const FreelanceLessonPage = () => {
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('Lesson complete! +1 XP · +2 Coins 🎉');
-      navigate('/complete/' + lesson.id, { state: { answers } });
+      navigate('/complete/' + lesson.id);
     }
   };
 
