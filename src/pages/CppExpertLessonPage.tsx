@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 // 1. EXPERT IMPORTS
 import { getCppExpertLessonById, isCppExpertLessonUnlocked } from '@/data/cppExpertLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, type LucideIcon,
@@ -95,13 +94,12 @@ const CppExpertLessonPage = () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     
     if (passed) {
       if (user) await completeLesson(lesson.id);
       // 7. EXPERT REWARDS (Bumped up for Expert track!)
       toast.success('Expert lesson complete! +1 XP · +2 ◈ 🎉');
-      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`, { state: { answers } });
+      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
     setIsSubmitting(false);
   };
