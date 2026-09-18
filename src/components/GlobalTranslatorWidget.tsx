@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import {
   Globe,
   Sparkles,
@@ -34,10 +36,17 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
     isTranslating
   } = useTranslation();
 
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Lesson pages already have the translator docked in the sticky header
+  const isLessonRoute = location.pathname.includes('/lesson') || location.pathname.includes('-lesson');
+  if (mode === 'floating' && isLessonRoute) {
+    return null;
+  }
 
   const activeLang =
     SUPPORTED_LANGUAGES.find(l => l.code === currentLanguage) ||
@@ -239,12 +248,13 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
         </div>
 
         {/* PRO Unlock Modal */}
-        {proModalOpen && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
-            data-no-translate="true"
-            onClick={() => setProModalOpen(false)}
-          >
+        {proModalOpen &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
+              data-no-translate="true"
+              onClick={() => setProModalOpen(false)}
+            >
             <div
               className="glass-card w-full max-w-md rounded-2xl p-6 border border-primary/30 shadow-2xl relative space-y-4 bg-card/95"
               onClick={e => e.stopPropagation()}
@@ -337,7 +347,8 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
                 </form>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );
@@ -516,12 +527,13 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
       </div>
 
       {/* PRO Unlock Modal */}
-      {proModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
-          data-no-translate="true"
-          onClick={() => setProModalOpen(false)}
-        >
+      {proModalOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
+            data-no-translate="true"
+            onClick={() => setProModalOpen(false)}
+          >
           <div
             className="glass-card w-full max-w-md rounded-2xl p-6 border border-primary/30 shadow-2xl relative space-y-4 bg-card/95"
             onClick={e => e.stopPropagation()}
@@ -618,7 +630,8 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
