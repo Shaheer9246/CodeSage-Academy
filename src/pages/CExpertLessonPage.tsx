@@ -4,7 +4,6 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getCExpertLessonById, isCExpertLessonUnlocked } from '@/data/cExpertLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import CWorkspace from '@/components/CWorkspace';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
@@ -60,10 +59,9 @@ const CExpertLessonPage = () => {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) completeLesson(lesson.id);
-      setTimeout(() => navigate('/complete/' + lesson.id, { state: { answers } }), 800);
+      setTimeout(() => navigate('/complete/' + lesson.id), 800);
     }
   };
 
