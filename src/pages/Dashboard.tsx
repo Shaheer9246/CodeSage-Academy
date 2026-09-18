@@ -12,9 +12,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import DashboardTour, { TourStep } from '@/components/DashboardTour';
 import EnrollDialog from '@/components/EnrollDialog';
-import { TrackId, isEnrolled, isActive, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
+import { TrackId, isEnrolled, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
 import SuggestionsBadge from '@/components/SuggestionsBadge';
-import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDetails, isTrackCompleted, type LessonTrackKey } from '@/data/lessonIndex';
+import { completedCountFor, lessonCountFor, type LessonTrackKey } from '@/data/lessonIndex';
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
@@ -256,7 +256,6 @@ const Dashboard = () => {
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [showXpModal, setShowXpModal] = useState(false);
-  const [showGuideDetails, setShowGuideDetails] = useState(false);
 
   const [tourReady, setTourReady] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
@@ -372,12 +371,11 @@ const Dashboard = () => {
   const streak = user?.streakCount ?? 0;
 
   const allTracks = useMemo(() => SECTIONS.flatMap(s => s.tracks), []);
-  const enrolledCount = allTracks.filter(t => t.trackId && !isGuest && (isActive(t.trackId) || isEnrolled(t.trackId))).length;
+  const enrolledCount = allTracks.filter(t => t.trackId && isEnrolled(t.trackId)).length;
 
   const myTracks = useMemo(
     () => allTracks
-      .filter(t => t.trackId && !isGuest && (isActive(t.trackId) || isEnrolled(t.trackId)))
-      .slice(0, 2)
+      .filter(t => t.trackId && !isGuest && isEnrolled(t.trackId))
       .map(t => {
         const key = t.trackId as unknown as LessonTrackKey;
         const total = lessonCountFor(key) || t.lessons || 0;
@@ -387,36 +385,9 @@ const Dashboard = () => {
     [allTracks, isGuest, user?.completedLessons, enrollTick],
   );
 
-  const activeContinueTrack = useMemo(() => {
-    if (myTracks.length === 0) return null;
-
-    // Check if user's last active track matches one of their active enrolled courses
-    const lastStored = localStorage.getItem('codesage_last_active_track');
-    if (lastStored) {
-      const match = myTracks.find(m => m.track.trackId === lastStored);
-      if (match) return match.track;
-    }
-
-    // Default to the first enrolled course
-    return myTracks[0].track;
-  }, [myTracks]);
-
-  const continueLessonInfo = useMemo(() => {
-    if (!activeContinueTrack || !activeContinueTrack.trackId || isGuest) return null;
-    const trackKey = activeContinueTrack.trackId as unknown as LessonTrackKey;
-    const nextLesson = getNextLessonForTrack(trackKey, user?.completedLessons || []);
-    const total = lessonCountFor(trackKey) || activeContinueTrack.lessons || 0;
-    const done = completedCountFor(trackKey, user?.completedLessons || []);
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-    return {
-      track: activeContinueTrack,
-      nextLesson,
-      done,
-      total,
-      pct,
-    };
-  }, [activeContinueTrack, isGuest, user?.completedLessons]);
+  const firstEnrolledTrack = useMemo(() => 
+    allTracks.find(t => t.trackId && !isGuest && isEnrolled(t.trackId)),
+    [allTracks, isGuest, enrollTick]);
 
   const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
 
@@ -463,31 +434,21 @@ const Dashboard = () => {
             <div>
               <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground mb-3 pl-1">Your Tracks</p>
               <div className="space-y-2">
-                {myTracks.slice(0, 2).map(({ track, done, total, pct }) => {
-                  const isDone = total > 0 && done >= total;
-                  return (
-                    <button 
-                      key={track.id} 
-                      onClick={go(track.path)}
-                      className="w-full text-left rounded-lg p-2.5 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-lg shrink-0">{track.emoji}</span>
-                          <p className="text-[10px] font-display font-semibold truncate">{track.title}</p>
-                        </div>
-                        {isDone && (
-                          <span className="text-[8px] font-mono font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded-full shrink-0">
-                            Completed
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 h-1 rounded-full bg-secondary overflow-hidden">
-                        <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
-                      </div>
-                    </button>
-                  );
-                })}
+                {myTracks.slice(0, 2).map(({ track, done, total, pct }) => (
+                  <button 
+                    key={track.id} 
+                    onClick={go(track.path)}
+                    className="w-full text-left rounded-lg p-2.5 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg shrink-0">{track.emoji}</span>
+                      <p className="text-[10px] font-display font-semibold truncate flex-1">{track.title}</p>
+                    </div>
+                    <div className="mt-2 h-1 rounded-full bg-secondary overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -677,21 +638,10 @@ const Dashboard = () => {
                   <Zap className="w-3.5 h-3.5 text-primary" />
                   <span className="text-xs font-bold text-primary">{energy} / 10 XP</span>
                 </button>
-                <button
-                  onClick={() => {
-                    if (isGuest) {
-                      navigate('/auth');
-                    } else {
-                      setShowXpModal(true);
-                      setShowGuideDetails(true);
-                    }
-                  }}
-                  className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
-                  title="View Sage Coins & XP Guide"
-                >
+                <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full">
                   <Coins className="w-3.5 h-3.5 text-yellow-400" />
                   <span className="text-xs font-bold text-yellow-400">{sageCoins}</span>
-                </button>
+                </div>
                 <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
                   <Flame className="w-3.5 h-3.5 text-orange-400" />
                   <span className="text-xs font-bold text-orange-400">{streak}d</span>
@@ -720,55 +670,29 @@ const Dashboard = () => {
           </div>
 
           {/* CONTINUE LEARNING */}
-          {!isGuest && activeContinueTrack && (
+          {!isGuest && firstEnrolledTrack && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
+              className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/20 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-                {(() => {
-                  const isTrackFinished = (continueLessonInfo?.total || 0) > 0 && (continueLessonInfo?.done || 0) >= (continueLessonInfo?.total || 0);
-                  return (
-                    <>
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
-                          <span className={`w-2 h-2 rounded-full ${isTrackFinished ? 'bg-amber-400' : 'bg-primary animate-pulse'}`} />
-                          <span>{isTrackFinished ? 'Track Completed 🎓' : 'Continue Learning'}</span>
-                          <span className="text-muted-foreground/60">·</span>
-                          <span className="text-muted-foreground">{activeContinueTrack.title}</span>
-                        </div>
-
-                        <h2 className="text-base sm:text-lg font-bold font-display text-foreground truncate">
-                          {isTrackFinished 
-                            ? `All ${continueLessonInfo?.total} lessons finished! Outstanding work.`
-                            : continueLessonInfo?.nextLesson 
-                              ? `${continueLessonInfo.nextLesson.title}`
-                              : activeContinueTrack.title}
-                        </h2>
-                      </div>
-
-                      <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
-                        <button
-                          onClick={() => {
-                            if (continueLessonInfo?.nextLesson?.url && !isTrackFinished) {
-                              navigate(continueLessonInfo.nextLesson.url + (continueLessonInfo.nextLesson.url.includes('?') ? '&from=dashboard' : '?from=dashboard'));
-                            } else {
-                              navigate(activeContinueTrack.path);
-                            }
-                          }}
-                          className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
-                        >
-                          {isTrackFinished ? 'Review Track →' : 'Resume Lesson →'}
-                        </button>
-                        <button
-                          onClick={go(activeContinueTrack.path)}
-                          className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          View Roadmap
-                        </button>
-                      </div>
-                    </>
-                  );
-                })()}
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    Continue Learning
+                  </div>
+                  <h2 className="text-base sm:text-lg font-bold font-display text-foreground truncate">
+                    {firstEnrolledTrack.title}
+                  </h2>
+                  <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                    Keep your momentum going! You're doing great.
+                  </p>
+                </div>
+                <button
+                  onClick={go(firstEnrolledTrack.path)}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 self-start sm:self-center"
+                >
+                  Resume Lesson →
+                </button>
               </div>
             </motion.div>
           )}
@@ -796,7 +720,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* YOUR TRACKS - Mobile Only */}
+                    {/* YOUR TRACKS - Mobile Only */}
           {!isGuest && myTracks.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               className="lg:hidden glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
@@ -876,20 +800,16 @@ const Dashboard = () => {
                         className="overflow-hidden"
                       >
                         <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2">
-                          {section.tracks.map(track => {
-                            const isTrackDone = track.trackId ? isTrackCompleted(track.trackId as unknown as LessonTrackKey, user?.completedLessons || []) : false;
-                            return (
-                              <TrackRow
-                                key={track.id}
-                                track={track}
-                                isGuest={isGuest}
-                                locked={isTrackLockedForGuest(track.path)}
-                                enrolled={!!(track.trackId && !isGuest && isEnrolled(track.trackId))}
-                                completed={isTrackDone}
-                                onClick={go(track.path)}
-                              />
-                            );
-                          })}
+                          {section.tracks.map(track => (
+                            <TrackRow
+                              key={track.id}
+                              track={track}
+                              isGuest={isGuest}
+                              locked={isTrackLockedForGuest(track.path)}
+                              enrolled={!!(track.trackId && !isGuest && isEnrolled(track.trackId))}
+                              onClick={go(track.path)}
+                            />
+                          ))}
                         </div>
                       </motion.div>
                     )}
@@ -999,75 +919,6 @@ const Dashboard = () => {
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-2">
               <p className="text-[10px] text-primary text-center font-semibold">💡 Daily XP is an allowance. Lifetime XP is your permanent score!</p>
             </div>
-
-            {/* Expandable XP & Coins Guide Accordion */}
-            <div className="border-t border-border/30 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowGuideDetails(!showGuideDetails)}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl bg-secondary/30 hover:bg-secondary/50 border border-border/40 text-xs font-semibold text-foreground transition-all group"
-              >
-                <span className="flex items-center gap-2">
-                  <Coins className="w-4 h-4 text-yellow-400" />
-                  <span>How to Earn & Use XP & Coins</span>
-                </span>
-                <ChevronDown
-                  className={`w-4 h-4 text-muted-foreground transition-transform duration-200 group-hover:text-primary ${
-                    showGuideDetails ? 'rotate-180 text-primary' : ''
-                  }`}
-                />
-              </button>
-
-              <AnimatePresence>
-                {showGuideDetails && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden space-y-2.5 pt-2.5"
-                  >
-                    {/* Earning Section */}
-                    <div className="bg-secondary/20 rounded-xl p-3 border border-border/30 space-y-1.5 text-left">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-primary font-display">
-                        <Zap className="w-3.5 h-3.5" /> How You Earn XP & Coins
-                      </div>
-                      <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                        <li>
-                          <strong className="text-foreground">+1 Victory XP</strong> & <strong className="text-yellow-400">+2 Coins</strong> for every lesson completed.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">+3 XP</strong> & <strong className="text-yellow-400">+5 Coins</strong> for passing Track Exams & Challenges.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">10 Daily Allowance XP:</strong> Refilled at midnight for active lesson sessions (3.3 XP per lesson).
-                        </li>
-                        <li>
-                          <strong className="text-orange-400">Streak Milestones:</strong> Bonus coin chests unlocked on 3-day, 7-day, and 14-day streaks!
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Using Section */}
-                    <div className="bg-yellow-500/5 rounded-xl p-3 border border-yellow-500/20 space-y-1.5 text-left">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-yellow-400 font-display">
-                        <Coins className="w-3.5 h-3.5" /> Where to Use XP & Coins
-                      </div>
-                      <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                        <li>
-                          <strong className="text-foreground">Streak Freeze (10 Coins):</strong> Protects your streak in Profile if you miss a study day.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Arcade & Crawler Lives:</strong> Replenish hearts in Code Crawler and challenges.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Leaderboard & Rank (XP):</strong> Lifetime XP levels up your profile rank and trophy status.
-                        </li>
-                      </ul>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
         </div>
       )}
@@ -1111,9 +962,9 @@ function QuickChip({
 }
 
 function TrackRow({
-  track, isGuest, locked, enrolled, completed, onClick,
+  track, isGuest, locked, enrolled, onClick,
 }: {
-  track: TrackDef; isGuest: boolean; locked: boolean; enrolled: boolean; completed?: boolean; onClick: () => void;
+  track: TrackDef; isGuest: boolean; locked: boolean; enrolled: boolean; onClick: () => void;
 }) {
   const count = track.trackId ? getStudentCount(track.trackId) : 0;
   const disabled = locked;
@@ -1126,7 +977,7 @@ function TrackRow({
       className={[
         'group relative w-full text-left rounded-xl p-3 border border-border/50 bg-secondary/20 transition-all overflow-hidden',
         disabled ? 'opacity-40 pointer-events-none grayscale' : 'hover:border-primary/40 hover:bg-secondary/40',
-        completed ? 'ring-1 ring-amber-400/40 border-amber-500/30' : enrolled ? 'ring-1 ring-primary/40 neon-border' : '',
+        enrolled ? 'ring-1 ring-primary/40 neon-border' : '',
       ].join(' ')}
     >
       <div className={`absolute left-0 top-0 bottom-0 w-0.5 bg-${track.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
@@ -1138,11 +989,7 @@ function TrackRow({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-bold font-display truncate">{track.title}</p>
-            {completed ? (
-              <span className="text-xs shrink-0" title="Track Completed">🎓</span>
-            ) : enrolled ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            ) : null}
+            {enrolled && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
           </div>
           <div className="flex flex-wrap items-center gap-1 mt-1">
             {track.tags.slice(0, 3).map(t => (
@@ -1169,15 +1016,11 @@ function TrackRow({
               <Lock className="w-2.5 h-2.5" /> Sign up
             </span>
           )}
-          {completed ? (
-            <span className="text-[9px] text-amber-400 bg-amber-500/15 border border-amber-500/30 rounded-full px-1.5 py-0.5 font-mono font-semibold flex items-center gap-1">
-              🏆 Completed
-            </span>
-          ) : enrolled ? (
+          {enrolled && (
             <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-1.5 py-0.5 font-mono">
               Enrolled
             </span>
-          ) : null}
+          )}
         </div>
       </div>
 
