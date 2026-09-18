@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { useUser } from '@/contexts/UserContext';
 // ⚠️ Wired to your existing javaExpertLessons.ts file
 import { getJavaExpertLessonById, isJavaExpertLessonUnlocked } from '@/data/javaExpertLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Crown, type LucideIcon,
@@ -82,11 +81,10 @@ const JavaExpertLessonPage = () => {
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) await completeLesson(lesson.id);
       toast.success('Expert Lesson Complete! +1 XP · +2 Coins 💎');
-      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`, { state: { answers } });
+      navigate(`/complete/${lesson.id}${from ? `?from=${from}` : ''}`);
     }
   };
 
