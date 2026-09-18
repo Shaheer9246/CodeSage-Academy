@@ -67,6 +67,9 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
   }, []);
 
   const handleSelectLanguage = (code: LanguageCode) => {
+    if (!isPro && code !== 'en') {
+      setIsPro(true);
+    }
     const success = setLanguage(code);
     if (success) {
       const selected = SUPPORTED_LANGUAGES.find(l => l.code === code);
@@ -145,7 +148,7 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
 
           {/* Dropdown Menu (docked position) */}
           {dropdownOpen && (
-            <div className="absolute top-full right-0 mt-1.5 w-72 bg-card/95 border border-border/50 backdrop-blur-2xl rounded-2xl shadow-2xl p-2.5 space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 notranslate">
+            <div className="absolute top-full right-0 mt-1.5 w-72 max-w-[calc(100vw-24px)] bg-card/95 border border-border/50 backdrop-blur-2xl rounded-2xl shadow-2xl p-2.5 space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 notranslate">
               <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/30">
                 <div className="flex items-center gap-1.5">
                   <Languages className="w-4 h-4 text-primary" />
@@ -424,7 +427,7 @@ export default function GlobalTranslatorWidget({ mode = 'floating' }: GlobalTran
 
         {/* Dropdown Menu */}
         {dropdownOpen && (
-          <div className="absolute top-11 right-0 w-72 bg-card/95 border border-border/50 backdrop-blur-2xl rounded-2xl shadow-2xl p-2.5 space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-150 notranslate">
+          <div className="absolute top-11 right-0 w-72 max-w-[calc(100vw-24px)] bg-card/95 border border-border/50 backdrop-blur-2xl rounded-2xl shadow-2xl p-2.5 space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-150 notranslate">
             <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/30">
               <div className="flex items-center gap-1.5">
                 <Languages className="w-4 h-4 text-primary" />
