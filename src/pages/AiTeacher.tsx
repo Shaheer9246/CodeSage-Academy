@@ -367,8 +367,16 @@ Tell me the **Lesson Name** and **Module Name** to get a complete note-type guid
     return <div>{nodes}</div>;
   };
 
+  const escapeHtml = (str: string) =>
+    str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
   const formatInline = (str: string) => {
-    return str
+    return escapeHtml(str)
       .replace(/`([^`]+)`/g, '<code class="bg-secondary/70 px-1.5 py-0.5 rounded text-accent font-mono text-[11px] notranslate" translate="no">$1</code>')
       .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
       .replace(/\*([^*]+)\*/g, '<em class="text-muted-foreground italic">$1</em>');
