@@ -459,9 +459,20 @@ AS $function$
 DECLARE
   p     public.profiles%ROWTYPE;
   v_new text[];
+  -- reward is fixed server-side; the _coin_reward argument is ignored
+  v_reward constant int := 3;
 BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF _test_id IS NULL OR length(_test_id) = 0 OR length(_test_id) > 100 THEN
+    RAISE EXCEPTION 'Invalid test id';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.test_registry WHERE id = _test_id) THEN
+    RAISE EXCEPTION 'Unknown test id';
+  END IF;
+
   SELECT * INTO p FROM public.profiles WHERE id = auth.uid() FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'profile not found'; END IF;
+
 
   -- Skip if already completed
   IF _test_id = ANY (COALESCE(p.completed_tests, ARRAY[]::text[])) THEN
