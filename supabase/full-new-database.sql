@@ -483,7 +483,7 @@ BEGIN
 
   UPDATE public.profiles
   SET completed_tests   = v_new,
-      sage_coins        = COALESCE(p.sage_coins, 0) + _coin_reward,
+      sage_coins        = COALESCE(p.sage_coins, 0) + v_reward,
       xp                = COALESCE(xp, 0) + 1, -- +1 Lifetime XP victory prize
       last_active_date  = current_date
   WHERE id = p.id RETURNING * INTO p;
