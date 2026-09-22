@@ -76,7 +76,7 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
       const selected = SUPPORTED_LANGUAGES.find(l => l.code === code);
       toast.success(
         `Language switched to ${selected?.nativeName || code}${
-          code === 'roman-urdu' ? ' 🇵🇰🇮🇳' : ''
+          (code as string) === 'roman-urdu' ? ' 🇵🇰🇮🇳' : ''
         }`
       );
       setDropdownOpen(false);
@@ -219,7 +219,7 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
                             <p className="text-xs font-semibold truncate leading-tight">
                               {lang.nativeName}
                             </p>
-                            {lang.code === 'roman-urdu' && (
+                            {lang.(code as string) === 'roman-urdu' && (
                               <span className="text-[9px] px-1 py-0.2 bg-primary/20 text-primary rounded font-mono">
                                 Popular
                               </span>
@@ -497,7 +497,7 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
                           <p className="text-xs font-semibold truncate leading-tight">
                             {lang.nativeName}
                           </p>
-                          {lang.code === 'roman-urdu' && (
+                          {lang.(code as string) === 'roman-urdu' && (
                             <span className="text-[9px] px-1 py-0.2 bg-primary/20 text-primary rounded font-mono">
                               Popular
                             </span>

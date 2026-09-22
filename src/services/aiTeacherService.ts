@@ -107,7 +107,7 @@ export async function fetchUserAiCredits(): Promise<number> {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('ai_credits, ai_credits_month, is_pro')
+        .select('ai_credits, ai_credits_month, is_pro' as any)
         .eq('id', session.user.id)
         .maybeSingle();
 

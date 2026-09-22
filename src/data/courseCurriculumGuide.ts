@@ -10,7 +10,7 @@ export interface CourseCurriculumInfo {
   emoji: string;
   category: 'Systems & Low-Level' | 'Web & Frontend Architecture' | 'Enterprise & Cloud Backend' | 'AI & Autonomous Models' | 'Consultancy & Commercial Practice';
   lessonsCount: number;
-  level: 'Beginner' | 'Beginner → Advanced' | 'Intermediate' | 'Advanced' | 'Expert';
+  level: 'Beginner' | 'Beginner → Intermediate' | 'Beginner → Advanced' | 'Intermediate' | 'Intermediate → Advanced' | 'Advanced' | 'Expert' | 'All Levels';
   route: string;
   // High-level overview (for Top Bar About modal)
   briefOverview: string;

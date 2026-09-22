@@ -149,7 +149,7 @@ export default function CommunityPage() {
       }
 
       let fetchedData: LeaderboardUser[] = [];
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_community_leaderboard');
+      const { data: rpcData, error: rpcError } = await (supabase.rpc as any)('get_community_leaderboard');
       
       if (!rpcError && Array.isArray(rpcData) && rpcData.length > 0) {
         fetchedData = (rpcData as RpcLeaderboardRow[]).map((item) => ({

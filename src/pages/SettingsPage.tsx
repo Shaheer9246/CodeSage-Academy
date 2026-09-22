@@ -211,7 +211,7 @@ const SettingsPage = () => {
     levelProgressPct = 100;
   }
   const safeLevelProgressPct = isNaN(levelProgressPct) ? 0 : Math.max(levelProgressPct, levelProgressPct > 0 ? 4 : 0);
-  const currentBadgeIcon = currentLevelData?.icon || '🏆';
+  const currentBadgeIcon = (currentLevelData as { icon?: string } | undefined)?.icon || '🏆';
   const nextBadgeLabel = nextLevelData
     ? `Next: ${formatBadgeName(nextLevelData.id || `Level ${user.level + 1}`)}`
     : 'Max Level Reached! 🏆';
@@ -740,6 +740,7 @@ function EnrollmentSection({
   doResume: (t: TrackId) => void;
   doEnd: (t: TrackId) => void;
 }) {
+  const { user } = useUser();
   const [expanded, setExpanded] = useState(false);
 
   return (
