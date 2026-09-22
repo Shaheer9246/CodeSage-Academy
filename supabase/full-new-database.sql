@@ -1001,6 +1001,11 @@ DO $$ DECLARE f record; BEGIN
   END LOOP;
 END $$;
 
+-- nothing in public is callable/readable by anonymous visitors
+REVOKE SELECT ON public.suggestions_public FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_community_leaderboard() FROM anon, PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_community_leaderboard() TO authenticated, service_role;
+
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
 
