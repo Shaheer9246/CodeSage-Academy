@@ -1,1 +1,0 @@
-UPDATE public.app_secrets SET value = 'admin-codesage-1994' WHERE key = 'admin_password';

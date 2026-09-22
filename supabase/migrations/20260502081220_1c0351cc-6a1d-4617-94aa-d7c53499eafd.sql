@@ -1,5 +1,0 @@
-
-ALTER TABLE public.profiles
-ADD COLUMN IF NOT EXISTS xp integer DEFAULT 0,
-ADD COLUMN IF NOT EXISTS level integer DEFAULT 1,
-ADD COLUMN IF NOT EXISTS sage_coins integer DEFAULT 0;
