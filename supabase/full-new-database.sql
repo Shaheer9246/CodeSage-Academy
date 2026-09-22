@@ -638,6 +638,14 @@ DECLARE
   v_reward_coins constant int := 2;
   v_new          text[];
 BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF _lesson_id IS NULL OR length(_lesson_id) = 0 OR length(_lesson_id) > 100 THEN
+    RAISE EXCEPTION 'Invalid lesson id';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.lesson_registry WHERE id = _lesson_id) THEN
+    RAISE EXCEPTION 'Unknown lesson id';
+  END IF;
+
   SELECT * INTO p FROM public.profiles WHERE id = auth.uid() FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'profile not found'; END IF;
 
