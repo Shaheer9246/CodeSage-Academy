@@ -38,8 +38,23 @@ Deno.serve(async (req) => {
     const rawBody = await req.text();
     const signature = req.headers.get('x-signature');
 
-    // If webhookSecret is configured, verify HMAC signature
-    if (webhookSecret && signature) {
+    // Signature verification is mandatory: reject anything unsigned or unverifiable.
+    if (!webhookSecret) {
+      console.error('[Lemon Squeezy] LEMON_SQUEEZY_WEBHOOK_SECRET is not configured; rejecting webhook.');
+      return new Response(JSON.stringify({ error: 'Webhook not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!signature) {
+      return new Response(JSON.stringify({ error: 'Missing signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    {
       const encoder = new TextEncoder();
       const key = await crypto.subtle.importKey(
         'raw',

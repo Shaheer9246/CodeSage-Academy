@@ -14,6 +14,7 @@ interface CWorkspaceProps {
   initialCode?: string;
   onCodeChange?: (code: string) => void;
   embedded?: boolean;
+  requiresLocalTerminal?: boolean;
   practical?: {
     title: string;
     intro: string;

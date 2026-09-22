@@ -82,7 +82,7 @@ const Learn = () => {
             </div>
           </div>
           <div className="self-end sm:self-auto shrink-0">
-            <CourseOverviewButton trackId="frontend" variant="default" label="View Syllabus & Guide" />
+            <CourseOverviewButton trackId="frontend" variant="full" label="View Syllabus & Guide" />
           </div>
         </div>
 

@@ -105,11 +105,17 @@ export async function fetchUserAiCredits(): Promise<number> {
       const now = new Date();
       const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       
-      const { data, error } = await supabase
+      const { data: rawData, error } = await supabase
         .from('profiles')
-        .select('ai_credits, ai_credits_month, is_pro')
+        .select('ai_credits, ai_credits_month, is_pro' as any)
         .eq('id', session.user.id)
         .maybeSingle();
+
+      const data = rawData as unknown as {
+        ai_credits?: number | null;
+        ai_credits_month?: string | null;
+        is_pro?: boolean | null;
+      } | null;
 
       if (!error && data) {
         // If credits already exist in the database, prioritize preserving user's balance

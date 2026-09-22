@@ -22,7 +22,7 @@ export const AdBannerCard: React.FC<AdBannerCardProps> = ({
     return null;
   }
 
-  const isEthicalAds = slot.network === 'ethicalads';
+  const isEthicalAds = (slot.network as string) === 'ethicalads';
   const isMonetag = slot.network === 'monetag';
 
   const handleAdClick = () => {

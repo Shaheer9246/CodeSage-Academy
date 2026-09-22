@@ -351,6 +351,14 @@ DECLARE
   v_reward_coins constant int := 2;
   v_new       text[];
 BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF _lesson_id IS NULL OR length(_lesson_id) = 0 OR length(_lesson_id) > 100 THEN
+    RAISE EXCEPTION 'Invalid lesson id';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.lesson_registry WHERE id = _lesson_id) THEN
+    RAISE EXCEPTION 'Unknown lesson id';
+  END IF;
+
   SELECT * INTO p FROM public.profiles WHERE id = auth.uid() FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'profile not found'; END IF;
 
@@ -459,9 +467,20 @@ AS $function$
 DECLARE
   p     public.profiles%ROWTYPE;
   v_new text[];
+  -- reward is fixed server-side; the _coin_reward argument is ignored
+  v_reward constant int := 3;
 BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF _test_id IS NULL OR length(_test_id) = 0 OR length(_test_id) > 100 THEN
+    RAISE EXCEPTION 'Invalid test id';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.test_registry WHERE id = _test_id) THEN
+    RAISE EXCEPTION 'Unknown test id';
+  END IF;
+
   SELECT * INTO p FROM public.profiles WHERE id = auth.uid() FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'profile not found'; END IF;
+
 
   -- Skip if already completed
   IF _test_id = ANY (COALESCE(p.completed_tests, ARRAY[]::text[])) THEN
@@ -472,7 +491,7 @@ BEGIN
 
   UPDATE public.profiles
   SET completed_tests   = v_new,
-      sage_coins        = COALESCE(p.sage_coins, 0) + _coin_reward,
+      sage_coins        = COALESCE(p.sage_coins, 0) + v_reward,
       xp                = COALESCE(xp, 0) + 1, -- +1 Lifetime XP victory prize
       last_active_date  = current_date
   WHERE id = p.id RETURNING * INTO p;
@@ -619,6 +638,14 @@ DECLARE
   v_reward_coins constant int := 2;
   v_new          text[];
 BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF _lesson_id IS NULL OR length(_lesson_id) = 0 OR length(_lesson_id) > 100 THEN
+    RAISE EXCEPTION 'Invalid lesson id';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.lesson_registry WHERE id = _lesson_id) THEN
+    RAISE EXCEPTION 'Unknown lesson id';
+  END IF;
+
   SELECT * INTO p FROM public.profiles WHERE id = auth.uid() FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'profile not found'; END IF;
 
@@ -972,6 +999,16 @@ DO $$ DECLARE f record; BEGIN
     EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC, anon', f.sig);
     EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO authenticated, service_role', f.sig);
   END LOOP;
+END $$;
+
+-- nothing in public is callable/readable by anonymous visitors
+REVOKE SELECT ON public.suggestions_public FROM anon;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+             WHERE n.nspname = 'public' AND p.proname = 'get_community_leaderboard') THEN
+    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.get_community_leaderboard() FROM anon, PUBLIC';
+    EXECUTE 'GRANT EXECUTE ON FUNCTION public.get_community_leaderboard() TO authenticated, service_role';
+  END IF;
 END $$;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO service_role;
