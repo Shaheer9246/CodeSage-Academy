@@ -16,11 +16,25 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ADS_CONFIG } from '@/config/adsConfig';
+import { SponsorAdModal } from '@/components/SponsorAdModal';
 
 export default function SupportUsPage() {
   const navigate = useNavigate();
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [visitedAds, setVisitedAds] = useState<Record<number, boolean>>({});
+  const [activeAdModal, setActiveAdModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    url: string;
+    id: number;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    url: '',
+    id: 0,
+  });
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(ADS_CONFIG.supportContacts.adminEmail);
@@ -29,11 +43,14 @@ export default function SupportUsPage() {
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
-  const handleOpenAd = (adIndex: number, url: string) => {
-    setVisitedAds(prev => ({ ...prev, [adIndex]: true }));
-    window.open(url, '_blank', 'noopener,noreferrer');
-    toast.success(`Thank you! Sponsor #${adIndex} opened in a new tab.`, {
-      description: 'You can come right back if you are not interested!'
+  const handleOpenAd = (adId: number, title: string, description: string, url: string) => {
+    setVisitedAds(prev => ({ ...prev, [adId]: true }));
+    setActiveAdModal({
+      isOpen: true,
+      title,
+      description,
+      url,
+      id: adId,
     });
   };
 
@@ -44,26 +61,26 @@ export default function SupportUsPage() {
       tag: 'Global Ad Partner #1',
       headline: 'Next-Gen Developer Cloud & API Hosting',
       description: 'Deploy full-stack projects, databases, and microservices in seconds with global edge nodes.',
-      cta: 'Click & View Sponsor (Takes 10s)',
-      url: 'https://monetag.com/?ref_id=codesage',
+      cta: 'View Sponsor Offer',
+      url: ADS_CONFIG.monetagDirectLink || ADS_CONFIG.monetagReferralLink,
     },
     {
       id: 2,
-      name: 'EthicalAds Developer Network',
-      tag: 'Privacy-First Dev Tool #2',
-      headline: 'Modern AI Code Completion & Git Workflows',
+      name: 'Monetag High-Yield Network Sponsor #2',
+      tag: 'Global Ad Partner #2',
+      headline: 'Modern AI Code Completion & Cloud Tools',
       description: 'Lightweight AI coding assistant, syntax visualizer, and debugging copilot for modern engineers.',
-      cta: 'Click & View Sponsor (Takes 10s)',
-      url: 'https://www.ethicalads.io/?ref=codesage',
+      cta: 'View Sponsor Offer',
+      url: ADS_CONFIG.monetagDirectLink || ADS_CONFIG.monetagReferralLink,
     },
     {
       id: 3,
-      name: 'Tech & Hosting Affiliate Showcase',
+      name: 'Tech & Hosting Sponsor Showcase',
       tag: 'Infrastructure Partner #3',
-      headline: 'Enterprise Cloud Databases & SSL Domains',
+      headline: 'Enterprise Cloud Databases & VPS Nodes',
       description: 'Get exclusive student credits on custom domains, high-speed VPS, and PostgreSQL instances.',
-      cta: 'Click & View Sponsor (Takes 10s)',
-      url: 'https://codesageacademy.netlify.app',
+      cta: 'View Sponsor Offer',
+      url: ADS_CONFIG.monetagDirectLink || ADS_CONFIG.monetagReferralLink,
     },
   ];
 
@@ -155,7 +172,7 @@ export default function SupportUsPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => handleOpenAd(ad.id, ad.url)}
+                    onClick={() => handleOpenAd(ad.id, ad.headline, ad.description, ad.url)}
                     className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm ${
                       isDone
                         ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
@@ -169,6 +186,37 @@ export default function SupportUsPage() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* SECTION: RUN ADS ON YOUR OWN WEBSITE FOR FREE (USER'S MONETAG REFERRAL) */}
+      <div className="rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 via-card/90 to-amber-500/10 p-5 sm:p-7 space-y-4 shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1.5 max-w-xl">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                ⭐ Developer Tool &amp; Partner
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-primary/20 text-primary border border-primary/30 font-semibold">
+                100% Free Setup
+              </span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold font-display text-foreground flex items-center gap-2">
+              🚀 Run Ads &amp; Monetize Your Own Website or Web App
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Have you built a student project, blog, or web application? Join Monetag's publisher network to monetize your visitors from day one with in-page push banners, multi-format tags, and high CPM instant payouts.
+            </p>
+          </div>
+          <a
+            href={ADS_CONFIG.monetagReferralLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-5 py-3 rounded-xl text-xs font-bold font-display bg-gradient-to-r from-primary to-accent text-primary-foreground hover:neon-glow transition-all flex items-center justify-center gap-2 shadow-md"
+          >
+            <span>Monetize My Site (Free)</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
         </div>
       </div>
 
@@ -248,6 +296,15 @@ export default function SupportUsPage() {
           </button>
         </div>
       </div>
+
+      <SponsorAdModal
+        isOpen={activeAdModal.isOpen}
+        onClose={() => setActiveAdModal(prev => ({ ...prev, isOpen: false }))}
+        title={activeAdModal.title}
+        description={activeAdModal.description}
+        sponsorUrl={activeAdModal.url}
+        partnerName="Monetag High-Yield Sponsor"
+      />
     </div>
   );
 }
