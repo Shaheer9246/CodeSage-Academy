@@ -22,9 +22,12 @@ export const ADS_CONFIG = {
   // Monetag Publisher Zone ID
   monetagDefaultZoneId: '285789',
 
-  // Fallback / Default sponsored partner URLs until Monetag / EthicalAds IDs are generated
+  // User's Monetag Referral Link (for other developers to sign up and earn commission)
+  monetagReferralLink: 'https://monetag.com/?ref_id=tHSJ',
+
+  // Fallback / Default sponsored partner URLs
   defaultSponsorLink: 'https://codesageacademy.netlify.app/support-us',
-  monetagDirectLink: 'https://omg10.com/4/11858088',
+  monetagDirectLink: '', // Paste your Monetag Direct Link here when generated from your Monetag dashboard
 
   // Ad slot placements
   slots: {
