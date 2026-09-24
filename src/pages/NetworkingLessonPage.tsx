@@ -3,9 +3,6 @@ import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { getNetworkingLessonById, isNetworkingLessonUnlocked } from '@/data/networkingLessons';
-import { saveLessonQuizAttempt } from '@/lib/quizStorage';
-import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
@@ -60,10 +57,9 @@ const NetworkingLessonPage = () => {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    saveLessonQuizAttempt(lesson.id, answers, quiz);
     if (passed) {
       if (user) completeLesson(lesson.id);
-      setTimeout(() => navigate('/complete/' + lesson.id, { state: { answers } }), 800);
+      setTimeout(() => navigate('/complete/' + lesson.id), 800);
     }
   };
 
@@ -87,11 +83,8 @@ const NetworkingLessonPage = () => {
               <span>{lesson.icon}</span> {lesson.title}
             </h1>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <CourseOverviewButton trackId="networking" variant="compact" label="Syllabus & Outcomes" />
-            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
-              <Sparkles className="w-3 h-3" /> +1 XP · +2 ◈
-            </div>
+          <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
+            <Sparkles className="w-3 h-3" /> +1 XP · +2 ◈
           </div>
         </div>
         <div className="h-0.5 bg-secondary/40">
@@ -133,10 +126,6 @@ const NetworkingLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
