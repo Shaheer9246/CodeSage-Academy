@@ -161,14 +161,30 @@ Deno.serve(async (req) => {
     const aiText = groqJson?.choices?.[0]?.message?.content || '';
 
     // 5. Deduct Credits Atomic update in Supabase
-    const newBalance = Math.max(0, currentCredits - costCredits);
-    await supabaseAdmin
-      .from('profiles')
-      .update({
-        ai_credits: newBalance,
-        ai_credits_month: currentMonth,
-      })
-      .eq('id', user.id);
+    let newBalance = Math.max(0, currentCredits - costCredits);
+
+    // Try atomic RPC function first
+    const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('deduct_user_ai_credits', {
+      target_user_id: user.id,
+      credits_to_deduct: costCredits,
+    });
+
+    if (!rpcErr && typeof rpcBal === 'number') {
+      newBalance = rpcBal;
+    } else {
+      // Fallback to direct profiles table update
+      const { error: updateErr } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          ai_credits: newBalance,
+          ai_credits_month: currentMonth,
+        })
+        .eq('id', user.id);
+
+      if (updateErr) {
+        console.error('Failed to update ai_credits in profiles:', updateErr.message);
+      }
+    }
 
     return new Response(
       JSON.stringify({
