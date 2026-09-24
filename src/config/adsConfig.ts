@@ -20,7 +20,7 @@ export const ADS_CONFIG = {
   ethicalAdsPublisherId: 'codesage-academy',
 
   // Monetag Publisher Zone ID
-  monetagDefaultZoneId: '11858032',
+  monetagDefaultZoneId: '285789',
 
   // Fallback / Default sponsored partner URLs until Monetag / EthicalAds IDs are generated
   defaultSponsorLink: 'https://codesageacademy.netlify.app/support-us',
@@ -33,14 +33,14 @@ export const ADS_CONFIG = {
       enabled: true,
       network: 'monetag' as const,
       title: 'Monetag Dev Sponsor',
-      monetagZoneId: '11858032',
+      monetagZoneId: '285789',
     },
     // Secondary Sidebar Big Ad under Categories (Monetag Big Ad Box)
     dashboardSidebarMonetagBig: {
       enabled: true,
       network: 'monetag' as const,
       title: 'Monetag High-CPM Sponsor',
-      monetagZoneId: '11858032',
+      monetagZoneId: '285789',
     },
     // Dashboard Continue Learning / Resume Banner
     dashboardContinueLearning: {
