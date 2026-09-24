@@ -4,7 +4,6 @@ import { allLevels, getAllLessons, isLessonUnlocked, getCompletedCount } from '@
 import { ArrowLeft, Lock, Check, ChevronDown, ChevronRight, Flame, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { useScrollTop } from '@/hooks/useScrollTop';
-import CourseOverviewButton from '@/components/CourseOverviewButton';
 
 const Learn = () => {
   useScrollTop();
@@ -53,39 +52,13 @@ const Learn = () => {
           </div>
           <span className="text-base font-bold gradient-text font-mono">Learning Path</span>
         </div>
-        <div className="flex items-center gap-2">
-          <CourseOverviewButton trackId="frontend" variant="compact" label="Syllabus & Outcomes" />
-          <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
-            <Flame className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-bold text-primary">{user.streakCount}</span>
-          </div>
+        <div className="flex items-center gap-2 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+          <Flame className="w-3.5 h-3.5 text-primary" />
+          <span className="text-xs font-bold text-primary">{user.streakCount}</span>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto p-4 sm:p-6 relative z-10">
-        {/* Course Syllabus & Guide Banner */}
-        <div className="glass-card rounded-2xl p-4 sm:p-5 mb-5 border border-primary/30 bg-gradient-to-r from-primary/10 via-card/70 to-accent/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
-              <span className="text-lg">🗺️</span>
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                Frontend Web Dev Syllabus & Outcomes
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
-                  Full Guide
-                </span>
-              </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Explore every topic, what you'll master in each level, and what real web apps you can build.
-              </p>
-            </div>
-          </div>
-          <div className="self-end sm:self-auto shrink-0">
-            <CourseOverviewButton trackId="frontend" variant="full" label="View Syllabus & Guide" />
-          </div>
-        </div>
-
         {/* Progress */}
         <div className="glass-card rounded-xl p-4 mb-5 neon-border-subtle">
           <div className="flex justify-between text-xs mb-2">
