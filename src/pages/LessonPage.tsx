@@ -6,7 +6,6 @@ import { getLessonById, getAllLessons, isLessonUnlocked } from '@/data/lessons';
 import CodeEditor from '@/components/CodeEditor';
 import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
-import GlobalTranslatorWidget from '@/components/GlobalTranslatorWidget';
 import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Lightbulb, BookOpen, Code, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -56,8 +55,7 @@ const LessonPage = () => {
     }
   }, [lesson]);
 
-  const { isGuest: __pgGuest } = useGuestLessonGate('frontend', id);
-  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  const { isGuest: __pgGuest } = useGuestLessonGate('frontend', id); if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
   if (!lesson) return <Navigate to="/learn" replace />;
   if (!isLessonUnlocked(lesson.id, (user?.completedLessons || []))) return <Navigate to="/learn" replace />;
 
@@ -70,7 +68,7 @@ const LessonPage = () => {
 
   const lang = fileTab === 'html' ? 'html' : fileTab === 'css' ? 'css' : 'javascript';
 
-  const handleStartChallenge = () => {
+   const handleStartChallenge = () => {
     if (!canLearn) {
       toast.error('You are out of XP! Come back tomorrow or buy more with coins.');
       return;
@@ -119,7 +117,7 @@ const LessonPage = () => {
     for (const line of lines) {
       if (line.startsWith('```')) {
         if (inCode) {
-          html.push(`<pre class="bg-secondary/60 rounded-lg p-3 my-3 text-xs font-mono overflow-x-auto border border-border/50 notranslate" translate="no"><code class="text-accent">${codeBlock}</code></pre>`);
+          html.push(`<pre class="bg-secondary/60 rounded-lg p-3 my-3 text-xs font-mono overflow-x-auto border border-border/50"><code class="text-accent">${codeBlock}</code></pre>`);
           codeBlock = '';
         }
         inCode = !inCode;
@@ -134,12 +132,12 @@ const LessonPage = () => {
         html.push(`<h2 class="text-sm font-semibold text-foreground mt-4 mb-2">${escaped.slice(3)}</h2>`);
       } else if (escaped.startsWith('- ')) {
         const content = escaped.slice(2)
-          .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono notranslate" translate="no">$1</code>')
+          .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono">$1</code>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
         html.push(`<li class="ml-4 text-xs text-muted-foreground mb-1 list-disc">${content}</li>`);
       } else if (escaped.trim()) {
         const content = escaped
-          .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono notranslate" translate="no">$1</code>')
+          .replace(/`([^`]+)`/g, '<code class="bg-secondary px-1.5 py-0.5 rounded text-accent text-xs font-mono">$1</code>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>');
         html.push(`<p class="text-xs text-muted-foreground mb-2 leading-relaxed">${content}</p>`);
       }
@@ -150,21 +148,18 @@ const LessonPage = () => {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border terminal-dots shrink-0">
+      <header className="flex items-center justify-between px-3 py-2 glass-card border-b border-border terminal-dots">
         <div className="flex items-center gap-2 min-w-0">
-          <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0" title="Back to Roadmap">
+          <button onClick={() => navigate('/learn')} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <span className="text-primary font-semibold text-xs truncate">⚡ {lesson.topic}</span>
           <span className="text-muted-foreground text-[10px] hidden sm:inline truncate">— {lesson.title}</span>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <GlobalTranslatorWidget mode="docked" />
-        </div>
       </header>
 
       {/* Mobile Tab Bar */}
-      <div className="sm:hidden flex border-b border-border bg-card/50 shrink-0">
+      <div className="sm:hidden flex border-b border-border bg-card/50">
         {([
           { key: 'lesson' as MobileView, icon: BookOpen, label: 'Lesson' },
           { key: 'code' as MobileView, icon: Code, label: 'Code' },
@@ -181,10 +176,10 @@ const LessonPage = () => {
       </div>
 
       {/* Desktop layout */}
-      <div className="flex-1 hidden sm:flex overflow-hidden min-h-0">
+      <div className="flex-1 hidden sm:flex overflow-hidden">
         {/* Lesson content panel */}
-        <div className="w-[340px] flex-shrink-0 border-r border-border overflow-auto glass-card flex flex-col justify-between">
-          <div className="p-4 space-y-4">
+        <div className="w-[340px] flex-shrink-0 border-r border-border overflow-auto glass-card">
+          <div className="p-4">
             <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
             {renderChallengeSection()}
           </div>
@@ -192,7 +187,7 @@ const LessonPage = () => {
 
         {/* Code editor + console */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center border-b border-border glass-card notranslate" translate="no">
+          <div className="flex items-center border-b border-border glass-card">
             {(['html', 'css', 'js'] as FileTab[]).map(tab => (
               <button key={tab} onClick={() => setFileTab(tab)}
                 className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
@@ -202,12 +197,10 @@ const LessonPage = () => {
               </button>
             ))}
           </div>
-          <div className="flex-1 min-h-0 notranslate" translate="no">
+          <div className="flex-1 min-h-0">
             <CodeEditor code={currentCode} onChange={setCurrentCode} language={lang} />
           </div>
-          <div className="notranslate" translate="no">
-            <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
-          </div>
+          <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
         </div>
 
         {/* Live preview */}
@@ -215,16 +208,16 @@ const LessonPage = () => {
           <div className="px-3 py-2 border-b border-border text-[10px] text-muted-foreground font-mono flex items-center gap-2 glass-card">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Preview
           </div>
-          <div className="flex-1 min-h-0 notranslate" translate="no">
+          <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />
           </div>
         </div>
       </div>
 
       {/* Mobile layout - show one view at a time */}
-      <div className="flex-1 sm:hidden flex flex-col overflow-hidden min-h-0">
+      <div className="flex-1 sm:hidden flex flex-col overflow-hidden">
         {mobileView === 'lesson' && (
-          <div className="flex-1 overflow-auto p-4 space-y-4">
+          <div className="flex-1 overflow-auto p-4">
             <div dangerouslySetInnerHTML={{ __html: renderContent(lesson.content) }} />
             {renderChallengeSection()}
           </div>
@@ -232,7 +225,7 @@ const LessonPage = () => {
 
         {mobileView === 'code' && (
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex items-center border-b border-border bg-card/50 notranslate" translate="no">
+            <div className="flex items-center border-b border-border bg-card/50">
               {(['html', 'css', 'js'] as FileTab[]).map(tab => (
                 <button key={tab} onClick={() => setFileTab(tab)}
                   className={`px-3 py-2 text-[10px] font-mono transition-colors border-b-2 ${
@@ -242,17 +235,15 @@ const LessonPage = () => {
                 </button>
               ))}
             </div>
-            <div className="flex-1 min-h-0 notranslate" translate="no">
+            <div className="flex-1 min-h-0">
               <CodeEditor code={currentCode} onChange={setCurrentCode} language={lang} />
             </div>
-            <div className="notranslate" translate="no">
-              <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
-            </div>
+            <ConsolePanel logs={consoleLogs} onClear={() => setConsoleLogs([])} />
           </div>
         )}
 
         {mobileView === 'preview' && (
-          <div className="flex-1 min-h-0 notranslate" translate="no">
+          <div className="flex-1 min-h-0">
             <LivePreview html={htmlCode} css={cssCode} js={jsCode} onConsoleLog={handleConsoleLog} />
           </div>
         )}
@@ -268,7 +259,7 @@ const LessonPage = () => {
         <div className="mt-5 border border-primary/20 rounded-xl p-4 bg-primary/5">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">🏆 Challenge</h3>
           <p className="text-xs text-muted-foreground mb-3">{lesson.challenge.instruction}</p>
-          <button 
+                    <button 
             onClick={handleStartChallenge}
             disabled={!canLearn}
             className={`w-full py-2 rounded-lg font-semibold text-xs transition-opacity shadow-lg ${
