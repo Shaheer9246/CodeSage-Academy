@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { ExternalLink, Sparkles, Shield, Cpu, Zap, ArrowUpRight } from 'lucide-react';
-import { ADS_CONFIG } from '@/config/adsConfig';
-import { SponsorAdModal } from '@/components/SponsorAdModal';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ExternalLink, Sparkles, Shield, Cpu, Zap, ArrowUpRight, Radio } from 'lucide-react';
+import {
+  ADS_CONFIG,
+  MONETAG_DIRECT_LINK_1,
+  MONETAG_DIRECT_LINK_2,
+  MONETAG_INPAGE_SRC,
+  MONETAG_INPAGE_ZONE,
+  MONETAG_VIGNETTE_SRC,
+  MONETAG_VIGNETTE_ZONE,
+} from '@/config/adsConfig';
 
 export type AdSlotKey = keyof typeof ADS_CONFIG.slots;
 
@@ -11,225 +18,394 @@ interface AdBannerCardProps {
   className?: string;
 }
 
+const ICONS = [Cpu, Zap, Shield, Sparkles];
+
+function hashSlotOffset(slotName: string, total: number): number {
+  let sum = 0;
+  for (let i = 0; i < slotName.length; i++) {
+    sum += slotName.charCodeAt(i);
+  }
+  return sum % Math.max(1, total);
+}
+
+/**
+ * Ensures Monetag Vignette Banner (11911764) and In-Page Push (11911770)
+ * are active on the page so you earn CPM impressions automatically on every visit.
+ */
+function ensureMonetagGlobalScripts() {
+  if (typeof document === 'undefined') return;
+
+  if (!document.querySelector(`script[data-zone="${MONETAG_VIGNETTE_ZONE}"]`)) {
+    const s1 = document.createElement('script');
+    s1.dataset.zone = MONETAG_VIGNETTE_ZONE;
+    s1.src = MONETAG_VIGNETTE_SRC;
+    s1.async = true;
+    (document.body || document.documentElement).appendChild(s1);
+  }
+
+  if (!document.querySelector(`script[data-zone="${MONETAG_INPAGE_ZONE}"]`)) {
+    const s2 = document.createElement('script');
+    s2.dataset.zone = MONETAG_INPAGE_ZONE;
+    s2.src = MONETAG_INPAGE_SRC;
+    s2.async = true;
+    (document.body || document.documentElement).appendChild(s2);
+  }
+}
+
 export const AdBannerCard: React.FC<AdBannerCardProps> = ({
   slotName,
   format = 'standard',
   className = '',
 }) => {
-  const [clicked, setClicked] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const slot = ADS_CONFIG.slots[slotName];
+  const creatives = ADS_CONFIG.liveCreatives;
+  const totalCreatives = creatives.length;
 
-  if (!ADS_CONFIG.enabled || !slot?.enabled) {
+  const initialIdx = useMemo(
+    () => hashSlotOffset(slotName, totalCreatives),
+    [slotName, totalCreatives]
+  );
+
+  const [activeIdx, setActiveIdx] = useState<number>(initialIdx);
+  const [progress, setProgress] = useState<number>(0);
+
+  const intervalSec = ADS_CONFIG.bannerRotationIntervalSec || 12;
+
+  useEffect(() => {
+    ensureMonetagGlobalScripts();
+  }, []);
+
+  // Continuous live ad rotation loop (runs automatically without user interaction)
+  useEffect(() => {
+    if (!ADS_CONFIG.enabled || !slot?.enabled || totalCreatives === 0) return;
+
+    const tickMs = 250;
+    const step = (tickMs / (intervalSec * 1000)) * 100;
+
+    const timer = window.setInterval(() => {
+      setProgress((prev) => {
+        if (prev + step >= 100) {
+          setActiveIdx((idx) => (idx + 1) % totalCreatives);
+          return 0;
+        }
+        return prev + step;
+      });
+    }, tickMs);
+
+    return () => window.clearInterval(timer);
+  }, [slot?.enabled, totalCreatives, intervalSec]);
+
+  if (!ADS_CONFIG.enabled || !slot?.enabled || totalCreatives === 0) {
     return null;
   }
 
-  const isEthicalAds = slot.network === 'ethicalads';
-  const isMonetag = slot.network === 'monetag';
+  const currentAd = creatives[activeIdx % totalCreatives];
+  const ActiveIcon = ICONS[activeIdx % ICONS.length];
+  const zoneId = currentAd.zoneId || slot.monetagZoneId || MONETAG_INPAGE_ZONE;
+  const scriptSrc = currentAd.scriptSrc || MONETAG_INPAGE_SRC;
+  const targetUrl =
+    currentAd.url ||
+    slot.monetagSmartLink ||
+    (activeIdx % 2 === 0 ? MONETAG_DIRECT_LINK_1 : MONETAG_DIRECT_LINK_2);
 
-  const handleAdClick = () => {
-    setClicked(true);
-    if (ADS_CONFIG.monetagDirectLink) {
-      window.open(ADS_CONFIG.monetagDirectLink, '_blank', 'noopener,noreferrer');
-    } else {
-      setShowModal(true);
-    }
-  };
+  // Embedded visual Monetag zone document inside the banner box
+  const liveZoneSrcDoc = useMemo(() => {
+    return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+  }
+</style>
+</head>
+<body>
+  <script>
+    (function(s){
+      s.dataset.zone='${zoneId}';
+      s.src='${scriptSrc}';
+    })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+  </script>
+</body>
+</html>`;
+  }, [zoneId, scriptSrc]);
 
-  // Format: Large Monetag Ad Box (prominent, high CPM card)
+  // Format: Large Monetag Ad Box
   if (format === 'big-box') {
     return (
-      <>
-        <div 
-          className={`relative overflow-hidden rounded-2xl p-3.5 bg-gradient-to-b from-secondary/40 via-card/80 to-background border border-border/50 hover:border-primary/50 transition-all shadow-md group ${className}`}
-        >
-          {/* Subtle background glow */}
-          <div className="absolute -top-12 -right-12 w-28 h-28 bg-primary/10 rounded-full blur-2xl pointer-events-none group-hover:bg-primary/20 transition-all" />
-          
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                Sponsored Spotlight
-              </span>
-            </div>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/25 font-bold">
-              High-Yield Partner
-            </span>
-          </div>
-
-          {/* Ad Body */}
-          <div className="space-y-2 mt-1">
-            <div className="flex items-start gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary/30 to-accent-blue/20 border border-primary/30 flex items-center justify-center shrink-0">
-                <Cpu className="w-4 h-4 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold font-display text-foreground leading-snug group-hover:text-primary transition-colors">
-                  Cloud GPU &amp; AI Deployment
-                </h4>
-                <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
-                  Instant container spins, unlimited bandwidth &amp; developer perks. 0$ start.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAdClick}
-              className="w-full mt-2 py-2 px-3 rounded-xl text-xs font-semibold font-display bg-primary text-primary-foreground hover:neon-glow transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]"
-            >
-              <span>{clicked ? 'Offer Visited (Thanks!)' : 'Claim Developer Credit'}</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-            
-            <div className="text-center pt-0.5">
-              <span className="text-[8px] font-mono text-muted-foreground/60">
-                Monetag Instant Ad Network · Verified Safe
-              </span>
-            </div>
-          </div>
+      <div
+        className={`relative overflow-hidden rounded-2xl p-3.5 bg-gradient-to-b ${currentAd.accentColor} via-card/90 to-background border border-primary/30 transition-all duration-500 shadow-md ${className}`}
+      >
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-secondary/50 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-primary via-emerald-400 to-accent transition-all duration-200"
+            style={{ width: `${Math.min(100, progress)}%` }}
+          />
         </div>
 
-        <SponsorAdModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title="Cloud GPU & AI Compute Deployment"
-          description="Deploy full-stack projects, AI pipelines, and student microservices with verified developer credits."
-          partnerName="Monetag Verified Partner"
-        />
-      </>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-400 font-bold">
+              MONETAG LIVE · {activeIdx + 1}/{totalCreatives}
+            </span>
+          </div>
+          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/25 font-bold">
+            {currentAd.badge}
+          </span>
+        </div>
+
+        {/* Visible Live Ad Frame (loads real Monetag Direct Link + Zone automatically) */}
+        <div className="relative w-full h-32 rounded-xl overflow-hidden border border-border/50 bg-background/80 mb-2">
+          <iframe
+            key={`${slotName}-big-${activeIdx}`}
+            title={`monetag-visual-${slotName}`}
+            src={targetUrl}
+            sandbox="allow-scripts allow-same-origin allow-forms"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-full border-0 relative z-10 bg-white"
+          />
+          <iframe
+            title={`monetag-tag-${slotName}`}
+            srcDoc={liveZoneSrcDoc}
+            sandbox="allow-scripts allow-same-origin"
+            className="w-0 h-0 opacity-0 pointer-events-none absolute"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <a
+            href={targetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute inset-0 z-20 flex items-end justify-between p-2 bg-gradient-to-t from-background/90 via-transparent to-transparent group"
+          >
+            <div className="min-w-0 pr-2">
+              <p className="text-[11px] font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                {currentAd.headline}
+              </p>
+            </div>
+            <span className="shrink-0 px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[10px] font-bold inline-flex items-center gap-1 shadow-sm">
+              {currentAd.cta}
+              <ArrowUpRight className="w-3 h-3" />
+            </span>
+          </a>
+        </div>
+
+        <div className="flex items-center justify-between text-[8px] font-mono text-muted-foreground/70 pt-0.5">
+          <span className="truncate">{currentAd.displayDomain}</span>
+          <span>Zone #{zoneId}</span>
+        </div>
+      </div>
     );
   }
 
-  // Format: Horizontal Banner (ideal for Continue Learning card or wide views)
+  // Format: Horizontal Banner (Track, Support & Course pages)
   if (format === 'horizontal-banner') {
     return (
-      <>
-        <div 
-          className={`p-2.5 sm:p-3 rounded-xl bg-secondary/25 border border-border/40 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${className}`}
-        >
+      <div
+        className={`relative overflow-hidden p-2.5 sm:p-3 rounded-xl bg-gradient-to-r ${currentAd.accentColor} via-secondary/30 to-card border border-border/50 hover:border-primary/40 transition-all duration-500 flex flex-col gap-2.5 ${className}`}
+      >
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-secondary/40 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-200"
+            style={{ width: `${Math.min(100, progress)}%` }}
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
-              <Shield className="w-3.5 h-3.5 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+              <ActiveIcon className="w-4 h-4 text-primary" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                  {isMonetag ? 'Monetag Partner' : isEthicalAds ? 'EthicalAds Network' : 'Developer Sponsor'}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider text-emerald-400 font-bold">
+                  <Radio className="w-2.5 h-2.5 animate-pulse" />
+                  MONETAG LIVE AD {activeIdx + 1}/{totalCreatives}
                 </span>
-                <span className="text-[8px] font-mono text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded">Verified Safe</span>
+                <span className="text-[8px] font-mono text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.2 rounded font-semibold">
+                  {currentAd.badge}
+                </span>
+                <span className="text-[9px] font-mono text-muted-foreground/70 hidden sm:inline">
+                  · Zone #{zoneId}
+                </span>
               </div>
-              <p className="text-[11px] font-semibold text-foreground truncate">
-                Cloud Hosting &amp; Python Sandbox Environment
+              <p className="text-xs font-semibold text-foreground truncate mt-0.5">
+                {currentAd.headline}
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleAdClick}
-            className="self-start sm:self-auto shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold font-mono bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary flex items-center gap-1.5 transition-all"
-          >
-            <span>{clicked ? '✓ Visited' : 'Explore Sponsor'}</span>
-            <ExternalLink className="w-3 h-3" />
-          </button>
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+            <a
+              href={targetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold font-mono bg-primary text-primary-foreground hover:neon-glow flex items-center gap-1.5 transition-all shadow-sm"
+            >
+              <span>{currentAd.cta}</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </div>
 
-        <SponsorAdModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title="Cloud Hosting & Python Sandbox Environment"
-          description="Explore modern student hosting perks, free SSL certificates, and zero-cost sandboxes."
-          partnerName="Monetag Partner"
-        />
-      </>
+        {/* Live Visual Monetag Feed Strip */}
+        <div className="relative w-full h-28 rounded-lg overflow-hidden border border-border/40 bg-white">
+          <iframe
+            key={`${slotName}-horiz-${activeIdx}`}
+            title={`monetag-horiz-${slotName}`}
+            src={targetUrl}
+            sandbox="allow-scripts allow-same-origin allow-forms"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-full border-0"
+          />
+          <iframe
+            title={`monetag-horiz-zone-${slotName}`}
+            srcDoc={liveZoneSrcDoc}
+            sandbox="allow-scripts allow-same-origin"
+            className="w-0 h-0 opacity-0 pointer-events-none absolute"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <a
+            href={targetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open live sponsor ad"
+            className="absolute inset-0 z-10 bg-transparent hover:bg-primary/5 transition-colors"
+          />
+        </div>
+      </div>
     );
   }
 
-  // Format: Compact (EthicalAds banner for sidebars)
+  // Format: Compact (for Lesson & Dashboard sidebars)
   if (format === 'compact') {
     return (
-      <>
-        <div className={`p-2.5 rounded-xl bg-secondary/30 border border-border/40 hover:border-primary/40 transition-all ${className}`}>
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1">
-              <Sparkles className="w-2.5 h-2.5 text-primary" />
-              {isMonetag ? 'Monetag Partner' : isEthicalAds ? 'EthicalAds Sponsor' : 'Sponsored Partner'}
-            </span>
-            <span className="text-[8px] font-mono text-muted-foreground/60">Free Tier Partner</span>
-          </div>
-          <button
-            type="button"
-            onClick={handleAdClick}
-            className="w-full text-left p-2 rounded-lg bg-background/50 hover:bg-background border border-border/30 group transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">
-                High-Speed Cloud Hosting &amp; AI
-              </span>
-              <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-            </div>
-            <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
-              Build and deploy student apps with zero upfront cost.
-            </p>
-          </button>
+      <div
+        className={`relative overflow-hidden p-2.5 rounded-xl bg-gradient-to-br ${currentAd.accentColor} via-secondary/30 to-background border border-border/50 transition-all duration-500 ${className}`}
+      >
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-secondary/40 overflow-hidden">
+          <div
+            className="h-full bg-primary transition-all duration-200"
+            style={{ width: `${Math.min(100, progress)}%` }}
+          />
         </div>
 
-        <SponsorAdModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title="High-Speed Cloud Hosting & Developer AI"
-          description="Build, test, and deploy interactive web applications with sponsored student resources."
-          partnerName="Monetag Partner"
-        />
-      </>
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            LIVE AD · #{zoneId}
+          </span>
+          <span className="text-[8px] font-mono px-1.5 py-0.2 rounded bg-primary/15 text-primary font-semibold">
+            {currentAd.badge}
+          </span>
+        </div>
+
+        <div className="relative w-full h-24 rounded-lg overflow-hidden border border-border/40 bg-white mb-1.5">
+          <iframe
+            key={`${slotName}-compact-${activeIdx}`}
+            title={`monetag-compact-${slotName}`}
+            src={targetUrl}
+            sandbox="allow-scripts allow-same-origin allow-forms"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-full border-0"
+          />
+          <iframe
+            title={`monetag-compact-zone-${slotName}`}
+            srcDoc={liveZoneSrcDoc}
+            sandbox="allow-scripts allow-same-origin"
+            className="w-0 h-0 opacity-0 pointer-events-none absolute"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <a
+            href={targetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open sponsor ad"
+            className="absolute inset-0 z-10"
+          />
+        </div>
+
+        <a
+          href={targetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block p-2 rounded-lg bg-background/60 hover:bg-background/90 border border-border/40 group transition-all"
+        >
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+              {currentAd.headline}
+            </span>
+            <ExternalLink className="w-3 h-3 text-primary shrink-0" />
+          </div>
+        </a>
+      </div>
     );
   }
 
   // Standard fallback format
   return (
-    <>
-      <div className={`p-3 rounded-xl bg-gradient-to-br from-secondary/40 via-card to-background border border-border/50 hover:border-primary/40 transition-all shadow-xs ${className}`}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-            <Shield className="w-3 h-3 text-primary" />
-            <span>{slot.title || 'Developer Sponsor'}</span>
-          </div>
-          <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
-            Supports CodeSage
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          <div className="text-xs font-semibold text-foreground">
-            Dev Tools &amp; Cloud Sandbox Ecosystem
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Level up your stack with developer tools and cloud infrastructure. Click to explore our sponsor offer!
-          </p>
-          <button
-            type="button"
-            onClick={handleAdClick}
-            className="w-full py-1.5 px-3 rounded-lg text-xs font-medium font-mono bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary flex items-center justify-center gap-1.5 transition-all"
-          >
-            <span>{clicked ? '✓ Sponsor Opened (Thank you!)' : 'Explore Sponsor Offer'}</span>
-            <ExternalLink className="w-3 h-3" />
-          </button>
-        </div>
+    <div
+      className={`relative overflow-hidden p-3 rounded-xl bg-gradient-to-br ${currentAd.accentColor} via-card to-background border border-border/50 transition-all duration-500 shadow-xs ${className}`}
+    >
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-secondary/40 overflow-hidden">
+        <div
+          className="h-full bg-primary transition-all duration-200"
+          style={{ width: `${Math.min(100, progress)}%` }}
+        />
       </div>
 
-      <SponsorAdModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={slot.title || 'Developer Tools & Cloud Sponsor'}
-        description="Level up your development stack with cloud resources, container credits, and student discounts."
-        partnerName="Monetag Partner"
-      />
-    </>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-wider text-emerald-400 font-bold">
+          <Radio className="w-3 h-3 animate-pulse" />
+          <span>LIVE AD · Zone #{zoneId}</span>
+        </div>
+        <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-primary/15 text-primary font-bold">
+          {currentAd.badge}
+        </span>
+      </div>
+
+      <div className="relative w-full h-24 rounded-lg overflow-hidden border border-border/40 bg-white mb-2">
+        <iframe
+          key={`${slotName}-std-${activeIdx}`}
+          title={`monetag-std-${slotName}`}
+          src={targetUrl}
+          sandbox="allow-scripts allow-same-origin allow-forms"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full border-0"
+        />
+        <a
+          href={targetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open sponsor ad"
+          className="absolute inset-0 z-10"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <a
+          href={targetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-1.5 px-3 rounded-lg text-xs font-medium font-mono bg-primary text-primary-foreground hover:neon-glow flex items-center justify-center gap-1.5 transition-all"
+        >
+          <span>{currentAd.cta}</span>
+          <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
+    </div>
   );
 };
-
