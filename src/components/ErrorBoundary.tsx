@@ -2,23 +2,33 @@ import { Component, ReactNode } from 'react';
 import { RefreshCw, Home } from 'lucide-react';
 
 interface Props { children: ReactNode }
-interface State { error: Error | null }
+interface State { error: Error | null; retried: boolean }
 
 export default class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null };
+  state: State = { error: null, retried: false };
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return { error };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error, info?.componentStack);
+
+    // Clear any stale Service Worker caches that could have served mismatched chunks
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      caches.keys().then(keys => {
+        keys.forEach(k => void caches.delete(k));
+      }).catch(() => {});
+    }
+
+    // Auto-recover once if it was a transient context/chunk hydration issue
+    if (!this.state.retried) {
+      this.setState({ error: null, retried: true });
+    }
   }
 
   reset = () => {
-    this.setState({ error: null });
-    // Best-effort recovery: navigate to dashboard.
-    try { window.history.replaceState(null, '', '/dashboard'); } catch { /* noop */ }
+    this.setState({ error: null, retried: false });
     window.location.reload();
   };
 
@@ -40,7 +50,10 @@ export default class ErrorBoundary extends Component<Props, State> {
                 <RefreshCw className="w-3.5 h-3.5" /> Reload
               </button>
               <button
-                onClick={() => { window.location.href = '/dashboard'; }}
+                onClick={() => {
+                  this.setState({ error: null, retried: false });
+                  window.location.href = '/dashboard';
+                }}
                 className="flex items-center gap-1 bg-secondary/60 text-foreground text-xs px-3 py-2 rounded-lg"
               >
                 <Home className="w-3.5 h-3.5" /> Dashboard
