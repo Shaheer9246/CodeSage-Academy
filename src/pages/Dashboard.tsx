@@ -3,7 +3,7 @@ import { useUser } from '@/contexts/UserContext';
 import { StreakModal } from '@/components/StreakModal';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
         Gamepad2, Trophy, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
-        Layout, Terminal, Database, Briefcase, Sparkles } from 'lucide-react';
+        Layout, Terminal, Database, Briefcase, Sparkles, Code2 } from 'lucide-react';
 import { energyToday } from '@/lib/gamification';
 
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
@@ -631,6 +631,24 @@ const Dashboard = () => {
             </button>
 
             <button
+              onClick={go('/dsa-sheet')}
+              className={`w-full text-left rounded-lg p-3 transition-all border ${
+                isGuest 
+                  ? 'opacity-40 pointer-events-none grayscale border-border/20' 
+                  : 'bg-primary/10 border-primary/30 hover:border-primary/50 hover:bg-primary/20'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-primary" />
+                <Code2 className="w-4 h-4 text-primary" />
+                <div className="flex items-center justify-between flex-1">
+                  <span className="text-xs font-semibold text-foreground">DSA Sheet</span>
+                  <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-mono font-bold">TOP 75</span>
+                </div>
+              </div>
+            </button>
+
+            <button
               onClick={go('/games/crawler')}
               className={`w-full text-left rounded-lg p-3 transition-all border ${
                 isGuest 
@@ -730,9 +748,11 @@ const Dashboard = () => {
           </motion.div>
 
           {/* QUICK LAUNCH */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             <QuickChip icon={<Zap className="w-4 h-4 text-accent-orange" />} label="Challenges" sub="Test skills"
               color="accent-orange" data-tour="challenges" onClick={go('/challenges')} disabled={isGuest} />
+            <QuickChip icon={<Code2 className="w-4 h-4 text-emerald-400" />} label="DSA Sheet" sub="Top 75 prep"
+              color="primary" onClick={go('/dsa-sheet')} disabled={isGuest} />
             <QuickChip icon={<Code className="w-4 h-4 text-primary" />} label="Editor" sub="Playground"
               color="primary" data-tour="playground" onClick={go('/playground')} disabled={isGuest} />
             <QuickChip icon={<HelpCircle className="w-4 h-4 text-accent-blue" />} label="Exams" sub="Quiz tests"
