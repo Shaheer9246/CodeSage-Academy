@@ -80,12 +80,137 @@ interface UserContextType {
   spendCoins: (amount: number, reason?: string) => Promise<boolean>;
 }
 
-const UserContext = createContext<UserContextType | null>(null);
+// Keep a single global Context instance on globalThis so even HMR or split chunks
+// always resolve the exact same React context without throwing.
+const GLOBAL_USER_CONTEXT_KEY = '__CODESAGE_USER_CONTEXT__';
+const GLOBAL_USER_STATE_KEY = '__CODESAGE_LAST_USER_CONTEXT_VALUE__';
 
-export const useUser = () => {
+const UserContext: React.Context<UserContextType | null> =
+  (globalThis as Record<string, unknown>)[GLOBAL_USER_CONTEXT_KEY] as React.Context<UserContextType | null> ||
+  ((globalThis as Record<string, unknown>)[GLOBAL_USER_CONTEXT_KEY] = createContext<UserContextType | null>(null));
+
+export function generateGlobalStudentId(userId: string): string {
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    hash = ((hash << 5) - hash) + userId.charCodeAt(i);
+    hash |= 0;
+  }
+  const num = 1000 + Math.abs(hash % 9000);
+  return `CS-${num}`;
+}
+
+export function cleanStudentId(raw: string | undefined | null, userId: string): string {
+  if (!raw) return generateGlobalStudentId(userId);
+  const trimmed = String(raw).trim();
+  // If it's a raw UUID (32+ chars with hyphens) or matches userId directly, convert to clean CS ID
+  if (trimmed.length > 20 || /^[0-9a-fA-F-]{32,}$/.test(trimmed) || trimmed === userId) {
+    return generateGlobalStudentId(userId);
+  }
+  return trimmed;
+}
+
+function ensureStringArray(val: unknown, fallback: string[] = []): string[] {
+  if (!Array.isArray(val)) return fallback;
+  return val.filter((x): x is string => typeof x === 'string');
+}
+
+function normalizeProfile(raw: Partial<UserProfile> & { id: string }): UserProfile {
+  const id = String(raw.id);
+  const localOnboarded = (() => {
+    try { return localStorage.getItem(`codesage_onboarded_${id}`) === 'true'; } catch { return false; }
+  })();
+  const completedLessons = ensureStringArray(raw.completedLessons);
+  const completedTests = ensureStringArray(raw.completedTests);
+  const badges = ensureStringArray(raw.badges);
+  const unlockedSections = ensureStringArray(raw.unlockedSections, ['frontend']);
+  const promoCodes = ensureStringArray(raw.promoCodes);
+
+  return {
+    id,
+    studentId: cleanStudentId(raw.studentId, id),
+    username: typeof raw.username === 'string' ? raw.username : '',
+    email: typeof raw.email === 'string' ? raw.email : '',
+    name: typeof raw.name === 'string' ? raw.name : '',
+    studying: typeof raw.studying === 'string' ? raw.studying : '',
+    hasJob: typeof raw.hasJob === 'string' ? raw.hasJob : '',
+    dob: typeof raw.dob === 'string' ? raw.dob : '',
+    goal: typeof raw.goal === 'string' ? raw.goal : '',
+    experienceLevel: typeof raw.experienceLevel === 'string' ? raw.experienceLevel : '',
+    joinDate: typeof raw.joinDate === 'string' ? raw.joinDate : '',
+    streakCount: Number.isFinite(Number(raw.streakCount)) ? Number(raw.streakCount) : 0,
+    lastActiveDate: typeof raw.lastActiveDate === 'string' ? raw.lastActiveDate : '',
+    badges,
+    completedLessons,
+    completedTests,
+    unlockedSections: unlockedSections.length ? unlockedSections : ['frontend'],
+    promoCodes,
+    isOnboarded: Boolean(raw.isOnboarded || raw.name || localOnboarded),
+    darkMode: raw.darkMode ?? true,
+    xp: Number.isFinite(Number(raw.xp)) ? Number(raw.xp) : 0,
+    level: Number.isFinite(Number(raw.level)) && Number(raw.level) >= 1 ? Number(raw.level) : 1,
+    sageCoins: Number.isFinite(Number(raw.sageCoins)) ? Number(raw.sageCoins) : 0,
+    hasSeenTour: Boolean(raw.hasSeenTour),
+    streakFreezeUntil: typeof raw.streakFreezeUntil === 'string' ? raw.streakFreezeUntil : null,
+    dailyXp: Number.isFinite(Number(raw.dailyXp)) ? Number(raw.dailyXp) : DAILY_XP,
+    dailyXpDate: typeof raw.dailyXpDate === 'string' ? raw.dailyXpDate : null,
+    isPro: Boolean(raw.isPro),
+    aiCredits: Number.isFinite(Number(raw.aiCredits)) ? Number(raw.aiCredits) : (raw.isPro ? 100 : 5),
+  };
+}
+
+function readCachedProfile(): UserProfile | null {
+  try {
+    const cached = localStorage.getItem('codesage_cached_profile');
+    if (!cached) return null;
+    const parsed = JSON.parse(cached) as Partial<UserProfile>;
+    if (!parsed || typeof parsed.id !== 'string' || !parsed.id) return null;
+    return normalizeProfile(parsed as Partial<UserProfile> & { id: string });
+  } catch {
+    return null;
+  }
+}
+
+function buildFallbackContext(): UserContextType {
+  const cached = readCachedProfile();
+  const energy = cached ? energyToday(cached.dailyXp, cached.dailyXpDate) : 0;
+  const coins = cached?.sageCoins ?? 0;
+  const nextLessonCharge = cached ? lessonCharge(energy, coins) : 'energy';
+  return {
+    user: cached,
+    loading: false,
+    isLoggedIn: !!cached,
+    isOnboarded: cached?.isOnboarded === true,
+    login: async () => null,
+    signup: async () => null,
+    completeOnboarding: async () => {},
+    completeLesson: async () => {},
+    completeTest: async () => {},
+    addBadge: () => {},
+    updateStreak: async () => {},
+    applyPromoCode: async () => false,
+    updateUser: () => {},
+    logout: async () => {},
+    deleteAccount: async () => false,
+    addXp: () => {},
+    addCoins: () => {},
+    toggleDarkMode: () => {},
+    buyFreezeStreak: async () => false,
+    markTourSeen: async () => {},
+    resetTour: async () => {},
+    energy,
+    nextLessonCharge,
+    canLearn: nextLessonCharge !== 'blocked',
+    rank: badgeForLessons(cached?.completedLessons?.length ?? 0),
+    spendCoins: async () => false,
+  };
+}
+
+export const useUser = (): UserContextType => {
   const ctx = useContext(UserContext);
-  if (!ctx) throw new Error('useUser must be inside UserProvider');
-  return ctx;
+  if (ctx) return ctx;
+  const lastGlobal = (globalThis as Record<string, unknown>)[GLOBAL_USER_STATE_KEY] as UserContextType | undefined;
+  if (lastGlobal) return lastGlobal;
+  return buildFallbackContext();
 };
 
 type DbProfileRow = {
@@ -131,26 +256,6 @@ type DbProfileUpdate = Partial<{
   has_seen_tour: boolean;
 }>;
 
-export function generateGlobalStudentId(userId: string): string {
-  let hash = 0;
-  for (let i = 0; i < userId.length; i++) {
-    hash = ((hash << 5) - hash) + userId.charCodeAt(i);
-    hash |= 0;
-  }
-  const num = 1000 + Math.abs(hash % 9000);
-  return `CS-${num}`;
-}
-
-export function cleanStudentId(raw: string | undefined | null, userId: string): string {
-  if (!raw) return generateGlobalStudentId(userId);
-  const trimmed = raw.trim();
-  // If it's a raw UUID (32+ chars with hyphens) or matches userId directly, convert to clean CS ID
-  if (trimmed.length > 20 || /^[0-9a-fA-F-]{32,}$/.test(trimmed) || trimmed === userId) {
-    return generateGlobalStudentId(userId);
-  }
-  return trimmed;
-}
-
 function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
   const localOnboarded = localStorage.getItem(`codesage_onboarded_${row.id}`) === 'true';
   const localTourSeen = localStorage.getItem(`codesage_tour_seen_${row.id}`) === 'true';
@@ -165,16 +270,17 @@ function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
   const studentId = cleanStudentId(rawServerStudentId || cachedStudentId, row.id);
 
   // Persist locally and backfill to Supabase if missing or was a raw UUID
-  localStorage.setItem(`codesage_student_id_${row.id}`, studentId);
+  try {
+    localStorage.setItem(`codesage_student_id_${row.id}`, studentId);
+    if (isOnboarded) localStorage.setItem(`codesage_onboarded_${row.id}`, 'true');
+    localStorage.setItem(`codesage_tour_seen_${row.id}`, hasSeenTour ? 'true' : 'false');
+  } catch { /* ignore */ }
+
   if ((!rawServerStudentId || rawServerStudentId.length > 20 || rawServerStudentId === row.id) && row.id) {
     void supabase.from('profiles').update({ student_id: studentId }).eq('id', row.id);
   }
 
-  // Refresh local cache so future loads are consistent.
-  if (isOnboarded) localStorage.setItem(`codesage_onboarded_${row.id}`, 'true');
-  localStorage.setItem(`codesage_tour_seen_${row.id}`, hasSeenTour ? 'true' : 'false');
-
-  return {
+  return normalizeProfile({
     id: row.id,
     studentId,
     username: row.username || '',
@@ -204,7 +310,7 @@ function dbRowToProfile(row: DbProfileRow, email: string): UserProfile {
     dailyXpDate: row.daily_xp_date || null,
     isPro: Boolean(row.is_pro),
     aiCredits: row.ai_credits ?? (row.is_pro ? 100 : 5),
-  };
+  });
 }
 
 function profileToDbUpdate(p: UserProfile): DbProfileUpdate {
@@ -221,21 +327,7 @@ function profileToDbUpdate(p: UserProfile): DbProfileUpdate {
   };
 }
 
-function readCachedProfile(): UserProfile | null {
-  try {
-    const cached = localStorage.getItem('codesage_cached_profile');
-    if (!cached) return null;
-    const parsed = JSON.parse(cached) as UserProfile;
-    if (!parsed || !parsed.id) return null;
-    parsed.studentId = cleanStudentId(parsed.studentId, parsed.id);
-    return parsed;
-  } catch { return null; }
-}
-
 // --- Offline-safe lesson completion queue -------------------------------
-// If award_lesson fails (expired token, flaky network), the completion is
-// parked here and retried on the next load, so progress is never silently
-// lost after a refresh.
 const PENDING_KEY = 'codesage_pending_lessons';
 
 function readPending(): string[] {
@@ -253,27 +345,30 @@ function writePending(ids: string[]) {
   } catch { /* ignore */ }
 }
 
-function queuePending(id: string) {
-  writePending([...readPending(), id]);
-}
-
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Hydrate synchronously from cache so we never flash "initializing CodeSage"
   // for a user that's already signed in.
-  const [user, setUser] = useState<UserProfile | null>(() => readCachedProfile());
+  const [user, setUserState] = useState<UserProfile | null>(() => readCachedProfile());
   const [loading, setLoading] = useState<boolean>(() => !readCachedProfile());
   const syncTimer = useRef<number | undefined>(undefined);
   const streakRef = useRef<string | null>(null);
   const fetchInflight = useRef<{ uid: string; p: Promise<void> } | null>(null);
   const hydratedUid = useRef<string | null | undefined>(undefined);
 
+  const setUser = useCallback((next: UserProfile | null | ((prev: UserProfile | null) => UserProfile | null)) => {
+    setUserState(prev => {
+      const resolved = typeof next === 'function' ? next(prev) : next;
+      return resolved ? normalizeProfile(resolved) : null;
+    });
+  }, []);
+
   const loadProfile = useCallback(async (authUser: User) => {
     const localOnboarded = localStorage.getItem(`codesage_onboarded_${authUser.id}`) === 'true';
 
     const buildDefaultProfile = (): UserProfile => {
       const studentId = cleanStudentId(localStorage.getItem(`codesage_student_id_${authUser.id}`), authUser.id);
-      localStorage.setItem(`codesage_student_id_${authUser.id}`, studentId);
-      return {
+      try { localStorage.setItem(`codesage_student_id_${authUser.id}`, studentId); } catch {}
+      return normalizeProfile({
         id: authUser.id,
         studentId,
         username: authUser.user_metadata?.username || '',
@@ -303,19 +398,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         dailyXpDate: todayKey(),
         isPro: false,
         aiCredits: 5,
-      };
+      });
     };
 
     // Check localStorage cache freshness (30 minutes) to prevent redundant database egress.
-    // RPCs (award_lesson, complete_test, spend_coins, update_streak) update the profile immediately,
-    // so background cache can safely be long-lived without showing stale data.
     const cached = readCachedProfile();
     const cachedTime = Number(localStorage.getItem('cached_profile_time') || 0);
     const now = Date.now();
-    if (cached && cached.id === authUser.id && (now - cachedTime < 30 * 60 * 1000)) {
-      cached.studentId = cleanStudentId(cached.studentId, authUser.id);
+    if (cached && cached.id === authUser.id) {
       setUser(cached);
-      return;
+      setLoading(false);
+      if (now - cachedTime < 30 * 60 * 1000) {
+        return;
+      }
     }
 
     try {
@@ -352,13 +447,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (err: unknown) {
       console.error('Failed to fetch profile:', err);
-      setUser(buildDefaultProfile());
+      if (!cached || cached.id !== authUser.id) {
+        setUser(buildDefaultProfile());
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setUser]);
 
-    const fetchProfile = useCallback((authUser: User) => {
+  const fetchProfile = useCallback((authUser: User) => {
     if (fetchInflight.current?.uid === authUser.id) return fetchInflight.current.p;
     const p = loadProfile(authUser).finally(() => {
       fetchInflight.current = null;
@@ -378,7 +475,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }, 500);
   }, []);
 
-    const hydrateFor = (uid: string | null, studentId?: string | null) => {
+  const hydrateFor = (uid: string | null, studentId?: string | null) => {
     if (hydratedUid.current === uid) return;
     hydratedUid.current = uid;
     import('@/lib/enrollment').then(({ hydrateEnrollments }) => {
@@ -386,14 +483,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }).catch(() => { /* noop */ });
   };
 
-useEffect(() => {
+  useEffect(() => {
     let mounted = true;
 
-    // Lazy import to avoid a circular dep at module top-level.
     const cachedProfile = readCachedProfile();
     hydrateFor(cachedProfile?.id ?? null, cachedProfile?.studentId ?? null);
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
       if (event === 'TOKEN_REFRESHED') return;
 
@@ -401,38 +497,40 @@ useEffect(() => {
         await fetchProfile(session.user);
         const currentCached = readCachedProfile();
         hydrateFor(session.user.id, currentCached?.studentId ?? null);
-      } else {
-        localStorage.removeItem('codesage_cached_profile');
+      } else if (event === 'SIGNED_OUT' || !readCachedProfile()) {
+        try {
+          localStorage.removeItem('codesage_cached_profile');
+          localStorage.removeItem('cached_profile_time');
+        } catch {}
         setUser(null);
         setLoading(false);
         hydrateFor(null, null);
+      } else {
+        setLoading(false);
       }
     });
 
-    // Explicit bootstrap: onAuthStateChange can miss INITIAL_SESSION if the
-    // network is slow or the backend is unreachable. Never leave the app stuck
-    // on the "Initializing CodeSage Environment..." screen.
     void supabase.auth.getSession()
       .then(({ data }) => {
         if (!mounted) return;
         if (data.session?.user) return fetchProfile(data.session.user);
+        if (!readCachedProfile()) {
+          setUser(null);
+        }
         setLoading(false);
       })
       .catch(() => { if (mounted) setLoading(false); });
 
-    // Hard watchdog — if anything above hangs, show the app anyway.
     const watchdog = window.setTimeout(() => {
       if (mounted) setLoading(false);
-    }, 6000);
+    }, 4000);
 
     return () => {
       mounted = false;
       clearTimeout(watchdog);
       subscription.unsubscribe();
     };
-  }, [fetchProfile]);
-
-
+  }, [fetchProfile, setUser]);
 
   const isLoggedIn = !!user;
   const isOnboarded = user?.isOnboarded === true;
@@ -440,17 +538,20 @@ useEffect(() => {
   // Keep a local cache of the profile for instant hydration on next load.
   useEffect(() => {
     try {
-      if (user) localStorage.setItem('codesage_cached_profile', JSON.stringify(user));
-      else localStorage.removeItem('codesage_cached_profile');
+      if (user) {
+        localStorage.setItem('codesage_cached_profile', JSON.stringify(normalizeProfile(user)));
+      } else {
+        localStorage.removeItem('codesage_cached_profile');
+      }
     } catch {
       // ignore quota errors
     }
   }, [user]);
 
-
   const updateProfile = (updated: UserProfile) => {
-    setUser(updated);
-    syncToDb(updated);
+    const normalized = normalizeProfile(updated);
+    setUser(normalized);
+    syncToDb(normalized);
   };
 
   const login = async (email: string, password: string): Promise<string | null> => {
@@ -471,10 +572,9 @@ useEffect(() => {
       });
       if (error) return error.message;
 
-      // Assign global student ID immediately upon sign up
       if (authData?.user?.id) {
         const studentId = generateGlobalStudentId(authData.user.id);
-        localStorage.setItem(`codesage_student_id_${authData.user.id}`, studentId);
+        try { localStorage.setItem(`codesage_student_id_${authData.user.id}`, studentId); } catch {}
         void supabase.from('profiles').update({ student_id: studentId }).eq('id', authData.user.id);
       }
       return null;
@@ -487,10 +587,12 @@ useEffect(() => {
   const completeOnboarding = async (data: Partial<UserProfile>) => {
     if (!user) return;
 
-    localStorage.setItem(`codesage_onboarded_${user.id}`, 'true');
-    localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
+    try {
+      localStorage.setItem(`codesage_onboarded_${user.id}`, 'true');
+      localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
+    } catch {}
 
-    const updatedProfile = { ...user, ...data, isOnboarded: true, hasSeenTour: false };
+    const updatedProfile = normalizeProfile({ ...user, ...data, isOnboarded: true, hasSeenTour: false });
 
     try {
       const dbData = profileToDbUpdate(updatedProfile);
@@ -500,11 +602,8 @@ useEffect(() => {
       console.error('Onboarding cloud save error:', err);
     }
 
-    // Set state AFTER the DB write so the route guard only flips once.
     setUser(updatedProfile);
   };
-
-  
 
   const applyServerProfile = (row: DbProfileRow | DbProfileRow[] | null) => {
     if (!user || !row) return;
@@ -512,19 +611,19 @@ useEffect(() => {
     const singleRow = Array.isArray(row) ? row[0] : row;
     if (!singleRow) return;
 
+    try { localStorage.setItem('cached_profile_time', String(Date.now())); } catch {}
     setUser(dbRowToProfile(singleRow, user.email));
   };
 
   // ── Gamification helpers ───────────────────────────────────
- const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
+  const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
   const xp = user?.xp || 0;
   const coins = user?.sageCoins ?? 0;
-
 
   const nextLessonCharge: LessonCharge = user ? lessonCharge(energy, coins) : 'energy';
 
   const canLearn = nextLessonCharge !== 'blocked';
-  const rank = badgeForLessons(user?.completedLessons.length ?? 0);
+  const rank = badgeForLessons(user?.completedLessons?.length ?? 0);
 
   /** Spend coins on anything (Crawler rescue, extras). Server-authoritative. */
   const spendCoins = async (amount: number, reason = 'spend'): Promise<boolean> => {
@@ -542,21 +641,20 @@ useEffect(() => {
 
   const completeLesson = async (lessonId: string) => {
     if (!user) return;
-    const alreadyDone = user.completedLessons.includes(lessonId);
+    const currentCompleted = Array.isArray(user.completedLessons) ? user.completedLessons : [];
+    const alreadyDone = currentCompleted.includes(lessonId);
     if (alreadyDone) return;
 
     // 1. Check Total XP (Daily + Lifetime)
     const totalXp = energy + xp;
     
     if (totalXp < LESSON_XP_COST) {
-      // Not enough XP. Check if we have coins to buy.
       if (coins >= LESSON_COIN_COST) {
         const confirmed = window.confirm(
           `You are run out of XPs (daily and winning).\n\nCome tomorrow for your next lesson when you get your daily XP, or revise what you learned today.\n\nClick OK to buy this lesson for ${LESSON_COIN_COST} coins, or Cancel to stop.`
         );
         if (!confirmed) return;
 
-        // User confirmed: Buy with coins directly on server
         const { data, error } = await supabase.rpc('purchase_extra_lesson', { _lesson_id: lessonId });
         if (error) {
           toast({ title: 'Purchase Failed', description: error.message, variant: 'destructive' });
@@ -577,7 +675,7 @@ useEffect(() => {
       }
     }
 
-    // 2. We have enough XP. Do optimistic UI update.
+    // 2. Optimistic UI update
     const xpNeededFromLifetime = Math.max(0, LESSON_XP_COST - energy);
     const newDailyXp = Math.max(0, Math.round((energy - LESSON_XP_COST) * 10) / 10);
     const newXp = Math.max(0, xp - xpNeededFromLifetime) + 1; 
@@ -585,26 +683,28 @@ useEffect(() => {
 
     setUser(prev => {
       if (!prev) return prev;
-      const updatedUser: UserProfile = {
+      const prevLessons = Array.isArray(prev.completedLessons) ? prev.completedLessons : [];
+      const updatedUser: UserProfile = normalizeProfile({
         ...prev,
-        completedLessons: [...prev.completedLessons, lessonId],
+        completedLessons: [...prevLessons, lessonId],
         xp: newXp,
         dailyXp: newDailyXp,
         dailyXpDate: todayKey(),
         sageCoins: newCoins,
-        level: badgeForLessons(prev.completedLessons.length + 1).level,
-      };
-      localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
+        level: badgeForLessons(prevLessons.length + 1).level,
+      });
+      try {
+        localStorage.setItem('codesage_cached_profile', JSON.stringify(updatedUser));
+        localStorage.setItem('cached_profile_time', String(Date.now()));
+      } catch {}
       return updatedUser;
     });
 
-    // 3. DIRECT SERVER CALL (No local queue fallback)
+    // 3. Direct server call
     const { data, error } = await supabase.rpc('award_lesson_v2', { _lesson_id: lessonId });
     
     if (error) {
-      // Revert optimistic UI on failure
       setUser(prev => prev ? { ...prev, ...user } : prev);
-      // Show the EXACT error from Supabase so we know why it failed
       toast({
         title: 'Server Sync Error',
         description: error.message, 
@@ -620,7 +720,7 @@ useEffect(() => {
     // Check if this lesson completed the entire track
     const details = getLessonDetails(lessonId);
     if (details?.trackKey) {
-      const allCompleted = [...new Set([...(user?.completedLessons || []), lessonId])];
+      const allCompleted = [...new Set([...currentCompleted, lessonId])];
       if (isTrackCompleted(details.trackKey, allCompleted)) {
         void markTrackCompleted(details.trackKey as TrackId);
         toast({
@@ -644,7 +744,6 @@ useEffect(() => {
 
   const updateStreak = async () => {
     if (!user) return;
-    // Guard: only one streak call per user per day (survives re-renders and reloads).
     const key = `codesage_streak_ping_${user.id}`;
     const today = new Date().toISOString().slice(0, 10);
     if (streakRef.current === today || localStorage.getItem(key) === today) return;
@@ -669,23 +768,27 @@ useEffect(() => {
   };
 
   const logout = async () => {
-    // Keep onboarded/tour cache so the next login goes straight to the dashboard.
+    try {
+      localStorage.removeItem('codesage_cached_profile');
+      localStorage.removeItem('cached_profile_time');
+    } catch {}
     await supabase.auth.signOut();
     setUser(null);
   };
-
 
   const deleteAccount = async () => {
     if (!user) return false;
 
     const clearLocalAccount = async () => {
-      localStorage.removeItem(`codesage_onboarded_${user.id}`);
+      try {
+        localStorage.removeItem(`codesage_onboarded_${user.id}`);
+        localStorage.removeItem('codesage_cached_profile');
+        localStorage.removeItem('cached_profile_time');
+      } catch {}
       await supabase.auth.signOut({ scope: 'local' });
       setUser(null);
     };
 
-    // Validate the server-backed user first. The profile context can briefly
-    // outlive a deleted/expired auth session after a refresh or a double click.
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       await clearLocalAccount();
@@ -729,7 +832,7 @@ useEffect(() => {
     updateProfile({ ...user, darkMode: !user.darkMode });
   };
 
-   const addXp = (amount: number) => {
+  const addXp = (amount: number) => {
     if (!user) return;
     setUser(prev => prev ? { ...prev, xp: prev.xp + amount } : prev);
   };
@@ -749,7 +852,7 @@ useEffect(() => {
 
   const markTourSeen = async () => {
     if (!user) return;
-    localStorage.setItem(`codesage_tour_seen_${user.id}`, 'true');
+    try { localStorage.setItem(`codesage_tour_seen_${user.id}`, 'true'); } catch {}
     setUser({ ...user, hasSeenTour: true });
     try {
       const { error } = await supabase
@@ -764,7 +867,7 @@ useEffect(() => {
 
   const resetTour = async () => {
     if (!user) return;
-    localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false');
+    try { localStorage.setItem(`codesage_tour_seen_${user.id}`, 'false'); } catch {}
     setUser({ ...user, hasSeenTour: false });
     try {
       await supabase.from('profiles').update({ has_seen_tour: false }).eq('id', user.id);
@@ -773,15 +876,18 @@ useEffect(() => {
     }
   };
 
+  const contextValue: UserContextType = {
+    user, loading, isLoggedIn, isOnboarded, login, signup, completeOnboarding,
+    completeLesson, completeTest, addBadge, updateStreak, applyPromoCode,
+    updateUser, logout, deleteAccount, toggleDarkMode, addXp, addCoins,
+    buyFreezeStreak, markTourSeen, resetTour,
+    energy, nextLessonCharge, canLearn, rank, spendCoins,
+  };
+
+  (globalThis as Record<string, unknown>)[GLOBAL_USER_STATE_KEY] = contextValue;
 
   return (
-    <UserContext.Provider value={{
-      user, loading, isLoggedIn, isOnboarded, login, signup, completeOnboarding,
-      completeLesson, completeTest, addBadge, updateStreak, applyPromoCode,
-      updateUser, logout, deleteAccount, toggleDarkMode, addXp, addCoins,
-      buyFreezeStreak, markTourSeen, resetTour,
-      energy, nextLessonCharge, canLearn, rank, spendCoins,
-    }}>
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );
