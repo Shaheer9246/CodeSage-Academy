@@ -93,6 +93,7 @@ const Three3dLessonPage = lazy(() => import("./pages/Three3dLessonPage"));
 const Tour = lazy(() => import("./pages/Tour"));
 const Playground = lazy(() => import("./pages/Playground"));
 const Challenges = lazy(() => import("./pages/Challenges"));
+const DsaSheet = lazy(() => import("./pages/DsaSheet"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 const LevelTest = lazy(() => import("./pages/LevelTest"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
@@ -232,6 +233,7 @@ const App = () => {
                 <Route path="/tour" element={<ProtectedRoute><Tour /></ProtectedRoute>} />
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
+                <Route path="/dsa-sheet" element={<ProtectedRoute><DsaSheet /></ProtectedRoute>} />
                 <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
                 <Route path="/test/:level" element={<ProtectedRoute><LevelTest /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
