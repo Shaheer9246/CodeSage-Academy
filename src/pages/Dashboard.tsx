@@ -3,7 +3,7 @@ import { useUser } from '@/contexts/UserContext';
 import { StreakModal } from '@/components/StreakModal';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
         Gamepad2, Trophy, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
-        Layout, Terminal, Database, Briefcase, Sparkles, Code2 } from 'lucide-react';
+        Layout, Terminal, Database, Briefcase, Sparkles, Code2, Bot } from 'lucide-react';
 import { energyToday } from '@/lib/gamification';
 
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
@@ -14,6 +14,7 @@ import DashboardTour, { TourStep } from '@/components/DashboardTour';
 import EnrollDialog from '@/components/EnrollDialog';
 import { TrackId, isEnrolled, isActive, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
 import SuggestionsBadge from '@/components/SuggestionsBadge';
+import InboxBadge from '@/components/InboxBadge';
 import { AdBannerCard } from '@/components/AdBannerCard';
 import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDetails, isTrackCompleted, type LessonTrackKey } from '@/data/lessonIndex';
 
@@ -740,6 +741,7 @@ const Dashboard = () => {
                       <Trophy className="w-3.5 h-3.5 text-primary" />
                       <span className="text-xs font-bold text-primary">Lvl {user?.level || 1}</span>
                     </div>
+                    <InboxBadge asPillButton />
                     <SuggestionsBadge />
                   </>
                 )}
@@ -950,6 +952,32 @@ const Dashboard = () => {
               );
             })}
           </div>
+
+          {/* DSA Sheet Featured Preview Card */}
+          <motion.button
+            initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.08 }}
+            onClick={go('/dsa-sheet')}
+            className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-primary/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10" />
+            <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-xl bg-primary/15 grid place-items-center border border-primary/30 neon-glow shrink-0">
+                  <Code2 className="w-5 h-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-bold font-display flex items-center gap-2 truncate">
+                    CodeSage DSA Sheet
+                    <span className="text-[10px] font-mono text-primary">· Top 75 Interview Prep</span>
+                  </p>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    Arrays · Trees · Graphs · DP · Live Python, C++, Java &amp; JS compiler
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-primary shrink-0" />
+            </div>
+          </motion.button>
 
           {/* Code Crawler featured */}
           <motion.button
