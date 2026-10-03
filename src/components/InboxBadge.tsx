@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Inbox } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/contexts/UserContext';
 
 interface InboxBadgeProps {
   className?: string;
+  asPillButton?: boolean;
 }
 
 // In-memory single-flight deduplication & shared state across desktop and mobile badge instances
@@ -15,7 +17,8 @@ function notifyInboxBadge(count: number) {
   badgeListeners.forEach(listener => listener(count));
 }
 
-export default function InboxBadge({ className }: InboxBadgeProps) {
+export default function InboxBadge({ className, asPillButton }: InboxBadgeProps) {
+  const navigate = useNavigate();
   const { user } = useUser();
 
   // Show the last known unread count instantly from cache (no server wait).
@@ -94,6 +97,26 @@ export default function InboxBadge({ className }: InboxBadgeProps) {
       window.removeEventListener('inbox:read', onRead);
     };
   }, [user?.id, refresh]);
+
+  if (asPillButton) {
+    return (
+      <button
+        onClick={() => navigate('/inbox')}
+        title="Inbox & Announcements"
+        className="relative flex items-center gap-1 bg-secondary/40 border border-border/40 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all active:scale-95"
+      >
+        <Inbox className="w-3.5 h-3.5 text-primary" />
+        {unread > 0 && (
+          <>
+            <span className="text-[10px] font-bold text-primary min-w-[14px] text-center">
+              {unread > 9 ? '9+' : unread}
+            </span>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse border border-background" />
+          </>
+        )}
+      </button>
+    );
+  }
 
   return (
     <div className={`relative flex items-center justify-center ${className}`}>
