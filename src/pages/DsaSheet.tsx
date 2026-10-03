@@ -1,50 +1,62 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Code2,
   CheckCircle2,
   Circle,
   Search,
-  Filter,
   Sparkles,
-  Trophy,
   Lightbulb,
   Play,
   ArrowRight,
-  ExternalLink,
   ChevronDown,
   ChevronRight,
-  Clock,
-  Layers,
-  Award,
-  BookOpen,
   ArrowLeft,
-  X
+  X,
+  Flame,
+  RotateCcw
 } from 'lucide-react';
 import {
   DSA_PROBLEMS,
   DSA_CATEGORIES,
-  DsaProblem,
-  DsaCategory,
-  DsaDifficulty
+  DsaProblem
 } from '@/data/dsaSheetData';
 import DsaWorkspace from '@/components/DsaWorkspace';
+import { AdBannerCard } from '@/components/AdBannerCard';
+import { useUser } from '@/contexts/UserContext';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import { toast } from 'sonner';
 
 const STORAGE_SOLVED_KEY = 'codesage_dsa_solved_ids';
 
 export const DsaSheet = () => {
+  useScrollTop();
   const navigate = useNavigate();
+  const { user, completeLesson } = useUser();
 
-  // Solved state in localStorage
+  // Solved state in localStorage + synced with user.completedLessons
   const [solvedIds, setSolvedIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_SOLVED_KEY);
-      return saved ? JSON.parse(saved) : [];
+      const parsed: string[] = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
   });
+
+  // Merge any solved DSA lessons from user profile
+  useEffect(() => {
+    if (user?.completedLessons) {
+      const fromProfile = user.completedLessons
+        .filter(id => id.startsWith('dsa-'))
+        .map(id => id.replace(/^dsa-sheet-/, ''));
+      if (fromProfile.length > 0) {
+        setSolvedIds(prev => Array.from(new Set([...prev, ...fromProfile])));
+      }
+    }
+  }, [user?.completedLessons]);
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,17 +64,24 @@ export const DsaSheet = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Solved' | 'Unsolved'>('All');
 
-  // Active Problem for Workspace Modal
+  // Active Problem for Full-Page CodeSage Workspace
   const [activeProblem, setActiveProblem] = useState<DsaProblem | null>(null);
 
-  // Quick Key Points Modal
+  // Quick Key Points Drawer/Modal
   const [keyPointsProblem, setKeyPointsProblem] = useState<DsaProblem | null>(null);
+
+  // Inline reset confirmation state (avoids window.confirm in iframe)
+  const [confirmReset, setConfirmReset] = useState(false);
 
   // Accordion collapsed state for categories
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_SOLVED_KEY, JSON.stringify(solvedIds));
+    try {
+      localStorage.setItem(STORAGE_SOLVED_KEY, JSON.stringify(solvedIds));
+    } catch {
+      // ignore storage quota errors
+    }
   }, [solvedIds]);
 
   const toggleSolved = (id: string) => {
@@ -72,7 +91,10 @@ export const DsaSheet = () => {
         toast.info('Marked as unsolved');
         return prev.filter(x => x !== id);
       } else {
-        toast.success('🎉 Problem marked as solved!');
+        toast.success('Problem solved! +1 XP & +2 Sage Coins awarded');
+        if (user) {
+          void completeLesson(id);
+        }
         return [...prev, id];
       }
     });
@@ -88,27 +110,24 @@ export const DsaSheet = () => {
   // Filtered problems
   const filteredProblems = useMemo(() => {
     return DSA_PROBLEMS.filter(p => {
-      // Category filter
       if (selectedCategory !== 'All' && p.category !== selectedCategory) {
         return false;
       }
-      // Difficulty filter
       if (selectedDifficulty !== 'All' && p.difficulty !== selectedDifficulty) {
         return false;
       }
-      // Status filter
       const isSolved = solvedIds.includes(p.id);
       if (statusFilter === 'Solved' && !isSolved) return false;
       if (statusFilter === 'Unsolved' && isSolved) return false;
 
-      // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = p.title.toLowerCase().includes(q);
         const matchesCat = p.category.toLowerCase().includes(q);
+        const matchesCompany = p.companies?.some(c => c.toLowerCase().includes(q)) ?? false;
         const matchesKeyPoint = p.keyPoints.some(k => k.toLowerCase().includes(q));
         const matchesSummary = p.summary.toLowerCase().includes(q);
-        if (!matchesTitle && !matchesCat && !matchesKeyPoint && !matchesSummary) {
+        if (!matchesTitle && !matchesCat && !matchesCompany && !matchesKeyPoint && !matchesSummary) {
           return false;
         }
       }
@@ -119,7 +138,7 @@ export const DsaSheet = () => {
 
   // Statistics
   const totalProblems = DSA_PROBLEMS.length;
-  const totalSolved = solvedIds.length;
+  const totalSolved = DSA_PROBLEMS.filter(p => solvedIds.includes(p.id)).length;
   const progressPct = totalProblems > 0 ? Math.round((totalSolved / totalProblems) * 100) : 0;
 
   const easyTotal = DSA_PROBLEMS.filter(p => p.difficulty === 'Easy').length;
@@ -131,396 +150,538 @@ export const DsaSheet = () => {
   const hardTotal = DSA_PROBLEMS.filter(p => p.difficulty === 'Hard').length;
   const hardSolved = DSA_PROBLEMS.filter(p => p.difficulty === 'Hard' && solvedIds.includes(p.id)).length;
 
+  // When a problem is active, render the full-page DsaWorkspace (matching Challenges & PythonLessonPage)
+  if (activeProblem) {
+    return (
+      <DsaWorkspace
+        problem={activeProblem}
+        isSolved={solvedIds.includes(activeProblem.id)}
+        onToggleSolved={toggleSolved}
+        onClose={() => setActiveProblem(null)}
+        onSelectProblem={nextProb => setActiveProblem(nextProb)}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#0f0f1e] text-foreground py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
-      {/* Top Header & Breadcrumb */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/20 pb-4">
-        <div>
+    <div className="min-h-screen bg-background grid-bg relative overflow-x-hidden text-foreground">
+      {/* Ambient Background Glows matching Dashboard & Tracks */}
+      <div className="absolute top-[-10%] right-[-5%] w-[420px] h-[420px] rounded-full bg-primary/5 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-15%] left-[-10%] w-[480px] h-[480px] rounded-full bg-accent-blue/5 blur-[160px] pointer-events-none" />
+
+      {/* Sticky Glass Header */}
+      <header className="border-b border-border/30 backdrop-blur-xl bg-background/80 px-3 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-20 w-full">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-2 transition-colors"
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-xl hover:bg-secondary/40 transition-colors shrink-0"
+            title="Back to Dashboard"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Dashboard</span>
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shadow-lg shadow-primary/20">
-              <Code2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-display font-extrabold tracking-tight text-foreground flex items-center gap-2">
-                <span>CodeSage DSA Sheet</span>
-                <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  Top Interview 75
-                </span>
+
+          <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary neon-glow shrink-0">
+            <Code2 className="w-4 h-4" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm sm:text-base font-display font-bold text-foreground truncate">
+                CodeSage DSA Sheet
               </h1>
-              <p className="text-xs md:text-sm text-muted-foreground">
-                Master core patterns with multi-language code templates (Python, C++, Java, JS), test runners & key intuition points.
-              </p>
+              <span className="hidden sm:inline text-[10px] font-mono text-primary">
+                · Top Interview {totalProblems}
+              </span>
             </div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+              Curated patterns · Python 3, C++ 20, Java 17 &amp; JS in-browser compiler
+            </p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              if (window.confirm('Reset your solved progress for all DSA problems?')) {
-                setSolvedIds([]);
-                toast.info('Progress has been reset');
-              }
-            }}
-            className="px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-secondary/30 hover:bg-secondary/60 border border-border/30 transition-colors"
-          >
-            Reset Progress
-          </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {user && (
+            <div className="hidden sm:flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+              <Flame className="w-3.5 h-3.5 text-primary" />
+              <span className="text-xs font-bold text-primary font-mono tabular-nums">
+                {user.streakCount}d
+              </span>
+            </div>
+          )}
+
           <button
             onClick={() => {
               const firstUnsolved = DSA_PROBLEMS.find(p => !solvedIds.includes(p.id)) || DSA_PROBLEMS[0];
               setActiveProblem(firstUnsolved);
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-all shadow-md shadow-primary/20"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-display font-bold hover:neon-glow transition-all whitespace-nowrap"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
-            <span>Solve Next Problem</span>
+            <span>{totalSolved > 0 ? 'Continue Solving' : 'Start First Problem'}</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Progress & Overview Dashboard Card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Main Progress Bar Card */}
-        <div className="sm:col-span-2 lg:col-span-2 p-5 rounded-2xl bg-gradient-to-br from-[#161630] to-[#121226] border border-border/30 shadow-xl relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Total Progress
-            </span>
-            <span className="text-sm font-bold text-primary font-mono">{progressPct}% Complete</span>
-          </div>
-
-          <div className="text-2xl md:text-3xl font-extrabold text-foreground font-display flex items-baseline gap-2 mb-3">
-            <span>{totalSolved}</span>
-            <span className="text-sm text-muted-foreground font-normal">of {totalProblems} solved</span>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full h-3 bg-secondary/50 rounded-full overflow-hidden p-0.5 border border-border/30">
-            <div
-              className="h-full bg-gradient-to-r from-primary via-emerald-400 to-cyan-400 rounded-full transition-all duration-500 shadow-sm"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Easy Breakdown */}
-        <div className="p-4 rounded-2xl bg-[#15152a] border border-border/30 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
-            <span>Easy</span>
-            <span className="font-mono">{easySolved}/{easyTotal}</span>
-          </div>
-          <div className="text-xl font-bold text-foreground font-mono mt-2">
-            {easyTotal > 0 ? Math.round((easySolved / easyTotal) * 100) : 0}%
-          </div>
-          <div className="w-full h-1.5 bg-secondary/50 rounded-full overflow-hidden mt-2">
-            <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-              style={{ width: `${easyTotal > 0 ? (easySolved / easyTotal) * 100 : 0}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Medium Breakdown */}
-        <div className="p-4 rounded-2xl bg-[#15152a] border border-border/30 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-bold text-amber-400">
-            <span>Medium</span>
-            <span className="font-mono">{medSolved}/{medTotal}</span>
-          </div>
-          <div className="text-xl font-bold text-foreground font-mono mt-2">
-            {medTotal > 0 ? Math.round((medSolved / medTotal) * 100) : 0}%
-          </div>
-          <div className="w-full h-1.5 bg-secondary/50 rounded-full overflow-hidden mt-2">
-            <div
-              className="h-full bg-amber-500 rounded-full transition-all duration-500"
-              style={{ width: `${medTotal > 0 ? (medSolved / medTotal) * 100 : 0}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Hard Breakdown */}
-        <div className="p-4 rounded-2xl bg-[#15152a] border border-border/30 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-bold text-rose-400">
-            <span>Hard</span>
-            <span className="font-mono">{hardSolved}/{hardTotal}</span>
-          </div>
-          <div className="text-xl font-bold text-foreground font-mono mt-2">
-            {hardTotal > 0 ? Math.round((hardSolved / hardTotal) * 100) : 0}%
-          </div>
-          <div className="w-full h-1.5 bg-secondary/50 rounded-full overflow-hidden mt-2">
-            <div
-              className="h-full bg-rose-500 rounded-full transition-all duration-500"
-              style={{ width: `${hardTotal > 0 ? (hardSolved / hardTotal) * 100 : 0}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Filters & Search Control Bar */}
-      <div className="p-4 rounded-2xl bg-[#141426] border border-border/30 space-y-3">
-        <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
-          {/* Search Box */}
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search problem, company, or concept..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-[#181830] border border-border/40 rounded-xl pl-9 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Difficulty & Status Tabs */}
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            {/* Difficulty Filter */}
-            <div className="flex items-center bg-[#181830] rounded-xl p-1 border border-border/30 text-xs">
-              {(['All', 'Easy', 'Medium', 'Hard'] as const).map(d => (
-                <button
-                  key={d}
-                  onClick={() => setSelectedDifficulty(d)}
-                  className={`px-3 py-1 rounded-lg transition-all ${
-                    selectedDifficulty === d
-                      ? 'bg-primary text-primary-foreground font-bold shadow'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center bg-[#181830] rounded-xl p-1 border border-border/30 text-xs">
-              {(['All', 'Solved', 'Unsolved'] as const).map(s => (
-                <button
-                  key={s}
-                  onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1 rounded-lg transition-all ${
-                    statusFilter === s
-                      ? 'bg-secondary text-foreground font-bold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Category Horizontal Scrolling Badges */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 scrollbar-none text-xs">
-          <button
-            onClick={() => setSelectedCategory('All')}
-            className={`px-3 py-1 rounded-xl whitespace-nowrap transition-all font-medium ${
-              selectedCategory === 'All'
-                ? 'bg-primary/20 text-primary border border-primary/40'
-                : 'bg-secondary/30 text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent'
-            }`}
-          >
-            All Topics ({DSA_PROBLEMS.length})
-          </button>
-          {DSA_CATEGORIES.map(cat => {
-            const count = DSA_PROBLEMS.filter(p => p.category === cat).length;
-            const solvedCount = DSA_PROBLEMS.filter(p => p.category === cat && solvedIds.includes(p.id)).length;
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-xl whitespace-nowrap transition-all font-medium flex items-center gap-1.5 ${
-                  selectedCategory === cat
-                    ? 'bg-primary/20 text-primary border border-primary/40'
-                    : 'bg-secondary/30 text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent'
-                }`}
-              >
-                <span>{cat}</span>
-                <span className="text-[10px] opacity-75 font-mono">({solvedCount}/{count})</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Problem Categories & Table */}
-      <div className="space-y-4">
-        {DSA_CATEGORIES.filter(cat => selectedCategory === 'All' || selectedCategory === cat).map(cat => {
-          const problemsInCat = filteredProblems.filter(p => p.category === cat);
-          if (problemsInCat.length === 0) return null;
-
-          const isCollapsed = collapsedCategories[cat] || false;
-          const solvedInCat = problemsInCat.filter(p => solvedIds.includes(p.id)).length;
-
-          return (
-            <div
-              key={cat}
-              className="rounded-2xl bg-[#141428] border border-border/30 overflow-hidden shadow-lg"
-            >
-              {/* Category Header */}
-              <div
-                onClick={() => toggleCategoryCollapse(cat)}
-                className="flex items-center justify-between px-5 py-3.5 bg-[#171732] hover:bg-[#1a1a3a] cursor-pointer transition-colors border-b border-border/20 select-none"
-              >
-                <div className="flex items-center gap-2.5">
-                  {isCollapsed ? (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                  )}
-                  <h3 className="font-bold text-sm md:text-base text-foreground">
-                    {cat}
-                  </h3>
-                  <span className="text-xs text-muted-foreground font-mono">
-                    ({solvedInCat}/{problemsInCat.length} solved)
+      {/* Main Content Container */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-5xl mx-auto px-3 sm:px-6 py-5 space-y-5 pb-20 relative z-10"
+      >
+        {/* Hero Mastery & Difficulty Breakdown HUD */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+          {/* Overall Mastery Progress Card */}
+          <div className="lg:col-span-6 glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 relative overflow-hidden flex flex-col justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/5 pointer-events-none" />
+            <div className="relative z-10 flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-1">
+                  Interview Readiness Tracker
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-display font-black text-foreground tabular-nums">
+                    {totalSolved}
                   </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-1.5 bg-secondary/50 rounded-full overflow-hidden hidden sm:block">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{
-                        width: `${problemsInCat.length > 0 ? (solvedInCat / problemsInCat.length) * 100 : 0}%`,
-                      }}
-                    />
-                  </div>
+                  <span className="text-xs text-muted-foreground font-mono tabular-nums">
+                    / {totalProblems} problems mastered ({progressPct}%)
+                  </span>
                 </div>
               </div>
 
-              {/* Problem Rows List */}
-              {!isCollapsed && (
-                <div className="divide-y divide-border/20">
-                  {problemsInCat.map(problem => {
-                    const isSolved = solvedIds.includes(problem.id);
-                    return (
-                      <div
-                        key={problem.id}
-                        className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 transition-colors ${
-                          isSolved ? 'bg-[#121224]/40 hover:bg-[#15152c]' : 'hover:bg-[#171732]'
-                        }`}
-                      >
-                        {/* Left Side: Checkbox, Number, Title & Tags */}
-                        <div className="flex items-start sm:items-center gap-3">
-                          <button
-                            onClick={() => toggleSolved(problem.id)}
-                            className="mt-0.5 sm:mt-0 p-1 rounded-lg text-muted-foreground hover:text-primary transition-colors shrink-0"
-                            title={isSolved ? 'Mark as Unsolved' : 'Mark as Solved'}
-                          >
-                            {isSolved ? (
-                              <CheckCircle2 className="w-5 h-5 text-emerald-400 fill-emerald-400/20" />
-                            ) : (
-                              <Circle className="w-5 h-5 hover:text-primary" />
-                            )}
-                          </button>
-
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs font-mono text-muted-foreground font-semibold">
-                                #{problem.number}
-                              </span>
-                              <button
-                                onClick={() => setActiveProblem(problem)}
-                                className={`text-sm font-semibold hover:text-primary transition-colors text-left ${
-                                  isSolved ? 'text-foreground/80 line-through decoration-muted-foreground/40' : 'text-foreground'
-                                }`}
-                              >
-                                {problem.title}
-                              </button>
-                              <span
-                                className={`text-[10px] font-semibold px-2 py-0.2 rounded-full border ${
-                                  problem.difficulty === 'Easy'
-                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                                    : problem.difficulty === 'Medium'
-                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                                    : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                                }`}
-                              >
-                                {problem.difficulty}
-                              </span>
-                            </div>
-
-                            <p className="text-xs text-muted-foreground line-clamp-1">
-                              {problem.summary}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Right Side: Complexity, Hints trigger & Action Button */}
-                        <div className="flex items-center gap-2 sm:self-center self-end shrink-0">
-                          <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-muted-foreground px-2 py-1 rounded bg-secondary/20">
-                            <span className="text-primary">{problem.timeComplexity}</span>
-                            <span>•</span>
-                            <span className="text-cyan-400">{problem.spaceComplexity}</span>
-                          </div>
-
-                          {/* Quick Key Points Trigger */}
-                          <button
-                            onClick={() => setKeyPointsProblem(problem)}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-colors"
-                            title="View Key Points & Intuition"
-                          >
-                            <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-                            <span className="hidden md:inline">Key Points</span>
-                          </button>
-
-                          {/* Solve in Workspace Button */}
-                          <button
-                            onClick={() => setActiveProblem(problem)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-all shadow-sm shadow-primary/20"
-                          >
-                            <Code2 className="w-3.5 h-3.5" />
-                            <span>Solve</span>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+              {confirmReset ? (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      setSolvedIds([]);
+                      setConfirmReset(false);
+                      toast.info('DSA Sheet progress reset');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-destructive text-destructive-foreground text-[10px] font-bold"
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    onClick={() => setConfirmReset(false)}
+                    className="px-2 py-1 rounded-lg bg-secondary text-muted-foreground text-[10px]"
+                  >
+                    Cancel
+                  </button>
                 </div>
+              ) : (
+                totalSolved > 0 && (
+                  <button
+                    onClick={() => setConfirmReset(true)}
+                    className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg bg-secondary/40 hover:bg-secondary transition-colors"
+                    title="Reset Solved Progress"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Reset</span>
+                  </button>
+                )
               )}
             </div>
-          );
-        })}
-      </div>
 
-      {/* Fullscreen Workspace Modal when problem is selected */}
-      {activeProblem && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
-          <div className="w-full h-full max-w-7xl max-h-[96vh]">
-            <DsaWorkspace
-              problem={activeProblem}
-              isSolved={solvedIds.includes(activeProblem.id)}
-              onToggleSolved={toggleSolved}
-              onClose={() => setActiveProblem(null)}
-            />
+            <div className="relative z-10 mt-4 space-y-1.5">
+              <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-primary via-emerald-400 to-accent-blue rounded-full transition-all duration-500"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
+                <span>9 Core Algorithmic Patterns</span>
+                <span className="text-primary">+1 XP · +2 Coins per problem</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Easy / Medium / Hard Breakdown Cards */}
+          <div className="lg:col-span-6 grid grid-cols-3 gap-2.5 sm:gap-3">
+            {/* Easy */}
+            <button
+              onClick={() => setSelectedDifficulty(selectedDifficulty === 'Easy' ? 'All' : 'Easy')}
+              className={`glass-card rounded-2xl p-3.5 text-left transition-all flex flex-col justify-between border ${
+                selectedDifficulty === 'Easy'
+                  ? 'border-emerald-500/50 bg-emerald-500/10'
+                  : 'border-border/40 hover:border-emerald-500/30'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full text-xs">
+                <span className="font-display font-bold text-emerald-400">Easy</span>
+                <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                  {easySolved}/{easyTotal}
+                </span>
+              </div>
+              <div className="text-lg sm:text-xl font-display font-bold text-foreground font-mono tabular-nums my-1.5">
+                {easyTotal > 0 ? Math.round((easySolved / easyTotal) * 100) : 0}%
+              </div>
+              <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-400 rounded-full transition-all duration-500"
+                  style={{ width: `${easyTotal > 0 ? (easySolved / easyTotal) * 100 : 0}%` }}
+                />
+              </div>
+            </button>
+
+            {/* Medium */}
+            <button
+              onClick={() => setSelectedDifficulty(selectedDifficulty === 'Medium' ? 'All' : 'Medium')}
+              className={`glass-card rounded-2xl p-3.5 text-left transition-all flex flex-col justify-between border ${
+                selectedDifficulty === 'Medium'
+                  ? 'border-amber-500/50 bg-amber-500/10'
+                  : 'border-border/40 hover:border-amber-500/30'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full text-xs">
+                <span className="font-display font-bold text-amber-400">Medium</span>
+                <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                  {medSolved}/{medTotal}
+                </span>
+              </div>
+              <div className="text-lg sm:text-xl font-display font-bold text-foreground font-mono tabular-nums my-1.5">
+                {medTotal > 0 ? Math.round((medSolved / medTotal) * 100) : 0}%
+              </div>
+              <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-400 rounded-full transition-all duration-500"
+                  style={{ width: `${medTotal > 0 ? (medSolved / medTotal) * 100 : 0}%` }}
+                />
+              </div>
+            </button>
+
+            {/* Hard */}
+            <button
+              onClick={() => setSelectedDifficulty(selectedDifficulty === 'Hard' ? 'All' : 'Hard')}
+              className={`glass-card rounded-2xl p-3.5 text-left transition-all flex flex-col justify-between border ${
+                selectedDifficulty === 'Hard'
+                  ? 'border-rose-500/50 bg-rose-500/10'
+                  : 'border-border/40 hover:border-rose-500/30'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full text-xs">
+                <span className="font-display font-bold text-rose-400">Hard</span>
+                <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                  {hardSolved}/{hardTotal}
+                </span>
+              </div>
+              <div className="text-lg sm:text-xl font-display font-bold text-foreground font-mono tabular-nums my-1.5">
+                {hardTotal > 0 ? Math.round((hardSolved / hardTotal) * 100) : 0}%
+              </div>
+              <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-rose-400 rounded-full transition-all duration-500"
+                  style={{ width: `${hardTotal > 0 ? (hardSolved / hardTotal) * 100 : 0}%` }}
+                />
+              </div>
+            </button>
           </div>
         </div>
-      )}
 
-      {/* Key Points / Intuition Quick Modal */}
+        {/* Sponsor Ad Banner (consistent with all Track pages) */}
+        <div className="pt-0.5">
+          <AdBannerCard slotName="learnTrackPage" format="horizontal-banner" />
+        </div>
+
+        {/* Search & Filter Control Card */}
+        <div className="glass-card rounded-2xl p-3.5 sm:p-4 border border-border/40 space-y-3">
+          <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+            {/* Search Input */}
+            <div className="relative w-full md:w-80">
+              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search problem, company (Google, Meta), or pattern..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full bg-secondary/40 border border-border/50 rounded-xl pl-9 pr-8 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Segmented Filter Controls */}
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+              {/* Difficulty Segmented Control */}
+              <div className="flex items-center bg-secondary/40 rounded-xl p-1 border border-border/40 text-xs">
+                {(['All', 'Easy', 'Medium', 'Hard'] as const).map(d => (
+                  <button
+                    key={d}
+                    onClick={() => setSelectedDifficulty(d)}
+                    className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+                      selectedDifficulty === d
+                        ? 'bg-primary text-primary-foreground font-display font-bold shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              {/* Status Segmented Control */}
+              <div className="flex items-center bg-secondary/40 rounded-xl p-1 border border-border/40 text-xs">
+                {(['All', 'Solved', 'Unsolved'] as const).map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setStatusFilter(s)}
+                    className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+                      statusFilter === s
+                        ? 'bg-card text-foreground font-display font-bold border border-border/50 shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Topic Filter Bar */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 scrollbar-none text-xs">
+            <button
+              onClick={() => setSelectedCategory('All')}
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all font-display font-semibold ${
+                selectedCategory === 'All'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-secondary/30 text-muted-foreground hover:text-foreground hover:bg-secondary/60 border border-border/30'
+              }`}
+            >
+              All Patterns ({DSA_PROBLEMS.length})
+            </button>
+            {DSA_CATEGORIES.map(cat => {
+              const count = DSA_PROBLEMS.filter(p => p.category === cat).length;
+              const solvedCount = DSA_PROBLEMS.filter(p => p.category === cat && solvedIds.includes(p.id)).length;
+              const active = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(active ? 'All' : cat)}
+                  className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all font-display font-semibold flex items-center gap-1.5 ${
+                    active
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'bg-secondary/30 text-muted-foreground hover:text-foreground hover:bg-secondary/60 border border-border/30'
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <span className={`text-[10px] font-mono tabular-nums ${active ? 'text-primary-foreground/90' : 'opacity-70'}`}>
+                    {solvedCount}/{count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Empty Search State */}
+        {filteredProblems.length === 0 && (
+          <div className="glass-card rounded-2xl p-8 text-center border border-border/40 space-y-3">
+            <p className="text-sm font-display font-bold text-foreground">
+              No matching DSA problems found
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Try clearing your search query or switching difficulty/topic filters.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('All');
+                setSelectedDifficulty('All');
+                setStatusFilter('All');
+              }}
+              className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-display font-bold hover:neon-glow transition-all"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+
+        {/* Problem Categories & Rows (Matches Dashboard Sections & Track Lists) */}
+        <div className="space-y-3.5">
+          {DSA_CATEGORIES.filter(cat => selectedCategory === 'All' || selectedCategory === cat).map((cat, catIdx) => {
+            const problemsInCat = filteredProblems.filter(p => p.category === cat);
+            if (problemsInCat.length === 0) return null;
+
+            const isCollapsed = collapsedCategories[cat] || false;
+            const solvedInCat = problemsInCat.filter(p => solvedIds.includes(p.id)).length;
+            const catPct = problemsInCat.length > 0 ? Math.round((solvedInCat / problemsInCat.length) * 100) : 0;
+
+            return (
+              <motion.section
+                key={cat}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: catIdx * 0.03 }}
+                className="glass-card rounded-2xl border border-border/50 overflow-hidden"
+              >
+                {/* Category Header */}
+                <button
+                  onClick={() => toggleCategoryCollapse(cat)}
+                  className="w-full flex items-center justify-between px-4 sm:px-5 py-3.5 bg-secondary/20 hover:bg-secondary/35 transition-colors border-b border-border/30 text-left"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center text-xs font-mono font-bold text-primary shrink-0 tabular-nums">
+                      {String(catIdx + 1).padStart(2, '0')}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-display font-bold text-sm sm:text-base text-foreground truncate">
+                          {cat}
+                        </h2>
+                        <span className="text-xs text-muted-foreground font-mono tabular-nums shrink-0">
+                          · {solvedInCat}/{problemsInCat.length}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="w-24 h-1.5 bg-secondary rounded-full overflow-hidden hidden sm:block">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-accent-blue rounded-full transition-all duration-300"
+                        style={{ width: `${catPct}%` }}
+                      />
+                    </div>
+                    {isCollapsed ? (
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </div>
+                </button>
+
+                {/* Problem Rows */}
+                <AnimatePresence initial={false}>
+                  {!isCollapsed && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="divide-y divide-border/25"
+                    >
+                      {problemsInCat.map(problem => {
+                        const isSolved = solvedIds.includes(problem.id);
+                        return (
+                          <div
+                            key={problem.id}
+                            className={`flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-5 py-3.5 gap-3 transition-colors group ${
+                              isSolved ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-secondary/25'
+                            }`}
+                          >
+                            {/* Left: Solved Checkbox + Title + Metadata */}
+                            <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                              <button
+                                onClick={() => toggleSolved(problem.id)}
+                                className="mt-0.5 sm:mt-0 p-1 rounded-lg text-muted-foreground hover:text-primary transition-colors shrink-0"
+                                title={isSolved ? 'Mark as Unsolved' : 'Mark as Solved'}
+                              >
+                                {isSolved ? (
+                                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                                ) : (
+                                  <Circle className="w-5 h-5 hover:text-primary" />
+                                )}
+                              </button>
+
+                              <div className="min-w-0 flex-1 space-y-0.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs font-mono text-muted-foreground tabular-nums">
+                                    #{String(problem.number).padStart(2, '0')}
+                                  </span>
+                                  <button
+                                    onClick={() => setActiveProblem(problem)}
+                                    className={`text-xs sm:text-sm font-display font-bold hover:text-primary transition-colors text-left ${
+                                      isSolved ? 'text-foreground/85' : 'text-foreground'
+                                    }`}
+                                  >
+                                    {problem.title}
+                                  </button>
+                                  <span aria-hidden="true" className="text-muted-foreground/50">·</span>
+                                  <span
+                                    className={`text-xs font-mono font-semibold ${
+                                      problem.difficulty === 'Easy'
+                                        ? 'text-emerald-400'
+                                        : problem.difficulty === 'Medium'
+                                        ? 'text-amber-400'
+                                        : 'text-rose-400'
+                                    }`}
+                                  >
+                                    {problem.difficulty}
+                                  </span>
+                                  {problem.companies && problem.companies.length > 0 && (
+                                    <>
+                                      <span aria-hidden="true" className="hidden md:inline text-muted-foreground/40">·</span>
+                                      <span className="hidden md:inline text-[11px] text-muted-foreground truncate">
+                                        {problem.companies.slice(0, 3).join(' / ')}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+
+                                <p className="text-xs text-muted-foreground line-clamp-1">
+                                  {problem.summary}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Right: Complexity + Intuition Trigger + Solve CTA */}
+                            <div className="flex items-center gap-2 sm:self-center self-end shrink-0">
+                              <div className="hidden lg:flex items-center gap-1.5 text-xs font-mono text-muted-foreground mr-1">
+                                <span className="text-primary">{problem.timeComplexity}</span>
+                                <span aria-hidden="true">·</span>
+                                <span className="text-accent-blue">{problem.spaceComplexity}</span>
+                              </div>
+
+                              <button
+                                onClick={() => setKeyPointsProblem(problem)}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs bg-secondary/40 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/40 transition-colors whitespace-nowrap"
+                                title="View Key Intuition"
+                              >
+                                <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+                                <span className="hidden md:inline">Intuition</span>
+                              </button>
+
+                              <button
+                                onClick={() => setActiveProblem(problem)}
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary/15 hover:bg-primary text-primary hover:text-primary-foreground border border-primary/30 text-xs font-display font-bold transition-all whitespace-nowrap"
+                              >
+                                <Code2 className="w-3.5 h-3.5" />
+                                <span>Solve</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.section>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Quick Intuition Modal */}
       {keyPointsProblem && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-lg bg-[#16162f] border border-border/40 rounded-2xl p-6 shadow-2xl space-y-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
+          onClick={() => setKeyPointsProblem(null)}
+        >
+          <div
+            className="w-full max-w-lg glass-card border border-primary/30 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-border/30 pb-3">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-amber-400" />
-                <h3 className="font-bold text-foreground text-base">
-                  Key Intuition: {keyPointsProblem.title}
+              <div className="flex items-center gap-2 min-w-0">
+                <Lightbulb className="w-5 h-5 text-amber-400 shrink-0" />
+                <h3 className="font-display font-bold text-foreground text-sm sm:text-base truncate">
+                  #{keyPointsProblem.number} {keyPointsProblem.title} — Intuition
                 </h3>
               </div>
               <button
@@ -531,27 +692,24 @@ export const DsaSheet = () => {
               </button>
             </div>
 
-            <p className="text-xs text-muted-foreground">
-              Core mental model and edge cases for this problem:
-            </p>
-
             <div className="space-y-2.5">
               {keyPointsProblem.keyPoints.map((point, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-xl bg-[#1b1b36] border border-border/30 flex gap-2.5 items-start text-xs text-foreground/90 leading-relaxed"
+                  className="p-3 rounded-xl bg-secondary/35 border border-border/40 flex gap-2.5 items-start text-xs text-foreground/90 leading-relaxed"
                 >
-                  <span className="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
-                    {idx + 1}
+                  <span className="w-5 h-5 rounded-md bg-primary/15 text-primary flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">
+                    0{idx + 1}
                   </span>
                   <span>{point}</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between pt-2 border-t border-border/30">
               <div className="text-xs font-mono text-muted-foreground">
-                Complexity: <span className="text-primary">{keyPointsProblem.timeComplexity}</span> | <span className="text-cyan-400">{keyPointsProblem.spaceComplexity}</span>
+                Time: <span className="text-primary font-semibold">{keyPointsProblem.timeComplexity}</span> · Space:{' '}
+                <span className="text-accent-blue font-semibold">{keyPointsProblem.spaceComplexity}</span>
               </div>
               <button
                 onClick={() => {
@@ -559,9 +717,10 @@ export const DsaSheet = () => {
                   setKeyPointsProblem(null);
                   setActiveProblem(p);
                 }}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-display font-bold hover:neon-glow transition-all"
               >
-                <span>Open in Workspace</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Open in Code Lab</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
