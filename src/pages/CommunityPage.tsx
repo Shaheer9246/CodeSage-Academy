@@ -261,7 +261,7 @@ export default function CommunityPage() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-primary/10 text-primary border border-primary/20">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              1,800+ Active Sages
+              2,100+ Active Sages
             </div>
             <h1 className="text-3xl sm:text-4xl font-black font-display tracking-tight text-foreground flex items-center gap-3">
               Community Hub <Sparkles className="w-6 h-6 text-accent-yellow animate-bounce" />
