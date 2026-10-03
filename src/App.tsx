@@ -140,6 +140,25 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function GoogleAnalyticsTracker() {
+  const location = useLocation();
+  const { user } = useUser();
+
+  useEffect(() => {
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void };
+    if (typeof w.gtag === "function") {
+      w.gtag("config", "G-9HLLPWB8LN", {
+        page_path: location.pathname + location.search,
+        page_location: window.location.href,
+        page_title: document.title,
+        ...(user?.id ? { user_id: user.id } : {}),
+      });
+    }
+  }, [location.pathname, location.search, user?.id]);
+
+  return null;
+}
+
 const App = () => {
   useEffect(() => {
     // Purge any stale Service Worker JS caches from earlier builds so chunks never mismatch
@@ -168,6 +187,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <GoogleAnalyticsTracker />
             <ErrorBoundary>
               <AppShell>
                 <Routes>
