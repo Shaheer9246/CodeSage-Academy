@@ -1854,8 +1854,8 @@ private static boolean validate(TreeNode node, long low, long high) {
            validate(node.right, node.val, high);
 }`
     },
-    solutionExplanation: `Checking only immediate children is insufficient because a violation might occur deeper in the tree (e.g., a node in the right subtree being smaller than an ancestor). We use a recursive helper that passes down the valid range `(low, high)` for the current node. Initially, the range is infinite. When going left, the upper bound becomes the current node's value. When going right, the lower bound becomes the current node's value.`,
-    testCases: [
+     solutionExplanation: "Checking only immediate children is insufficient because a violation might occur deeper in the tree (e.g., a node in the right subtree being smaller than an ancestor). We use a recursive helper that passes down the valid range (low, high) for the current node. Initially, the range is infinite. When going left, the upper bound becomes the current node's value. When going right, the lower bound becomes the current node's value.",
+     testCases: [
       { id: 'tc-1', input: '[2,1,3]', expected: 'true' },
       { id: 'tc-2', input: '[5,1,4,null,null,3,6]', expected: 'false' },
       { id: 'tc-3', input: '[10,5,15,null,null,6,20]', expected: 'false' }
