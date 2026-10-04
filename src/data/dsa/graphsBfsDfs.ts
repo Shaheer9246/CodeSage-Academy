@@ -30,7 +30,7 @@ export const GRAPHS_BFS_DFS_PROBLEMS: DsaProblem[] = [
     ],
     keyPoints: [
       '**Brute Force**: Naive scanning without marking visited cells leads to infinite loops or double counting.',
-      '**Core Insight**: DFS/BFS Flood Fill. Iterate through every cell. If it is land ('1'), increment count and launch DFS/BFS to mark all connected land as visited (change to '0' or use a visited set).',
+      "**Core Insight**: DFS/BFS Flood Fill. Iterate through every cell. If it is land ('1'), increment count and launch DFS/BFS to mark all connected land as visited (change to '0' or use a visited set).",
       '**Edge Cases**: Empty grid, all water, all land, single row/column grids.',
       '**Space-Time Analysis**: O(M*N) time since each cell is visited once. O(M*N) space for recursion stack or queue in worst case.'
     ],
@@ -1254,9 +1254,9 @@ public static List<List<Integer>> pacificAtlantic(int[][] heights) {
     ],
     keyPoints: [
       '**Brute Force**: Try all permutations of courses. Factorial time.',
-      '**Core Insight**: Topological Sort / Cycle Detection. Represent courses as a Directed Graph. If the graph has a cycle, completion is impossible. Use Kahn's Algorithm (BFS indegree) or DFS coloring to detect cycles.',
+      "**Core Insight**: Topological Sort / Cycle Detection. Represent courses as a Directed Graph. If the graph has a cycle, completion is impossible. Use Kahn's Algorithm (BFS indegree) or DFS coloring to detect cycles.",
       '**Edge Cases**: No prerequisites (always true), disconnected components.',
-      '**Space-Time Analysis**: O(V+E) time, O(V+E) space.**
+      '**Space-Time Analysis**: O(V+E) time, O(V+E) space.'
     ],
     timeComplexity: 'O(V+E)',
     spaceComplexity: 'O(V+E)',
@@ -1460,7 +1460,7 @@ public static boolean canFinish(int numCourses, int[][] prerequisites) {
       '**Brute Force**: Check all subsets/permutations. Impossible.',
       '**Core Insight**: BFS on Implicit Graph. Each word is a node. Edges exist between words differing by 1 char. BFS guarantees shortest path in unweighted graph. Optimize neighbor generation by trying all 26 letters for each position.',
       '**Edge Cases**: End word not in list (return 0), begin word equals end word (not allowed per constraints).',
-      '**Space-Time Analysis**: O(M^2 * N) time where M is word length, N is dict size. O(N) space.**
+      '**Space-Time Analysis**: O(M^2 * N) time where M is word length, N is dict size. O(N) space.'
     ],
     timeComplexity: 'O(M^2 * N)',
     spaceComplexity: 'O(N)',
