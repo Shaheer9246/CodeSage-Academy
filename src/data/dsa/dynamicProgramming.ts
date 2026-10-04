@@ -172,7 +172,7 @@ int main() {
       '**Brute Force**: Try all subsets of non-adjacent indices. Exponential time.',
       '**Core Insight**: Decision at each house: Rob it (add value + max profit from i-2) OR Skip it (max profit from i-1).\nRecurrence: \`dp[i] = max(dp[i-1], dp[i-2] + nums[i])\`.',
       '**Edge Cases**: Single house, two houses.',
-      '**Space-Time Analysis**: O(N) time, O(1) space using two variables.**
+      '**Space-Time Analysis**: O(N) time, O(1) space using two variables.'
     ],
     timeComplexity: 'O(N)',
     spaceComplexity: 'O(1)',
