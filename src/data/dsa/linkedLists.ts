@@ -540,7 +540,7 @@ public class Solution {
     ],
     keyPoints: [
       '**Brute Force**: Store visited nodes in a HashSet. If a node repeats, cycle detected. Time O(N), Space O(N).',
-      '**Core Insight**: Floyd's Tortoise and Hare algorithm. Use two pointers moving at different speeds (slow=1 step, fast=2 steps). If they meet, there is a cycle.',
+      '**Core Insight**: Floyd\'s Tortoise and Hare algorithm. Use two pointers moving at different speeds (slow=1 step, fast=2 steps). If they meet, there is a cycle.',
       '**Edge Cases**: Empty list, single node without cycle, self-looping node.',
       '**Space-Time Analysis**: Optimal solution uses O(N) time and O(1) space.'
     ],
