@@ -163,7 +163,7 @@ public class Solution {
     return stack.isEmpty();
 }`
     },
-    solutionExplanation: `We use a stack to keep track of unmatched opening brackets. As we iterate through the string, if we encounter an opening bracket (\`(\`, \`{\`, \`[\`), we push it onto the stack. If we encounter a closing bracket (\`)`, \`}\`, \`]\`), we check if the stack is empty (invalid) or if the top of the stack does not match the corresponding opening bracket (invalid). If it matches, we pop the top element. After processing all characters, the string is valid only if the stack is empty (all opened brackets were closed).`,
+    solutionExplanation: "We use a stack to keep track of unmatched opening brackets. As we iterate through the string, if we encounter an opening bracket ('(', '{', '['), we push it onto the stack. If we encounter a closing bracket (')', '}', ']'), we check if the stack is empty (invalid) or if the top of the stack does not match the corresponding opening bracket (invalid). If it matches, we pop the top element. After processing all characters, the string is valid only if the stack is empty (all opened brackets were closed).",
     testCases: [
       { id: 'tc-1', input: '"()"', expected: 'true' },
       { id: 'tc-2', input: '"(]"', expected: 'false' },
@@ -194,7 +194,7 @@ public class Solution {
     keyPoints: [
       '**Brute Force**: Scan entire stack for min on every \`getMin\`. Time O(N) for getMin. Fails requirement.',
       '**Core Insight**: Auxiliary Stack. Maintain two stacks: one for data, one for mins. On push, push value to data stack and \`min(val, currentMin)\` to min stack. On pop, pop both. GetMin is simply top of min stack.',
-      '**Edge Cases**: Single element, duplicate minimums (must handle correctly so popping doesn't lose the min reference if another same min exists below).',
+      '**Edge Cases**: Single element, duplicate minimums (must handle correctly so popping doesn\'t lose the min reference if another same min exists below).',
       '**Space-Time Analysis**: O(1) time for all ops. O(N) space for auxiliary stack.'
     ],
     timeComplexity: 'O(1)',
