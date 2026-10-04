@@ -339,7 +339,7 @@ public class Solution {
     ],
     keyPoints: [
       '**Brute Force**: Try every substring and count mismatches. Time O(N^2) or worse.',
-      '**Core Insight**: Sliding Window. Maintain frequency count of chars in window. Key condition: \`window_length - max_freq_char_count <= k\`. If violated, shrink window. Note: \`max_freq\` doesn't need to be updated when shrinking, as we only care about finding larger windows later.',
+      '**Core Insight**: Sliding Window. Maintain frequency count of chars in window. Key condition: `window_length - max_freq_char_count <= k`. If violated, shrink window. Note: `max_freq` doesn\'t need to be updated when shrinking, as we only care about finding larger windows later.',
       '**Edge Cases**: k=0 (standard longest repeated char), k>=N (entire string), all distinct chars.',
       '**Space-Time Analysis**: O(N) time, O(Alphabet Size) space (constant 26).'
     ],
