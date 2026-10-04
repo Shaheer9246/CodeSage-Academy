@@ -319,7 +319,7 @@ public class Solution {
       {
         input: 'nums = [1,2,3,1]',
         output: '4',
-        explanation: 'Rob 1 and 3 (indices 0 and 2) or 2 and 4 (indices 1 and 3)? Actually indices 0&2 -> 1+3=4. Indices 1&3 -> 2+1=3. Wait, circular means 0 and 3 are adjacent. So can't do 0 and 3. Options: [0,2] -> 1+3=4. [1,3] -> 2+1=3. Max 4.'
+        explanation: "Rob 1 and 3 (indices 0 and 2) or 2 and 4 (indices 1 and 3)? Actually indices 0&2 -> 1+3=4. Indices 1&3 -> 2+1=3. Wait, circular means 0 and 3 are adjacent. So can't do 0 and 3. Options: [0,2] -> 1+3=4. [1,3] -> 2+1=3. Max 4."
       }
     ],
     constraints: [
