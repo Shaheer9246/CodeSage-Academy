@@ -47,18 +47,21 @@ const Suggestions = () => {
     const cachedTime = Number(localStorage.getItem(cacheTimeKey) || 0);
     const cachedData = localStorage.getItem(cacheKey);
 
-    // If cached less than 15 minutes ago, serve instantly from localStorage with ZERO egress
+        // Only serve from cache if cached less than 15 minutes ago AND has items (never lock into empty state)
     if (cachedData && now - cachedTime < 15 * 60 * 1000) {
       try {
         const parsed = JSON.parse(cachedData);
-        setItems(parsed);
-        if (user) {
-          const today = new Date(); today.setHours(0, 0, 0, 0);
-          setPostedToday(parsed.some((s: any) => s.is_mine && new Date(s.created_at) >= today));
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setItems(parsed);
+          if (user) {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            setPostedToday(parsed.some((s: any) => s.is_mine && new Date(s.created_at) >= today));
+          }
+          return;
         }
-        return;
       } catch {}
     }
+
 
     const { data: suggestionsData, error: suggestionsError } = await sb
       .from('suggestions_public')
