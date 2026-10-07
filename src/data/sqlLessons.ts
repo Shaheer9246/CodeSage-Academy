@@ -12,6 +12,8 @@ export interface SQLQuiz {
 }
 
 export interface SQLPractical {
+  verificationStrategy?: 'exact-match' | 'count-only' | 'custom' | string;
+  customValidator?: (userRes: any, solRes: any) => boolean;
   title: string;
   intro: string;
   steps: string[];
