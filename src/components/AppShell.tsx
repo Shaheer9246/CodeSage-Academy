@@ -243,11 +243,11 @@ function AppShellContent({ children }: { children: ReactNode }) {
         </div>
       </nav>
 
-      {/* Mobile "More" Drawer */}
+            {/* Mobile "More" Drawer */}
       {mobileMoreOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex flex-col justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full bg-card border-t border-border/50 rounded-t-3xl p-4 shadow-2xl space-y-3 pb-24">
-            <div className="flex items-center justify-between pb-2 border-b border-border/30">
+          <div className="w-full bg-card border-t border-border/50 rounded-t-3xl max-h-[50vh] overflow-y-auto p-4 shadow-2xl space-y-3 pb-6 scrollbar-thin scrollbar-thumb-secondary/50 scrollbar-track-transparent">
+            <div className="flex items-center justify-between pb-2 border-b border-border/30 sticky top-0 bg-card z-10">
               <span className="text-xs font-bold text-foreground">More Options</span>
               <button
                 onClick={() => setMobileMoreOpen(false)}
@@ -257,7 +257,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
               </button>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 pt-2">
               <button
                 onClick={() => {
                   setMobileMoreOpen(false);
