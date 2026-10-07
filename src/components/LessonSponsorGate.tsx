@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ArrowRight, ExternalLink, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,15 +8,12 @@ import { AdBannerCard } from '@/components/AdBannerCard';
 
 function LessonEntry({ children }: { children: ReactNode }) {
   const [showSponsor, setShowSponsor] = useState<boolean | null>(null);
+  const checked = useRef(false);
 
   useEffect(() => {
-    // Set up once per entry, including React StrictMode's effect replay.
-    let claimed: boolean | undefined;
-    setShowSponsor(previous => {
-      if (previous !== null) return previous;
-      claimed ??= claimLessonSponsor();
-      return claimed;
-    });
+    if (checked.current) return;
+    checked.current = true;
+    setShowSponsor(claimLessonSponsor());
   }, []);
 
   if (showSponsor === null) return null;

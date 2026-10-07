@@ -1,6 +1,6 @@
 /**
- * Central Configuration for CodeSage Real Monetag Ads & Monetization
- * Wired with:
+ * Central configuration for CodeSage's optional Monetag sponsor links.
+ * Zone metadata retained for reference only; scripts are not automatically loaded.
  * - Vignette Banner Zone: 11911764 (https://n6wxm.com/vignette.min.js)
  * - In-Page Push Zone: 11911770 (https://nap5k.com/tag.min.js)
  * - Direct SmartLink 1 (Positive link): https://omg10.com/4/11911757
@@ -55,12 +55,12 @@ export const ADS_CONFIG = {
   monetagVignetteZoneId: MONETAG_VIGNETTE_ZONE,
   monetagVignetteScriptSrc: MONETAG_VIGNETTE_SRC,
 
-  // Real Monetag Direct Links (SmartLinks that pay for every view/click)
+  // Monetag SmartLinks; earnings depend on Monetag's eligible traffic and advertiser rules.
   monetagDirectLink: MONETAG_DIRECT_LINK_1,
   monetagDirectLinkSecondary: MONETAG_DIRECT_LINK_2,
   monetagDirectLinks: [MONETAG_DIRECT_LINK_1, MONETAG_DIRECT_LINK_2],
 
-  // Fallback sponsor URL -> points to real Monetag Direct Link so clicks always earn revenue
+  // Fallback external sponsor URL; opening an offer does not guarantee revenue.
   defaultSponsorLink: MONETAG_DIRECT_LINK_1,
 
   // User's Monetag Publisher Referral Link (only used on the "Monetize Your Own Site" button)
