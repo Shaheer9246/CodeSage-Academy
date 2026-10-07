@@ -25,16 +25,34 @@ const InboxPage = () => {
     const cachedTime = Number(localStorage.getItem(cacheTimeKey) || 0);
     const cachedData = localStorage.getItem(cacheKey);
 
-    // If cached less than 30 minutes ago, load from localStorage with ZERO database egress
+        // If cached less than 30 minutes ago, load from localStorage with ZERO database egress
     if (cachedData && now - cachedTime < 30 * 60 * 1000) {
       try {
         const parsed = JSON.parse(cachedData);
         setItems(parsed);
+        // Still mark cached announcements as read so the badge clears immediately
+        if (user?.id && parsed.length > 0) {
+          const key = `codesage_inbox_seen_${user.id}`;
+          let seen: string[] = [];
+          try { seen = JSON.parse(localStorage.getItem(key) || '[]'); } catch { seen = []; }
+          const unseen = parsed.filter((a: Announcement) => !seen.includes(a.id));
+          if (unseen.length) {
+            supabase
+              .from('announcement_reads')
+              .upsert(unseen.map((a: Announcement) => ({ user_id: user.id, announcement_id: a.id })), { onConflict: 'user_id,announcement_id' })
+              .then(() => {
+                localStorage.setItem(key, JSON.stringify(parsed.map((a: Announcement) => a.id)));
+                localStorage.setItem(`codesage_badge_unread_${user.id}`, '0');
+                window.dispatchEvent(new Event('inbox:read'));
+              });
+          }
+        }
         return;
       } catch {
         // fallback to fetch if parse fails
       }
     }
+
 
     const { data, error } = await supabase
       .from('announcements')
