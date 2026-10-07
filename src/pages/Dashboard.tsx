@@ -749,17 +749,16 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* QUICK LAUNCH */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                    {/* QUICK LAUNCH */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <QuickChip icon={<Zap className="w-4 h-4 text-accent-orange" />} label="Challenges" sub="Test skills"
               color="accent-orange" data-tour="challenges" onClick={go('/challenges')} disabled={isGuest} />
-            <QuickChip icon={<Code2 className="w-4 h-4 text-emerald-400" />} label="DSA Sheet" sub="Top 75 prep"
-              color="primary" onClick={go('/dsa-sheet')} disabled={isGuest} />
             <QuickChip icon={<Code className="w-4 h-4 text-primary" />} label="Editor" sub="Playground"
               color="primary" data-tour="playground" onClick={go('/playground')} disabled={isGuest} />
             <QuickChip icon={<HelpCircle className="w-4 h-4 text-accent-blue" />} label="Exams" sub="Quiz tests"
               color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
           </div>
+
 
           {/* CONTINUE LEARNING */}
           {!isGuest && activeContinueTrack && (
