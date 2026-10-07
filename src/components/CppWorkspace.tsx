@@ -483,10 +483,10 @@ int main() {
           </div>
         </div>
 
-        {/* Body Split */}
-        <div className="flex-1 flex min-h-0">
+      {/* Body Split */}
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Editor Side */}
-          <div className="flex-1 border-r border-border/30 relative">
+          <div className="flex-1 min-h-[200px] border-b border-border/30 relative">
             <CodeEditor 
               code={code} 
               onChange={setCode} 
@@ -496,7 +496,7 @@ int main() {
           </div>
           
           {/* Terminal Side */}
-          <div className="w-[40%] min-w-[250px] flex flex-col">
+          <div className="h-[45%] min-h-[160px] flex flex-col">
             {renderTerminalContent()}
           </div>
         </div>
