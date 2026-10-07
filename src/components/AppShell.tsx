@@ -20,8 +20,8 @@ const DESKTOP_NAV_ITEMS = [
 
 const MOBILE_PRIMARY_ITEMS = [
   { path: '/dashboard', icon: Home, label: 'Dashboard' },
+  { path: '/dsa-sheet', icon: Code2, label: 'DSA Sheet' },
   { path: '/roadmap', icon: Map, label: 'Roadmap' },
-  { path: '/inbox', icon: InboxBadge, label: 'Inbox' },
   { path: '/ai-teacher', icon: Bot, label: 'AI Teacher' },
 ];
 
@@ -52,7 +52,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
     );
   }
 
-  const isMoreActive = location.pathname === '/community' || location.pathname === '/settings';
+  const isMoreActive = location.pathname === '/inbox' || location.pathname === '/community' || location.pathname === '/settings' || location.pathname === '/marketplace';
   
   const desktopVisibleItems = DESKTOP_NAV_ITEMS.slice(0, 4);
   const desktopHiddenItems = DESKTOP_NAV_ITEMS.slice(4);
@@ -261,24 +261,21 @@ function AppShellContent({ children }: { children: ReactNode }) {
               <button
                 onClick={() => {
                   setMobileMoreOpen(false);
-                  navigate('/dsa-sheet');
+                  navigate('/inbox');
                 }}
                 className={`w-full flex items-center justify-between p-3 rounded-xl text-xs font-medium transition-all ${
-                  location.pathname === '/dsa-sheet'
+                  location.pathname === '/inbox'
                     ? 'bg-primary/10 text-primary border border-primary/20'
                     : 'bg-secondary/30 text-foreground hover:bg-secondary/60'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                    <Code2 className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <InboxBadge className="w-4 h-4" />
                   </div>
                   <div className="text-left">
-                    <div className="font-semibold flex items-center gap-1.5">
-                      <span>DSA Sheet</span>
-                      <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.2 rounded font-mono font-bold">TOP 75</span>
-                    </div>
-                    <div className="text-[10px] text-muted-foreground">Interview coding problems with multi-language compiler</div>
+                    <div className="font-semibold">Inbox</div>
+                    <div className="text-[10px] text-muted-foreground">Messages and notifications</div>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
