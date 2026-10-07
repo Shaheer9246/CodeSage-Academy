@@ -41,6 +41,9 @@ export const ADS_CONFIG = {
   // Global toggle
   enabled: true,
 
+  // Local sponsor prompt only; no automatic popup scripts or impression simulation.
+  lessonStart: { enabled: true, cooldownMinutes: 10 },
+
   // EthicalAds Publisher ID
   ethicalAdsPublisherId: 'codesage-academy',
 

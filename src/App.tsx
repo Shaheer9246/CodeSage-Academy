@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider, useUser } from "@/contexts/UserContext";
 import AppShell from "@/components/AppShell";
+import { LessonSponsorGate } from "@/components/LessonSponsorGate";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2, Terminal } from "lucide-react";
 
@@ -190,6 +191,7 @@ const App = () => {
             <GoogleAnalyticsTracker />
             <ErrorBoundary>
               <AppShell>
+                <LessonSponsorGate>
                 <Routes>
                   <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
@@ -261,6 +263,7 @@ const App = () => {
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </LessonSponsorGate>
               </AppShell>
             </ErrorBoundary>
           </BrowserRouter>
