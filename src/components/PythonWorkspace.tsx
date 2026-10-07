@@ -393,11 +393,11 @@ export default function PythonWorkspace({
              </button>
           </div>
         </div>
-        <div className="flex-1 flex min-h-0">
-          <div className="flex-1 border-r border-border/30 relative">
+          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 min-h-[200px] border-b border-border/30 relative">
             <CodeEditor code={code} onChange={setCode} language="python" showShortcuts={false} />
           </div>
-          <div className="w-[40%] min-w-[250px] flex flex-col">
+          <div className="h-[45%] min-h-[160px] flex flex-col">
             {renderTerminal()}
           </div>
         </div>
