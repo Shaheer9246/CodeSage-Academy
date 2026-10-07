@@ -7,6 +7,7 @@ import {
 import CodeEditor from './CodeEditor';
 
 interface JavaWorkspaceProps {
+  requiresLocalTerminal?: boolean;
   starterCode?: string;
   initialCode?: string;
   onCodeChange?: (code: string) => void;

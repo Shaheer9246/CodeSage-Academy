@@ -13,6 +13,7 @@ import {
 import CodeEditor from './CodeEditor';
 
 interface CWorkspaceProps {
+  requiresLocalTerminal?: boolean;
   starterCode?: string;
   initialCode?: string;
   onCodeChange?: (code: string) => void;

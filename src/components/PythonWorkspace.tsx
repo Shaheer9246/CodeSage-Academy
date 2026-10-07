@@ -290,7 +290,7 @@ export default function PythonWorkspace({
           if (isWaitingForInput) {
              return (
                <div key={line.id} className="flex items-center gap-2 mt-1">
-                 <span className="text-emerald-500 font-bold">>>> </span>
+                 <span className="text-emerald-500 font-bold">{'>>> '}</span>
                  <form onSubmit={(e) => { e.preventDefault(); submitInput(inputRef.current?.value || ''); }} className="flex-1">
                    <input 
                      ref={inputRef}
