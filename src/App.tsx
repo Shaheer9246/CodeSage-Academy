@@ -267,6 +267,7 @@ const App = () => {
                 </LessonSponsorGate>
               </AppShell>
             </ErrorBoundary>
+           <PwaInstallPrompt />
           </BrowserRouter>
         </TooltipProvider>
       </UserProvider>
