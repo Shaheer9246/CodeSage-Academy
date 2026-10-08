@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { Lock, Check, Flame, Zap, Trophy, ChevronRight } from 'lucide-react';
+import { Lock, Check, Flame, Zap, Trophy, ChevronRight, ChevronDown, Compass, ArrowRight, Sparkles } from 'lucide-react';
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AdBannerCard } from '@/components/AdBannerCard';
@@ -504,10 +504,88 @@ const height = rows * ROW_H + 32;
 /*  PAGE                                                              */
 /* ------------------------------------------------------------------ */
 
+interface CareerStep {
+  title: string;
+  trackKey?: string;
+  isDsa?: boolean;
+}
+
+interface CareerPath {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  duration: string;
+  badge: string;
+  steps: CareerStep[];
+}
+
+const CAREER_PATHS: CareerPath[] = [
+  {
+    id: 'fullstack-career',
+    title: 'Full-Stack Developer',
+    subtitle: 'Build complete web apps from scratch to production',
+    icon: '🚀',
+    duration: '4–6 Months',
+    badge: 'Most Popular',
+    steps: [
+      { title: 'Frontend Web Development (HTML, CSS, JS, React)', trackKey: 'frontend' },
+      { title: 'Computer & Network Fundamentals', trackKey: 'networking' },
+      { title: 'SQL & Database Mastery', trackKey: 'sql' },
+      { title: 'Full-Stack Web Development', trackKey: 'fullstack' },
+      { title: 'DSA Sheet & Interview Prep', isDsa: true },
+    ],
+  },
+  {
+    id: 'ai-career',
+    title: 'AI & Machine Learning Engineer',
+    subtitle: 'Master Python, Data, LLMs, and modern AI engineering',
+    icon: '🤖',
+    duration: '3–5 Months',
+    badge: 'High Demand',
+    steps: [
+      { title: 'Python for Beginners', trackKey: 'python' },
+      { title: 'Python Advanced & APIs', trackKey: 'pythonexpert' },
+      { title: 'SQL & Database Mastery', trackKey: 'sql' },
+      { title: 'AI & Machine Learning Fundamentals', trackKey: 'ai-fundamentals' },
+      { title: 'Generative AI, LLMs & Prompting', trackKey: 'intermediate-ai' },
+    ],
+  },
+  {
+    id: 'frontend-3d-career',
+    title: 'Modern Frontend & 3D Specialist',
+    subtitle: 'Create award-winning interactive & 3D web experiences',
+    icon: '🎨',
+    duration: '3–4 Months',
+    badge: 'Creative Tech',
+    steps: [
+      { title: 'Frontend Web Development (HTML, CSS, JS, React)', trackKey: 'frontend' },
+      { title: 'Computer & Network Fundamentals', trackKey: 'networking' },
+      { title: '3D Web Development (Three.js & WebGL)', trackKey: 'three3d' },
+      { title: 'Real-World Portfolio Projects', trackKey: 'frontend' },
+    ],
+  },
+  {
+    id: 'freelance-career',
+    title: 'Freelancing Fast-Track',
+    subtitle: 'Learn marketable skills and land your first paying clients',
+    icon: '💼',
+    duration: '2–3 Months',
+    badge: 'Earn Fastest',
+    steps: [
+      { title: 'Choose Frontend Dev OR Python', trackKey: 'frontend' },
+      { title: 'Real-World Freelance Execution', trackKey: 'real-freelance' },
+      { title: 'Freelance & Client Strategies', trackKey: 'freelance' },
+      { title: 'Build 3 Live Client Demos', trackKey: 'real-freelance' },
+    ],
+  },
+];
+
 const Roadmap = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [activeTrack, setActiveTrack] = useState('frontend');
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [enrollDialogTrack, setEnrollDialogTrack] = useState<TrackId | null>(null);
   const [pendingNode, setPendingNode] = useState<TrackNode | null>(null);
   const shouldRedirect = !user;
@@ -582,6 +660,132 @@ const Roadmap = () => {
               className="h-full rounded-full bg-gradient-to-r from-primary/60 via-primary to-primary/60 shadow-[0_0_12px_hsl(var(--primary))]"
             />
           </div>
+        </div>
+
+        {/* Career Paths & Beginner Guide (Expandable) */}
+        <div className="mb-6 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-secondary/20 to-primary/5 p-4 backdrop-blur-sm transition-all">
+          <button
+            type="button"
+            onClick={() => setIsGuideOpen(prev => !prev)}
+            className="flex w-full items-center justify-between gap-3 text-left"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
+                <Compass className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="font-display text-sm sm:text-base font-bold text-foreground">
+                    Unsure Where to Start? View Career Paths
+                  </h2>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2 py-0.5 font-mono text-[10px] font-semibold text-primary">
+                    <Sparkles className="h-2.5 w-2.5" /> Beginner Guide
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground truncate">
+                  Step-by-step ordered tracks for Full-Stack, AI Engineer, 3D Web, and Freelancing
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+              <span className="hidden sm:inline">{isGuideOpen ? 'Hide Guide' : 'Explore Paths'}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-200 ${
+                  isGuideOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </div>
+          </button>
+
+          {isGuideOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="mt-4 grid grid-cols-1 gap-4 border-t border-border/40 pt-4 md:grid-cols-2"
+            >
+              {CAREER_PATHS.map(career => (
+                <div
+                  key={career.id}
+                  className="flex flex-col justify-between rounded-xl border border-border/50 bg-background/70 p-4 hover:border-primary/40 transition-all"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-2xl">{career.icon}</span>
+                        <div>
+                          <h3 className="font-display text-sm font-bold text-foreground">
+                            {career.title}
+                          </h3>
+                          <p className="text-[11px] text-muted-foreground">{career.subtitle}</p>
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-primary">
+                        {career.badge}
+                      </span>
+                    </div>
+
+                    <div className="my-3 space-y-1.5">
+                      {career.steps.map((step, idx) => {
+                        const isCurrentlySelected = step.trackKey === activeTrack;
+                        return (
+                          <div
+                            key={idx}
+                            className={`flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
+                              isCurrentlySelected
+                                ? 'bg-primary/15 border border-primary/30 text-foreground'
+                                : 'bg-secondary/20 text-muted-foreground hover:bg-secondary/40 hover:text-foreground'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 font-mono text-[10px] font-bold text-primary">
+                                {idx + 1}
+                              </span>
+                              <span className="truncate font-medium">{step.title}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (step.isDsa) {
+                                  navigate('/dsa-sheet');
+                                } else if (step.trackKey) {
+                                  setActiveTrack(step.trackKey);
+                                  setIsGuideOpen(false);
+                                }
+                              }}
+                              className="shrink-0 inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                            >
+                              {step.isDsa ? 'Open DSA' : isCurrentlySelected ? 'Active' : 'Go'}
+                              <ArrowRight className="h-2.5 w-2.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between border-t border-border/30 pt-2.5">
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      ⏱ Est. Time: {career.duration}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const firstTrack = career.steps[0]?.trackKey;
+                        if (firstTrack) {
+                          setActiveTrack(firstTrack);
+                          setIsGuideOpen(false);
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-xs font-display font-bold text-primary hover:underline"
+                    >
+                      Start Step 1 <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          )}
         </div>
 
         {/* Track selector — pill rail */}
