@@ -9,6 +9,7 @@ import AppShell from "@/components/AppShell";
 import { LessonSponsorGate } from "@/components/LessonSponsorGate";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2, Terminal } from "lucide-react";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 // Direct imports for all pages so route transitions are 100% instant
 // with zero per-page "loading module..." delay and zero chunk-mismatch errors
