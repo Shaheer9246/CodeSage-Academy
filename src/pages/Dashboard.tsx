@@ -1216,7 +1216,14 @@ function TrackRow({
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-bold font-display truncate">{track.title}</p>
+            <p className="text-sm font-bold font-display truncate flex items-center gap-1.5">
+              {track.title}
+              {['pythonexpert', 'cexpert', 'cppexpert', 'javaexpert', 'intermediate-ai'].includes(track.id) && (
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/40 shadow-sm shrink-0">
+                  PRO
+                </span>
+              )}
+            </p>
             {completed ? (
               <span className="text-xs shrink-0" title="Track Completed">🎓</span>
             ) : enrolled ? (
