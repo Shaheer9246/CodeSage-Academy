@@ -23,3 +23,8 @@ self.addEventListener('activate', (event) => {
     ).then(() => self.clients.claim())
   );
 });
+
+// Minimal fetch listener to satisfy PWA installability requirements
+self.addEventListener('fetch', (event) => {
+  // Pass-through to network
+});
