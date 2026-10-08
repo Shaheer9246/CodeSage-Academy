@@ -23,8 +23,8 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
     const booted = !!doc?.getElementById('codesage-live-css');
 
     // ⚡ INSTANT HOT CSS RELOAD: If only CSS changed, update style tag directly without reloading iframe
-    if (!htmlChanged && !jsChanged) {
-      if (booted) {
+    if (!htmlChanged && !jsChanged && booted) {
+      {
         const styleEl = doc!.getElementById('codesage-live-css');
         if (styleEl && styleEl.textContent !== safeCss) styleEl.textContent = safeCss;
       }
@@ -203,7 +203,7 @@ const LivePreview = ({ html, css, js, onConsoleLog }: LivePreviewProps) => {
       ref={iframeRef}
       className="w-full h-full border-0 bg-[#0f0a2e]"
       style={{ backgroundColor: '#0f0a2e' }}
-      sandbox="allow-scripts allow-modals allow-same-origin allow-downloads"
+      sandbox="allow-scripts allow-modals allow-downloads"
       title="Preview"
     />
   );
