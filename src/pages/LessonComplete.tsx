@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 import { badgeForLessons } from '@/lib/gamification';
 import { getLessonQuizAttempt, saveLessonQuizAttempt, type QuizAttempt } from '@/lib/quizStorage';
+import { canClaimDaily2x, markDaily2xClaimed, recordFreeLessonFinished } from '@/lib/lessonAds';
+import { ADS_CONFIG } from '@/config/adsConfig';
 
 type TrackLessonItem = { 
   id: string; 
@@ -89,10 +91,23 @@ const LessonComplete = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useUser();
+  const { user, addXp, addCoins } = useUser();
+  const [claimedDaily2x, setClaimedDaily2x] = useState(!canClaimDaily2x());
   const [searchParams] = useSearchParams();
   const [showConfetti, setShowConfetti] = useState(true);
   const [showFullReview, setShowFullReview] = useState(false);
+
+  useEffect(() => {
+    recordFreeLessonFinished();
+  }, []);
+
+  const handleClaimDaily2x = () => {
+    window.open(ADS_CONFIG.monetagDirectLink, '_blank', 'noopener,noreferrer');
+    addXp(1);
+    addCoins(2);
+    markDaily2xClaimed();
+    setClaimedDaily2x(true);
+  };
 
   // Preserve the query parameter across all navigation jumps.
   const from = searchParams.get('from') ?? 'dashboard';
@@ -281,6 +296,37 @@ const LessonComplete = () => {
             <p className="text-lg font-bold font-display text-foreground">{user.streakCount}</p>
             <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Streak Days</p>
           </div>
+        </div>
+
+        {/* Daily 2x Reward Boost (1 time per day) */}
+        <div className="mb-5 glass-card rounded-xl p-3.5 border border-amber-500/30 bg-amber-500/5 relative overflow-hidden">
+          {!claimedDaily2x ? (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <Zap className="w-4 h-4 fill-current" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    Daily 2x Reward Boost <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400">1x / Day</span>
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Visit sponsor to double this lesson's earnings (+1 XP, +2 Coins).
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleClaimDaily2x}
+                className="w-full sm:w-auto px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md shrink-0 flex items-center justify-center gap-1"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Claim 2x Bonus
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 text-xs font-mono text-emerald-400 py-0.5">
+              <CheckCircle2 className="w-4 h-4" /> 2x Reward claimed for today. Next boost ready tomorrow!
+            </div>
+          )}
         </div>
 
         {isLeveledUp && (
