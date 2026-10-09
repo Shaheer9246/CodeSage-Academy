@@ -526,17 +526,15 @@ Tell me the **Lesson Name** and **Module Name** to get a complete note-type guid
             <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">Monetag Partner</span>
             <span className="truncate">Cloud Hosting &amp; Python Sandbox Environment</span>
           </div>
-          <button 
-            type="button"
-            onClick={() => {
-              const url = ADS_CONFIG.monetagDirectLink || ADS_CONFIG.defaultSponsorLink;
-              window.open(url, '_blank', 'noopener,noreferrer');
-            }}
+          <a 
+            href={ADS_CONFIG.monetagDirectLink || ADS_CONFIG.defaultSponsorLink}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-primary hover:underline flex items-center gap-1 shrink-0 font-medium font-mono cursor-pointer"
           >
             <span>Explore Sponsor</span>
             <ExternalLink className="w-2.5 h-2.5" />
-          </button>
+          </a>
         </div>
       )}
 
