@@ -112,7 +112,7 @@ const LocalLessonPage = () => {
           <div className="flex items-center gap-2 shrink-0">
             <CourseOverviewButton trackId="local" variant="compact" label="Syllabus & Outcomes" />
             <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
-              <Sparkles className="w-3 h-3" /> +5 XP · +2 ◈
+              <Sparkles className="w-3 h-3" /> +1 XP · +2 ◈
             </div>
           </div>
         </div>
