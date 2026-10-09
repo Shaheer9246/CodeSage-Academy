@@ -362,10 +362,15 @@ export async function askProfessor(
     onQueueStatus?: (msg: string) => void;
   }
 ): Promise<{ text: string; groundedLesson: GroundedLesson | null; creditsRemaining: number }> {
+  
   const grounded = options?.lessonOverride || findGroundedLesson(userQuery);
 
+  // --- NEW LOGIC STARTS HERE ---
   let groundingContext = '';
+  let generalInstruction = '';
+
   if (grounded) {
+    // Case 1: User asked about a specific CodeSage Lesson
     groundingContext = `
 =========================================
 OFFICIAL CODESAGE CURRICULUM SYLLABUS REFERENCE:
@@ -379,7 +384,31 @@ ${grounded.summary}
 =========================================
 TEACHING DIRECTIVE: The student is asking about this lesson from our curriculum.
 Use this curriculum material as your trusted foundation so your answer directly teaches what CodeSage covers, but explain it in your warm, encouraging, human teacher voice!`;
+    
+    generalInstruction = ""; // No extra instruction needed, focus on lesson
+  } else {
+    // Case 2: User asked something OFF-CURRICULUM or GENERAL
+    groundingContext = ""; 
+    
+    generalInstruction = `
+=========================================
+GENERAL KNOWLEDGE & OFF-TOPIC HANDLING:
+The student has asked a question that is NOT part of the official CodeSage curriculum files.
+
+YOUR RULES FOR THIS CASE:
+1. IF IT IS TECH/CODING RELATED (but not in our syllabus): 
+   - Explain it clearly using your "Teacher Punk" style (analogies, simple code snippets).
+   - Mention that while this isn't in our current course modules, here is how it works generally.
+   
+2. IF IT IS NON-TECH (e.g., life advice, history, baking, sports):
+   - Be polite and helpful, but gently steer them back to learning if appropriate.
+   - Example: "That's interesting! While I'm here to help you master coding, I can briefly mention that... But hey, did you know similar logic applies to JavaScript arrays?"
+   
+3. NEVER HALLUCINATE CURRICULUM CONTENT. 
+   - Do not pretend this topic is in our syllabus if it isn't.
+   - Keep the tone warm, friendly, and encouraging regardless of the topic.`;
   }
+  // --- NEW LOGIC ENDS HERE ---
 
   const systemPrompt = `You are "Teacher Punk", the inspiring, friendly, and beloved coding mentor at CodeSage.
 Students love learning from you because you make complex programming feel easy, intuitive, and fun—like a brilliant senior developer sitting next to them with a cup of coffee and a smile.
@@ -405,7 +434,8 @@ Students love learning from you because you make complex programming feel easy, 
      - If the student asks in Roman Urdu (e.g., "HTML kya hai bhai", "Flexbox samjhao", "kaise use karein"), reply naturally in warm, friendly, encouraging Roman Urdu (e.g., "AOA dost! Bohot zabardast sawal hai. Asaan lafzon mein samjho...").
      - If in English, reply in natural, inspiring, conversational English.
 
-${groundingContext}`;
+${groundingContext}
+${generalInstruction}`; // <-- Inject both contexts
 
   const result = await callBackendAiTeacher(
     [
