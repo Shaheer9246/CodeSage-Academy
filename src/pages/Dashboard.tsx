@@ -718,10 +718,12 @@ const Dashboard = () => {
 
           {/* HERO / HUD */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            className="relative glass-card rounded-3xl p-4 sm:p-5 border border-primary/20 overflow-hidden"
+            className="relative z-20 glass-card rounded-3xl p-4 sm:p-5 border border-primary/20"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10 pointer-events-none" />
-            <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+            <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10" />
+              <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
+            </div>
 
             <div className="relative flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
               <div className="min-w-0">
