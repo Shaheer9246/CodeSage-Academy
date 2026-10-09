@@ -6,6 +6,10 @@ export const DAILY_2X_CLAIMED_KEY = 'codesage_daily_2x_claimed_date';
 
 export const PRO_TRACK_PREFIXES = ['pyx-', 'cx-', 'cppx-', 'javax-', 'aiin-'];
 
+let memoryFreeCounter = 0;
+let memoryDaily2xDate = '';
+const memoryUnlockedPro = new Set<string>();
+
 export function isLessonPath(pathname: string): boolean {
   return /^\/(?:lesson|n-lesson|f-lesson|fs-lesson|java-lesson|javax-lesson|c-lesson|cx-lesson|py-lesson|pyx-lesson|local-lesson|sql-lesson|rf-lesson|ai-lesson|iai-lesson|cpp-lesson|cppx-lesson|three-lesson)\/[^/]+\/?$/.test(pathname);
 }
@@ -30,7 +34,10 @@ export function evaluateLessonGate(pathname: string): { shouldShow: boolean; isP
 
   // 1. Pro / Expert track: always gate behind sponsor unlock
   if (isProLessonPath(pathname)) {
-    const sessionUnlocked = sessionStorage.getItem(`unlocked_${pathname}`);
+    let sessionUnlocked = memoryUnlockedPro.has(pathname);
+    try {
+      sessionUnlocked = sessionUnlocked || sessionStorage.getItem(`unlocked_${pathname}`) === 'true';
+    } catch { /* fallback to memory */ }
     if (!sessionUnlocked) {
       return { shouldShow: true, isProGate: true };
     }
@@ -38,11 +45,15 @@ export function evaluateLessonGate(pathname: string): { shouldShow: boolean; isP
   }
 
   // 2. Free track: show ad every 2 lessons
-  let count = 0;
+  let count = memoryFreeCounter;
   try {
-    count = parseInt(localStorage.getItem(FREE_LESSON_COUNTER_KEY) || '0', 10);
+    const stored = localStorage.getItem(FREE_LESSON_COUNTER_KEY);
+    if (stored !== null) {
+      count = parseInt(stored, 10) || 0;
+      memoryFreeCounter = count;
+    }
   } catch {
-    count = 0;
+    count = memoryFreeCounter;
   }
 
   // Gate triggers every 2 lessons (count >= 2)
@@ -57,9 +68,12 @@ export function evaluateLessonGate(pathname: string): { shouldShow: boolean; isP
  * Increments the free lesson counter (call when finishing a free lesson).
  */
 export function recordFreeLessonFinished(): void {
+  memoryFreeCounter += 1;
   try {
-    const current = parseInt(localStorage.getItem(FREE_LESSON_COUNTER_KEY) || '0', 10);
-    localStorage.setItem(FREE_LESSON_COUNTER_KEY, String(current + 1));
+    const current = parseInt(localStorage.getItem(FREE_LESSON_COUNTER_KEY) || '0', 10) || 0;
+    const next = current + 1;
+    memoryFreeCounter = next;
+    localStorage.setItem(FREE_LESSON_COUNTER_KEY, String(next));
   } catch { /* storage fallback */ }
 }
 
@@ -67,6 +81,7 @@ export function recordFreeLessonFinished(): void {
  * Resets the free lesson counter after the ad has been shown.
  */
 export function resetFreeLessonCounter(): void {
+  memoryFreeCounter = 0;
   try {
     localStorage.setItem(FREE_LESSON_COUNTER_KEY, '0');
   } catch { /* storage fallback */ }
@@ -76,6 +91,7 @@ export function resetFreeLessonCounter(): void {
  * Unlocks a Pro lesson for the current browser session.
  */
 export function unlockProLesson(pathname: string): void {
+  memoryUnlockedPro.add(pathname);
   try {
     sessionStorage.setItem(`unlocked_${pathname}`, 'true');
   } catch { /* fallback */ }
@@ -89,16 +105,20 @@ function getTodayString(): string {
 }
 
 export function canClaimDaily2x(): boolean {
+  const today = getTodayString();
+  if (memoryDaily2xDate === today) return false;
   try {
     const lastClaimed = localStorage.getItem(DAILY_2X_CLAIMED_KEY);
-    return lastClaimed !== getTodayString();
+    return lastClaimed !== today;
   } catch {
-    return true;
+    return memoryDaily2xDate !== today;
   }
 }
 
 export function markDaily2xClaimed(): void {
+  const today = getTodayString();
+  memoryDaily2xDate = today;
   try {
-    localStorage.setItem(DAILY_2X_CLAIMED_KEY, getTodayString());
+    localStorage.setItem(DAILY_2X_CLAIMED_KEY, today);
   } catch { /* storage fallback */ }
 }
