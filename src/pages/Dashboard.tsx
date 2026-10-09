@@ -1,5 +1,6 @@
-  import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
+import { supabase } from '@/integrations/supabase/client';
 import { StreakModal } from '@/components/StreakModal';
 import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
         Gamepad2, Trophy, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
@@ -250,7 +251,7 @@ function loadCollapsed(): Record<string, boolean> {
 }
 
 const Dashboard = () => {
-  const { user, loading, updateStreak, applyPromoCode, markTourSeen } = useUser();
+  const { user, loading, updateStreak, applyPromoCode, markTourSeen, updateUser } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuest = searchParams.get('guest') === '1';
@@ -259,6 +260,7 @@ const Dashboard = () => {
   const [promoMsg, setPromoMsg] = useState('');
   const [showXpModal, setShowXpModal] = useState(false);
   const [showGuideDetails, setShowGuideDetails] = useState(false);
+  const [showCoinMenu, setShowCoinMenu] = useState(false);
 
   const [tourReady, setTourReady] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
@@ -372,6 +374,32 @@ const Dashboard = () => {
   const xp = user?.xp || 0;
   const sageCoins = user?.sageCoins ?? 0;
   const streak = user?.streakCount ?? 0;
+
+  const handleBuyXp = async () => {
+    const { data, error } = await supabase.rpc('buy_daily_xp');
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | { sage_coins?: number; daily_xp?: number; daily_xp_date?: string | null } | null;
+    if (error || !row) {
+      toast.error(error?.message?.includes('5 Sage Coins') ? 'Need 5 Sage Coins to buy XP' : (error?.message || 'Purchase failed'));
+      return;
+    }
+    updateUser({ sageCoins: row.sage_coins || 0, dailyXp: Number(row.daily_xp ?? 10), dailyXpDate: row.daily_xp_date || null });
+    toast.success('⚡ +3.3 XP added — one more lesson unlocked!');
+    setShowCoinMenu(false);
+  };
+
+  const handleBuyFreeze = async () => {
+    const { data, error } = await supabase.rpc('buy_streak_freeze');
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | { sage_coins?: number; streak_freeze_until?: string | null } | null;
+    if (error || !row) {
+      toast.error(error?.message?.includes('5 Sage Coins') ? 'Need 5 Sage Coins for a Streak Freeze' : (error?.message || 'Purchase failed'));
+      return;
+    }
+    updateUser({ sageCoins: row.sage_coins || 0, streakFreezeUntil: row.streak_freeze_until || null });
+    toast.success('❄️ Streak Freeze purchased — tomorrow is protected!');
+    setShowCoinMenu(false);
+  };
 
   const allTracks = useMemo(() => SECTIONS.flatMap(s => s.tracks), []);
   const enrolledCount = allTracks.filter(t => t.trackId && !isGuest && (isActive(t.trackId) || isEnrolled(t.trackId))).length;
@@ -716,21 +744,47 @@ const Dashboard = () => {
                   <Zap className="w-3.5 h-3.5 text-primary" />
                   <span className="text-xs font-bold text-primary">{energy} / 10 XP</span>
                 </button>
-                <button
-                  onClick={() => {
-                    if (isGuest) {
-                      navigate('/auth');
-                    } else {
-                      setShowXpModal(true);
-                      setShowGuideDetails(true);
-                    }
-                  }}
-                  className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
-                  title="View Sage Coins & XP Guide"
-                >
-                  <Coins className="w-3.5 h-3.5 text-yellow-400" />
-                  <span className="text-xs font-bold text-yellow-400">{sageCoins}</span>
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      if (isGuest) {
+                        navigate('/auth');
+                      } else {
+                        setShowCoinMenu(v => !v);
+                      }
+                    }}
+                    className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
+                    title="Sage Coins — Buy XP or Streak Freeze"
+                  >
+                    <Coins className="w-3.5 h-3.5 text-yellow-400" />
+                    <span className="text-xs font-bold text-yellow-400">{sageCoins}</span>
+                  </button>
+                  {showCoinMenu && !isGuest && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowCoinMenu(false)} />
+                      <div className="absolute right-0 top-full mt-2 w-60 z-50 rounded-xl border border-border bg-popover p-2 shadow-xl space-y-1">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2 pt-1 pb-1.5">Coin Shop</p>
+                        <button
+                          onClick={handleBuyXp}
+                          className="w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-semibold text-foreground hover:bg-secondary/60 transition-colors"
+                        >
+                          <Zap className="w-4 h-4 text-primary shrink-0" />
+                          <span>Buy XP Refill <span className="text-muted-foreground">(+3.3 XP)</span></span>
+                          <span className="ml-auto text-[10px] font-bold text-yellow-400 shrink-0">5 🪙</span>
+                        </button>
+                        <button
+                          onClick={handleBuyFreeze}
+                          className="w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-semibold text-foreground hover:bg-secondary/60 transition-colors"
+                        >
+                          <Flame className="w-4 h-4 text-orange-400 shrink-0" />
+                          <span>Buy Streak Freeze</span>
+                          <span className="ml-auto text-[10px] font-bold text-yellow-400 shrink-0">5 🪙</span>
+                        </button>
+                        <p className="text-[10px] text-muted-foreground px-2 pt-1 pb-0.5">Coins are earned 100% free by completing lessons & challenges.</p>
+                      </div>
+                    </>
+                  )}
+                </div>
                 <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
                   <Flame className="w-3.5 h-3.5 text-orange-400" />
                   <span className="text-xs font-bold text-orange-400">{streak}d</span>
@@ -1133,7 +1187,10 @@ const Dashboard = () => {
                       </div>
                       <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
                         <li>
-                          <strong className="text-foreground">Streak Freeze (10 Coins):</strong> Protects your streak in Profile if you miss a study day.
+                          <strong className="text-foreground">Streak Freeze (5 Coins):</strong> Protects your streak if you miss a study day — buy it from the coin button.
+                        </li>
+                        <li>
+                          <strong className="text-foreground">Buy XP (5 Coins):</strong> Tap the coin button to instantly refill +3.3 XP for one more lesson.
                         </li>
                         <li>
                           <strong className="text-foreground">Arcade & Crawler Lives:</strong> Replenish hearts in Code Crawler and challenges.
