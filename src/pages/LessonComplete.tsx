@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { badgeForLessons } from '@/lib/gamification';
 import { getLessonQuizAttempt, saveLessonQuizAttempt, type QuizAttempt } from '@/lib/quizStorage';
-import { canClaimDaily2x, markDaily2xClaimed, recordFreeLessonFinished } from '@/lib/lessonAds';
+import { canClaimDaily2x, markDaily2xClaimed, recordFreeLessonFinished, PRO_TRACK_PREFIXES } from '@/lib/lessonAds';
 import { ADS_CONFIG } from '@/config/adsConfig';
 
 type TrackLessonItem = { 
@@ -98,15 +98,19 @@ const LessonComplete = () => {
   const [showFullReview, setShowFullReview] = useState(false);
 
   useEffect(() => {
-    recordFreeLessonFinished();
-  }, []);
+    const isPro = id ? PRO_TRACK_PREFIXES.some(prefix => id.startsWith(prefix)) : false;
+    if (!isPro) {
+      recordFreeLessonFinished();
+    }
+  }, [id]);
 
   const handleClaimDaily2x = () => {
-    window.open(ADS_CONFIG.monetagDirectLink, '_blank', 'noopener,noreferrer');
     addXp(1);
     addCoins(2);
     markDaily2xClaimed();
-    setClaimedDaily2x(true);
+    setTimeout(() => {
+      setClaimedDaily2x(true);
+    }, 150);
   };
 
   // Preserve the query parameter across all navigation jumps.
@@ -315,12 +319,15 @@ const LessonComplete = () => {
                   </p>
                 </div>
               </div>
-              <button
+              <a
+                href={ADS_CONFIG.monetagDirectLink}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={handleClaimDaily2x}
                 className="w-full sm:w-auto px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md shrink-0 flex items-center justify-center gap-1"
               >
                 <Sparkles className="w-3.5 h-3.5" /> Claim 2x Bonus
-              </button>
+              </a>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2 text-xs font-mono text-emerald-400 py-0.5">
