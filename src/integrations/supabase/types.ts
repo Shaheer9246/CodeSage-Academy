@@ -509,7 +509,81 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      buy_daily_xp: {
+        Args: never
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          daily_xp: number
+          daily_xp_date: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          has_seen_tour: boolean | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          streak_freeze_until: string | null
+          student_id: string | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       buy_freeze_streak: {
+        Args: never
+        Returns: {
+          badges: string[] | null
+          completed_lessons: string[] | null
+          completed_tests: string[] | null
+          created_at: string
+          daily_xp: number
+          daily_xp_date: string
+          dark_mode: boolean | null
+          dob: string | null
+          experience_level: string | null
+          goal: string | null
+          has_job: string | null
+          has_seen_tour: boolean | null
+          id: string
+          last_active_date: string | null
+          level: number | null
+          name: string | null
+          promo_codes: string[] | null
+          sage_coins: number | null
+          streak_count: number | null
+          streak_freeze_until: string | null
+          student_id: string | null
+          studying: string | null
+          unlocked_sections: string[] | null
+          updated_at: string
+          username: string | null
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      buy_streak_freeze: {
         Args: never
         Returns: {
           badges: string[] | null
