@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ArrowRight, ExternalLink, Sparkles, Coffee } from 'lucide-react';
+import { ExternalLink, Sparkles, Coffee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ADS_CONFIG } from '@/config/adsConfig';
 import { evaluateLessonGate, resetFreeLessonCounter, unlockProLesson, isLessonPath } from '@/lib/lessonAds';
@@ -18,15 +18,19 @@ function LessonEntry({ children }: { children: ReactNode }) {
   if (!gateState.shouldShow) return <>{children}</>;
 
   const handleProUnlock = () => {
-    // Open sponsor link in new tab to earn
-    window.open(ADS_CONFIG.monetagDirectLink, '_blank', 'noopener,noreferrer');
     unlockProLesson(pathname);
-    setGateState({ shouldShow: false, isProGate: true });
+    // Defer state update slightly so the browser completes opening the <a target="_blank"> tab first
+    setTimeout(() => {
+      setGateState({ shouldShow: false, isProGate: true });
+    }, 150);
   };
 
   const handleFreeContinue = () => {
     resetFreeLessonCounter();
-    setGateState({ shouldShow: false, isProGate: false });
+    // Defer state update slightly so the browser completes opening the <a target="_blank"> tab first
+    setTimeout(() => {
+      setGateState({ shouldShow: false, isProGate: false });
+    }, 150);
   };
 
   if (gateState.isProGate) {
@@ -50,13 +54,20 @@ function LessonEntry({ children }: { children: ReactNode }) {
 
           <div className="space-y-3 pt-2">
             <Button 
-              onClick={handleProUnlock} 
+              asChild
               className="w-full gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold hover:brightness-110 shadow-lg"
             >
-              Unlock Lesson via Sponsor <ExternalLink className="h-4 w-4" />
+              <a
+                href={ADS_CONFIG.monetagDirectLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleProUnlock}
+              >
+                Unlock Lesson via Sponsor <ExternalLink className="h-4 w-4" />
+              </a>
             </Button>
             <p className="text-[11px] text-center text-muted-foreground">
-              100% Free · Opens verified sponsor offer in a new tab
+              100% Free · Opens verified Monetag sponsor offer in a new tab
             </p>
           </div>
         </div>
@@ -73,18 +84,23 @@ function LessonEntry({ children }: { children: ReactNode }) {
         <div className="space-y-2">
           <h1 className="font-display text-2xl font-bold text-foreground">A quick moment for CodeSage</h1>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            You completed 2 lessons! Check out our sponsor to keep CodeSage completely free for all students.
+            You completed 2 lessons! Visit our sponsor in a new tab to unlock your next lesson and keep CodeSage 100% free.
           </p>
         </div>
         <div className="space-y-3 pt-2">
-          <Button asChild variant="outline" className="w-full gap-2 border-primary/40 hover:bg-primary/10">
-            <a href={ADS_CONFIG.monetagDirectLink} target="_blank" rel="noopener noreferrer">
-              Explore sponsor offer <ExternalLink className="h-4 w-4" />
+          <Button asChild className="w-full gap-2 shadow-lg">
+            <a
+              href={ADS_CONFIG.monetagDirectLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleFreeContinue}
+            >
+              Visit Sponsor &amp; Continue to Lesson <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
-          <Button className="w-full gap-2" onClick={handleFreeContinue}>
-            Continue to lesson <ArrowRight className="h-4 w-4" />
-          </Button>
+          <p className="text-[11px] text-center text-muted-foreground">
+            Opens official Monetag sponsor offer in a new tab &amp; unlocks your lesson
+          </p>
         </div>
       </div>
     </section>
