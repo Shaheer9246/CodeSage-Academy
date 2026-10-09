@@ -22,10 +22,6 @@ export const SponsorAdModal: React.FC<SponsorAdModalProps> = ({
 }) => {
   const targetUrl = sponsorUrl || ADS_CONFIG.monetagDirectLink || ADS_CONFIG.monetagReferralLink || ADS_CONFIG.defaultSponsorLink;
 
-  const handleOpenSponsor = () => {
-    window.open(targetUrl, '_blank', 'noopener,noreferrer');
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -82,14 +78,15 @@ export const SponsorAdModal: React.FC<SponsorAdModalProps> = ({
 
             {/* Actions */}
             <div className="space-y-2 pt-2">
-              <button
-                type="button"
-                onClick={handleOpenSponsor}
+              <a
+                href={targetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-3 px-4 rounded-xl text-xs font-bold font-display bg-primary text-primary-foreground hover:neon-glow transition-all flex items-center justify-center gap-2 shadow-md"
               >
                 <span>Visit Sponsor Offer (Takes 10s)</span>
                 <ExternalLink className="w-4 h-4" />
-              </button>
+              </a>
 
               <button
                 type="button"
