@@ -147,13 +147,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 4. Execute Inference using Groq's supported fast production models with automatic fallback
-    // Primary: llama-3.3-70b-versatile, Fallbacks: llama-3.1-8b-instant, gemma2-9b-it
+    // 4. Groq inference: strong + cheap + fast primary, fast fallbacks
     const candidateModels = [
-      'llama-3.3-70b-versatile',
-      'llama-3.1-8b-instant',
       'openai/gpt-oss-120b',
-      'gemma2-9b-it',
+      'llama-3.3-70b-versatile',
+      'openai/gpt-oss-20b',
+      'llama-3.1-8b-instant',
     ];
 
     let lastErrMsg = 'Groq API request failed';
@@ -169,9 +168,10 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             model: modelName,
-            messages: body.messages,
-            temperature: body.temperature ?? 0.6,
-            max_tokens: Math.min(body.max_tokens ?? 950, 1500),
+            messages: safeMessages,
+            temperature,
+            max_tokens: maxTokens,
+            ...(modelName.startsWith('openai/gpt-oss') ? { reasoning_effort: 'low' } : {}),
           }),
         });
 
