@@ -117,6 +117,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -130,6 +132,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -145,6 +148,8 @@ export type Database = {
           xp: number | null
         }
         Insert: {
+          ai_credits?: number | null
+          ai_credits_month?: string | null
           badges?: string[] | null
           completed_lessons?: string[] | null
           completed_tests?: string[] | null
@@ -158,6 +163,7 @@ export type Database = {
           has_job?: string | null
           has_seen_tour?: boolean | null
           id: string
+          is_pro?: boolean | null
           last_active_date?: string | null
           level?: number | null
           name?: string | null
@@ -173,6 +179,8 @@ export type Database = {
           xp?: number | null
         }
         Update: {
+          ai_credits?: number | null
+          ai_credits_month?: string | null
           badges?: string[] | null
           completed_lessons?: string[] | null
           completed_tests?: string[] | null
@@ -186,6 +194,7 @@ export type Database = {
           has_job?: string | null
           has_seen_tour?: boolean | null
           id?: string
+          is_pro?: boolean | null
           last_active_date?: string | null
           level?: number | null
           name?: string | null
@@ -438,6 +447,8 @@ export type Database = {
       award_lesson: {
         Args: { _lesson_id: string }
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -451,6 +462,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -475,6 +487,8 @@ export type Database = {
       award_lesson_v2: {
         Args: { _lesson_id: string }
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -488,6 +502,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -512,6 +527,8 @@ export type Database = {
       buy_daily_xp: {
         Args: never
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -525,6 +542,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -549,6 +567,8 @@ export type Database = {
       buy_freeze_streak: {
         Args: never
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -562,6 +582,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -586,6 +607,8 @@ export type Database = {
       buy_streak_freeze: {
         Args: never
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -599,6 +622,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -624,6 +648,8 @@ export type Database = {
         | {
             Args: { _test_id: string }
             Returns: {
+              ai_credits: number | null
+              ai_credits_month: string | null
               badges: string[] | null
               completed_lessons: string[] | null
               completed_tests: string[] | null
@@ -637,6 +663,7 @@ export type Database = {
               has_job: string | null
               has_seen_tour: boolean | null
               id: string
+              is_pro: boolean | null
               last_active_date: string | null
               level: number | null
               name: string | null
@@ -661,6 +688,8 @@ export type Database = {
         | {
             Args: { _coin_reward?: number; _test_id: string }
             Returns: {
+              ai_credits: number | null
+              ai_credits_month: string | null
               badges: string[] | null
               completed_lessons: string[] | null
               completed_tests: string[] | null
@@ -674,6 +703,7 @@ export type Database = {
               has_job: string | null
               has_seen_tour: boolean | null
               id: string
+              is_pro: boolean | null
               last_active_date: string | null
               level: number | null
               name: string | null
@@ -695,6 +725,10 @@ export type Database = {
               isSetofReturn: true
             }
           }
+      deduct_user_ai_credits: {
+        Args: { credits_to_deduct?: number; target_user_id: string }
+        Returns: number
+      }
       enroll_track: {
         Args: { _track: string }
         Returns: {
@@ -740,6 +774,8 @@ export type Database = {
       purchase_extra_lesson: {
         Args: { _lesson_id: string }
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -753,6 +789,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -777,6 +814,8 @@ export type Database = {
       redeem_promo: {
         Args: { _code: string }
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -790,6 +829,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -814,6 +854,8 @@ export type Database = {
       refresh_daily_xp: {
         Args: never
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -827,6 +869,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -872,6 +915,8 @@ export type Database = {
       spend_coins: {
         Args: { _amount: number; _reason?: string }
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -885,6 +930,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
@@ -926,6 +972,8 @@ export type Database = {
       update_streak: {
         Args: never
         Returns: {
+          ai_credits: number | null
+          ai_credits_month: string | null
           badges: string[] | null
           completed_lessons: string[] | null
           completed_tests: string[] | null
@@ -939,6 +987,7 @@ export type Database = {
           has_job: string | null
           has_seen_tour: boolean | null
           id: string
+          is_pro: boolean | null
           last_active_date: string | null
           level: number | null
           name: string | null
