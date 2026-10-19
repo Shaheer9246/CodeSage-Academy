@@ -22,12 +22,13 @@ import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { 
   Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles,
   CheckCircle2, XCircle, AlertTriangle, Award, ChevronDown, ChevronUp, Check, X,
-  Code2
+  Code2, Share2
 } from 'lucide-react';
 import { badgeForLessons } from '@/lib/gamification';
 import { getLessonQuizAttempt, saveLessonQuizAttempt, type QuizAttempt } from '@/lib/quizStorage';
 import { canClaimDaily2x, markDaily2xClaimed, recordFreeLessonFinished, PRO_TRACK_PREFIXES } from '@/lib/lessonAds';
 import { ADS_CONFIG } from '@/config/adsConfig';
+import ShareAchievementModal from '@/components/ShareAchievementModal';
 
 type TrackLessonItem = { 
   id: string; 
@@ -96,6 +97,7 @@ const LessonComplete = () => {
   const [searchParams] = useSearchParams();
   const [showConfetti, setShowConfetti] = useState(true);
   const [showFullReview, setShowFullReview] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const isPro = id ? PRO_TRACK_PREFIXES.some(prefix => id.startsWith(prefix)) : false;
@@ -633,6 +635,15 @@ const LessonComplete = () => {
           </ul>
         </div>
 
+        {/* ── 1-CLICK VIRAL SHARE BUTTON ───────────────────── */}
+        <button
+          onClick={() => setShowShareModal(true)}
+          className="w-full mb-3 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary/20 via-primary/30 to-accent-blue/20 hover:from-primary/30 hover:to-accent-blue/30 text-foreground border border-primary/40 font-bold text-xs shadow-md transition-all hover:scale-[1.01] active:scale-[0.99]"
+        >
+          <Share2 className="w-4 h-4 text-primary" />
+          <span>Share Achievement to WhatsApp & Socials 🔥</span>
+        </button>
+
         {/* ── ACTION COMMAND BAR ───────────────────────────── */}
         <div className="grid grid-cols-3 gap-2">
           <button
@@ -667,6 +678,15 @@ const LessonComplete = () => {
           )}
         </div>
       </div>
+
+      {/* Share Achievement Modal */}
+      <ShareAchievementModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={lesson?.title || 'Lesson'}
+        topic={track?.prefix ? track.prefix.replace('-', ' ') : 'Software Engineering'}
+        achievementType="lesson"
+      />
     </div>
   );
 };
