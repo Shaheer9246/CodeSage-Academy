@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   RotateCcw,
   Building2,
-  Cpu
+  Cpu,
+  Share2
 } from 'lucide-react';
 import { DsaProblem, SupportedLanguage, DSA_PROBLEMS } from '@/data/dsaSheetData';
 import PythonWorkspace from '@/components/PythonWorkspace';
@@ -25,6 +26,7 @@ import JavaWorkspace from '@/components/JavaWorkspace';
 import CodeEditor from '@/components/CodeEditor';
 import ConsolePanel from '@/components/ConsolePanel';
 import { AdBannerCard } from '@/components/AdBannerCard';
+import ShareAchievementModal from '@/components/ShareAchievementModal';
 import { toast } from 'sonner';
 
 interface DsaWorkspaceProps {
@@ -53,6 +55,7 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
 }) => {
   const [lang, setLang] = useState<SupportedLanguage>('python');
   const [stage, setStage] = useState<StageKey>('problem');
+  const [showShareModal, setShowShareModal] = useState(false);
   const [jsLogs, setJsLogs] = useState<{ type: string; message: string }[]>([]);
   const [selectedTestCaseIdx, setSelectedTestCaseIdx] = useState(0);
   const [openIntuition, setOpenIntuition] = useState<number>(0);
@@ -209,7 +212,13 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
             </div>
 
             <button
-              onClick={() => onToggleSolved(problem.id)}
+              onClick={() => {
+                const willBeSolved = !isSolved;
+                onToggleSolved(problem.id);
+                if (willBeSolved) {
+                  setShowShareModal(true);
+                }
+              }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-display font-bold transition-all whitespace-nowrap ${
                 isSolved
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
@@ -219,6 +228,17 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>{isSolved ? 'Solved' : 'Mark Solved'}</span>
             </button>
+
+            {isSolved && (
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-display font-semibold bg-secondary/80 hover:bg-secondary text-foreground border border-border/60 transition-colors"
+                title="Share your DSA solution"
+              >
+                <Share2 className="w-3.5 h-3.5 text-primary" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -610,7 +630,13 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => onToggleSolved(problem.id)}
+                    onClick={() => {
+                      const willBeSolved = !isSolved;
+                      onToggleSolved(problem.id);
+                      if (willBeSolved) {
+                        setShowShareModal(true);
+                      }
+                    }}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-display font-bold transition-all ${
                       isSolved
                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
@@ -620,6 +646,17 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
                     <CheckCircle2 className="w-4 h-4" />
                     <span>{isSolved ? 'Completed ✓' : 'Mark Problem Solved'}</span>
                   </button>
+
+                  {isSolved && (
+                    <button
+                      onClick={() => setShowShareModal(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground text-xs font-display font-semibold border border-border/60 transition-all"
+                      title="Share achievement"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-primary" />
+                      <span>Share</span>
+                    </button>
+                  )}
                   {nextProblem && onSelectProblem && (
                     <button
                       onClick={() => {
@@ -805,6 +842,14 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
           )}
         </main>
       </div>
+
+      <ShareAchievementModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={problem.title}
+        topic={problem.category}
+        achievementType="dsa"
+      />
     </div>
   );
 };
