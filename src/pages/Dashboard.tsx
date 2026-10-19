@@ -547,11 +547,6 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Desktop Left Sidebar Ad Placement (Under Tracks) */}
-          <div className="pt-0.5">
-            <AdBannerCard slotName="dashboardSidebar" format="compact" />
-          </div>
-
           {/* Category Filters - Desktop - Compressed to 3 visible items with scroll */}
           <div>
             <div className="flex items-center justify-between mb-2 pl-1">
@@ -656,10 +651,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Big Monetag Ad Box Under Categories */}
-          <div className="pt-1">
-            <AdBannerCard slotName="dashboardSidebarMonetagBig" format="big-box" />
-          </div>
 
           {/* Suggestions & Game - Desktop */}
           <div className="space-y-2 pt-2">
@@ -836,18 +827,17 @@ const Dashboard = () => {
           </div>
 
           {/* PROBLEM OF THE DAY */}
-          {!isGuest && (
-            <DailyProblemCard
-              onOpenShare={(title, topic) => {
-                setShareModalConfig({
-                  isOpen: true,
-                  title,
-                  topic,
-                  achievementType: 'dsa',
-                });
-              }}
-            />
-          )}
+          <DailyProblemCard
+            onOpenShare={(title, topic) => {
+              setShareModalConfig({
+                isOpen: true,
+                title,
+                topic,
+                achievementType: 'dsa',
+              });
+            }}
+          />
+
 
           {/* CONTINUE LEARNING */}
           {!isGuest && activeContinueTrack && (
@@ -901,12 +891,6 @@ const Dashboard = () => {
                 })()}
               </div>
 
-              {/* EthicalAds Sponsor Banner for Continue Learning Card */}
-              <div className="mt-3.5 pt-3 border-t border-primary/20 relative z-10">
-                <AdBannerCard slotName="dashboardContinueLearning" format="horizontal-banner" />
-              </div>
-            </motion.div>
-          )}
 
           {/* CATEGORY FILTER BAR - Mobile Only */}
           <div className="lg:hidden w-full overflow-x-auto scrollbar-none py-1">
@@ -958,12 +942,6 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              {/* Mobile Ad Placement Under Tracks */}
-              <div className="pt-1">
-                <AdBannerCard slotName="dashboardSidebar" format="compact" />
-              </div>
-            </motion.div>
-          )}
 
           {/* SECTIONS */}
           <div className="space-y-3">
