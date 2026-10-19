@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Code2,
@@ -15,7 +15,8 @@ import {
   ArrowLeft,
   X,
   Flame,
-  RotateCcw
+  RotateCcw,
+  Share2
 } from 'lucide-react';
 import {
   DSA_PROBLEMS,
@@ -26,6 +27,8 @@ import DsaWorkspace from '@/components/DsaWorkspace';
 import { AdBannerCard } from '@/components/AdBannerCard';
 import { useUser } from '@/contexts/UserContext';
 import { useScrollTop } from '@/hooks/useScrollTop';
+import { getDailyProblem, claimDailyProblemReward, POTD_REWARD_XP, POTD_REWARD_COINS } from '@/lib/dailyProblem';
+import ShareAchievementModal from '@/components/ShareAchievementModal';
 import { toast } from 'sonner';
 
 const STORAGE_SOLVED_KEY = 'codesage_dsa_solved_ids';
@@ -33,7 +36,9 @@ const STORAGE_SOLVED_KEY = 'codesage_dsa_solved_ids';
 export const DsaSheet = () => {
   useScrollTop();
   const navigate = useNavigate();
-  const { user, completeLesson } = useUser();
+  const [searchParams] = useSearchParams();
+  const { user, completeLesson, addXp, addCoins } = useUser();
+  const [shareProblem, setShareProblem] = useState<DsaProblem | null>(null);
 
   // Solved state in localStorage + synced with user.completedLessons
   const [solvedIds, setSolvedIds] = useState<string[]>(() => {
@@ -67,6 +72,17 @@ export const DsaSheet = () => {
   // Active Problem for Full-Page CodeSage Workspace
   const [activeProblem, setActiveProblem] = useState<DsaProblem | null>(null);
 
+  // Auto-open requested problem from query param (e.g. from Problem of the Day on Dashboard)
+  useEffect(() => {
+    const requestedId = searchParams.get('problem');
+    if (requestedId) {
+      const matched = DSA_PROBLEMS.find(p => p.id === requestedId || p.slug === requestedId);
+      if (matched) {
+        setActiveProblem(matched);
+      }
+    }
+  }, [searchParams]);
+
   // Quick Key Points Drawer/Modal
   const [keyPointsProblem, setKeyPointsProblem] = useState<DsaProblem | null>(null);
 
@@ -91,10 +107,29 @@ export const DsaSheet = () => {
         toast.info('Marked as unsolved');
         return prev.filter(x => x !== id);
       } else {
-        toast.success('Problem solved! +1 XP & +2 Sage Coins awarded');
+        // Check if this problem is today's Problem of the Day
+        const currentPotd = getDailyProblem(new Date(), user?.completedLessons);
+        const isPotd = currentPotd.problem.id === id || currentPotd.problem.slug === id;
+
+        if (isPotd && !currentPotd.bonusClaimed) {
+          claimDailyProblemReward(id);
+          addXp(POTD_REWARD_XP);
+          addCoins(POTD_REWARD_COINS);
+          toast.success(`🎉 Problem of the Day Solved! +${POTD_REWARD_XP} XP & +${POTD_REWARD_COINS} Sage Coins awarded!`);
+        } else {
+          toast.success('Problem solved! +1 XP & +2 Sage Coins awarded');
+        }
+
         if (user) {
           void completeLesson(id);
         }
+
+        // Set share candidate for modal
+        const prob = DSA_PROBLEMS.find(p => p.id === id || p.slug === id);
+        if (prob) {
+          setShareProblem(prob);
+        }
+
         return [...prev, id];
       }
     });
@@ -727,6 +762,14 @@ export const DsaSheet = () => {
           </div>
         </div>
       )}
+      {/* Viral Share Achievement Modal */}
+      <ShareAchievementModal
+        isOpen={shareProblem !== null}
+        onClose={() => setShareProblem(null)}
+        title={shareProblem?.title}
+        topic={shareProblem?.category}
+        achievementType="dsa"
+      />
     </div>
   );
 };
