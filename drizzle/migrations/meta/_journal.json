@@ -8,6 +8,13 @@
       "when": 1791530167641,
       "tag": "0000_codesage_full_database",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792431440763,
+      "tag": "0001_restrict_suggestion_votes_read",
+      "breakpoints": true
     }
   ]
 }
