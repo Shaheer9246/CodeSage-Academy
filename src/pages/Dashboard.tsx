@@ -18,6 +18,10 @@ import SuggestionsBadge from '@/components/SuggestionsBadge';
 import InboxBadge from '@/components/InboxBadge';
 import { AdBannerCard } from '@/components/AdBannerCard';
 import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDetails, isTrackCompleted, type LessonTrackKey } from '@/data/lessonIndex';
+import DailyProblemCard from '@/components/DailyProblemCard';
+import ShareAchievementModal, { ShareAchievementType } from '@/components/ShareAchievementModal';
+import StreakReminderToggle from '@/components/StreakReminderToggle';
+import { checkAndTriggerStreakReminder } from '@/lib/streakNotifications';
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
@@ -455,6 +459,21 @@ const Dashboard = () => {
     return Math.floor(spent / 3.3); 
   }, [user, energy]);
 
+  const [shareModalConfig, setShareModalConfig] = useState<{
+    isOpen: boolean;
+    title?: string;
+    topic?: string;
+    achievementType?: ShareAchievementType;
+    customMessage?: string;
+  }>({ isOpen: false });
+
+  // Evaluate browser PWA streak reminder notification (alerts at 6 PM if no lesson completed today)
+  useEffect(() => {
+    if (isGuest || !user) return;
+    const hasActivity = todayLessons > 0 || energy < 10;
+    checkAndTriggerStreakReminder(hasActivity);
+  }, [todayLessons, energy, isGuest, user]);
+
   const filterOptions = [
     { id: 'All', label: 'All Courses', icon: Layout },
     { id: 'frontend', label: 'Frontend', icon: Layout },
@@ -793,6 +812,7 @@ const Dashboard = () => {
                 </div>
                 {!isGuest && (
                   <>
+                    <StreakReminderToggle compact />
                     <div className="flex items-center gap-1 bg-primary/20 border border-primary/40 px-2.5 py-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]">
                       <Trophy className="w-3.5 h-3.5 text-primary" />
                       <span className="text-xs font-bold text-primary">Lvl {user?.level || 1}</span>
@@ -815,6 +835,19 @@ const Dashboard = () => {
               color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
           </div>
 
+          {/* PROBLEM OF THE DAY */}
+          {!isGuest && (
+            <DailyProblemCard
+              onOpenShare={(title, topic) => {
+                setShareModalConfig({
+                  isOpen: true,
+                  title,
+                  topic,
+                  achievementType: 'dsa',
+                });
+              }}
+            />
+          )}
 
           {/* CONTINUE LEARNING */}
           {!isGuest && activeContinueTrack && (
@@ -1218,6 +1251,15 @@ const Dashboard = () => {
         open={enrollTarget !== null}
         track={enrollTarget}
         onClose={() => setEnrollTarget(null)}
+      />
+
+      <ShareAchievementModal
+        isOpen={shareModalConfig.isOpen}
+        onClose={() => setShareModalConfig(prev => ({ ...prev, isOpen: false }))}
+        title={shareModalConfig.title}
+        topic={shareModalConfig.topic}
+        achievementType={shareModalConfig.achievementType}
+        customMessage={shareModalConfig.customMessage}
       />
     </div>
   );
