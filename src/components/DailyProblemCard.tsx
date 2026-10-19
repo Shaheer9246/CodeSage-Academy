@@ -52,18 +52,19 @@ export const DailyProblemCard: React.FC<DailyProblemCardProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`w-full rounded-2xl p-4 sm:p-5 border border-primary/30 bg-[#16213e]/90 backdrop-blur-md relative overflow-hidden shadow-xl shadow-primary/5 ${className}`}
+      className={`w-full rounded-2xl p-4 sm:p-5 border border-orange-500/30 bg-card/95 hover:border-orange-500/50 backdrop-blur-md relative overflow-hidden shadow-xl shadow-orange-500/5 transition-colors ${className}`}
     >
       {/* Background ambient gradient accent */}
-      <div className="absolute -top-16 -right-16 w-48 h-48 bg-primary/15 rounded-full blur-3xl pointer-events-none -z-0" />
+      <div className="absolute -top-16 -right-16 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none -z-0" />
+
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left Information Section */}
         <div className="space-y-2 min-w-0 flex-1">
           {/* Header kicker with date and rewards */}
           <div className="flex items-center gap-2 flex-wrap text-[11px] font-mono">
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30 font-bold uppercase tracking-wider">
-              <Flame className="w-3.5 h-3.5 fill-primary text-primary" />
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30 font-bold uppercase tracking-wider">
+              <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-400" />
               Problem of the Day
             </span>
             <span className="text-muted-foreground/50">·</span>
@@ -81,8 +82,8 @@ export const DailyProblemCard: React.FC<DailyProblemCardProps> = ({
 
           {/* Problem Title & Category */}
           <div className="flex items-baseline gap-2 flex-wrap">
-            <h3 className="text-base sm:text-lg font-bold font-display text-foreground hover:text-primary transition-colors cursor-pointer truncate max-w-full"
-                onClick={handleNavigateToProblem}>
+            <h3 className="text-base sm:text-lg font-bold font-display text-foreground hover:text-orange-400 transition-colors cursor-pointer truncate max-w-full"
+              onClick={handleNavigateToProblem}>
               {potd.problem.title}
             </h3>
             <span className="text-xs text-muted-foreground font-mono">
@@ -134,9 +135,9 @@ export const DailyProblemCard: React.FC<DailyProblemCardProps> = ({
               </button>
             </div>
           ) : (
-            <button
+           <button
               onClick={handleNavigateToProblem}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-display font-bold text-xs hover:neon-glow transition-all shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-display font-bold text-xs hover:brightness-110 transition-all shadow-md shadow-orange-500/25 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Solve Today's Problem</span>
