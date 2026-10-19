@@ -15,6 +15,13 @@
       "when": 1792431440763,
       "tag": "0001_restrict_suggestion_votes_read",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792431667621,
+      "tag": "0002_badge_levels_signed_in_only",
+      "breakpoints": true
     }
   ]
 }
