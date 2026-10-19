@@ -49,7 +49,7 @@ export const ShareAchievementModal: React.FC<ShareAchievementModalProps> = ({
   const [copied, setCopied] = useState(false);
 
   const studentName = user?.name || user?.email?.split('@')[0] || 'Learner';
-  const currentStreak = streakCount ?? (user?.streak || 1);
+  const currentStreak = streakCount ?? (user?.streakCount || 1);
   const coins = user?.sageCoins || 0;
 
   // Generate dynamic viral headline & share text
