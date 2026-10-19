@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, X, Sparkles, Zap, Rocket, ShieldCheck, Coins, Heart } from 'lucide-react';
+import { Flame, X, Sparkles, Zap, Rocket, ShieldCheck, Coins, Heart, Share2 } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import ShareAchievementModal from '@/components/ShareAchievementModal';
 import { toast } from 'sonner';
 
 const DEV_QUOTES = [
@@ -71,6 +72,7 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
   const navigate = useNavigate();
   const { isOpen, quote, todayIdx, daysOfWeek, closeModal } = useStreakMonitor();
   const { user, spendCoins } = useUser();
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const open = isOpen || !!forceOpen;
   const displayQuote = quote || DEV_QUOTES[0];
@@ -250,6 +252,17 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                 <span>Donate for CodeSage by watching ads (Takes 1 min)</span>
               </motion.button>
 
+              {/* Viral Share Streak Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowShareModal(true)}
+                className="w-full mb-2 bg-gradient-to-r from-orange-500/15 via-primary/15 to-amber-500/15 border border-orange-500/40 text-orange-400 font-semibold rounded-xl py-2.5 transition-all text-xs flex items-center justify-center gap-2 hover:bg-orange-500/25 shadow-xs"
+              >
+                <Share2 className="w-4 h-4 text-orange-400" />
+                <span>Share {streakCount}-Day Streak 🔥</span>
+              </motion.button>
+
               {/* Primary CTA Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -262,6 +275,14 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
               </motion.button>
             </div>
           </motion.div>
+
+          {/* Share Achievement Modal */}
+          <ShareAchievementModal
+            isOpen={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            streakCount={streakCount}
+            achievementType="streak"
+          />
         </div>
       )}
     </AnimatePresence>
