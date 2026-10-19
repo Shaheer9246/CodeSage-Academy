@@ -890,6 +890,8 @@ const Dashboard = () => {
                   );
                 })()}
               </div>
+            </motion.div>
+          )}
 
 
           {/* CATEGORY FILTER BAR - Mobile Only */}
@@ -941,6 +943,8 @@ const Dashboard = () => {
                   </button>
                 ))}
               </div>
+            </motion.div>
+          )}
 
 
           {/* SECTIONS */}
