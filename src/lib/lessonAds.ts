@@ -11,11 +11,11 @@ let memoryDaily2xDate = '';
 const memoryUnlockedPro = new Set<string>();
 
 export function isLessonPath(pathname: string): boolean {
-  return /^\/(?:lesson|n-lesson|f-lesson|fs-lesson|java-lesson|javax-lesson|c-lesson|cx-lesson|py-lesson|pyx-lesson|local-lesson|sql-lesson|rf-lesson|ai-lesson|iai-lesson|cpp-lesson|cppx-lesson|three-lesson)\/[^/]+\/?$/.test(pathname);
+  return /^\/(?:lesson|n-lesson|f-lesson|fs-lesson|java-lesson|javax-lesson|c-lesson|cx-lesson|py-lesson|pyx-lesson|local-lesson|sql-lesson|rf-lesson|ai-lesson|iai-lesson|adv-ai-lesson|cpp-lesson|cppx-lesson|three-lesson)\/[^/]+\/?$/.test(pathname);
 }
 
 export function isProLessonPath(pathname: string): boolean {
-  const match = pathname.match(/^\/(?:javax-lesson|cx-lesson|pyx-lesson|iai-lesson|cppx-lesson)\/([^/]+)/);
+  const match = pathname.match(/^\/(?:javax-lesson|cx-lesson|pyx-lesson|iai-lesson|adv-ai-lesson|cppx-lesson)\/([^/]+)/);
   if (match) return true;
   return PRO_TRACK_PREFIXES.some(prefix => pathname.includes(`/${prefix}`));
 }
