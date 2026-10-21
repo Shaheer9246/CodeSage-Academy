@@ -15,6 +15,7 @@ import { SQL_LESSONS } from '@/data/sqlLessons';
 import { PYTHON_EXPERT_LESSONS } from '@/data/pythonExpertLessons';
 import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson'; // <-- ADD THIS LINE
+import { ADVANCED_AI_LESSONS } from '@/data/advancedAiLesson';
 import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { JAVA_LESSONS } from '@/data/javaLesson';
@@ -38,7 +39,7 @@ interface TrackNode {
   lessonIds: string[];
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
-    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'iai-lesson' | 'three-lesson' | 'rf-lesson'
+    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'iai-lesson' | 'aiadv-lesson' | 'three-lesson' | 'rf-lesson'
     | 'java-lesson' | 'javax-lesson'| 'cpp-lesson' | 'cppx-lesson' | 'c-lesson' | 'cx-lesson';
   locked?: boolean;
 }
@@ -120,8 +121,9 @@ const buildTrack = (
 const TRACKS_DATA: Record<string, TrackNode[]> = {
   frontend:     buildTrack(FRONTEND_LESSONS, 'lesson', 'HTML — Beginner', 'FRONTEND MASTER'),
   networking:   buildTrack(NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'n-lesson', 'Module 1: Networking Fundamentals', 'NETWORKING COMPLETE'),
-'ai-fundamentals': buildTrack(AI_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧠' })), 'ai-lesson', 'Module 1: Foundations of AI', 'AI BASICS COMPLETE'),
-  'intermediate-ai': buildTrack(INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🤖' })), 'iai-lesson', 'Module 1: Advanced AI Concepts', 'INTERMEDIATE AI MASTER'),
+ 'ai-fundamentals': buildTrack(AI_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧠' })), 'ai-lesson', 'Module 1: Foundations of AI', 'AI BASICS COMPLETE'),
+ 'intermediate-ai': buildTrack(INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🤖' })), 'iai-lesson', 'Module 1: Advanced AI Concepts', 'INTERMEDIATE AI MASTER'),
+ 'advanced-ai': buildTrack(ADVANCED_AI_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚡' })), 'adv-ai-lesson', 'Module 1: Production AI Systems', 'ADVANCED AI ENGINEER'),
   fullstack:    buildTrack(FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'fs-lesson', 'Module 1: Full Stack Frontend Dev', 'FULL STACK COMPLETE'),
   freelance:    buildTrack(FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'f-lesson', 'Module 1: Freelance & Clients', 'FREELANCE MASTER'),
   python:       buildTrack(PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'py-lesson', 'Module 1: Python Programming', 'PYTHON COMPLETE'),
@@ -130,13 +132,13 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   pythonexpert: buildTrack(PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'pyx-lesson', 'Module 1: Python Expert', 'PYTHON EXPERT'),
   three3d:      buildTrack(THREE3D_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🧊' })), 'three-lesson', 'Module 1: 3D Web Dev', '3D MASTER'),
  'real-freelance': buildTrack(REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💼' })), 'rf-lesson', 'Module 1: Real-World Freelance', 'REAL FREELANCE MASTER'),
- cpp: buildTrack(CPP_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚙️' })), 'cpp-lesson', 'Module 1: C++ Foundations', 'C++ MASTER'),
- cppexpert: buildTrack(CPP_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🚀' })), 'cppx-lesson', 'Module 1: Advanced C++', 'C++ EXPERT MASTER'),
- java: buildTrack(JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'java-lesson', 'Module 1: Java Programming', 'JAVA COMPLETE'),
- javaexpert: buildTrack(JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '☕' })), 'javax-lesson', 'Module 1: Advanced Java', 'JAVA EXPERT MASTER'),
- c: buildTrack(C_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚡' })), 'c-lesson', 'Module 1: C Foundations', 'C MASTER'),
- cexpert: buildTrack(C_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💻' })), 'cx-lesson', 'Module 1: Advanced C', 'C EXPERT MASTER'),
-};
+  cpp: buildTrack(CPP_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚙️' })), 'cpp-lesson', 'Module 1: C++ Foundations', 'C++ MASTER'),
+  cppexpert: buildTrack(CPP_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🚀' })), 'cppx-lesson', 'Module 1: Advanced C++', 'C++ EXPERT MASTER'),
+  java: buildTrack(JAVA_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon })), 'java-lesson', 'Module 1: Java Programming', 'JAVA COMPLETE'),
+  javaexpert: buildTrack(JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '☕' })), 'javax-lesson', 'Module 1: Advanced Java', 'JAVA EXPERT MASTER'),
+  c: buildTrack(C_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚡' })), 'c-lesson', 'Module 1: C Foundations', 'C MASTER'),
+  cexpert: buildTrack(C_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💻' })), 'cx-lesson', 'Module 1: Advanced C', 'C EXPERT MASTER'),
+ };
 
 const TRACKS = [
   { key: 'frontend',     label: 'Frontend Dev' },
@@ -149,6 +151,7 @@ const TRACKS = [
   { key: 'networking',   label: 'Networking' },
   { key: 'ai-fundamentals', label: 'AI Fundamentals' },
   { key: 'intermediate-ai', label: 'Intermediate AI' },
+  { key: 'advanced-ai', label: 'Advanced AI' },
   { key: 'fullstack',    label: 'Full Stack' },
   { key: 'freelance',    label: 'Freelance' },
   { key: 'python',       label: 'Python' },
@@ -171,6 +174,7 @@ const TRACK_KEY_TO_ENROLL_TRACK: Record<string, TrackId> = {
   pythonexpert: 'pythonexpert',
   'ai-fundamentals': 'ai-fundamentals',
   'intermediate-ai': 'intermediate-ai',
+  'advanced-ai': 'advanced-ai',
   three3d: 'three3d',
   java: 'java',
   javaexpert: 'javaexpert',
@@ -541,7 +545,7 @@ const CAREER_PATHS: CareerPath[] = [
     title: 'AI & Machine Learning Engineer',
     subtitle: 'Master Python, Data, LLMs, and modern AI engineering',
     icon: '🤖',
-    duration: '3–5 Months',
+    duration: '4-6 Months',
     badge: 'High Demand',
     steps: [
       { title: 'Python for Beginners', trackKey: 'python' },
@@ -549,6 +553,7 @@ const CAREER_PATHS: CareerPath[] = [
       { title: 'SQL & Database Mastery', trackKey: 'sql' },
       { title: 'AI & Machine Learning Fundamentals', trackKey: 'ai-fundamentals' },
       { title: 'Generative AI, LLMs & Prompting', trackKey: 'intermediate-ai' },
+      { title: 'Advanced AI Agents & Production Systems', trackKey: 'advanced-ai' }, 
     ],
   },
   {
