@@ -33,6 +33,8 @@ import AiFundamentalsLearn from "./pages/AiFundamentalsLearn";
 import AiFundamentalsLessonPage from "./pages/AiFundamentalsLessonPage";
 import IntermediateAiLearn from "./pages/IntermediateAiLearn";
 import IntermediateAiLessonPage from "./pages/IntermediateAiLessonPage";
+import AdvancedAiLearn from "./pages/AdvancedAiLearn";
+import AdvancedAiLessonPage from "./pages/AdvancedAiLessonPage";
 import FreelanceLearn from "./pages/FreelanceLearn";
 import FreelanceLessonPage from "./pages/FreelanceLessonPage";
 import FullstackLearn from "./pages/FullstackLearn";
@@ -247,6 +249,8 @@ const App = () => {
                   <Route path="/ai-lesson/:id" element={<ProtectedRoute><AiFundamentalsLessonPage /></ProtectedRoute>} />
                   <Route path="/intermediate-ai" element={<ProtectedRoute><IntermediateAiLearn /></ProtectedRoute>} />
                   <Route path="/iai-lesson/:id" element={<ProtectedRoute><IntermediateAiLessonPage /></ProtectedRoute>} />
+                  <Route path="/advanced-ai" element={<ProtectedRoute><AdvancedAiLearn /></ProtectedRoute>} />
+                  <Route path="/adv-ai-lesson/:id" element={<ProtectedRoute><AdvancedAiLessonPage /></ProtectedRoute>} />
                   <Route path="/cpp" element={<ProtectedRoute><CppLearn /></ProtectedRoute>} />
                   <Route path="/cpp-lesson/:id" element={<ProtectedRoute><CppLessonPage /></ProtectedRoute>} />
                   <Route path="/cpp/expert" element={<ProtectedRoute><CppExpertLearn /></ProtectedRoute>} />
