@@ -39,7 +39,7 @@ interface TrackNode {
   lessonIds: string[];
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
-    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'iai-lesson' | 'aiadv-lesson' | 'three-lesson' | 'rf-lesson'
+    | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'iai-lesson' | 'adv-ai-lesson' | 'three-lesson' | 'rf-lesson'
     | 'java-lesson' | 'javax-lesson'| 'cpp-lesson' | 'cppx-lesson' | 'c-lesson' | 'cx-lesson';
   locked?: boolean;
 }
