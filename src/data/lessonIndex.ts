@@ -12,6 +12,7 @@ import { LOCAL_LESSONS } from './localLessons';
 import { SQL_LESSONS } from './sqlLessons';
 import { AI_LESSONS } from './aiFundamentalsLesson';
 import { INTERMEDIATE_AI_LESSONS } from './intermediateAiLesson';
+import { ADVANCED_AI_LESSONS } from './advancedAiLesson';
 import { THREE3D_LESSONS } from './three3dLessons';
 import { JAVA_LESSONS } from './javaLesson';
 import { JAVA_EXPERT_LESSONS } from './javaExpertLessons';
@@ -32,6 +33,7 @@ export type LessonTrackKey =
   | 'sql'
   | 'ai-fundamentals'
   | 'intermediate-ai'
+  | 'advanced-ai'
   | 'three3d'
   | 'java'
   | 'javaexpert'
@@ -55,6 +57,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   sql: ids(SQL_LESSONS),
   'ai-fundamentals': ids(AI_LESSONS),
   'intermediate-ai': ids(INTERMEDIATE_AI_LESSONS),
+  'advanced-ai': ids(ADVANCED_AI_LESSONS),
   three3d: ids(THREE3D_LESSONS),
   java: ids(JAVA_LESSONS),
   javaexpert: ids(JAVA_EXPERT_LESSONS),
@@ -77,6 +80,7 @@ export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
   sql: 'SQL',
   'ai-fundamentals': 'AI Fundamentals',
   'intermediate-ai': 'Intermediate AI',
+  'advanced-ai': 'Advanced AI',
   three3d: '3D Web Dev',
   java: 'Java',
   javaexpert: 'Java Expert',
@@ -121,6 +125,7 @@ export const TRACK_BASE_URLS: Record<LessonTrackKey, string> = {
   sql: '/sql-lesson',
   'ai-fundamentals': '/ai-lesson',
   'intermediate-ai': '/iai-lesson',
+  'advanced-ai': '/adv-ai-lesson',
   three3d: '/three-lesson',
   java: '/java-lesson',
   javaexpert: '/javax-lesson',
@@ -181,6 +186,9 @@ export function getLessonDetails(lessonId: string): {
         if (found) title = found.title;
       } else if (trackKey === 'intermediate-ai') {
         const found = INTERMEDIATE_AI_LESSONS.find(l => l.id === lessonId);
+        if (found) title = found.title;
+      } else if (trackKey === 'advanced-ai') {
+        const found = ADVANCED_AI_LESSONS.find(l => l.id === lessonId);
         if (found) title = found.title;
       } else if (trackKey === 'three3d') {
         const found = THREE3D_LESSONS.find(l => l.id === lessonId);
