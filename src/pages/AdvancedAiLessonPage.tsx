@@ -152,7 +152,7 @@ const AdvancedAiLessonPage = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <CourseOverviewButton trackId="ai" currentLessonId={lesson.id} />
+          <CourseOverviewButton trackId="ai" />
           {/* Stage pills */}
           <div className="flex bg-secondary/80 p-1 rounded-xl gap-1 border border-border/50">
             {STAGES.map((s) => {
