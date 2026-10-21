@@ -138,6 +138,18 @@ const SECTIONS: SectionDef[] = [
         desc: 'PEFT → LoRA → Vector Databases → Production RAG', 
         trackId: 'intermediate-ai' as TrackId
       },
+      {
+        id: 'advanced-ai',
+        path: '/advanced-ai?from=dashboard',
+        title: 'Advanced AI & Autonomous Agents',
+        emoji: '⚡',
+        tour: 'advanced-ai',
+        lessons: 12,
+        accent: 'accent-orange',
+        tags: ['MCP', 'Agents', 'LLMOps', 'Production'],
+        desc: 'Reasoning → MCP → Agent Systems → Production AI',
+        trackId: 'advanced-ai' as TrackId
+      },
     ],
   },
 
@@ -338,6 +350,7 @@ const Dashboard = () => {
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
     '/ai-fundamentals': 'ai-fundamentals',
     '/intermediate-ai': 'intermediate-ai' as TrackId,
+    '/advanced-ai': 'advanced-ai' as TrackId,
     '/three3d': 'three3d' as TrackId,
     '/java': 'java' as TrackId,
     '/java-expert': 'javaexpert' as TrackId,
