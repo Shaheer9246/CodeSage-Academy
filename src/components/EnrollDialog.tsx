@@ -74,6 +74,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: 'Applied GenAI covers advanced topics like PEFT, LoRA/QLoRA fine-tuning, and production RAG. We recommend completing Foundations of AI first to build a solid grasp of transformer architecture.',
     ctas: [{ label: 'AI Foundations course', route: '/ai-fundamentals' }],
   },
+  'advanced-ai': {
+    title: 'Finish Applied Generative AI & Fine-Tuning first',
+    body: 'Autonomous AI Agents & Production Systems covers ReAct loops, Model Context Protocol (MCP), multi-agent swarms, and production LLMOps. We recommend completing Applied Generative AI first to establish strong fine-tuning and RAG foundations.',
+    ctas: [{ label: 'Applied GenAI course', route: '/intermediate-ai' }],
+  },
   cppexpert: {
     title: 'Finish Modern C++ Engineering first',
     body: 'Advanced C++ covers metaprogramming, lock-free atomics, and move semantics. Please complete Modern C++ Engineering first to establish a solid grasp of RAII and core syntax.',
