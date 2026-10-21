@@ -120,13 +120,7 @@ const AdvancedAiLessonPage = () => {
   }
 
   const handleFinish = async () => {
-    saveLessonQuizAttempt(lesson.id, {
-      score: correctCount,
-      totalQuestions: quiz.length,
-      passed,
-      selectedAnswers: answers,
-      completedAt: new Date().toISOString(),
-    });
+    saveLessonQuizAttempt(lesson.id, answers, quiz, lesson.title);
 
     if (passed) {
       await completeLesson(lesson.id);
@@ -158,7 +152,7 @@ const AdvancedAiLessonPage = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <CourseOverviewButton track="ai" currentLessonId={lesson.id} />
+          <CourseOverviewButton trackId="ai" />
           {/* Stage pills */}
           <div className="flex bg-secondary/80 p-1 rounded-xl gap-1 border border-border/50">
             {STAGES.map((s) => {
@@ -346,8 +340,9 @@ const AdvancedAiLessonPage = () => {
                 Interactive Environment
               </h3>
               <AiPracticalTerminal
-                practical={lesson.practical}
                 lessonId={lesson.id}
+                starterCode={lesson.practical.starterCode}
+                solutionCode={lesson.practical.solutionCode}
               />
             </div>
 
@@ -528,7 +523,7 @@ const AdvancedAiLessonPage = () => {
 
       {/* Footer Ad Banner */}
       <div className="border-t border-border/20 p-2">
-        <AdBannerCard slotName="lessonFooter" format="horizontal-banner" />
+        <AdBannerCard slotName="lessonSidebar" format="horizontal-banner" />
       </div>
     </div>
   );
