@@ -16,6 +16,7 @@ import { SQL_LESSONS } from '@/data/sqlLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson';
+import { ADVANCED_AI_LESSONS } from '@/data/advancedAiLesson';
 import { C_LESSONS } from '@/data/cLessons';
 import { C_EXPERT_LESSONS } from '@/data/cExpertLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
@@ -202,6 +203,7 @@ const TRACK_CATALOG_DEFS: { id: string; name: string; badge: string; icon: strin
   { id: 'javaexpert', name: 'Advanced Java Systems', badge: '16 Lessons', icon: 'Shield', list: JAVA_EXPERT_LESSONS },
   { id: 'ai-fundamentals', name: 'AI Fundamentals & Neural Models', badge: '14 Lessons', icon: 'Bot', list: AI_LESSONS },
   { id: 'intermediate-ai', name: 'Intermediate Applied GenAI', badge: '10 Lessons', icon: 'BrainCircuit', list: INTERMEDIATE_AI_LESSONS },
+  { id: 'advanced-ai', name: 'Advanced AI & Autonomous Agents', badge: '12 Lessons', icon: 'Sparkles', list: ADVANCED_AI_LESSONS },
   { id: 'three3d', name: 'Interactive 3D Graphics (Three.js)', badge: '16 Lessons', icon: 'Box', list: THREE3D_LESSONS },
   { id: 'freelance', name: 'Freelancing & Technical Consulting', badge: '12 Lessons', icon: 'Briefcase', list: FREELANCE_LESSONS },
   { id: 'real-freelance', name: 'Real-World Freelance Contracts', badge: '10 Lessons', icon: 'FileText', list: REAL_FREELANCE_LESSONS },
