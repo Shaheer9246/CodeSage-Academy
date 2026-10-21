@@ -20,8 +20,7 @@ import { AdBannerCard } from '@/components/AdBannerCard';
 import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDetails, isTrackCompleted, type LessonTrackKey } from '@/data/lessonIndex';
 import DailyProblemCard from '@/components/DailyProblemCard';
 import ShareAchievementModal, { ShareAchievementType } from '@/components/ShareAchievementModal';
-import StreakReminderToggle from '@/components/StreakReminderToggle';
-import { checkAndTriggerStreakReminder } from '@/lib/streakNotifications';
+import { checkAndTriggerStreakReminder, autoEnableStreakReminder } from '@/lib/streakNotifications';
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
@@ -480,9 +479,10 @@ const Dashboard = () => {
     customMessage?: string;
   }>({ isOpen: false });
 
-  // Evaluate browser PWA streak reminder notification (alerts at 6 PM if no lesson completed today)
+    // Auto-request notifications on login/visit, and alert at 6 PM if streak is at risk
   useEffect(() => {
     if (isGuest || !user) return;
+    autoEnableStreakReminder();
     const hasActivity = todayLessons > 0 || energy < 10;
     checkAndTriggerStreakReminder(hasActivity);
   }, [todayLessons, energy, isGuest, user]);
@@ -814,9 +814,8 @@ const Dashboard = () => {
                   <Flame className="w-3.5 h-3.5 text-orange-400" />
                   <span className="text-xs font-bold text-orange-400">{streak}d</span>
                 </div>
-                {!isGuest && (
+                 {!isGuest && (
                   <>
-                    <StreakReminderToggle compact />
                     <div className="flex items-center gap-1 bg-primary/20 border border-primary/40 px-2.5 py-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]">
                       <Trophy className="w-3.5 h-3.5 text-primary" />
                       <span className="text-xs font-bold text-primary">Lvl {user?.level || 1}</span>
