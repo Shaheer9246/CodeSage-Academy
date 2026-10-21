@@ -5,6 +5,7 @@ import { getLessonById, getAllLessons, type Lesson } from '@/data/lessons';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
 import { AI_LESSONS } from '@/data/aiFundamentalsLesson';
 import { INTERMEDIATE_AI_LESSONS } from '@/data/intermediateAiLesson';
+import { ADVANCED_AI_LESSONS } from '@/data/advancedAiLesson';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { FULLSTACK_LESSONS } from '@/data/fullstackLessons';
 import { PYTHON_LESSONS } from '@/data/pythonLessons';
@@ -49,6 +50,7 @@ const TRACKS: Track[] = [
   { prefix: 'net-',        path: '/n-lesson',     list: NETWORKING_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'ai-',         path: '/ai-lesson',    list: AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'aiin-',       path: '/iai-lesson',   list: INTERMEDIATE_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
+  { prefix: 'aiadv-', path: '/adv-ai-lesson', list: ADVANCED_AI_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'fs-',         path: '/fs-lesson',    list: FULLSTACK_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'pyx-',        path: '/pyx-lesson',   list: PYTHON_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'py-',         path: '/py-lesson',    list: PYTHON_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
@@ -70,6 +72,7 @@ const TRACK_HOME: Record<string, string> = {
   'net-': '/networking',
   'ai-': '/ai-fundamentals',
   'aiin-': '/intermediate-ai',
+  'aiadv-': '/advanced-ai',
   'free-': '/freelance',
   'fs-': '/fullstack',
   'pyx-': '/pythonexpert',
