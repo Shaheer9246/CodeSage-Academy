@@ -4,7 +4,7 @@ export const LESSON_AD_CACHE_KEY = 'codesage_lesson_sponsor_last_shown';
 export const FREE_LESSON_COUNTER_KEY = 'codesage_free_lessons_counter';
 export const DAILY_2X_CLAIMED_KEY = 'codesage_daily_2x_claimed_date';
 
-export const PRO_TRACK_PREFIXES = ['pyx-', 'cx-', 'cppx-', 'javax-', 'aiin-'];
+export const PRO_TRACK_PREFIXES = ['pyx-', 'cx-', 'cppx-', 'javax-', 'aiin-', 'aiadv-'];
 
 let memoryFreeCounter = 0;
 let memoryDaily2xDate = '';
