@@ -25,6 +25,7 @@ const TRACK_EMOJIS: Record<string, string> = {
   sql: '🗄️',
   'ai-fundamentals': '🧠',
   'intermediate-ai': '🤖',
+  'advanced-ai': '⚡',
   three3d: '🎮',
   java: '☕',
   javaexpert: '☕',
