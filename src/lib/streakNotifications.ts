@@ -19,11 +19,59 @@ export function isNotificationSupported(): boolean {
  * Check if the user has opted-in to streak reminders
  */
 export function isStreakReminderEnabled(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (!isNotificationSupported()) return false;
   try {
+    // If explicitly muted/blocked, don't notify
+    if (localStorage.getItem(STREAK_REMINDER_KEY) === 'false') return false;
+    // If browser permission is granted, it's active by default!
+    if (Notification.permission === 'granted') return true;
     return localStorage.getItem(STREAK_REMINDER_KEY) === 'true';
   } catch {
     return false;
+  }
+}
+
+/**
+ * Automatically prompt for notification permission on login / dashboard visit,
+ * and activate streak reminders as soon as allowed.
+ */
+export function autoEnableStreakReminder(): void {
+  if (!isNotificationSupported()) return;
+
+  if (Notification.permission === 'granted') {
+    if (localStorage.getItem(STREAK_REMINDER_KEY) !== 'false') {
+      localStorage.setItem(STREAK_REMINDER_KEY, 'true');
+    }
+    return;
+  }
+
+  // If user hasn't made a choice yet ('default')
+  if (Notification.permission === 'default') {
+    const askPermission = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          localStorage.setItem(STREAK_REMINDER_KEY, 'true');
+        } else if (permission === 'denied') {
+          localStorage.setItem(STREAK_REMINDER_KEY, 'false');
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    // Modern browsers require a user gesture (tap/click) for the permission prompt
+    const onUserInteraction = () => {
+      askPermission();
+      window.removeEventListener('click', onUserInteraction);
+      window.removeEventListener('touchstart', onUserInteraction);
+    };
+
+    window.addEventListener('click', onUserInteraction, { once: true });
+    window.addEventListener('touchstart', onUserInteraction, { once: true });
+
+    // Also attempt immediately on mount
+    askPermission();
   }
 }
 
