@@ -62,40 +62,41 @@
     --neon-glow-strong: 0 0 10px hsl(145 90% 55% / 0.5), 0 0 40px hsl(145 90% 55% / 0.2), 0 0 80px hsl(145 90% 55% / 0.08);
   }
 
- /* THEME: Light */
+  /* THEME: Light (Crisp White + Sky Blue & Emerald Mix) */
   [data-theme="light"] {
-    --background: 140 25% 96%;
-    --foreground: 150 30% 12%;
-    --card: 140 20% 98%;
-    --card-foreground: 160 30% 10%;
+    --background: 210 33% 98%;           /* Clean ice-white slate (#f8fafc) */
+    --foreground: 222 47% 11%;           /* High-contrast deep slate (#0f172a) */
+    --card: 0 0% 100%;                   /* Pure white card (#ffffff) */
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 160 30% 10%;
-    --primary: 145 70% 38%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 199 89% 48%;              /* Sky Blue (#0ea5e9) */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 145 80% 50%;
-    --secondary: 160 10% 94%;
-    --secondary-foreground: 160 30% 15%;
-    --muted: 160 10% 94%;
-    --muted-foreground: 160 8% 40%;
-    --accent: 145 70% 38%;
+    --primary-glow: 199 95% 60%;
+    --secondary: 210 28% 95%;            /* Subtle ice slate */
+    --secondary-foreground: 215 25% 20%;
+    --muted: 210 25% 94%;
+    --muted-foreground: 215 16% 45%;     /* Clean readable slate text */
+    --accent: 160 84% 39%;               /* Fresh Emerald (#10b981) */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 160 10% 88%;
-    --input: 160 10% 88%;
-    --ring: 145 70% 38%;
+    --border: 214 32% 91%;               /* Soft clean slate border */
+    --input: 214 32% 91%;
+    --ring: 199 89% 48%;
     --glass: 0 0% 100%;
-    --glass-border: 145 50% 45%;
-    --sidebar-background: 0 0% 96%;
-    --sidebar-foreground: 160 10% 30%;
-    --sidebar-primary: 145 70% 38%;
-    --sidebar-accent: 160 10% 90%;
-    --sidebar-accent-foreground: 160 30% 15%;
-    --sidebar-border: 160 10% 85%;
-    --neon: 145 70% 38%;
-    --neon-glow: 0 0 6px hsl(145 70% 38% / 0.3), 0 0 16px hsl(145 70% 38% / 0.1);
-    --neon-glow-strong: 0 0 10px hsl(145 70% 38% / 0.4), 0 0 30px hsl(145 70% 38% / 0.15);
+    --glass-border: 199 89% 48%;
+    --sidebar-background: 210 25% 97%;   /* Crisp sidebar */
+    --sidebar-foreground: 222 47% 18%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-accent: 210 25% 92%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --neon: 160 84% 39%;                 /* Emerald highlight */
+    --neon-glow: 0 0 6px hsl(199 89% 48% / 0.25), 0 0 16px hsl(160 84% 39% / 0.12);
+    --neon-glow-strong: 0 0 10px hsl(199 89% 48% / 0.35), 0 0 30px hsl(160 84% 39% / 0.18);
   }
+
 
   /* THEME: Blue (dark variant w/ blue primary) */
   [data-theme="blue"] {
