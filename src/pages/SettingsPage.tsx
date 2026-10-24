@@ -84,6 +84,22 @@ const TABS = [
 const formatBadgeName = (id: string) =>
   id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
+const formatGoal = (goalId?: string) => {
+  switch (goalId) {
+    case 'frontend':
+      return 'Modern Full-Stack & Web';
+    case 'ai':
+      return 'AI & Machine Learning Engineer';
+    case 'python':
+      return 'Python Software Engineer';
+    case 'systems':
+      return 'Systems & Core Programming';
+    case 'all':
+    default:
+      return 'All-Round Explorer';
+  }
+};
+
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { user, logout, deleteAccount, resetTour, updateUser, spendCoins } = useUser();
@@ -113,8 +129,12 @@ const SettingsPage = () => {
   const changeTheme = (t: ThemeName) => { setTheme(t); applyTheme(t); };
 
   const handleReplayTour = async () => {
+    try {
+      localStorage.setItem(`codesage_tour_seen_${user?.id}`, 'false');
+    } catch {}
     await resetTour();
-    navigate('/tour');
+    toast.success('Tour reset! Launching dashboard...');
+    navigate('/dashboard');
   };
 
   const handleResetRuntime = () => {
@@ -307,12 +327,12 @@ const SettingsPage = () => {
                     <InfoRow label="Student ID" value={cleanStudentId(user.studentId, user.id)} />
                     <InfoRow label="Email" value={user.email} />
                     <InfoRow label="Studying" value={user.studying} />
-                    <InfoRow label="Goal" value={user.goal} />
+                    <InfoRow label="Goal" value={formatGoal(user.goal)} />
                     <InfoRow label="Experience" value={user.experienceLevel} />
                     <InfoRow label="Member Since" value={joinDate} />
                   </div>
                   <button onClick={() => {
-                    setEditData({ name: user.name || '', studying: user.studying || '', goal: user.goal || '', experienceLevel: user.experienceLevel || '' });
+                    setEditData({ name: user.name || '', studying: user.studying || '', goal: user.goal || 'all', experienceLevel: user.experienceLevel || '' });
                     setShowEditModal(true);
                   }} className="w-full mt-4 flex items-center justify-center gap-2 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-xs font-semibold text-foreground">
                     <Pencil className="w-3.5 h-3.5 text-primary" /> Edit Profile Data
@@ -706,10 +726,32 @@ const SettingsPage = () => {
               <div className="space-y-3">
                 <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Name</label><input type="text" value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
                 <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Studying</label><input type="text" value={editData.studying} onChange={e => setEditData({ ...editData, studying: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
-                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label><input type="text" value={editData.goal} onChange={e => setEditData({ ...editData, goal: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label>
+                  <select
+                    value={editData.goal}
+                    onChange={e => setEditData({ ...editData, goal: e.target.value })}
+                    className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"
+                  >
+                    <option value="frontend">Modern Full-Stack & Web</option>
+                    <option value="ai">AI & Machine Learning Engineer</option>
+                    <option value="python">Python Software Engineer</option>
+                    <option value="systems">Systems & Core Programming</option>
+                    <option value="all">All-Round Explorer (All Tracks)</option>
+                  </select>
+                </div>
                 <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label><select value={editData.experienceLevel} onChange={e => setEditData({ ...editData, experienceLevel: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option></select></div>
               </div>
-              <button onClick={() => { if (user) { updateUser(editData); } toast.success('Profile updated successfully!'); setShowEditModal(false); }} className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm">Save Changes</button>
+              <button onClick={() => {
+                if (user) {
+                  updateUser(editData);
+                  try {
+                    localStorage.setItem('codesage_selected_goal_' + user.id, editData.goal);
+                  } catch {}
+                }
+                toast.success('Profile updated successfully!');
+                setShowEditModal(false);
+              }} className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm">Save Changes</button>
             </div>
           </div>
         )}
