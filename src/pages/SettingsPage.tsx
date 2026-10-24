@@ -77,7 +77,7 @@ const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'progress', label: 'Progress', icon: Trophy },
   { id: 'settings', label: 'Settings', icon: Wrench },
-  { id: 'ai-teacher', label: 'AI Teacher', icon: Sparkles, badge: 'Soon' },
+   { id: 'ai-teacher', label: 'AI Teacher', icon: Sparkles, badge: 'Active' },
   { id: 'account', label: 'Account', icon: ShieldCheck },
 ] as const;
 
@@ -549,57 +549,99 @@ const SettingsPage = () => {
 
               {/* ================= AI TEACHER TAB ================= */}
               {activeTab === 'ai-teacher' && (
-                <div className="relative">
-                  <div className="glass-card rounded-2xl p-5 lg:p-6 border border-primary/20 bg-gradient-to-br from-primary/10 to-purple-500/10">
-                    <div className="absolute inset-0 backdrop-blur-sm bg-background/30 rounded-2xl z-10" />
-
-                    <div className="relative z-20 flex flex-col items-center justify-center py-12 lg:py-16 space-y-6">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full animate-pulse" />
-                        <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-[0_0_40px_rgba(var(--primary),0.4)]">
-                          <Sparkles className="w-10 h-10 text-white" />
+                <div className="space-y-4">
+                  {/* Credits & Status Banner */}
+                  <div className="glass-card rounded-2xl p-5 lg:p-6 border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-secondary/20">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-emerald-500 flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0">
+                          <Sparkles className="w-6 h-6 text-white" />
                         </div>
-                      </div>
-
-                      <div className="text-center space-y-2">
-                        <h3 className="text-2xl font-bold font-display text-foreground">AI Teacher</h3>
-                        <p className="text-sm text-muted-foreground max-w-md">
-                          Get personalized coding guidance, instant feedback, and 24/7 mentorship powered by advanced AI.
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
-                        <Lock className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-xs font-semibold text-primary">Coming on 22 of SEP</span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg mt-4">
-                        <div className="glass-card rounded-xl p-3 text-center opacity-60">
-                          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-2">
-                            <Target className="w-4 h-4 text-primary" />
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">Personalized Learning</p>
-                        </div>
-                        <div className="glass-card rounded-xl p-3 text-center opacity-60">
-                          <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-2">
-                            <Zap className="w-4 h-4 text-purple-400" />
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">Instant Feedback</p>
-                        </div>
-                        <div className="glass-card rounded-xl p-3 text-center opacity-60">
-                          <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
-                            <BookOpen className="w-4 h-4 text-blue-400" />
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">24/7 Mentorship</p>
+                        <div>
+                          <h3 className="text-base font-bold font-display text-foreground flex items-center gap-2">
+                            AI Teacher & Mentorship
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
+                              Groq Llama 3.3
+                            </span>
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Personalized coding explanations, mock interviews & resume review.
+                          </p>
                         </div>
                       </div>
 
                       <button
-                        onClick={() => toast.info("We'll notify you when AI Teacher launches! 🎉")}
-                        className="mt-4 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary to-purple-500 text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(var(--primary),0.3)]"
+                        onClick={() => navigate('/ai-teacher')}
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/25"
                       >
-                        Notify Me
+                        Open AI Teacher
+                        <Zap className="w-3.5 h-3.5" />
                       </button>
+                    </div>
+
+                    {/* Credit Status Bar */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 pt-5 border-t border-border/30">
+                      <div className="p-3 rounded-xl bg-secondary/30 border border-border/30">
+                        <span className="text-[10px] text-muted-foreground block">Monthly Queries</span>
+                        <span className="text-lg font-bold text-foreground">
+                          {user?.aiCredits ?? 5} <span className="text-xs font-normal text-muted-foreground">/ 5 left</span>
+                        </span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-secondary/30 border border-border/30">
+                        <span className="text-[10px] text-muted-foreground block">Next Refill</span>
+                        <span className="text-lg font-bold text-foreground">1st of next month</span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-secondary/30 border border-border/30">
+                        <span className="text-[10px] text-muted-foreground block">Model Latency</span>
+                        <span className="text-lg font-bold text-emerald-400">~0.4s (Ultra-Fast)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Teaching Modes Overview */}
+                  <div className="glass-card rounded-2xl p-5 lg:p-6">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                      Available Mentorship Modes
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div
+                        onClick={() => navigate('/ai-teacher')}
+                        className="p-4 rounded-xl border border-border/40 bg-secondary/20 hover:border-primary/40 cursor-pointer transition-all hover:scale-[1.01]"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-2.5">
+                          <GraduationCap className="w-4 h-4 text-primary" />
+                        </div>
+                        <h5 className="text-xs font-bold text-foreground mb-1">🎓 Professor Mode</h5>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Grounded in CodeSage curriculum. Ask anything from lesson debugging to syntax deep-dives.
+                        </p>
+                      </div>
+
+                      <div
+                        onClick={() => navigate('/ai-teacher')}
+                        className="p-4 rounded-xl border border-border/40 bg-secondary/20 hover:border-primary/40 cursor-pointer transition-all hover:scale-[1.01]"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mb-2.5">
+                          <Target className="w-4 h-4 text-purple-400" />
+                        </div>
+                        <h5 className="text-xs font-bold text-foreground mb-1">💼 Mock Interviewer</h5>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Timed scenario-based questions to prepare you for frontend, backend, or DSA job rounds.
+                        </p>
+                      </div>
+
+                      <div
+                        onClick={() => navigate('/ai-teacher')}
+                        className="p-4 rounded-xl border border-border/40 bg-secondary/20 hover:border-primary/40 cursor-pointer transition-all hover:scale-[1.01]"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center mb-2.5">
+                          <BookOpen className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <h5 className="text-xs font-bold text-foreground mb-1">📄 Resume Counselor</h5>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Upload your resume to get keyword analysis, portfolio ideas, and targeted hiring advice.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
