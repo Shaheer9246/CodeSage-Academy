@@ -1,15 +1,107 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ChevronLeft, ChevronRight, Sprout, Rocket, Code2, Pen, Terminal, CheckCircle2, ArrowRight } from 'lucide-react';
+import { 
+  ChevronLeft, ChevronRight, CheckCircle2, ArrowRight,
+  Terminal, Globe, Sparkles, Code2, Cpu, Compass,
+  GraduationCap, Laptop, Briefcase, Rocket, Clock, Zap, Flame
+} from 'lucide-react';
 
-const steps = [
-  { key: 'name', question: 'What is your name?', placeholder: 'Enter your full name', type: 'text' },
-  { key: 'studying', question: 'What are you currently studying?', placeholder: 'e.g., Computer Science, High School', type: 'text' },
-  { key: 'hasJob', question: 'Do you have any job or work?', type: 'choice', options: ['Student only', 'Part-time job', 'Full-time job', 'Freelancer', 'Unemployed'] },
-  { key: 'dob', question: 'What is your date of birth?', placeholder: 'Select your birth date', type: 'date' },
-  { key: 'goal', question: 'What is your primary goal?', type: 'goalCards' },
-  { key: 'experienceLevel', question: 'What is your experience level?', type: 'expCards' },
+interface StepDef {
+  key: string;
+  question: string;
+  subtitle?: string;
+  placeholder?: string;
+  type: 'text' | 'choice' | 'goalCards' | 'tourCards';
+  options?: Array<{ label: string; sub?: string; icon?: React.ReactNode; value: string }>;
+}
+
+const steps: StepDef[] = [
+  { 
+    key: 'name', 
+    question: 'What should we call you?', 
+    subtitle: 'Enter your preferred name or engineering handle',
+    placeholder: 'e.g. Shaheer, Alex, Sarah', 
+    type: 'text' 
+  },
+  { 
+    key: 'studying', 
+    question: 'What best describes your current stage?', 
+    subtitle: 'This helps calibrate your course pacing',
+    type: 'choice', 
+    options: [
+      { label: 'Computer Science / IT Student', sub: 'University or College degree program', value: 'CS Student' },
+      { label: 'Self-Taught Developer', sub: 'Building real projects independently', value: 'Self-Taught' },
+      { label: 'Career Switcher', sub: 'Transitioning from non-tech into software engineering', value: 'Career Switcher' },
+      { label: 'Absolute Beginner', sub: 'Zero prior programming knowledge', value: 'Absolute Beginner' },
+    ] 
+  },
+  { 
+    key: 'goal', 
+    question: 'What is your primary engineering goal?', 
+    subtitle: 'We will personalize your initial dashboard tracks. You can switch to All Tracks anytime.',
+    type: 'goalCards' 
+  },
+  {
+    key: 'dailyPace',
+    question: 'What is your daily learning target?',
+    subtitle: 'Consistent daily coding protects your streak',
+    type: 'choice',
+    options: [
+      { label: 'Casual (10 mins / day)', sub: 'Light daily momentum', value: '10m' },
+      { label: 'Focused (20 mins / day)', sub: 'Recommended for steady progress', value: '20m' },
+      { label: 'Intense (45+ mins / day)', sub: 'Fast-track career readiness', value: '45m' },
+    ]
+  },
+  { 
+    key: 'wantTour', 
+    question: 'Would you like an interactive tour?', 
+    subtitle: 'Choose how you want to begin your journey on CodeSage',
+    type: 'tourCards' 
+  },
+];
+
+const CAREER_GOALS = [
+  {
+    id: 'frontend',
+    title: 'Modern Full-Stack & Web',
+    desc: 'HTML, CSS, JavaScript, React, APIs, and Production Apps',
+    icon: <Globe className="w-6 h-6 text-fuchsia-400" />,
+    badge: 'Popular',
+    accent: 'border-fuchsia-500/30 hover:border-fuchsia-500/60 bg-fuchsia-500/5',
+  },
+  {
+    id: 'ai',
+    title: 'AI & Machine Learning Engineer',
+    desc: 'Neural Foundations, Applied GenAI, LLMs, and Autonomous Agents',
+    icon: <Sparkles className="w-6 h-6 text-purple-400" />,
+    badge: 'Trending',
+    accent: 'border-purple-500/30 hover:border-purple-500/60 bg-purple-500/5',
+  },
+  {
+    id: 'python',
+    title: 'Python Software Engineer',
+    desc: 'Python Core, Data Structures, OOP Architecture, and Capstone APIs',
+    icon: <Code2 className="w-6 h-6 text-emerald-400" />,
+    badge: 'Beginner Friendly',
+    accent: 'border-emerald-500/30 hover:border-emerald-500/60 bg-emerald-500/5',
+  },
+  {
+    id: 'systems',
+    title: 'Systems & Core Programming',
+    desc: 'Procedural C, Modern C++, Memory Layout, Networks, and Relational SQL',
+    icon: <Cpu className="w-6 h-6 text-cyan-400" />,
+    badge: 'Low-Level',
+    accent: 'border-cyan-500/30 hover:border-cyan-500/60 bg-cyan-500/5',
+  },
+  {
+    id: 'all',
+    title: 'All-Round Explorer',
+    desc: 'Show me all 19 tracks across every language, framework, and tool',
+    icon: <Compass className="w-6 h-6 text-primary" />,
+    badge: 'Full Catalog',
+    accent: 'border-primary/30 hover:border-primary/60 bg-primary/5',
+  },
 ];
 
 const Onboarding = () => {
@@ -23,7 +115,6 @@ const Onboarding = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<NodeJS.Timeout>();
 
-  // Auto-focus text/date inputs on step change
   useEffect(() => {
     if (!isTransitioning && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -42,7 +133,7 @@ const Onboarding = () => {
     setTimeout(() => {
       setCurrentIndex(nextIndex);
       setIsTransitioning(false);
-    }, 400); // Match CSS transition duration
+    }, 350);
   };
 
   const handleAnswer = (key: string, val: string) => {
@@ -51,8 +142,7 @@ const Onboarding = () => {
 
   const handleChoiceSelect = (key: string, val: string) => {
     setAnswers(prev => ({ ...prev, [key]: val }));
-    // Instant advance for choices/cards (slightly delayed for visual feedback)
-    setTimeout(() => goToStep(currentIndex + 1), 250);
+    setTimeout(() => goToStep(currentIndex + 1), 220);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -66,7 +156,21 @@ const Onboarding = () => {
     if (currentIndex !== steps.length - 1 || !currentValue.trim() || submitting) return;
     setSubmitting(true);
     try {
-      await completeOnboarding(answers);
+      const wantTour = answers.wantTour === 'yes';
+      const chosenGoal = answers.goal || 'all';
+
+      // Save tour preference and chosen goal locally
+      try {
+        localStorage.setItem(`codesage_tour_seen_${user.id}`, wantTour ? 'false' : 'true');
+        localStorage.setItem(`codesage_selected_goal_${user.id}`, chosenGoal);
+      } catch {}
+
+      await completeOnboarding({
+        name: answers.name || user.name,
+        goal: chosenGoal,
+        hasSeenTour: !wantTour,
+      });
+
       navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Onboarding submit failed', err);
@@ -74,135 +178,160 @@ const Onboarding = () => {
     }
   };
 
-  // Animation classes based on transition state
   const getCardAnimationClass = () => {
     if (!isTransitioning) return 'translate-y-0 opacity-100 scale-100';
     return direction === 'up'
-      ? '-translate-y-8 opacity-0 scale-95'
-      : 'translate-y-8 opacity-0 scale-95';
-  };
-
-  const getNextCardPreviewClass = () => {
-    if (!isTransitioning) return 'translate-y-8 opacity-0 scale-95';
-    return 'translate-y-0 opacity-100 scale-100';
+      ? '-translate-y-6 opacity-0 scale-95'
+      : 'translate-y-6 opacity-0 scale-95';
   };
 
   const commonInputClass =
-    'w-full bg-background/40 border border-border/60 rounded-2xl px-5 py-4 text-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:bg-secondary/20 focus:shadow-[0_0_20px_hsl(153,100%,50%,0.08)] transition-all font-mono';
+    'w-full bg-background/50 border border-border/60 rounded-2xl px-5 py-4 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/60 focus:bg-secondary/20 focus:shadow-[0_0_20px_hsl(153,100%,50%,0.08)] transition-all font-mono';
 
   const renderInput = () => {
     switch (currentStep.type) {
-      case 'text':
-      case 'date':
+      case 'text': {
         const isNextDisabled = !currentValue.trim();
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <input
-              ref={inputRef as any}
-              type={currentStep.type}
+              ref={inputRef}
+              type="text"
               placeholder={currentStep.placeholder}
               value={currentValue}
               onChange={e => handleAnswer(currentStep.key, e.target.value)}
               onKeyDown={handleKeyDown}
-              className={`${commonInputClass} ${currentStep.type === 'date' ? 'cursor-pointer' : ''}`}
+              className={commonInputClass}
               autoFocus
             />
-            
-            {/* Explicit Next Button for Text/Date */}
             <button
               type="button"
               onClick={() => goToStep(currentIndex + 1)}
               disabled={isNextDisabled || isTransitioning}
-              className={`w-full py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 text-sm font-mono uppercase tracking-widest ${
+              className={`w-full py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 text-xs font-mono uppercase tracking-widest ${
                 isNextDisabled
-                  ? 'bg-secondary/50 text-muted-foreground cursor-not-allowed'
+                  ? 'bg-secondary/40 text-muted-foreground cursor-not-allowed'
                   : 'bg-primary text-primary-foreground hover:shadow-[0_0_25px_hsl(153,100%,50%,0.3)] hover:scale-[1.01]'
               }`}
             >
               Continue
               <ChevronRight className="w-4 h-4" />
             </button>
-
             {!isNextDisabled && (
-              <p className="text-center text-xs text-muted-foreground font-mono animate-fade-in">
-                Or press Enter ↵
+              <p className="text-center text-[11px] text-muted-foreground font-mono">
+                Press Enter ↵
               </p>
             )}
           </div>
         );
+      }
 
       case 'choice':
         return (
-          <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-primary/20 [&::-webkit-scrollbar-thumb]:rounded-full">
-            {currentStep.options?.map(opt => (
-              <button
-                key={opt}
-                onClick={() => handleChoiceSelect(currentStep.key, opt)}
-                className={`w-full text-left px-5 py-4 rounded-2xl border transition-all duration-200 text-base font-mono group ${
-                  currentValue === opt
-                    ? 'border-primary bg-primary/10 text-primary shadow-[0_0_15px_hsl(153,100%,50%,0.1)]'
-                    : 'border-border/40 bg-secondary/10 text-foreground hover:border-primary/30 hover:bg-secondary/20 hover:translate-x-1'
-                }`}
-              >
-                <span className="flex items-center justify-between">
-                  {opt}
-                  {currentValue === opt && <CheckCircle2 className="w-4 h-4 text-primary" />}
-                </span>
-              </button>
-            ))}
+          <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+            {currentStep.options?.map(opt => {
+              const isSelected = currentValue === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => handleChoiceSelect(currentStep.key, opt.value)}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 group flex items-center justify-between ${
+                    isSelected
+                      ? 'border-primary bg-primary/10 text-primary shadow-[0_0_15px_hsl(153,100%,50%,0.1)]'
+                      : 'border-border/40 bg-secondary/10 text-foreground hover:border-primary/40 hover:bg-secondary/20 hover:translate-x-1'
+                  }`}
+                >
+                  <div className="space-y-0.5">
+                    <p className="font-semibold text-sm font-mono">{opt.label}</p>
+                    {opt.sub && <p className="text-xs text-muted-foreground">{opt.sub}</p>}
+                  </div>
+                  {isSelected && <CheckCircle2 className="w-4 h-4 text-primary shrink-0 ml-2" />}
+                </button>
+              );
+            })}
           </div>
         );
 
       case 'goalCards':
         return (
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { val: 'Learn Code', icon: <Code2 className="w-8 h-8" /> },
-              { val: 'Edit Code Live', icon: <Pen className="w-8 h-8" /> },
-            ].map(g => (
-              <button
-                key={g.val}
-                onClick={() => handleChoiceSelect(currentStep.key, g.val)}
-                className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-200 group ${
-                  currentValue === g.val
-                    ? 'bg-primary/10 border-primary/40 shadow-[0_0_20px_hsl(153,100%,50%,0.1)]'
-                    : 'bg-secondary/10 border-border/30 hover:border-primary/20 hover:bg-secondary/20 hover:-translate-y-0.5'
-                }`}
-              >
-                <div className={`mb-3 transition-colors ${currentValue === g.val ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
-                  {g.icon}
-                </div>
-                <span className="font-semibold text-xs uppercase tracking-wider font-mono text-foreground">
-                  {g.val}
-                </span>
-              </button>
-            ))}
+          <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+            {CAREER_GOALS.map(goal => {
+              const isSelected = currentValue === goal.id;
+              return (
+                <button
+                  key={goal.id}
+                  type="button"
+                  onClick={() => handleChoiceSelect(currentStep.key, goal.id)}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 group flex items-start gap-3.5 ${
+                    isSelected
+                      ? 'border-primary bg-primary/15 text-foreground shadow-[0_0_20px_hsl(153,100%,50%,0.15)] ring-1 ring-primary/40'
+                      : `${goal.accent} text-foreground hover:scale-[1.01]`
+                  }`}
+                >
+                  <div className="p-2 rounded-xl bg-background/50 border border-border/40 shrink-0 mt-0.5">
+                    {goal.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-bold text-sm text-foreground">{goal.title}</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary/50 text-muted-foreground border border-border/30">
+                        {goal.badge}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                      {goal.desc}
+                    </p>
+                  </div>
+                  {isSelected && <CheckCircle2 className="w-5 h-5 text-primary shrink-0 self-center" />}
+                </button>
+              );
+            })}
           </div>
         );
 
-      case 'expCards':
+      case 'tourCards':
         return (
           <div className="space-y-3">
             {[
-              { val: 'Complete Beginner', icon: <Sprout className="w-5 h-5" /> },
-              { val: 'Experienced', icon: <Rocket className="w-5 h-5" /> },
-            ].map(e => (
-              <button
-                key={e.val}
-                onClick={() => handleChoiceSelect(currentStep.key, e.val)}
-                className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all duration-200 text-sm font-mono group ${
-                  currentValue === e.val
-                    ? 'border-primary/50 bg-primary/10 shadow-[0_0_15px_hsl(153,100%,50%,0.1)]'
-                    : 'border-border/40 bg-secondary/10 hover:border-primary/20 hover:bg-secondary/20 hover:translate-x-1'
-                }`}
-              >
-                <span className={`transition-colors ${currentValue === e.val ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
-                  {e.icon}
-                </span>
-                <span className="font-semibold uppercase tracking-wide text-foreground">{e.val}</span>
-                {currentValue === e.val && <CheckCircle2 className="w-4 h-4 ml-auto text-primary" />}
-              </button>
-            ))}
+              {
+                value: 'yes',
+                title: '🚀 Yes, show me around',
+                desc: 'Take a 60-second interactive tour of the editor, daily challenges, and tracks.',
+                badge: 'Recommended for first visit',
+              },
+              {
+                value: 'no',
+                title: '⚡ No, jump straight to my goal',
+                desc: 'Skip the tour and open my personalized curriculum immediately.',
+                badge: 'Fast track',
+              },
+            ].map(opt => {
+              const isSelected = currentValue === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => handleAnswer(currentStep.key, opt.value)}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 group flex items-start gap-3.5 ${
+                    isSelected
+                      ? 'border-primary bg-primary/15 text-foreground shadow-[0_0_20px_hsl(153,100%,50%,0.15)] ring-1 ring-primary/40'
+                      : 'border-border/40 bg-secondary/10 hover:border-primary/40 hover:bg-secondary/20 hover:scale-[1.01]'
+                  }`}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-bold text-sm text-foreground">{opt.title}</p>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-secondary/60 text-muted-foreground border border-border/30">
+                        {opt.badge}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                  </div>
+                  {isSelected && <CheckCircle2 className="w-5 h-5 text-primary shrink-0 self-center" />}
+                </button>
+              );
+            })}
           </div>
         );
 
@@ -212,28 +341,28 @@ const Onboarding = () => {
   };
 
   const isLastStep = currentIndex === steps.length - 1;
-  const canSubmit = isLastStep && currentValue.trim();
+  const canSubmit = isLastStep && !!currentValue.trim();
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden ambient-grid">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-lg relative z-10">
         {/* Header & Progress */}
-        <div className="mb-8 animate-fade-in">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 animate-fade-in">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 neon-glow">
-                <Terminal className="w-5 h-5 text-primary" />
+              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 neon-glow">
+                <Terminal className="w-4 h-4 text-primary" />
               </div>
-              <span className="text-lg font-bold text-primary font-mono neon-text">CodeSage</span>
+              <span className="text-base font-bold text-primary font-mono neon-text">CodeSage</span>
             </div>
             <span className="text-xs text-muted-foreground font-mono tracking-wider">
               {currentIndex + 1} / {steps.length}
             </span>
           </div>
-          
+
           {/* Segmented Progress Bar */}
           <div className="flex gap-1.5">
             {steps.map((_, i) => (
@@ -248,13 +377,12 @@ const Onboarding = () => {
         </div>
 
         {/* Card Viewport */}
-        <div className="relative min-h-[480px] perspective-1000 flex flex-col">
-          {/* Current / Exiting Card */}
+        <div className="relative min-h-[480px] flex flex-col">
           <div
-            className={`absolute inset-0 bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] ${getCardAnimationClass()}`}
+            className={`w-full bg-card/70 backdrop-blur-xl border border-border/50 rounded-3xl p-6 sm:p-8 flex flex-col transition-all duration-300 ease-out shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] ${getCardAnimationClass()}`}
           >
-            {/* Question Counter & Back Button */}
-            <div className="flex items-center justify-between mb-6">
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between mb-5">
               <button
                 type="button"
                 onClick={() => goToStep(currentIndex - 1)}
@@ -263,52 +391,44 @@ const Onboarding = () => {
               >
                 <ChevronLeft className="w-4 h-4" /> Back
               </button>
-              <div className={`px-2 py-0.5 rounded-md bg-secondary/30 text-[10px] text-muted-foreground uppercase tracking-widest font-mono`}>
-                {currentStep.type === 'text' || currentStep.type === 'date' ? 'Input' : 'Select'}
+              <div className="px-2.5 py-0.5 rounded-md bg-secondary/30 text-[10px] text-muted-foreground uppercase tracking-widest font-mono">
+                Step {currentIndex + 1}
               </div>
             </div>
 
-            {/* Question Title */}
-            <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight">
-              {currentStep.question}
-              {!isTransitioning && <span className="text-primary animate-pulse ml-0.5">_</span>}
-            </h2>
+            {/* Question Title & Subtitle */}
+            <div className="mb-5">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground font-mono leading-tight">
+                {currentStep.question}
+                {!isTransitioning && <span className="text-primary animate-pulse ml-0.5">_</span>}
+              </h2>
+              {currentStep.subtitle && (
+                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed font-sans">
+                  {currentStep.subtitle}
+                </p>
+              )}
+            </div>
 
             {/* Input Area */}
             <div className="flex-1 flex flex-col justify-center">
               {renderInput()}
             </div>
           </div>
+        </div>
 
-          {/* Incoming Card Preview */}
-          {isTransitioning && currentIndex + 1 < steps.length && (
-            <div
-              className={`absolute inset-0 bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-8 flex flex-col transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] ${getNextCardPreviewClass()}`}
+        {/* Submit Button (Only on final step) */}
+        {isLastStep && (
+          <div className="mt-4 transition-all duration-300">
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit || submitting}
+              className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_30px_hsl(153,100%,50%,0.3)] hover:scale-[1.01] disabled:opacity-40 disabled:cursor-not-allowed transition-all text-xs font-mono uppercase tracking-widest"
             >
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-12 h-4 bg-secondary/20 rounded animate-pulse" />
-                <div className={`px-2 py-0.5 rounded-md bg-secondary/30 text-[10px] text-muted-foreground uppercase tracking-widest font-mono`}>
-                  {steps[currentIndex + 1].type === 'text' || steps[currentIndex + 1].type === 'date' ? 'Input' : 'Select'}
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-foreground mb-6 font-mono leading-tight animate-pulse">
-                {steps[currentIndex + 1].question}
-              </h2>
-            </div>
-          )}
-        </div>
-
-        {/* Submit Button - Only shows on last step when answered */}
-        <div className={`mt-8 transition-all duration-300 ${canSubmit ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden mt-0'}`}>
-          <button
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_30px_hsl(153,100%,50%,0.3)] hover:scale-[1.01] disabled:opacity-50 transition-all text-sm font-mono uppercase tracking-widest"
-          >
-            {submitting ? 'Initializing...' : 'start()'}
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+              {submitting ? 'Initializing Workspace...' : 'Launch CodeSage'}
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
