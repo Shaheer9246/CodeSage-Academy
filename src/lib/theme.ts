@@ -2,7 +2,7 @@ export type ThemeName = 'dark' | 'light' | 'blue' | 'purple';
 
 export const THEMES: { id: ThemeName; label: string; swatch: string }[] = [
   { id: 'dark',   label: 'Dark Green',  swatch: '#22c55e' },
-  { id: 'light',  label: 'Light',       swatch: '#16a34a' },
+  { id: 'light',  label: 'Light Aurora', swatch: 'linear-gradient(135deg, #0ea5e9 0%, #10b981 100%)' },
   { id: 'blue',   label: 'Dark Blue',   swatch: '#3b82f6' },
   { id: 'purple', label: 'Dark Purple', swatch: '#a855f7' },
 ];
