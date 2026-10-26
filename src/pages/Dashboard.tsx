@@ -583,6 +583,12 @@ const Dashboard = () => {
     }, 100);
   };
 
+  return (
+    <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
+      {user && !showTour && <StreakModal streakCount={streak} />}
+
+      <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-accent-blue/5 blur-[180px] pointer-events-none" />
 
       {/* =========================================
           MAIN LAYOUT WRAPPER
