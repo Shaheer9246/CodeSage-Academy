@@ -36,6 +36,13 @@
       "when": 1792586503387,
       "tag": "0004_add_advanced_ai_enrollment",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793037075695,
+      "tag": "0005_restrict_suggestions_read",
+      "breakpoints": true
     }
   ]
 }
