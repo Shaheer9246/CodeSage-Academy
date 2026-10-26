@@ -511,23 +511,40 @@ const Dashboard = () => {
     });
   }, [selectedCategory]);
 
-  // --- SEARCH LOGIC ---
+  // --- SEARCH & LANGUAGE FILTER LOGIC ---
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const filteredTracks = useMemo(() => {
-    if (!searchQuery.trim()) {
-      // Show popular courses when user clicks into search
-      return allTracks.slice(0, 8);
-    }
-    const q = searchQuery.toLowerCase();
-    return allTracks.filter(t => 
-      t.title.toLowerCase().includes(q) || 
-      t.tags.some(tag => tag.toLowerCase().includes(q)) ||
-      t.desc.toLowerCase().includes(q)
-    ).slice(0, 8);
-  }, [searchQuery, allTracks]);
+  const SEARCH_CATEGORIES: {
+    id: DashboardCategory | 'cyber';
+    name: string;
+    subtitle: string;
+    emoji: string;
+    badge?: string;
+    keywords: string[];
+  }[] = [
+    { id: 'c', name: 'C Programming', subtitle: 'Pointers, memory & systems', emoji: '⚡', keywords: ['c', 'pointers', 'memory'] },
+    { id: 'cpp', name: 'C++ Programming', subtitle: 'OOP, STL & high performance', emoji: '⚙️', keywords: ['c++', 'cpp', 'stl', 'oop'] },
+    { id: 'python', name: 'Python Programming', subtitle: 'Beginner to advanced & APIs', emoji: '🐍', keywords: ['python', 'py', 'django', 'fastapi'] },
+    { id: 'java', name: 'Java Programming', subtitle: 'Enterprise OOP & JVM internals', emoji: '☕', keywords: ['java', 'spring', 'jvm', 'oop'] },
+    { id: 'ai', name: 'Artificial Intelligence (AI)', subtitle: 'Neural nets, LLMs & agents', emoji: '🧠', keywords: ['ai', 'ml', 'machine learning', 'llm', 'chatgpt'] },
+    { id: 'frontend', name: 'Frontend Development', subtitle: 'HTML, CSS, JavaScript & React', emoji: '📱', keywords: ['frontend', 'html', 'css', 'javascript', 'js', 'react'] },
+    { id: 'sql', name: 'SQL & Backend', subtitle: 'Relational DBs, queries & schemas', emoji: '🗄️', keywords: ['sql', 'database', 'backend', 'postgres'] },
+    { id: 'fundamentals', name: 'Computer Fundamentals', subtitle: 'Hardware, OS & networking', emoji: '🌐', keywords: ['computer', 'hardware', 'os', 'networking', 'dns'] },
+    { id: 'cyber', name: 'Cyber Security', subtitle: 'Network defense & security', emoji: '🛡️', badge: 'Soon', keywords: ['cyber', 'security', 'hacking'] },
+    { id: 'All', name: 'All Courses', subtitle: 'Show all tracks & modules', emoji: '📚', keywords: ['all', 'courses', 'tracks'] },
+  ];
+
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) return SEARCH_CATEGORIES;
+    const q = searchQuery.toLowerCase().trim();
+    return SEARCH_CATEGORIES.filter(c => 
+      c.name.toLowerCase().includes(q) || 
+      c.subtitle.toLowerCase().includes(q) ||
+      c.keywords.some(k => k.toLowerCase().includes(q))
+    );
+  }, [searchQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -546,18 +563,26 @@ const Dashboard = () => {
     };
   }, []);
 
-  const handleSearchSelect = (track: TrackDef) => {
+  const handleSelectSearchCategory = (catId: DashboardCategory | 'cyber') => {
     setIsSearchOpen(false);
     setSearchQuery('');
-    go(track.path)();
+    
+    if (catId === 'cyber') {
+      toast.info('🛡️ Cyber Security track is in active development! Coming soon.');
+      return;
+    }
+
+    setSelectedCategory(catId);
+
+    // Smooth scroll straight down to the course section
+    setTimeout(() => {
+      const el = document.getElementById('course-catalog');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
-  return (
-    <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
-      {user && !showTour && <StreakModal streakCount={streak} />}
-
-      <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-accent-blue/5 blur-[180px] pointer-events-none" />
 
       {/* =========================================
           MAIN LAYOUT WRAPPER
@@ -596,43 +621,53 @@ const Dashboard = () => {
               )}
             </div>
             
-            {/* Search Dropdown */}
+                        {/* Search Dropdown */}
             <AnimatePresence>
               {isSearchOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, y: -6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden max-h-[400px] overflow-y-auto"
+                  exit={{ opacity: 0, y: -6 }}
+                  className="absolute top-full left-0 right-0 mt-2 bg-popover/95 backdrop-blur-md border border-border/80 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[360px] overflow-y-auto"
                 >
-                  {filteredTracks.length > 0 ? (
-                    <div className="p-2 space-y-1">
-                      {filteredTracks.map((track) => (
+                  <div className="p-1.5 sm:p-2 space-y-1">
+                    <div className="px-2.5 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      {searchQuery ? 'Matching Languages' : 'Select Language or Course'}
+                    </div>
+
+                    {filteredCategories.length > 0 ? (
+                      filteredCategories.map((item) => (
                         <button
-                          key={track.id}
-                          onClick={() => handleSearchSelect(track)}
-                          className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors text-left group"
+                          key={item.id}
+                          onClick={() => handleSelectSearchCategory(item.id)}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-secondary/70 transition-colors text-left group"
                         >
-                          <div className={`w-8 h-8 rounded-lg bg-${track.accent}/15 flex items-center justify-center text-lg shrink-0`}>
-                            {track.emoji}
+                          <div className="w-7 h-7 rounded-lg bg-secondary/80 flex items-center justify-center text-sm shrink-0 border border-border/40">
+                            {item.emoji}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-foreground truncate">{track.title}</p>
-                            <p className="text-xs text-muted-foreground truncate">{track.desc}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{item.name}</p>
+                              {item.badge && (
+                                <span className="px-1.5 py-0.2 text-[9px] font-bold rounded bg-primary/15 text-primary border border-primary/20">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">{item.subtitle}</p>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                         </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
-                      No courses found matching "{searchQuery}"
-                    </div>
-                  )}
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-xs text-muted-foreground">
+                        No courses found matching "{searchQuery}"
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
 
            {/* 2. COMPACT WELCOME BACK HUD CARD */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
@@ -852,7 +887,7 @@ const Dashboard = () => {
           )}
 
           {/* 7. COURSE / TRACK CATALOG CARDS */}
-          <div className="space-y-3">
+           <div id="course-catalog" className="space-y-3">
             {visibleSections.map((section, i) => {
               const isCollapsed = !!collapsed[section.id];
               const enrolled = section.tracks.filter(t => t.trackId && isEnrolled(t.trackId)).length;
