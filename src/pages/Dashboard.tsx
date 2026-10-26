@@ -571,25 +571,25 @@ const Dashboard = () => {
           className="flex-1 min-w-0 space-y-6 order-1 lg:order-none"
         >
           
-          {/* 1. SEARCH BAR */}
+          {/* 1. COMPACT SEARCH BAR */}
           <div ref={searchRef} className="relative z-50">
             <div className="relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder="Search for courses or languages (e.g. Python, C++, AI)..."
+                placeholder="Search courses or languages (Python, C++, AI)..."
                 value={searchQuery}
                 onFocus={() => setIsSearchOpen(true)}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setIsSearchOpen(true);
                 }}
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-card border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base shadow-sm"
+                className="w-full pl-10 pr-9 py-2 sm:py-2.5 rounded-xl bg-card/90 border border-border/70 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-xs sm:text-sm shadow-sm"
               />
               {searchQuery && (
                 <button 
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
                 >
                   ×
                 </button>
@@ -634,35 +634,35 @@ const Dashboard = () => {
             </AnimatePresence>
           </div>
 
-          {/* 2. WELCOME BACK HUD CARD */}
+           {/* 2. COMPACT WELCOME BACK HUD CARD */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            className="relative z-20 glass-card rounded-3xl p-4 sm:p-5 border border-primary/20"
+            className="relative z-20 glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-primary/20"
           >
-            <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10" />
               <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
             </div>
 
-            <div className="relative flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+            <div className="relative flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto] items-start gap-2.5">
               <div className="min-w-0">
-                <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>system_online</span>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-black font-display truncate mt-1">
+                <h1 className="text-lg sm:text-xl font-black font-display truncate mt-0.5">
                   {isGuest ? 'Welcome to ' : 'Welcome back, '}
                   <span className="text-primary neon-text">{isGuest ? 'CodeSage' : displayName}</span>
                 </h1>
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
                   {isGuest ? 'Tap any tile for a preview.' : `${enrolledCount} track${enrolledCount === 1 ? '' : 's'} active · keep the streak alive.`}
                 </p>
               </div>
               
-              <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
+              <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-0.5 sm:mt-0">
                 <button onClick={() => isGuest ? navigate('/auth') : setShowXpModal(true)}
-                  className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1.5 rounded-full hover:neon-glow transition-all cursor-pointer">
-                  <Zap className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-xs font-bold text-primary">{energy} / 10 XP</span>
+                  className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-full hover:neon-glow transition-all cursor-pointer">
+                  <Zap className="w-3 h-3 text-primary" />
+                  <span className="text-[11px] font-bold text-primary">{energy} / 10 XP</span>
                 </button>
                 <div className="relative">
                   <button
@@ -673,11 +673,11 @@ const Dashboard = () => {
                         setShowCoinMenu(v => !v);
                       }
                     }}
-                    className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1.5 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
+                    className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2 py-1 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
                     title="Sage Coins — Buy XP or Streak Freeze"
                   >
-                    <Coins className="w-3.5 h-3.5 text-yellow-400" />
-                    <span className="text-xs font-bold text-yellow-400">{sageCoins}</span>
+                    <Coins className="w-3 h-3 text-yellow-400" />
+                    <span className="text-[11px] font-bold text-yellow-400">{sageCoins}</span>
                   </button>
                   {showCoinMenu && !isGuest && (
                     <>
@@ -1280,11 +1280,15 @@ function QuickChip({
     <button
       {...rest}
       onClick={onClick}
-      className={`glass-card p-3 rounded-2xl text-left transition-all ${disabled ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+      className={`glass-card p-2 sm:p-2.5 rounded-xl text-left transition-all ${disabled ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
     >
-      <div className={`w-9 h-9 rounded-xl bg-${color}/15 grid place-items-center mb-2`}>{icon}</div>
-      <p className="text-[11px] font-bold font-display leading-tight">{label}</p>
-      <p className="text-[9px] text-muted-foreground mt-0.5">{sub}</p>
+      <div className="flex items-center gap-2">
+        <div className={`w-7 h-7 rounded-lg bg-${color}/15 grid place-items-center shrink-0`}>{icon}</div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-bold font-display leading-tight truncate">{label}</p>
+          <p className="text-[9px] text-muted-foreground truncate">{sub}</p>
+        </div>
+      </div>
     </button>
   );
 }
