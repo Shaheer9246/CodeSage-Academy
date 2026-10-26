@@ -561,7 +561,7 @@ const SettingsPage = () => {
                           <h3 className="text-base font-bold font-display text-foreground flex items-center gap-2">
                             AI Teacher & Mentorship
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
-                              Groq Llama 3.3
+                              Flashy
                             </span>
                           </h3>
                           <p className="text-xs text-muted-foreground mt-0.5">
