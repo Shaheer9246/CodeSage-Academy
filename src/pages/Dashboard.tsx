@@ -2,9 +2,12 @@ import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
 import { StreakModal } from '@/components/StreakModal';
-import { Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
-        Gamepad2, Trophy, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
-        Layout, Terminal, Database, Briefcase, Sparkles, Code2, Bot } from 'lucide-react';
+import { 
+  Code, Zap, ChevronRight, Flame, MessageSquare, UserPlus, HelpCircle,
+  Gamepad2, Trophy, Users, Lock, CheckCircle2, ChevronDown, Cpu, Coins, X,
+  Layout, Terminal, Database, Briefcase, Sparkles, Code2, Bot, Search,
+  ExternalLink, BookOpen, Target, ShieldCheck
+} from 'lucide-react';
 import { energyToday } from '@/lib/gamification';
 
 import { THEMES, getTheme, applyTheme, type ThemeName } from '@/lib/theme';
@@ -163,7 +166,7 @@ const SECTIONS: SectionDef[] = [
         tour: 'java', lessons: 30, accent: 'orange-500',
         tags: ['Core Java', 'OOP', 'Spring Boot'], desc: 'Core Java → OOP Design → Enterprise APIs',
         trackId: 'java' as TrackId },
-      { id: 'javaexpert', path: '/java-expert?from=dashboard', title: 'Advanced Java Systems & JVM Internals', emoji: '🧙‍♂️',
+      { id: 'javaexpert', path: '/java-expert?from=dashboard', title: 'Advanced Java Systems & JVM Internals', emoji: '🧙‍️',
         tour: 'javaexpert', lessons: 30, accent: 'orange-500',
         tags: ['JVM', 'Multithreading', 'Performance'], desc: 'JVM Internals → Concurrency → Memory Architecture',
         trackId: 'javaexpert' as TrackId },  
@@ -266,7 +269,7 @@ function loadCollapsed(): Record<string, boolean> {
 }
 
 const Dashboard = () => {
-  const { user, loading, updateStreak, applyPromoCode, markTourSeen, updateUser } = useUser();
+  const { user, loading, updateStreak, applyPromoCode, markTourSeen, updateUser, spendCoins } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuest = searchParams.get('guest') === '1';
@@ -508,6 +511,47 @@ const Dashboard = () => {
     });
   }, [selectedCategory]);
 
+  // --- SEARCH LOGIC ---
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const filteredTracks = useMemo(() => {
+    if (!searchQuery.trim()) {
+      // Show popular courses when user clicks into search
+      return allTracks.slice(0, 8);
+    }
+    const q = searchQuery.toLowerCase();
+    return allTracks.filter(t => 
+      t.title.toLowerCase().includes(q) || 
+      t.tags.some(tag => tag.toLowerCase().includes(q)) ||
+      t.desc.toLowerCase().includes(q)
+    ).slice(0, 8);
+  }, [searchQuery, allTracks]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsSearchOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
+  const handleSearchSelect = (track: TrackDef) => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    go(track.path)();
+  };
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden grid-bg">
       {user && !showTour && <StreakModal streakCount={streak} />}
@@ -515,231 +559,82 @@ const Dashboard = () => {
       <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-accent-blue/5 blur-[180px] pointer-events-none" />
 
-      <div className="relative z-10 flex">
-        {/* Secondary Left Sidebar - Desktop Only */}
-        <div className="hidden lg:block w-64 shrink-0 p-4 space-y-4 border-r border-border/30">
-          
-          {/* Your Active Tracks - Compressed to 3 items with scroll if more */}
-          {!isGuest && myTracks.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-2 pl-1">
-                <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground">Your Tracks</p>
-                {myTracks.length > 3 && (
-                  <span className="text-[9px] font-mono text-muted-foreground/70">
-                    Scroll for more ({myTracks.length})
-                  </span>
-                )}
-              </div>
-              <div className="space-y-1.5 max-h-[196px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border/40 hover:scrollbar-thumb-border">
-                {myTracks.map(({ track, done, total, pct }) => {
-                  const isDone = total > 0 && done >= total;
-                  return (
-                    <button 
-                      key={track.id} 
-                      onClick={go(track.path)}
-                      className="w-full text-left rounded-lg p-2 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
-                    >
-                      <div className="flex items-center justify-between gap-1.5">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-base shrink-0">{track.emoji}</span>
-                          <p className="text-[10px] font-display font-semibold truncate">{track.title}</p>
-                        </div>
-                        {isDone && (
-                          <span className="text-[8px] font-mono font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1 py-0.5 rounded-full shrink-0">
-                            Done
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1.5 h-1 rounded-full bg-secondary overflow-hidden">
-                        <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Category Filters - Desktop - Compressed to 3 visible items with scroll */}
-          <div>
-            <div className="flex items-center justify-between mb-2 pl-1">
-              <p className="text-[10px] font-display font-bold uppercase tracking-wider text-muted-foreground">Categories</p>
-              <span className="text-[9px] font-mono text-muted-foreground/70">Scroll for more ({filterOptions.length})</span>
-            </div>
-            <div className="space-y-1 max-h-[148px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border/40 hover:scrollbar-thumb-border">
-              {filterOptions.map((option, index) => {
-                const Icon = option.icon;
-                const isSelected = selectedCategory === option.id;
-                
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => handleCategorySelect(option.id as DashboardCategory, index)}
-                    className={`relative w-full text-left rounded-lg p-2.5 transition-all duration-300 group overflow-hidden ${
-                      isSelected 
-                        ? 'bg-primary/10' 
-                        : 'hover:bg-secondary/30'
-                    }`}
-                  >
-                    {/* Sweeping Glow Effect */}
-                    <AnimatePresence mode="wait">
-                      {isSelected && (
-                        <motion.div
-                          key={`glow-${glowDirection}`}
-                          initial={{ 
-                            x: glowDirection === 'ltr' ? '-100%' : '100%',
-                            opacity: 0 
-                          }}
-                          animate={{ 
-                            x: '0%',
-                            opacity: 0.6 
-                          }}
-                          exit={{ 
-                            opacity: 0,
-                            x: glowDirection === 'ltr' ? '100%' : '-100%'
-                          }}
-                          transition={{ 
-                            duration: 0.5,
-                            ease: [0.4, 0, 0.2, 1]
-                          }}
-                          className="absolute inset-0 bg-gradient-to-r from-primary/40 via-primary/20 to-transparent"
-                        />
-                      )}
-                    </AnimatePresence>
-
-                    {/* Active glow border */}
-                    {isSelected && (
-                      <motion.div
-                        initial={false}
-                        animate={{ 
-                          boxShadow: '0 0 20px rgba(var(--primary), 0.4), inset 0 0 20px rgba(var(--primary), 0.1)'
-                        }}
-                        className="absolute inset-0 rounded-lg border border-primary/50"
-                      />
-                    )}
-
-                    {/* Content */}
-                    <div className="relative flex items-center gap-2.5">
-                      {/* Glowing circle indicator */}
-                      <div className={`relative w-2 h-2 rounded-full transition-all duration-300 ${
-                        isSelected 
-                          ? 'bg-primary shadow-[0_0_12px_rgba(var(--primary),1)]' 
-                          : 'bg-muted-foreground/30 group-hover:bg-muted-foreground/60'
-                      }`} />
-                      
-                      <Icon className={`w-3.5 h-3.5 transition-all duration-300 ${
-                        isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                      }`} />
-                      
-                      <span className={`text-xs font-semibold transition-all duration-300 ${
-                        isSelected ? 'text-primary font-bold' : 'text-muted-foreground group-hover:text-foreground'
-                      }`}>
-                        {option.label}
-                      </span>
-
-                      {isSelected && (
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="ml-auto"
-                        >
-                          <ChevronRight className="w-4 h-4 text-primary" />
-                        </motion.div>
-                      )}
-                    </div>
-
-                    {/* Subtle scanline for selected */}
-                    {isSelected && (
-                      <motion.div
-                        initial={{ top: '0%' }}
-                        animate={{ top: '100%' }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-
-          {/* Suggestions & Game - Desktop */}
-          <div className="space-y-2 pt-2">
-            <button
-              onClick={go('/suggestions')}
-              className={`w-full text-left rounded-lg p-3 transition-all border ${
-                isGuest 
-                  ? 'opacity-40 pointer-events-none grayscale border-border/20' 
-                  : 'bg-secondary/20 border-border/40 hover:border-accent-yellow/40 hover:bg-secondary/40'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-accent-yellow/60" />
-                <MessageSquare className="w-4 h-4 text-accent-yellow" />
-                <span className="text-xs font-semibold text-foreground">Suggestions</span>
-              </div>
-            </button>
-
-            <button
-              onClick={go('/dsa-sheet')}
-              className={`w-full text-left rounded-lg p-3 transition-all border ${
-                isGuest 
-                  ? 'opacity-40 pointer-events-none grayscale border-border/20' 
-                  : 'bg-primary/10 border-primary/30 hover:border-primary/50 hover:bg-primary/20'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                <Code2 className="w-4 h-4 text-primary" />
-                <div className="flex items-center justify-between flex-1">
-                  <span className="text-xs font-semibold text-foreground">DSA Sheet</span>
-                  <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-mono font-bold">TOP 75</span>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={go('/games/crawler')}
-              className={`w-full text-left rounded-lg p-3 transition-all border ${
-                isGuest 
-                  ? 'opacity-40 pointer-events-none grayscale border-border/20' 
-                  : 'bg-secondary/20 border-border/40 hover:border-accent-orange/40 hover:bg-secondary/40'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-accent-orange/60" />
-                <Gamepad2 className="w-4 h-4 text-accent-orange" />
-                <span className="text-xs font-semibold text-foreground">Code Crawler</span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
+      {/* =========================================
+          MAIN LAYOUT WRAPPER
+          ========================================= */}
+      <div className="relative z-10 flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-[1600px] mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        
+        {/* LEFT COLUMN: MAIN FEED (65-70%) */}
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }}
-          className="flex-1 px-4 sm:px-6 py-4 space-y-4 sm:space-y-5 overflow-x-hidden"
+          className="flex-1 min-w-0 space-y-6 order-1 lg:order-none"
         >
-          {isGuest && (
-            <div className="glass-card rounded-2xl border border-primary/40 p-3 flex items-center gap-3 neon-glow">
-              <div className="w-9 h-9 rounded-xl bg-primary/20 grid place-items-center shrink-0">
-                <UserPlus className="w-4 h-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-display font-bold">You're touring as a guest </p>
-                <p className="text-[10px] text-muted-foreground">Sign up to save progress and unlock everything.</p>
-              </div>
-              <button onClick={() => navigate('/auth')}
-                className="bg-primary text-primary-foreground text-[11px] font-display font-bold px-3 py-1.5 rounded-xl">
-                Sign Up
-              </button>
+          
+          {/* 1. SEARCH BAR */}
+          <div ref={searchRef} className="relative z-50">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <input
+                type="text"
+                placeholder="Search for courses or languages (e.g. Python, C++, AI)..."
+                value={searchQuery}
+                onFocus={() => setIsSearchOpen(true)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchOpen(true);
+                }}
+                className="w-full pl-12 pr-4 py-4 rounded-xl bg-card border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base shadow-sm"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  ×
+                </button>
+              )}
             </div>
-          )}
+            
+            {/* Search Dropdown */}
+            <AnimatePresence>
+              {isSearchOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden max-h-[400px] overflow-y-auto"
+                >
+                  {filteredTracks.length > 0 ? (
+                    <div className="p-2 space-y-1">
+                      {filteredTracks.map((track) => (
+                        <button
+                          key={track.id}
+                          onClick={() => handleSearchSelect(track)}
+                          className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors text-left group"
+                        >
+                          <div className={`w-8 h-8 rounded-lg bg-${track.accent}/15 flex items-center justify-center text-lg shrink-0`}>
+                            {track.emoji}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground truncate">{track.title}</p>
+                            <p className="text-xs text-muted-foreground truncate">{track.desc}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center text-sm text-muted-foreground">
+                      No courses found matching "{searchQuery}"
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-          {/* HERO / HUD */}
+          {/* 2. WELCOME BACK HUD CARD */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             className="relative z-20 glass-card rounded-3xl p-4 sm:p-5 border border-primary/20"
           >
@@ -828,8 +723,8 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-                    {/* QUICK LAUNCH */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {/* MOBILE ONLY QUICK TOOLS ROW */}
+          <div className="lg:hidden grid grid-cols-3 gap-2 sm:gap-3">
             <QuickChip icon={<Zap className="w-4 h-4 text-accent-orange" />} label="Challenges" sub="Test skills"
               color="accent-orange" data-tour="challenges" onClick={go('/challenges')} disabled={isGuest} />
             <QuickChip icon={<Code className="w-4 h-4 text-primary" />} label="Editor" sub="Playground"
@@ -838,20 +733,7 @@ const Dashboard = () => {
               color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
           </div>
 
-          {/* PROBLEM OF THE DAY */}
-          <DailyProblemCard
-            onOpenShare={(title, topic) => {
-              setShareModalConfig({
-                isOpen: true,
-                title,
-                topic,
-                achievementType: 'dsa',
-              });
-            }}
-          />
-
-
-          {/* CONTINUE LEARNING */}
+          {/* 3. CONTINUE LEARNING BANNER */}
           {!isGuest && activeContinueTrack && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
@@ -905,9 +787,20 @@ const Dashboard = () => {
             </motion.div>
           )}
 
+          {/* 4. PROBLEM OF THE DAY */}
+          <DailyProblemCard
+            onOpenShare={(title, topic) => {
+              setShareModalConfig({
+                isOpen: true,
+                title,
+                topic,
+                achievementType: 'dsa',
+              });
+            }}
+          />
 
-          {/* CATEGORY FILTER BAR - Mobile Only */}
-          <div className="lg:hidden w-full overflow-x-auto scrollbar-none py-1">
+          {/* 5. CATEGORY FILTER CHIPS (Horizontal Scroll on Mobile/Tablet) */}
+          <div className="w-full overflow-x-auto scrollbar-none py-1 -mx-4 px-4 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-1.5 min-w-max pb-2">
               {filterOptions.map((tab, index) => {
                 const Icon = tab.icon;
@@ -929,10 +822,10 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* YOUR TRACKS - Mobile Only */}
+          {/* 6. YOUR ACTIVE TRACKS (Compact Pills/Accordion) */}
           {!isGuest && myTracks.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="lg:hidden glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
+              className="glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
             >
               <div className="flex items-center justify-between">
                 <p className="text-xs font-display font-bold uppercase tracking-wider text-muted-foreground">Your tracks</p>
@@ -958,8 +851,7 @@ const Dashboard = () => {
             </motion.div>
           )}
 
-
-          {/* SECTIONS */}
+          {/* 7. COURSE / TRACK CATALOG CARDS */}
           <div className="space-y-3">
             {visibleSections.map((section, i) => {
               const isCollapsed = !!collapsed[section.id];
@@ -1035,77 +927,65 @@ const Dashboard = () => {
             })}
           </div>
 
-          {/* DSA Sheet Featured Preview Card */}
-          <motion.button
-            initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.08 }}
-            onClick={go('/dsa-sheet')}
-            className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-primary/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10" />
-            <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-12 h-12 rounded-xl bg-primary/15 grid place-items-center border border-primary/30 neon-glow shrink-0">
+          {/* Footer Links (DSA Sheet, Crawler, Suggestions) - Moved to Bottom for Main Feed Flow */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+             <motion.button
+              initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+              onClick={go('/dsa-sheet')}
+              className={`glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-primary/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10" />
+              <div className="relative flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 grid place-items-center border border-primary/30 neon-glow shrink-0">
                   <Code2 className="w-5 h-5 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-base font-bold font-display flex items-center gap-2 truncate">
-                    CodeSage DSA Sheet
-                    <span className="text-[10px] font-mono text-primary">· Top 75 Interview Prep</span>
-                  </p>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    Arrays · Trees · Graphs · DP · Live Python, C++, Java &amp; JS compiler
-                  </p>
+                  <p className="text-sm font-bold font-display truncate">DSA Sheet</p>
+                  <p className="text-[10px] text-muted-foreground truncate">Top 75 Interview Prep</p>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-primary shrink-0" />
-            </div>
-          </motion.button>
+            </motion.button>
 
-          {/* Code Crawler featured */}
-          <motion.button
-            initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-            onClick={go('/games/crawler')}
-            className={`w-full glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden lg:hidden ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10" />
-            <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-12 h-12 rounded-xl bg-accent-orange/15 grid place-items-center border border-accent-orange/30 neon-glow shrink-0">
+            <motion.button
+              initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+              onClick={go('/games/crawler')}
+              className={`glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-accent-orange/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10" />
+              <div className="relative flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-accent-orange/15 grid place-items-center border border-accent-orange/30 neon-glow shrink-0">
                   <Gamepad2 className="w-5 h-5 text-accent-orange" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-base font-bold font-display flex items-center gap-2 truncate">
-                    Code Crawler
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent-orange/15 text-accent-orange border border-accent-orange/30 font-mono">NEW</span>
-                  </p>
-                  <p className="text-[10px] text-muted-foreground truncate">Maze runner · fix code at every gate</p>
+                  <p className="text-sm font-bold font-display truncate">Code Crawler</p>
+                  <p className="text-[10px] text-muted-foreground truncate">Maze runner game</p>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-primary shrink-0" />
-            </div>
-          </motion.button>
-          
-          {/* Suggestions */}
-          <motion.button
-            initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-            onClick={go('/suggestions')}
-            className={`w-full glass-card p-4 rounded-2xl text-left flex items-center gap-3 transition-all lg:hidden ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-          >
-            <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 grid place-items-center shrink-0">
-              <MessageSquare className="w-5 h-5 text-accent-yellow" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold font-display">Suggestions & Feedback</p>
-              <p className="text-[10px] text-muted-foreground">Tell us what's missing — we read every one.</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-          </motion.button>
+            </motion.button>
+
+            <motion.button
+              initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+              onClick={go('/suggestions')}
+              className={`glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-accent-yellow/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-yellow/10 via-transparent to-primary/10" />
+              <div className="relative flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 grid place-items-center border border-accent-yellow/30 neon-glow shrink-0">
+                  <MessageSquare className="w-5 h-5 text-accent-yellow" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold font-display truncate">Suggestions</p>
+                  <p className="text-[10px] text-muted-foreground truncate">Feedback & Ideas</p>
+                </div>
+              </div>
+            </motion.button>
+          </div>
 
           {/* Promo */}
           <div className="glass-card p-4 rounded-2xl">
             <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">promo_code</h3>
             <div className="flex gap-2">
-              <input value={promoInput} onChange={e => setPromoInput(e.target.value)} placeholder="Future_Update_If_You_Lose_Your_Progress_By_Any_Chance"
+              <input value={promoInput} onChange={e => setPromoInput(e.target.value)} placeholder="Enter promo code..."
                 className="flex-1 min-w-0 bg-secondary/40 border border-border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-primary/50 font-mono" />
               <button onClick={handlePromo} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold font-display hover:neon-glow">
                 Apply
@@ -1113,7 +993,132 @@ const Dashboard = () => {
             </div>
             {promoMsg && <p className="text-xs mt-2 font-mono">{promoMsg}</p>}
           </div>
+
         </motion.div>
+
+        {/* RIGHT SIDEBAR: TOOLS & MINI-HUD (30-35%, STICKY ON DESKTOP) */}
+        <aside className="hidden lg:block w-[30%] xl:w-[28%] shrink-0 order-2 lg:order-none">
+          <div className="sticky top-8 space-y-6">
+            
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-500" /> Quick Tools
+              </h3>
+            </div>
+
+            {/* Challenge Card */}
+            <button
+              onClick={go('/challenges')}
+              className="group relative w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1 text-left overflow-hidden"
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-purple-500" />
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <h4 className="font-bold text-sm text-foreground mb-1">Daily Challenges</h4>
+                  <p className="text-xs text-muted-foreground">Test your logic & DSA skills</p>
+                </div>
+                <div className="p-2 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-purple-400">
+                  <Target className="w-5 h-5" />
+                </div>
+              </div>
+            </button>
+
+            {/* Playground Card */}
+            <button
+              onClick={go('/playground')}
+              className="group relative w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1 text-left overflow-hidden"
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-cyan-500" />
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <h4 className="font-bold text-sm text-foreground mb-1">Code Playground</h4>
+                  <p className="text-xs text-muted-foreground">Sandbox environment for snippets</p>
+                </div>
+                <div className="p-2 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-cyan-400">
+                  <Code className="w-5 h-5" />
+                </div>
+              </div>
+            </button>
+
+            {/* Exams Card */}
+            <button
+              onClick={go('/exams')}
+              className="group relative w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1 text-left overflow-hidden"
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-orange-500" />
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <h4 className="font-bold text-sm text-foreground mb-1">Exams & Quizzes</h4>
+                  <p className="text-xs text-muted-foreground">Validate your knowledge level</p>
+                </div>
+                <div className="p-2 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-orange-400">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+              </div>
+            </button>
+
+            {/* Separator */}
+            <div className="h-px bg-border my-2" />
+
+            {/* Mini HUD: Coins & Streak */}
+            <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-background border border-border">
+              <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Status</h4>
+              
+              <div className="space-y-3">
+                {/* Coins */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-4 h-4 text-yellow-500" />
+                    <span className="text-sm font-medium text-foreground">Sage Coins</span>
+                  </div>
+                  <span className="text-sm font-bold text-yellow-500">{sageCoins}</span>
+                </div>
+                
+                {/* Streak */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                    <span className="text-sm font-medium text-foreground">Current Streak</span>
+                  </div>
+                  <span className="text-sm font-bold text-orange-500">{streak} Days</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-border/50">
+                <button 
+                  onClick={() => {
+                    if (isGuest) {
+                      navigate('/auth');
+                    } else {
+                      setShowCoinMenu(v => !v);
+                    }
+                  }}
+                  className="w-full py-2 px-3 rounded-lg bg-secondary/50 hover:bg-secondary text-xs font-semibold text-foreground transition-colors flex items-center justify-center gap-2"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-primary" /> Visit Coin Shop
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="space-y-1.5">
+              <button 
+                onClick={go('/dsa-sheet')}
+                className="w-full p-2.5 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
+              >
+                <BookOpen className="w-4 h-4 text-primary" /> DSA Sheet (Top 75)
+              </button>
+              <button 
+                onClick={isGuest ? () => navigate('/auth') : go('/suggestions')}
+                className="w-full p-2.5 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
+              >
+                <Sparkles className="w-4 h-4 text-accent-yellow" /> Suggestions & Feedback
+              </button>
+            </div>
+
+          </div>
+        </aside>
+
       </div>
 
       {/* XP Breakdown Modal */}
