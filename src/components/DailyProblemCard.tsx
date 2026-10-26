@@ -52,7 +52,7 @@ export const DailyProblemCard: React.FC<DailyProblemCardProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`w-full rounded-2xl p-4 sm:p-5 border border-orange-500/30 bg-card/95 hover:border-orange-500/50 backdrop-blur-md relative overflow-hidden shadow-xl shadow-orange-500/5 transition-colors ${className}`}
+       className={`w-full rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-orange-500/30 bg-card/95 hover:border-orange-500/50 backdrop-blur-md relative overflow-hidden shadow-md shadow-orange-500/5 transition-colors ${className}`}
     >
       {/* Background ambient gradient accent */}
       <div className="absolute -top-16 -right-16 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none -z-0" />
@@ -137,11 +137,11 @@ export const DailyProblemCard: React.FC<DailyProblemCardProps> = ({
           ) : (
            <button
               onClick={handleNavigateToProblem}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-display font-bold text-xs hover:brightness-110 transition-all shadow-md shadow-orange-500/25 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-display font-bold text-[11px] sm:text-xs hover:brightness-110 transition-all shadow-sm hover:scale-[1.01] active:scale-[0.98]"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3 h-3" />
               <span>Solve Today's Problem</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+              <ArrowRight className="w-3 h-3 ml-0.5" />
             </button>
           )}
         </div>
