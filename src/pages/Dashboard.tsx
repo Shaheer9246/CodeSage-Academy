@@ -668,6 +668,7 @@ const Dashboard = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
 
            {/* 2. COMPACT WELCOME BACK HUD CARD */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
