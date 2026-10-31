@@ -6,7 +6,6 @@ import { JAVA_EXPERT_LESSONS, isJavaExpertLessonUnlocked } from '@/data/javaExpe
 import { ArrowLeft, Lock, Check, ChevronRight, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 const JavaExpertLearn = () => {
   useScrollTop();
@@ -87,11 +86,6 @@ const JavaExpertLearn = () => {
               style={{ width: `${progress}%` }}
             />
           </div>
-        </div>
-
-        {/* Developer Track Sponsor Banner */}
-        <div className="pt-0.5">
-          <AdBannerCard slotName="learnTrackPage" format="horizontal-banner" />
         </div>
 
         {/* Lessons List */}
