@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, ShieldCheck, Sparkles, Zap, Heart, CheckCircle2 } from 'lucide-react';
+import { X, ExternalLink, ShieldCheck, Sparkles, Zap, Heart } from 'lucide-react';
 import { ADS_CONFIG } from '@/config/adsConfig';
 
 interface SponsorAdModalProps {
@@ -18,9 +18,9 @@ export const SponsorAdModal: React.FC<SponsorAdModalProps> = ({
   title = 'Next-Gen Cloud GPU & AI Hosting',
   description = 'High-speed cloud container spins, developer compute perks, and free sandbox environments for modern web developers.',
   sponsorUrl,
-  partnerName = 'Monetag Verified Partner',
+  partnerName = 'CodeSage Verified Partner',
 }) => {
-  const targetUrl = sponsorUrl || ADS_CONFIG.monetagDirectLink || ADS_CONFIG.monetagReferralLink || ADS_CONFIG.defaultSponsorLink;
+  const targetUrl = sponsorUrl || ADS_CONFIG.defaultSponsorLink;
 
   return (
     <AnimatePresence>
@@ -100,13 +100,13 @@ export const SponsorAdModal: React.FC<SponsorAdModalProps> = ({
             {/* Referral Banner */}
             <div className="pt-3 border-t border-border/30 text-center">
               <a
-                href={ADS_CONFIG.monetagReferralLink}
+                href={ADS_CONFIG.defaultSponsorLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] text-primary/90 hover:text-primary underline flex items-center justify-center gap-1 transition-colors"
               >
                 <Zap className="w-3 h-3 text-amber-400" />
-                <span>Want to run ads & monetize your own website? Join Monetag for Free</span>
+                <span>Want to run ads &amp; monetize your own website? Join Partner Network</span>
               </a>
             </div>
           </motion.div>
