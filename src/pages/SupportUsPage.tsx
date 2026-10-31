@@ -1,14 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ExternalLink, ArrowLeft, Coins, Mail, Globe, ShieldCheck, Check, Copy } from 'lucide-react';
+import { Heart, ExternalLink, ArrowLeft, Coins, Mail, Globe, ShieldCheck, Check, Copy, Sparkles, CheckCircle2, Server, Cloud, Code } from 'lucide-react';
 import { toast } from 'sonner';
 import { ADS_CONFIG } from '@/config/adsConfig';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import { Button } from '@/components/ui/button';
+
+interface VoluntaryCard {
+  id: string;
+  icon: typeof Server;
+  badge: string;
+  title: string;
+  description: string;
+  cta: string;
+}
+
+const VOLUNTARY_CARDS: VoluntaryCard[] = [
+  {
+    id: 'server-boost',
+    icon: Server,
+    badge: 'Voluntary Server Boost',
+    title: 'Quick 15s Sponsor Visit',
+    description: 'Spend 15 seconds viewing a verified sponsor offer to directly fund free in-browser code execution and Docker sandboxes for students.',
+    cta: 'Visit Sponsor (15s)',
+  },
+  {
+    id: 'cloud-tools',
+    icon: Cloud,
+    badge: 'Developer Cloud Perks',
+    title: 'Explore Dev Tools & Cloud Credits',
+    description: 'Discover developer infrastructure, cloud hostings, and exclusive partner promotions that keep CodeSage 100% accessible.',
+    cta: 'Explore Dev Deals (15s)',
+  },
+  {
+    id: 'global-access',
+    icon: Code,
+    badge: 'Global Education Fund',
+    title: 'Support Free Student Learning',
+    description: 'Help ensure aspiring software engineers worldwide can learn full-stack, AI, and systems programming without paywalls.',
+    cta: 'Support Academy (15s)',
+  },
+];
 
 export default function SupportUsPage() {
   const navigate = useNavigate();
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [activeTimers, setActiveTimers] = useState<Record<string, number>>({});
+  const timerIntervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const hasActive = Object.values(activeTimers).some(sec => sec > 0);
+    if (!hasActive) {
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+      return;
+    }
+
+    timerIntervalRef.current = window.setInterval(() => {
+      setActiveTimers(prev => {
+        const next: Record<string, number> = { ...prev };
+        for (const key of Object.keys(next)) {
+          if (next[key] > 0) {
+            next[key] -= 1;
+          }
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    };
+  }, [activeTimers]);
+
+  const handleStartTimer = (cardId: string) => {
+    setActiveTimers(prev => ({ ...prev, [cardId]: 15 }));
+  };
+
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(ADS_CONFIG.supportContacts.adminEmail);
@@ -21,18 +87,94 @@ export default function SupportUsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground py-8 px-4 sm:px-6 max-w-4xl mx-auto space-y-7">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="h-4 w-4" /> Back to Academy</Button>
+      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
+        <ArrowLeft className="h-4 w-4" /> Back to Academy
+      </Button>
+
       <header className="space-y-3 border-b border-border pb-6">
-        <p className="flex items-center gap-2 text-xs font-mono text-primary"><Heart className="h-4 w-4" /> COMMUNITY SUPPORTED</p>
+        <p className="flex items-center gap-2 text-xs font-mono text-primary">
+          <Heart className="h-4 w-4 text-primary" /> COMMUNITY SUPPORTED
+        </p>
         <h1 className="text-2xl font-bold font-display">Support CodeSage</h1>
-        <p className="text-sm text-muted-foreground leading-relaxed">Learning stays free. Sponsor offers and direct support are entirely optional.</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Learning stays 100% free. Sponsor visits and direct contributions are completely voluntary.
+        </p>
       </header>
+
+      {/* 3 VOLUNTARY SPONSOR ACTION CARDS WITH 15-SECOND COUNTDOWN */}
       <div className="space-y-4">
-        <AdBannerCard slotName="supportPageTop" format="horizontal-banner" />
-        <AdBannerCard slotName="supportPageMid" format="horizontal-banner" />
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold font-display uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-400" /> Voluntary Sponsor Actions
+          </h2>
+          <span className="text-[11px] font-mono text-muted-foreground">15s per visit · No payment needed</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {VOLUNTARY_CARDS.map(card => {
+            const Icon = card.icon;
+            const secondsLeft = activeTimers[card.id];
+            const isRunning = typeof secondsLeft === 'number' && secondsLeft > 0;
+            const isDone = typeof secondsLeft === 'number' && secondsLeft === 0;
+
+            return (
+              <div
+                key={card.id}
+                className="rounded-2xl border border-border/60 bg-card/60 p-5 flex flex-col justify-between space-y-4 relative overflow-hidden transition-all hover:border-primary/40 shadow-sm"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border/40">
+                      {card.badge}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold font-display text-foreground pt-1">{card.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{card.description}</p>
+                </div>
+
+                <div className="pt-2">
+                  {isDone ? (
+                    <div className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                      <CheckCircle2 className="w-4 h-4" /> Thanks for supporting!
+                    </div>
+                  ) : isRunning ? (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-amber-400 font-bold">Verifying visit...</span>
+                        <span className="text-amber-400 font-bold tabular-nums">{secondsLeft}s</span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-amber-400 h-1.5 rounded-full transition-all duration-1000"
+                          style={{ width: `${((15 - secondsLeft) / 15) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-center text-muted-foreground">Keep the partner tab open</p>
+                    </div>
+                  ) : (
+                    <Button
+                      asChild
+                      size="sm"
+                      className="w-full gap-2 shadow-sm font-semibold text-xs"
+                      onClick={() => handleStartTimer(card.id)}
+                    >
+                      <a href={ADS_CONFIG.defaultSponsorLink} target="_blank" rel="noopener noreferrer">
+                        <span>{card.cta}</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* SECTION: RUN ADS ON YOUR OWN WEBSITE FOR FREE (USER'S MONETAG REFERRAL) */}
+      {/* SECTION: RUN ADS ON YOUR OWN WEBSITE (VERIFIED DEVELOPER SPONSOR NETWORK) */}
       <div className="rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 via-card/90 to-amber-500/10 p-5 sm:p-7 space-y-4 shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-xl">
@@ -48,11 +190,11 @@ export default function SupportUsPage() {
               🚀 Run Ads &amp; Monetize Your Own Website or Web App
             </h2>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Have you built a student project, blog, or web application? Join Monetag's publisher network to monetize your visitors from day one with in-page push banners, multi-format tags, and high CPM instant payouts.
+              Have you built a student project, blog, or web application? Join our Verified Developer Sponsor network to monetize your visitors from day one with in-page banners, smart links, and high CPM instant payouts.
             </p>
           </div>
           <a
-            href={ADS_CONFIG.monetagReferralLink}
+            href={ADS_CONFIG.defaultSponsorLink}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 px-5 py-3 rounded-xl text-xs font-bold font-display bg-gradient-to-r from-primary to-accent text-primary-foreground hover:neon-glow transition-all flex items-center justify-center gap-2 shadow-md"
@@ -63,7 +205,7 @@ export default function SupportUsPage() {
         </div>
       </div>
 
-      {/* SECTION 2: DIRECT DONATION (CONTACT ADMIN FOR SECURE DETAILS) */}
+      {/* SECTION 2: DIRECT DONATION */}
       <div className="rounded-2xl border border-border/60 bg-card/80 p-5 sm:p-7 space-y-5">
         <div className="space-y-1">
           <h2 className="text-lg font-bold font-display text-foreground flex items-center gap-2">
