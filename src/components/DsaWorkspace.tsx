@@ -25,7 +25,6 @@ import CppWorkspace from '@/components/CppWorkspace';
 import JavaWorkspace from '@/components/JavaWorkspace';
 import CodeEditor from '@/components/CodeEditor';
 import ConsolePanel from '@/components/ConsolePanel';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import ShareAchievementModal from '@/components/ShareAchievementModal';
 import { toast } from 'sonner';
 
@@ -323,10 +322,6 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
               )}
             </div>
 
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-1">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
