@@ -1,3 +1,4 @@
+// Clean, distraction-free C++ coding workspace
 import { useMemo, useState, useEffect } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
@@ -11,7 +12,6 @@ import {
 } from 'lucide-react';
 import CppWorkspace from '@/components/CppWorkspace';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -170,10 +170,6 @@ const CppLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
