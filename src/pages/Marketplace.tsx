@@ -14,7 +14,6 @@ import {
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 interface MarketItem {
   id: string;
@@ -32,17 +31,6 @@ interface MarketItem {
 
 const MARKETPLACE_ITEMS: MarketItem[] = [
   // --- AFFILIATE & FREE CREDITS (TODO: Update referral links soon) ---
-  {
-    id: 'monetag-publisher',
-    title: 'Monetag Ad Network & Monetization',
-    category: 'affiliate',
-    badge: 'Monetize Websites Free',
-    description: 'Turn your websites, web apps, and projects into cash. Join Monetag to run clean banners, in-page push, and smart monetization with instant payouts.',
-    link: 'https://monetag.com/?ref_id=tHSJ',
-    perk: 'Earn revenue from your web visitors from day 1 with zero setup fee',
-    isAffiliate: true,
-    iconName: 'tool',
-  },
   {
     id: 'hostinger-dev',
     title: 'Hostinger Cloud & VPS Hosting',
@@ -296,10 +284,6 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* Featured High-CPM Monetag Partner Box */}
-      <div>
-        <AdBannerCard slotName="marketplace" format="big-box" />
-      </div>
 
       {/* Grid of Marketplace Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
