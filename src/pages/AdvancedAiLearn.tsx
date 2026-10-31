@@ -4,7 +4,6 @@ import { ADVANCED_AI_LESSONS, isAdvancedAiLessonUnlocked } from '@/data/advanced
 import { ArrowLeft, Lock, Check, ChevronRight, Flame, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 const AdvancedAiLearn = () => {
   useScrollTop();
@@ -71,11 +70,6 @@ const AdvancedAiLearn = () => {
               style={{ width: `${progress || 0}%` }} 
             />
           </div>
-        </div>
-
-        {/* Developer Track Sponsor Banner */}
-        <div className="pt-0.5">
-          <AdBannerCard slotName="learnTrackPage" format="horizontal-banner" />
         </div>
 
         {/* Lessons List */}
