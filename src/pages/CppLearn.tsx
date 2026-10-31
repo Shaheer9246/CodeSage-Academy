@@ -5,7 +5,6 @@ import { CPP_LESSONS, isCppLessonUnlocked } from '@/data/cppLessons';
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 const CppLearn = () => {
   useScrollTop();
@@ -82,11 +81,6 @@ const CppLearn = () => {
               style={{ width: `${progress || 0}%` }}
             />
           </div>
-        </div>
-
-        {/* Developer Track Sponsor Banner */}
-        <div className="pt-0.5">
-          <AdBannerCard slotName="learnTrackPage" format="horizontal-banner" />
         </div>
 
         {/* Lessons List */}
