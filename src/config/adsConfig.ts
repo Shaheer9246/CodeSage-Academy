@@ -1,19 +1,14 @@
 /**
- * Central configuration for CodeSage's optional Monetag sponsor links.
- * Zone metadata retained for reference only; scripts are not automatically loaded.
- * - Vignette Banner Zone: 11911764 (https://n6wxm.com/vignette.min.js)
- * - In-Page Push Zone: 11911770 (https://nap5k.com/tag.min.js)
- * - Direct SmartLink 1 (Positive link): https://omg10.com/4/11911757
- * - Direct SmartLink 2 (Joyful link): https://omg10.com/4/11858088
+ * Central configuration for CodeSage's Adsterra sponsor links.
+ * All ads are centralized as direct sponsor links across designated high-intent spots.
  */
 
 export interface AdZoneConfig {
   enabled: boolean;
-  network?: 'ethicalads' | 'monetag' | 'direct';
+  network?: 'adsterra' | 'monetag' | 'direct';
   title?: string;
-  monetagZoneId?: string;
+  adsterraSmartLink?: string;
   monetagSmartLink?: string;
-  ethicalAdsPlacement?: string;
 }
 
 export interface LiveAdCreative {
@@ -25,17 +20,16 @@ export interface LiveAdCreative {
   cta: string;
   accentColor: string;
   url: string;
-  zoneId: string;
-  scriptSrc: string;
   displayDomain: string;
 }
 
-export const MONETAG_DIRECT_LINK_1 = 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b'; // Adsterra Direct Link
-export const MONETAG_DIRECT_LINK_2 = 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b'; // Adsterra Direct Link
-export const MONETAG_VIGNETTE_ZONE = '11911764';
-export const MONETAG_VIGNETTE_SRC = 'https://n6wxm.com/vignette.min.js';
-export const MONETAG_INPAGE_ZONE = '11911770';
-export const MONETAG_INPAGE_SRC = 'https://nap5k.com/tag.min.js';
+// Active Adsterra Configuration
+export const ADSTERRA_DIRECT_LINK_1 = 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b';
+export const ADSTERRA_DIRECT_LINK_2 = 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b';
+
+// Backwards-compatible aliases for legacy references
+export const MONETAG_DIRECT_LINK_1 = ADSTERRA_DIRECT_LINK_1;
+export const MONETAG_DIRECT_LINK_2 = ADSTERRA_DIRECT_LINK_2;
 
 export const ADS_CONFIG = {
   // Global toggle
@@ -44,188 +38,121 @@ export const ADS_CONFIG = {
   // Local sponsor prompt only; no automatic popup scripts or impression simulation.
   lessonStart: { enabled: true, cooldownMinutes: 10 },
 
-  // EthicalAds Publisher ID
-  ethicalAdsPublisherId: 'codesage-academy',
+  // Active Adsterra Direct Links
+  adsterraDirectLink: ADSTERRA_DIRECT_LINK_1,
+  adsterraDirectLinkSecondary: ADSTERRA_DIRECT_LINK_2,
+  adsterraDirectLinks: [ADSTERRA_DIRECT_LINK_1, ADSTERRA_DIRECT_LINK_2],
 
-  // Real Monetag Zones & Scripts
-  monetagDomain: 'nap5k.com',
-  monetagDefaultZoneId: MONETAG_INPAGE_ZONE,
-  monetagInPageZoneId: MONETAG_INPAGE_ZONE,
-  monetagInPageScriptSrc: MONETAG_INPAGE_SRC,
-  monetagVignetteZoneId: MONETAG_VIGNETTE_ZONE,
-  monetagVignetteScriptSrc: MONETAG_VIGNETTE_SRC,
+  // Backwards-compatible aliases so legacy references work seamlessly
+  monetagDirectLink: ADSTERRA_DIRECT_LINK_1,
+  monetagDirectLinkSecondary: ADSTERRA_DIRECT_LINK_2,
+  monetagDirectLinks: [ADSTERRA_DIRECT_LINK_1, ADSTERRA_DIRECT_LINK_2],
 
-  // Monetag SmartLinks; earnings depend on Monetag's eligible traffic and advertiser rules.
-  monetagDirectLink: MONETAG_DIRECT_LINK_1,
-  monetagDirectLinkSecondary: MONETAG_DIRECT_LINK_2,
-  monetagDirectLinks: [MONETAG_DIRECT_LINK_1, MONETAG_DIRECT_LINK_2],
+  // Primary external sponsor URL
+  defaultSponsorLink: ADSTERRA_DIRECT_LINK_1,
 
-  // Fallback external sponsor URL; opening an offer does not guarantee revenue.
-  defaultSponsorLink: MONETAG_DIRECT_LINK_1,
+  // Partner Referral Link
+  monetagReferralLink: ADSTERRA_DIRECT_LINK_1,
 
-  // User's Monetag Publisher Referral Link (only used on the "Monetize Your Own Site" button)
-  monetagReferralLink: 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b',
-
-  // How many seconds each ad rotates inside the live banner
+  // How many seconds each ad rotates inside any live banner
   bannerRotationIntervalSec: 12,
 
-  // Duration of each Support Us ad in seconds
-  supportAdDurationSec: 30,
+  // Duration of each voluntary Support Us ad in seconds
+  supportAdDurationSec: 15,
 
-  // Live rotating ad feeds backed by your real Monetag Direct Links & Zones
+  // Live rotating ad creatives backed by Adsterra Direct Links
   liveCreatives: [
     {
-      id: 'monetag-live-1',
-      tag: 'Monetag Live Feed · Zone #11911757',
-      badge: 'SPONSORED AD',
-      headline: 'Featured Sponsor Offer · Click to Open Live Partner Deal',
-      subtext: 'Real-time advertiser feed powered by Monetag Direct SmartLink #11911757.',
-      cta: 'Open Sponsored Ad',
+      id: 'adsterra-live-1',
+      tag: 'Verified Partner Offer',
+      badge: 'SPONSORED',
+      headline: 'Featured Developer Offer · Click to Open Partner Deal',
+      subtext: 'Real-time developer tool and cloud offers supporting CodeSage.',
+      cta: 'Open Partner Deal',
       accentColor: 'from-cyan-500/20 via-primary/15 to-blue-600/20',
-      url: MONETAG_DIRECT_LINK_1,
-      zoneId: MONETAG_INPAGE_ZONE,
-      scriptSrc: MONETAG_INPAGE_SRC,
-      displayDomain: 'omg10.com/4/11911757',
+      url: ADSTERRA_DIRECT_LINK_1,
+      displayDomain: 'asiafilm.org',
     },
     {
-      id: 'monetag-live-2',
-      tag: 'Monetag Live Feed · Zone #11858088',
+      id: 'adsterra-live-2',
+      tag: 'Developer Cloud Offer',
       badge: 'LIVE OFFER',
       headline: 'Trending Partner Promotion · Supporting Free Student Servers',
-      subtext: 'Interactive sponsor showcase powered by Monetag Direct SmartLink #11858088.',
-      cta: 'View Sponsor Offer',
+      subtext: 'Explore verified cloud infrastructure and dev tools.',
+      cta: 'View Partner Offer',
       accentColor: 'from-emerald-500/20 via-teal-500/15 to-primary/20',
-      url: MONETAG_DIRECT_LINK_2,
-      zoneId: MONETAG_VIGNETTE_ZONE,
-      scriptSrc: MONETAG_VIGNETTE_SRC,
-      displayDomain: 'omg10.com/4/11858088',
+      url: ADSTERRA_DIRECT_LINK_2,
+      displayDomain: 'asiafilm.org',
     },
     {
-      id: 'monetag-live-3',
-      tag: 'Monetag Vignette · Zone #11911764',
+      id: 'adsterra-live-3',
+      tag: 'Tech Partner Showcase',
       badge: 'PARTNER AD',
       headline: 'Exclusive Developer & Tech Partner Showcase',
-      subtext: 'Every view and click directly funds CodeSage free coding tracks.',
-      cta: 'Visit Advertiser',
+      subtext: 'Every view directly funds CodeSage free coding tracks.',
+      cta: 'Visit Partner',
       accentColor: 'from-purple-500/20 via-indigo-500/15 to-primary/20',
-      url: MONETAG_DIRECT_LINK_1,
-      zoneId: MONETAG_VIGNETTE_ZONE,
-      scriptSrc: MONETAG_VIGNETTE_SRC,
-      displayDomain: 'n6wxm.com · #11911764',
-    },
-    {
-      id: 'monetag-live-4',
-      tag: 'Monetag In-Page · Zone #11911770',
-      badge: 'LIVE STREAM',
-      headline: 'Global Advertiser Feed · Keep CodeSage 100% Free',
-      subtext: 'Live sponsor stream via Monetag In-Page Push & SmartLink network.',
-      cta: 'Open Ad Link',
-      accentColor: 'from-amber-500/20 via-orange-500/15 to-primary/20',
-      url: MONETAG_DIRECT_LINK_2,
-      zoneId: MONETAG_INPAGE_ZONE,
-      scriptSrc: MONETAG_INPAGE_SRC,
-      displayDomain: 'nap5k.com · #11911770',
+      url: ADSTERRA_DIRECT_LINK_1,
+      displayDomain: 'asiafilm.org',
     },
   ] as LiveAdCreative[],
 
-  // Ad slot placements across the platform
+  // Central slot mappings
   slots: {
     dashboardSidebar: {
       enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Live Ad',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
-    },
-    dashboardSidebarMonetagBig: {
-      enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Live Stream',
-      monetagZoneId: MONETAG_VIGNETTE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_2,
+      network: 'adsterra' as const,
+      title: 'Verified Sponsor Offer',
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_1,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_1,
     },
     dashboardContinueLearning: {
       enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Tech Partner',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
+      network: 'adsterra' as const,
+      title: 'Developer Tech Partner',
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_1,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_1,
     },
     lessonSidebar: {
       enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Live Sponsor',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_2,
+      network: 'adsterra' as const,
+      title: 'Developer Sponsor',
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_1,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_1,
     },
     marketplace: {
       enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Partner Showcase',
-      monetagZoneId: MONETAG_VIGNETTE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
-    },
-    inbox: {
-      enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Dev Sponsor',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_2,
-    },
-    exams: {
-      enabled: true,
-      network: 'monetag' as const,
-      title: 'Certification Partner',
-      monetagZoneId: MONETAG_VIGNETTE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
-    },
-    aiTeacher: {
-      enabled: true,
-      network: 'monetag' as const,
-      title: 'AI Cloud Compute Sponsor',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_2,
-    },
-    profile: {
-      enabled: true,
-      network: 'monetag' as const,
-      title: 'Developer Career Sponsor',
-      monetagZoneId: MONETAG_VIGNETTE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
+      network: 'adsterra' as const,
+      title: 'Partner Showcase',
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_1,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_1,
     },
     learnTrackPage: {
       enabled: true,
-      network: 'monetag' as const,
+      network: 'adsterra' as const,
       title: 'Developer Track Sponsor',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_1,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_1,
     },
     supportPageTop: {
       enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Live Ad Feed',
-      monetagZoneId: MONETAG_VIGNETTE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
+      network: 'adsterra' as const,
+      title: 'Verified Sponsor Feed',
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_1,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_1,
     },
     supportPageMid: {
       enabled: true,
-      network: 'monetag' as const,
-      title: 'Monetag Dev Network',
-      monetagZoneId: MONETAG_INPAGE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_2,
-    },
-    supportPageBottom: {
-      enabled: true,
-      network: 'monetag' as const,
-      title: 'Tech Affiliate & Tools',
-      monetagZoneId: MONETAG_VIGNETTE_ZONE,
-      monetagSmartLink: MONETAG_DIRECT_LINK_1,
+      network: 'adsterra' as const,
+      title: 'Developer Network Offer',
+      adsterraSmartLink: ADSTERRA_DIRECT_LINK_2,
+      monetagSmartLink: ADSTERRA_DIRECT_LINK_2,
     },
   },
 
   // Contact for direct payment & sponsorships
   supportContacts: {
-    adminEmail: 'shaheerwrites703@gmail.com',
+    adminEmail: 'zainrao.dev@gmail.com',
     adminTelegram: 'https://t.me/codesage_admin',
     paymentJazzCashNote: 'Contact Admin for verified 0% fee JazzCash transfer details',
     paymentBinanceNote: 'Contact Admin for verified Binance Pay ID or USDT TRC-20 address',
