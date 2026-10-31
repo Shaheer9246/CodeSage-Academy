@@ -19,7 +19,6 @@ import EnrollDialog from '@/components/EnrollDialog';
 import { TrackId, isEnrolled, isActive, getStudentCount, onEnrollmentChange } from '@/lib/enrollment';
 import SuggestionsBadge from '@/components/SuggestionsBadge';
 import InboxBadge from '@/components/InboxBadge';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDetails, isTrackCompleted, type LessonTrackKey } from '@/data/lessonIndex';
 import DailyProblemCard from '@/components/DailyProblemCard';
 import ShareAchievementModal, { ShareAchievementType } from '@/components/ShareAchievementModal';
