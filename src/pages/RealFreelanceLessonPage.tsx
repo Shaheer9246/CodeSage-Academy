@@ -1,3 +1,4 @@
+// Clean, distraction-free Real Freelance coding workspace
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { useUser } from '@/contexts/UserContext';
 import { REAL_FREELANCE_LESSONS, getRealFreelanceLessonById, isRealFreelanceLessonUnlocked } from '@/data/realfreelanceLesson';
 import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
@@ -138,10 +138,6 @@ const RealFreelanceLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
