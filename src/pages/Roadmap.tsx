@@ -3,7 +3,6 @@ import { useUser } from '@/contexts/UserContext';
 import { Lock, Check, Flame, Zap, Trophy, ChevronRight, ChevronDown, Compass, ArrowRight, Sparkles } from 'lucide-react';
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import EnrollDialog from '@/components/EnrollDialog';
 import { isEnrolled, type TrackId } from '@/lib/enrollment';
 import { NETWORKING_LESSONS } from '@/data/networkingLessons';
@@ -810,10 +809,6 @@ const Roadmap = () => {
           ))}
         </div>
 
-        {/* Sponsor Banner Card */}
-        <div className="mb-8">
-          <AdBannerCard slotName="dashboardSidebar" format="compact" />
-        </div>
 
         {/* Sectors */}
         <div className="space-y-10">
