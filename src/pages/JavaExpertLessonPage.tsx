@@ -1,3 +1,4 @@
+// Clean, distraction-free Java Expert coding workspace
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
@@ -13,7 +14,6 @@ import {
 import JavaWorkspace from '@/components/JavaWorkspace';
 import { useIsMobile } from '@/hooks/use-mobile';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -158,10 +158,6 @@ const JavaExpertLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
