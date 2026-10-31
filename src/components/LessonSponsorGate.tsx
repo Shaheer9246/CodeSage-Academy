@@ -4,7 +4,6 @@ import { ExternalLink, Sparkles, Coffee, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ADS_CONFIG } from '@/config/adsConfig';
 import { evaluateLessonGate, resetFreeLessonCounter, unlockProLesson, isLessonPath } from '@/lib/lessonAds';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 const SPONSOR_WAIT_SECONDS = 15;
 
@@ -110,7 +109,7 @@ function LessonEntry({ children }: { children: ReactNode }) {
           <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500/20 to-transparent w-32 h-32 blur-2xl pointer-events-none" />
 
           <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full">
-            <Sparkles className="h-3.5 w-3.5" /> PRO TRACK · SPONSOR UNLOCK
+            <Sparkles className="h-3.5 w-3.5" /> CODESAGE VERIFIED SPONSOR · PRO UNLOCK
           </div>
 
           <div className="space-y-2">
@@ -118,7 +117,7 @@ function LessonEntry({ children }: { children: ReactNode }) {
               Unlock Expert Lesson for Free
             </h1>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              This is an advanced industry track. Visit one sponsor deal for about 15 seconds to unlock full access — no payment, ever.
+              This is an advanced industry track. Visit one verified sponsor deal for about 15 seconds to unlock full access — no payment, ever.
             </p>
           </div>
 
@@ -129,7 +128,7 @@ function LessonEntry({ children }: { children: ReactNode }) {
                 className="w-full gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold hover:brightness-110 shadow-lg"
               >
                 <a
-                  href={ADS_CONFIG.monetagDirectLink}
+                  href={ADS_CONFIG.defaultSponsorLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleSponsorClick}
@@ -173,7 +172,7 @@ function LessonEntry({ children }: { children: ReactNode }) {
           <div className="space-y-3 pt-2">
             <Button asChild className="w-full gap-2 shadow-lg">
               <a
-                href={ADS_CONFIG.monetagDirectLink}
+                href={ADS_CONFIG.defaultSponsorLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleSponsorClick}
@@ -203,15 +202,5 @@ function LessonEntry({ children }: { children: ReactNode }) {
 export function LessonSponsorGate({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   if (isLessonPath(pathname)) return <LessonEntry key={pathname}>{children}</LessonEntry>;
-  const isCompletion = /^\/complete\/[^/]+\/?$/.test(pathname) || /^\/lesson\/[^/]+\/complete\/?$/.test(pathname);
-  return (
-    <>
-      {children}
-      {isCompletion && (
-        <div className="max-w-2xl mx-auto px-4 pb-8">
-          <AdBannerCard slotName="dashboardContinueLearning" format="horizontal-banner" />
-        </div>
-      )}
-    </>
-  );
+  return <>{children}</>;
 }
