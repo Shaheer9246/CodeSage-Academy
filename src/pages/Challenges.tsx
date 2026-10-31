@@ -8,7 +8,6 @@ import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
 import PythonWorkspace from '@/components/PythonWorkspace';
 import JavaWorkspace from '@/components/JavaWorkspace';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import { CHALLENGES, TIER_INFO, ChallengeDef, Tier } from '@/data/challengesData';
 
 function normalize(code: string): string {
@@ -321,10 +320,6 @@ const handleLog = useCallback((log: { type: string; message: string }) => {
           })}
         </div>
 
-        {/* Sponsor Banner Card */}
-        <div className="pt-2">
-          <AdBannerCard slotName="lessonSidebar" format="compact" />
-        </div>
       </div>
     </div>
   );
