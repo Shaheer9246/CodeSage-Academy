@@ -1,4 +1,5 @@
 // src/pages/CExpertLessonPage.tsx
+// Clean, distraction-free C Expert coding workspace
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
@@ -7,7 +8,6 @@ import { getCExpertLessonById, isCExpertLessonUnlocked } from '@/data/cExpertLes
 import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import CWorkspace from '@/components/CWorkspace';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Terminal, Code2, type LucideIcon
@@ -135,10 +135,6 @@ const CExpertLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
