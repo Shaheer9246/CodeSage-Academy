@@ -1,3 +1,4 @@
+// Clean, distraction-free Advanced AI coding workspace
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
@@ -23,7 +24,6 @@ import {
 } from 'lucide-react';
 import AiPracticalTerminal from '@/components/AiPracticalTerminal';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -521,10 +521,6 @@ const AdvancedAiLessonPage = () => {
         )}
       </main>
 
-      {/* Footer Ad Banner */}
-      <div className="border-t border-border/20 p-2">
-        <AdBannerCard slotName="lessonSidebar" format="horizontal-banner" />
-      </div>
     </div>
   );
 };
