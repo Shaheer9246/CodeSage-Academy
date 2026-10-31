@@ -30,8 +30,8 @@ export interface LiveAdCreative {
   displayDomain: string;
 }
 
-export const MONETAG_DIRECT_LINK_1 = 'https://omg10.com/4/11911757'; // Positive link · 11911757
-export const MONETAG_DIRECT_LINK_2 = 'https://omg10.com/4/11858088'; // Joyful link · 11858088
+export const MONETAG_DIRECT_LINK_1 = 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b'; // Adsterra Direct Link
+export const MONETAG_DIRECT_LINK_2 = 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b'; // Adsterra Direct Link
 export const MONETAG_VIGNETTE_ZONE = '11911764';
 export const MONETAG_VIGNETTE_SRC = 'https://n6wxm.com/vignette.min.js';
 export const MONETAG_INPAGE_ZONE = '11911770';
@@ -64,7 +64,7 @@ export const ADS_CONFIG = {
   defaultSponsorLink: MONETAG_DIRECT_LINK_1,
 
   // User's Monetag Publisher Referral Link (only used on the "Monetize Your Own Site" button)
-  monetagReferralLink: 'https://monetag.com/?ref_id=tHSJ',
+  monetagReferralLink: 'https://asiafilm.org/4/eca5e087800bb710d5fbb6dc8255917b',
 
   // How many seconds each ad rotates inside the live banner
   bannerRotationIntervalSec: 12,
