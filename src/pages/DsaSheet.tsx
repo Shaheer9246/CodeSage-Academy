@@ -24,7 +24,6 @@ import {
   DsaProblem
 } from '@/data/dsaSheetData';
 import DsaWorkspace from '@/components/DsaWorkspace';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import { useUser } from '@/contexts/UserContext';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import { getDailyProblem, claimDailyProblemReward, POTD_REWARD_XP, POTD_REWARD_COINS } from '@/lib/dailyProblem';
@@ -412,10 +411,6 @@ export const DsaSheet = () => {
           </div>
         </div>
 
-        {/* Sponsor Ad Banner (consistent with all Track pages) */}
-        <div className="pt-0.5">
-          <AdBannerCard slotName="learnTrackPage" format="horizontal-banner" />
-        </div>
 
         {/* Search & Filter Control Card */}
         <div className="glass-card rounded-2xl p-3.5 sm:p-4 border border-border/40 space-y-3">
