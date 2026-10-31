@@ -28,7 +28,6 @@ import { toast } from 'sonner';
 import { downloadBlobFile } from '@/lib/downloadHelper';
 import AvatarPicker, { getStoredAvatar } from '@/components/AvatarPicker';
 import { SkillHealthCard } from '@/components/SkillHealthCard';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import {
   TRACK_META,
   TrackId,
@@ -431,11 +430,6 @@ const SettingsPage = () => {
                     doResume={doResume}
                     doEnd={doEnd}
                   />
-
-                  {/* EthicalAds Developer Career Sponsor */}
-                  <div>
-                    <AdBannerCard slotName="profile" format="horizontal-banner" />
-                  </div>
 
                   {/* 4) Achievements — unlocked first, expandable */}
                   <div className="glass-card rounded-2xl p-5 lg:p-6">
