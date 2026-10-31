@@ -325,7 +325,7 @@ const LessonComplete = () => {
                 </div>
               </div>
               <a
-                href={ADS_CONFIG.monetagDirectLink}
+                href={ADS_CONFIG.defaultSponsorLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleClaimDaily2x}
@@ -356,7 +356,7 @@ const LessonComplete = () => {
               <p className="text-[11px] text-muted-foreground">Support CodeSage by checking out offers from our verified partners.</p>
             </div>
             <a
-              href={ADS_CONFIG.monetagDirectLink}
+              href={ADS_CONFIG.defaultSponsorLink}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold transition-all shrink-0 text-center shadow-sm"
@@ -724,4 +724,3 @@ const LessonComplete = () => {
 };
 
 export default LessonComplete;
-
