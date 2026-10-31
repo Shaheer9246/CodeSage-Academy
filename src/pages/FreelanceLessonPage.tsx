@@ -1,3 +1,4 @@
+// Clean, distraction-free Freelance coding workspace
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { useUser } from '@/contexts/UserContext';
 import { getFreelanceLessonById, isFreelanceLessonUnlocked } from '@/data/freelanceLessons';
 import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, type LucideIcon
@@ -134,10 +134,6 @@ const FreelanceLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
