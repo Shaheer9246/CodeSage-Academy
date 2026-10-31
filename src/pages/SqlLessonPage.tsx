@@ -1,3 +1,4 @@
+// Clean, distraction-free SQL coding workspace
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
@@ -10,7 +11,6 @@ import {
 import { SQL_LESSONS, isSqlLessonUnlocked } from '@/data/sqlLessons';
 import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 type Stage = 'concept' | 'practical' | 'quiz';
 
@@ -394,10 +394,6 @@ const passed = correctCount >= passThreshold;
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
