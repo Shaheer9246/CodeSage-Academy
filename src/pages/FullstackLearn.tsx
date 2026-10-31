@@ -4,7 +4,6 @@ import { FULLSTACK_LESSONS, isFullstackLessonUnlocked } from '@/data/fullstackLe
 import { ArrowLeft, Lock, Check, ChevronRight, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollTop } from '@/hooks/useScrollTop';
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 const FullstackLearn = () => {
   useScrollTop();
@@ -47,11 +46,6 @@ const FullstackLearn = () => {
           <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-primary to-accent rounded-full" style={{ width: `${progress}%` }} />
           </div>
-        </div>
-
-        {/* Developer Track Sponsor Banner */}
-        <div className="pt-0.5">
-          <AdBannerCard slotName="learnTrackPage" format="horizontal-banner" />
         </div>
 
         <div className="space-y-2">
