@@ -1,3 +1,4 @@
+// Clean, distraction-free Python Expert coding workspace
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -10,7 +11,6 @@ import {
 } from 'lucide-react';
 import PythonWorkspace from '@/components/PythonWorkspace';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 // import { useGuestLessonGate } from '@/lib/guestGate'; // Uncomment if you want guests in Expert track
 
 type Stage = 'concept' | 'practical' | 'quiz';
@@ -139,10 +139,6 @@ const PythonExpertLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
