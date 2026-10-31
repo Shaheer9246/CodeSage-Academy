@@ -10,7 +10,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 // --- COMPONENTS ---
 import { ExamCard } from '@/components/ExamCard'; // Adjust path
 import { Navigator } from '@/components/Navigator'; // Adjust path
-import { AdBannerCard } from '@/components/AdBannerCard';
 
 // --- DATA TRACKS ---
 import { pythonTrack } from '@/data/exams/python';
@@ -164,10 +163,6 @@ const QuestionsPage = () => {
             ))}
           </motion.div>
 
-          {/* EthicalAds Certification Sponsor Banner */}
-          <div className="pt-2">
-            <AdBannerCard slotName="exams" format="horizontal-banner" />
-          </div>
         </div>
       </div>
     );
