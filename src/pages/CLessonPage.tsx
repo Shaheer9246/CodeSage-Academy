@@ -1,3 +1,4 @@
+// Clean, distraction-free C coding workspace
 import { useMemo, useState } from 'react';
 import { useGuestLessonGate } from '@/lib/guestGate';
 import { useParams, useNavigate, Navigate, useSearchParams } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { getCLessonById, isCLessonUnlocked } from '@/data/cLessons';
 import { saveLessonQuizAttempt } from '@/lib/quizStorage';
 import CWorkspace from '@/components/CWorkspace';
 import CourseOverviewButton from '@/components/CourseOverviewButton';
-import { AdBannerCard } from '@/components/AdBannerCard';
 import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Terminal, Code2, type LucideIcon
@@ -134,10 +134,6 @@ const CLessonPage = () => {
                 </button>
               );
             })}
-            {/* Sponsor Ad Rail */}
-            <div className="hidden md:block pt-3">
-              <AdBannerCard slotName="lessonSidebar" format="compact" />
-            </div>
           </div>
         </nav>
 
