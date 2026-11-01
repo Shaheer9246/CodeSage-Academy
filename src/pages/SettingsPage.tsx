@@ -5,8 +5,9 @@ import {
   User, Flame, Trophy, Trash2, LogOut, Check, Lock, Target, Zap,
   Palette, Wrench, Download, RefreshCw, PlayCircle, Eraser, BookOpen,
   BarChart3, X, Pencil, GraduationCap, PauseCircle, PlayCircle as ResumeIcon,
-  StopCircle, ShieldCheck, Sparkles, ChevronDown
+  StopCircle, ShieldCheck, Sparkles, ChevronDown, Volume2, VolumeX
 } from 'lucide-react';
+import { isSoundEnabled, setSoundEnabled, playTestPassed } from '@/lib/soundFx';
 import { useState, useEffect } from 'react';
 import {
   ALL_LESSON_IDS,
@@ -108,6 +109,12 @@ const SettingsPage = () => {
   const [autoRun, setAutoRun] = useState<boolean>(() => {
     try { return localStorage.getItem('codesage_autorun') !== '0'; } catch { return true; }
   });
+  const [soundEnabled, setSoundEnabledState] = useState<boolean>(() => isSoundEnabled());
+  const handleToggleSound = (enabled: boolean) => {
+    setSoundEnabled(enabled);
+    setSoundEnabledState(enabled);
+    if (enabled) playTestPassed();
+  };
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [detailModal, setDetailModal] = useState<'lessons' | 'progress' | 'xp' | null>(null);
@@ -507,6 +514,33 @@ const SettingsPage = () => {
                           <p className="text-[10px] text-muted-foreground">Live preview refreshes as you type in Playground.</p>
                         </div>
                         <Switch checked={autoRun} onCheckedChange={setAutoRun} />
+                      </div>
+
+                      <div className="flex items-center justify-between bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30">
+                        <div className="min-w-0 flex-1 mr-3">
+                          <div className="flex items-center gap-1.5">
+                            {soundEnabled ? (
+                              <Volume2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                            ) : (
+                              <VolumeX className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                            )}
+                            <p className="text-xs font-semibold text-foreground">Sound FX &amp; Haptics</p>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">Synthesizer chimes for streak celebrations and test completions.</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {soundEnabled && (
+                            <button
+                              type="button"
+                              onClick={() => playTestPassed()}
+                              className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors border border-primary/25"
+                              title="Test audio chime"
+                            >
+                              Test
+                            </button>
+                          )}
+                          <Switch checked={soundEnabled} onCheckedChange={handleToggleSound} />
+                        </div>
                       </div>
                       <button onClick={handleReplayTour} className="w-full flex items-center gap-3 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-left">
                         <PlayCircle className="w-4 h-4 text-primary flex-shrink-0" />
