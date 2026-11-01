@@ -4,6 +4,7 @@ import { Flame, X, Sparkles, Zap, Rocket, ShieldCheck, Share2, Award } from 'luc
 import { useUser } from '@/contexts/UserContext';
 import ShareAchievementModal from '@/components/ShareAchievementModal';
 import { toast } from 'sonner';
+import { playStreakFanfare } from '@/lib/soundFx';
 
 const DEV_QUOTES = [
   "Consistency compiles success.",
@@ -405,6 +406,12 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
 
   const open = isOpen || !!forceOpen;
   const displayQuote = quote || DEV_QUOTES[0];
+
+  useEffect(() => {
+    if (open) {
+      playStreakFanfare();
+    }
+  }, [open]);
 
   const close = () => { 
     closeModal(); 
