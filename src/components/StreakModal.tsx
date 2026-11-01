@@ -466,7 +466,7 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative w-full max-w-[440px] sm:max-w-[470px] bg-background/95 border border-border shadow-2xl rounded-3xl overflow-hidden"
+            className="relative w-full max-w-[340px] sm:max-w-[360px] bg-background/95 border border-border shadow-2xl rounded-3xl overflow-hidden"
           >
             {/* Top Accent Gradient Bar */}
             <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${gradientLine}`} />
@@ -474,63 +474,63 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
             {/* Close Button */}
             <button
               onClick={close}
-              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground p-1.5 rounded-full hover:bg-secondary transition-colors z-20"
+              className="absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-secondary transition-colors z-20"
               aria-label="Close streak modal"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="px-6 pt-8 pb-6 text-center relative z-10">
+            <div className="px-4.5 sm:px-5 pt-5 pb-4 text-center relative z-10">
               
-              {/* Mascot Stage */}
-              <div className="mb-3">
+              {/* Mascot Stage - Owl stays prominent & fun */}
+              <div className="mb-1">
                 <SageOwlMascot streakCount={streakCount} />
               </div>
 
               {/* Heading & Status Text */}
-              <div className="space-y-1 mb-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/80 border border-border/60 text-xs font-mono font-bold text-muted-foreground">
-                  <Award className="w-3.5 h-3.5 text-primary" />
+              <div className="space-y-0.5 mb-2.5">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/80 border border-border/60 text-[10px] font-mono font-bold text-muted-foreground">
+                  <Award className="w-3 h-3 text-primary" />
                   <span>CODESAGE LEARNING STREAK</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-display font-black tracking-tight text-foreground">
+                <h2 className="text-2xl sm:text-3xl font-display font-black tracking-tight text-foreground">
                   Day <span className={iconColor}>{streakCount}</span>
                 </h2>
-                <p className={`text-xs sm:text-sm font-bold uppercase tracking-widest ${iconColor}`}>
+                <p className={`text-[11px] sm:text-xs font-bold uppercase tracking-wider ${iconColor}`}>
                   {statusText}
                 </p>
               </div>
 
               {/* Inspiring Developer Quote */}
-              <div className="bg-secondary/30 border border-border/50 rounded-xl p-3 mb-5 text-center shadow-inner">
-                <p className="text-xs sm:text-[13px] text-foreground/90 font-medium leading-relaxed italic">
+              <div className="bg-secondary/30 border border-border/50 rounded-lg px-2.5 py-2 mb-2.5 text-center shadow-inner">
+                <p className="text-[11px] sm:text-xs text-foreground/85 font-medium leading-relaxed italic">
                   "{displayQuote}"
                 </p>
               </div>
 
               {/* 7-Day Tracker with Warm Colors */}
-              <div className="mb-6 bg-card/60 border border-border/40 rounded-2xl p-3">
-                <div className="flex justify-between gap-1.5 sm:gap-2">
+              <div className="mb-3 bg-card/60 border border-border/40 rounded-xl p-2 sm:p-2.5">
+                <div className="flex justify-between gap-1 sm:gap-1.5">
                   {daysOfWeek.map((day, i) => {
                     const isActive = i <= todayIdx && i >= todayIdx - Math.min(streakCount - 1, todayIdx);
                     const isToday = i === todayIdx;
 
                     return (
-                      <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
-                        <span className={`text-[10px] font-bold ${isToday ? 'text-foreground font-black' : 'text-muted-foreground'}`}>
+                      <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                        <span className={`text-[9px] font-bold ${isToday ? 'text-foreground font-black' : 'text-muted-foreground'}`}>
                           {day}
                         </span>
                         <div
-                          className={`w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
+                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
                             isToday
-                              ? `bg-gradient-to-br from-orange-500 to-amber-500 text-white ${shadowColor} scale-110 font-bold`
+                              ? `bg-gradient-to-br from-orange-500 to-amber-500 text-white ${shadowColor} scale-105 font-bold`
                               : isActive
                               ? 'bg-orange-500/15 text-orange-400 border border-orange-500/30'
                               : 'bg-secondary/40 text-muted-foreground/30'
                           }`}
                         >
                           {isActive ? (
-                            <StatusIcon className={`w-3.5 h-3.5 ${isToday ? 'fill-current' : 'opacity-70'}`} />
+                            <StatusIcon className={`w-3 h-3 ${isToday ? 'fill-current' : 'opacity-70'}`} />
                           ) : (
                             <div className="w-1.5 h-1.5 rounded-full bg-current opacity-30" />
                           )}
@@ -542,15 +542,15 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {/* Primary CTA */}
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={close}
-                  className="w-full bg-foreground text-background font-bold rounded-xl py-3 transition-all text-sm shadow-md flex items-center justify-center gap-2 hover:bg-foreground/90"
+                  className="w-full bg-foreground text-background font-bold rounded-xl py-2.5 transition-all text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 hover:bg-foreground/90"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-3.5 h-3.5" />
                   Keep Building
                 </motion.button>
 
@@ -559,9 +559,9 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setShowShareModal(true)}
-                  className="w-full bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-orange-400 hover:text-orange-300 font-semibold rounded-xl py-2.5 transition-all text-xs flex items-center justify-center gap-2 hover:bg-orange-500/20 shadow-xs"
+                  className="w-full bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-orange-400 hover:text-orange-300 font-semibold rounded-xl py-2 transition-all text-[11px] sm:text-xs flex items-center justify-center gap-1.5 hover:bg-orange-500/20 shadow-xs"
                 >
-                  <Share2 className="w-4 h-4 text-orange-400" />
+                  <Share2 className="w-3.5 h-3.5 text-orange-400" />
                   <span>Share {streakCount}-Day Streak 🔥</span>
                 </motion.button>
 
@@ -570,9 +570,9 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                   <button
                     onClick={handleBuyFreeze}
                     disabled={(user.sageCoins || 0) < 10}
-                    className="w-full text-center text-[11px] text-muted-foreground hover:text-amber-400 transition-colors flex items-center justify-center gap-1.5 pt-1 pb-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full text-center text-[10px] text-muted-foreground hover:text-amber-400 transition-colors flex items-center justify-center gap-1 pt-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                    <ShieldCheck className="w-3 h-3 text-amber-400" />
                     <span>Protect Streak with 10 Coins</span>
                   </button>
                 )}
