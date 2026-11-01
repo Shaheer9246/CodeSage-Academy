@@ -30,6 +30,7 @@ import { getLessonQuizAttempt, saveLessonQuizAttempt, type QuizAttempt } from '@
 import { canClaimDaily2x, markDaily2xClaimed, recordFreeLessonFinished, PRO_TRACK_PREFIXES } from '@/lib/lessonAds';
 import { ADS_CONFIG } from '@/config/adsConfig';
 import ShareAchievementModal from '@/components/ShareAchievementModal';
+import { AdsterraBanner } from '@/components/AdsterraBanner';
 
 type TrackLessonItem = { 
   id: string; 
@@ -341,33 +342,11 @@ const LessonComplete = () => {
           )}
         </div>
 
-                {/* Adsterra Sponsored Resource / Banner Slot */}
-        <div className="mb-5 glass-card rounded-xl p-3.5 border border-border/50 bg-card/40 relative overflow-hidden">
-          <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border/30">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-primary" /> Sponsored Developer Perk
-            </span>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary">Partner</span>
+        {/* Real Live Running Adsterra Native Banner */}
+          <div className="mb-5">
+            <AdsterraBanner />
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="text-left">
-              <p className="text-xs font-bold text-foreground">Explore Cloud Credits & Free Dev Tools</p>
-              <p className="text-[11px] text-muted-foreground">Support CodeSage by checking out offers from our verified partners.</p>
-            </div>
-            <a
-              href={ADS_CONFIG.defaultSponsorLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold transition-all shrink-0 text-center shadow-sm"
-            >
-              View Partner Offer →
-            </a>
-          </div>
-
-          {/* Adsterra Native Banner script injection container (active when code is ready) */}
-          <div id="adsterra-native-banner-lesson" className="mt-2 empty:hidden" />
-        </div>
 
 
         {isLeveledUp && (
