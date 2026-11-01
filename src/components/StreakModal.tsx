@@ -16,108 +16,327 @@ const DEV_QUOTES = [
 
 /**
  * ==============================================================================
- * SageOwlMascot: CodeSage's Wise Owl Mascot that celebrates your streak
+ * SageOwlMascot: CodeSage's Cheering & Dancing Owl Mascot
+ * 100% Pure Lightweight Vector SVG + GPU-accelerated Framer Motion transforms
  * ==============================================================================
  */
 function SageOwlMascot({ streakCount }: { streakCount: number }) {
   const isSuper = streakCount >= 7;
   const isHot = streakCount >= 3;
+  const [isDancingFast, setIsDancingFast] = useState(false);
+
+  // Dance speed multiplier (faster for higher streaks or when tapped)
+  const danceDuration = isDancingFast ? 0.6 : isSuper ? 0.85 : isHot ? 1.0 : 1.2;
 
   return (
-    <div className="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto flex items-center justify-center">
-      {/* Ambient background glow behind mascot */}
+    <div 
+      className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center select-none cursor-pointer group"
+      onClick={() => {
+        setIsDancingFast(true);
+        setTimeout(() => setIsDancingFast(false), 2000);
+      }}
+      title="Click me to cheer faster!"
+    >
+      {/* Ambient background glow pulsing with the music beat */}
       <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.35, 0.65, 0.35] }}
-        transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
-        className={`absolute inset-2 rounded-full blur-2xl -z-10 ${
-          isSuper ? 'bg-purple-500/30' : isHot ? 'bg-orange-500/35' : 'bg-amber-500/25'
+        animate={{ 
+          scale: isDancingFast ? [1.1, 1.35, 1.1] : [1, 1.25, 1], 
+          opacity: isDancingFast ? [0.6, 0.9, 0.6] : [0.35, 0.65, 0.35] 
+        }}
+        transition={{ repeat: Infinity, duration: danceDuration, ease: "easeInOut" }}
+        className={`absolute inset-0 rounded-full blur-2xl -z-10 ${
+          isSuper ? 'bg-purple-500/35' : isHot ? 'bg-orange-500/40' : 'bg-amber-500/30'
         }`}
       />
 
-      {/* Floating particles */}
+      {/* Floating Code & Sparkle Confetti (Pure Vector, zero weight) */}
       <motion.div
-        animate={{ y: [-4, 4, -4], rotate: [-2, 2, -2] }}
-        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+        animate={{ y: [-3, 3, -3], opacity: [0.7, 1, 0.7] }}
+        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        <motion.span 
+          animate={{ y: [0, -6, 0], x: [-2, 2, -2], rotate: [-10, 10, -10] }}
+          transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+          className="absolute -top-1 left-3 text-[11px] font-mono font-bold text-amber-400 select-none drop-shadow"
+        >
+          &lt;/&gt;
+        </motion.span>
+        <motion.span 
+          animate={{ y: [0, -8, 0], rotate: [8, -8, 8] }}
+          transition={{ repeat: Infinity, duration: 1.9, delay: 0.3, ease: "easeInOut" }}
+          className="absolute -top-1 right-3 text-[11px] font-mono font-bold text-emerald-400 select-none drop-shadow"
+        >
+          &#123;&#125;
+        </motion.span>
+        <motion.span 
+          animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 0.9, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.3, delay: 0.5, ease: "easeInOut" }}
+          className="absolute bottom-2 left-2 text-[10px] text-yellow-300 select-none"
+        >
+          ✨
+        </motion.span>
+        <motion.span 
+          animate={{ scale: [0.8, 1.25, 0.8], opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 1.4, delay: 0.2, ease: "easeInOut" }}
+          className="absolute bottom-3 right-3 text-xs select-none"
+        >
+          🔥
+        </motion.span>
+      </motion.div>
+
+      {/* Main Dancing Owl Avatar */}
+      <motion.div
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.92, rotate: 6 }}
         className="relative w-full h-full flex items-center justify-center"
       >
-        <svg viewBox="0 0 160 160" className="w-full h-full drop-shadow-xl" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Owl Body */}
-          <ellipse cx="80" cy="95" rx="42" ry="46" fill="#1e293b" stroke="#334155" strokeWidth="3" />
-          {/* Owl Belly */}
-          <ellipse cx="80" cy="102" rx="28" ry="30" fill="#334155" />
-          <path d="M72 92 C76 96, 84 96, 88 92" stroke="#64748b" strokeWidth="2" strokeLinecap="round" />
-          <path d="M70 104 C75 108, 85 108, 90 104" stroke="#64748b" strokeWidth="2" strokeLinecap="round" />
-          <path d="M73 116 C77 119, 83 119, 87 116" stroke="#64748b" strokeWidth="2" strokeLinecap="round" />
+        <svg 
+          viewBox="0 0 160 160" 
+          className="w-full h-full drop-shadow-2xl overflow-visible" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* DEFINITIONS & GRADIENTS */}
+          <defs>
+            <linearGradient id="owlBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+            <linearGradient id="owlBellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#334155" />
+              <stop offset="100%" stopColor="#1e293b" />
+            </linearGradient>
+            <linearGradient id="owlFlameGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#f59e0b" />
+              <stop offset="50%" stopColor="#ea580c" />
+              <stop offset="100%" stopColor="#ef4444" />
+            </linearGradient>
+          </defs>
 
-          {/* Owl Ears / Tufts */}
-          <path d="M50 54 L62 32 L72 52 Z" fill="#0f172a" stroke="#334155" strokeWidth="2.5" />
-          <path d="M110 54 L98 32 L88 52 Z" fill="#0f172a" stroke="#334155" strokeWidth="2.5" />
+          {/* DANCING BODY & HEAD ROOT GROUP */}
+          <motion.g
+            animate={{ 
+              y: [0, -8, 0, -4, 0],
+              rotate: [-3.5, 3.5, -3.5, 3.5, 0]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: danceDuration, 
+              ease: "easeInOut" 
+            }}
+            style={{ transformOrigin: "80px 130px" }}
+          >
+            {/* Owl Body */}
+            <ellipse cx="80" cy="95" rx="42" ry="46" fill="url(#owlBodyGrad)" stroke="#38bdf8" strokeWidth="2.5" strokeOpacity="0.4" />
+            
+            {/* Owl Belly */}
+            <ellipse cx="80" cy="102" rx="28" ry="30" fill="url(#owlBellyGrad)" />
+            <path d="M72 92 C76 96, 84 96, 88 92" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M70 104 C75 108, 85 108, 90 104" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M73 116 C77 119, 83 119, 87 116" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
 
-          {/* Owl Head */}
-          <circle cx="80" cy="62" r="34" fill="#0f172a" stroke="#334155" strokeWidth="3" />
+            {/* Owl Ears / Tufts with bouncy wiggle */}
+            <motion.path 
+              animate={{ rotate: [-2, 4, -2] }}
+              transition={{ repeat: Infinity, duration: danceDuration * 0.9, ease: "easeInOut" }}
+              style={{ transformOrigin: "62px 42px" }}
+              d="M50 54 L62 30 L72 52 Z" 
+              fill="#0f172a" 
+              stroke="#38bdf8" 
+              strokeWidth="2"
+              strokeOpacity="0.3"
+            />
+            <motion.path 
+              animate={{ rotate: [2, -4, 2] }}
+              transition={{ repeat: Infinity, duration: danceDuration * 0.9, ease: "easeInOut" }}
+              style={{ transformOrigin: "98px 42px" }}
+              d="M110 54 L98 30 L88 52 Z" 
+              fill="#0f172a" 
+              stroke="#38bdf8" 
+              strokeWidth="2"
+              strokeOpacity="0.3"
+            />
 
-          {/* Big Owl Eyes */}
-          <circle cx="66" cy="60" r="14" fill="#ffffff" />
-          <circle cx="94" cy="60" r="14" fill="#ffffff" />
-          {/* Eye Pupils with excited shine */}
-          <circle cx="67" cy="60" r="8" fill="#0f172a" />
-          <circle cx="95" cy="60" r="8" fill="#0f172a" />
-          <circle cx="69" cy="58" r="2.8" fill="#ffffff" />
-          <circle cx="97" cy="58" r="2.8" fill="#ffffff" />
+            {/* Owl Head with rhythmic bobbing */}
+            <motion.g
+              animate={{ rotate: [-3, 3, -3], y: [-1, 1, -1] }}
+              transition={{ repeat: Infinity, duration: danceDuration * 1.1, ease: "easeInOut" }}
+              style={{ transformOrigin: "80px 62px" }}
+            >
+              <circle cx="80" cy="62" r="34" fill="#0f172a" stroke="#38bdf8" strokeWidth="2.5" strokeOpacity="0.5" />
 
-          {/* Golden Beak */}
-          <polygon points="76,68 84,68 80,78" fill="#f59e0b" />
+              {/* Big Sparkling Owl Eyes */}
+              <circle cx="66" cy="60" r="14" fill="#ffffff" />
+              <circle cx="94" cy="60" r="14" fill="#ffffff" />
 
-          {/* Cute Cheeks */}
-          <ellipse cx="56" cy="70" rx="5" ry="3" fill="#f43f5e" opacity="0.6" />
-          <ellipse cx="104" cy="70" rx="5" ry="3" fill="#f43f5e" opacity="0.6" />
+              {/* Animated Pupils with enthusiastic blinking / happy dance squints */}
+              <motion.g
+                animate={{ 
+                  scaleY: [1, 1, 0.15, 1, 1],
+                  scaleX: [1, 1, 1.05, 1, 1]
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 2.8, 
+                  times: [0, 0.45, 0.5, 0.55, 1], 
+                  ease: "easeInOut" 
+                }}
+                style={{ transformOrigin: "80px 60px" }}
+              >
+                {/* Outer Iris */}
+                <circle cx="66" cy="60" r="9" fill="#0284c7" />
+                <circle cx="94" cy="60" r="9" fill="#0284c7" />
+                {/* Deep Pupil */}
+                <circle cx="67" cy="60" r="6.5" fill="#0f172a" />
+                <circle cx="95" cy="60" r="6.5" fill="#0f172a" />
+                {/* Excited Starlight Shines */}
+                <circle cx="69" cy="57.5" r="3" fill="#ffffff" />
+                <circle cx="97" cy="57.5" r="3" fill="#ffffff" />
+                <circle cx="64.5" cy="62.5" r="1.3" fill="#ffffff" />
+                <circle cx="92.5" cy="62.5" r="1.3" fill="#ffffff" />
+              </motion.g>
 
-          {/* Left Wing */}
-          <path d="M40 85 C32 95, 34 115, 46 120 C42 108, 44 95, 48 88 Z" fill="#0f172a" stroke="#334155" strokeWidth="2.5" />
+              {/* Cheerful Beak with singing/cheering open motion */}
+              <motion.polygon 
+                animate={{ scaleY: [1, 1.25, 1], y: [0, 1, 0] }}
+                transition={{ repeat: Infinity, duration: danceDuration * 0.5, ease: "easeInOut" }}
+                style={{ transformOrigin: "80px 68px" }}
+                points="76,68 84,68 80,78" 
+                fill="#f59e0b" 
+              />
 
-          {/* Right Wing (Waving / Holding Flame) */}
-          <path d="M120 85 C128 95, 126 115, 114 120 C118 108, 116 95, 112 88 Z" fill="#0f172a" stroke="#334155" strokeWidth="2.5" />
+              {/* Cute Blushing Cheeks */}
+              <motion.ellipse 
+                animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.85, 0.6] }}
+                transition={{ repeat: Infinity, duration: danceDuration, ease: "easeInOut" }}
+                cx="55" cy="70" rx="5" ry="3.5" fill="#f43f5e" 
+              />
+              <motion.ellipse 
+                animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.85, 0.6] }}
+                transition={{ repeat: Infinity, duration: danceDuration, ease: "easeInOut" }}
+                cx="105" cy="70" rx="5" ry="3.5" fill="#f43f5e" 
+              />
 
-          {/* Owl Feet */}
-          <ellipse cx="68" cy="140" rx="6" ry="4" fill="#f59e0b" />
-          <ellipse cx="92" cy="140" rx="6" ry="4" fill="#f59e0b" />
+              {/* Tier Accessory: Golden Crown with Sparkling Jewels (Days 7+) */}
+              {isSuper && (
+                <motion.g 
+                  animate={{ y: [-1, 1, -1], rotate: [-2, 2, -2] }}
+                  transition={{ repeat: Infinity, duration: danceDuration, ease: "easeInOut" }}
+                  transform="translate(60, 13)"
+                >
+                  <path d="M4 18 L10 6 L20 14 L30 6 L36 18 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+                  <circle cx="10" cy="5" r="2.2" fill="#ef4444" />
+                  <circle cx="20" cy="13" r="2.2" fill="#3b82f6" />
+                  <circle cx="30" cy="5" r="2.2" fill="#10b981" />
+                </motion.g>
+              )}
 
-          {/* Tier Accessory: Golden Crown (Days 7+) */}
-          {isSuper && (
-            <g transform="translate(60, 14)">
-              <path d="M4 18 L10 6 L20 14 L30 6 L36 18 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
-              <circle cx="10" cy="5" r="2" fill="#ef4444" />
-              <circle cx="20" cy="13" r="2" fill="#3b82f6" />
-              <circle cx="30" cy="5" r="2" fill="#10b981" />
-            </g>
-          )}
+              {/* Tier Accessory: Developer Headband with Flame Emblem (Days 3-6) */}
+              {isHot && !isSuper && (
+                <g>
+                  <rect x="47" y="44" width="66" height="7" rx="3.5" fill="#ea580c" />
+                  <circle cx="80" cy="47.5" r="4.5" fill="#fef08a" />
+                  <path d="M78 48 C79 46, 81 46, 82 48" stroke="#ea580c" strokeWidth="1.2" strokeLinecap="round" />
+                </g>
+              )}
 
-          {/* Tier Accessory: Developer Headband with Flame (Days 3-6) */}
-          {isHot && !isSuper && (
-            <g>
-              <rect x="47" y="44" width="66" height="7" rx="3.5" fill="#ea580c" />
-              <circle cx="80" cy="47.5" r="4.5" fill="#fef08a" />
-            </g>
-          )}
+              {/* Tier Accessory: Neon Cyan Coding Glasses (Days 1-2) */}
+              {!isHot && (
+                <g stroke="#38bdf8" strokeWidth="2.5" fill="none">
+                  <circle cx="66" cy="60" r="14" />
+                  <circle cx="94" cy="60" r="14" />
+                  <line x1="80" y1="60" x2="80" y2="60" strokeWidth="3" />
+                </g>
+              )}
+            </motion.g>
 
-          {/* Tier Accessory: Coding Glasses (Days 1-2) */}
-          {!isHot && (
-            <g stroke="#38bdf8" strokeWidth="2.5" fill="none">
-              <circle cx="66" cy="60" r="14" />
-              <circle cx="94" cy="60" r="14" />
-              <line x1="80" y1="60" x2="80" y2="60" strokeWidth="3" />
-            </g>
-          )}
+            {/* LEFT WING: Cheering, Flapping & Waving in Celebration */}
+            <motion.g
+              animate={{ 
+                rotate: [0, -38, 8, -32, 0],
+                y: [0, -4, 0, -3, 0]
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: danceDuration, 
+                ease: "easeInOut" 
+              }}
+              style={{ transformOrigin: "48px 88px" }}
+            >
+              <path 
+                d="M44 85 C28 92, 26 116, 42 122 C40 108, 42 96, 48 88 Z" 
+                fill="#0f172a" 
+                stroke="#38bdf8" 
+                strokeWidth="2.5" 
+                strokeOpacity="0.5" 
+              />
+            </motion.g>
+
+            {/* RIGHT WING: Pumping the Flame Torch / Cheering Fist */}
+            <motion.g
+              animate={{ 
+                rotate: [0, 35, -6, 28, 0],
+                y: [0, -5, 0, -4, 0]
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: danceDuration, 
+                ease: "easeInOut" 
+              }}
+              style={{ transformOrigin: "112px 88px" }}
+            >
+              <path 
+                d="M116 85 C132 92, 134 116, 118 122 C120 108, 118 96, 112 88 Z" 
+                fill="#0f172a" 
+                stroke="#38bdf8" 
+                strokeWidth="2.5" 
+                strokeOpacity="0.5" 
+              />
+            </motion.g>
+          </motion.g>
+
+          {/* DANCING HAPPY FEET: Alternating Step-Tap Dance */}
+          {/* Left Foot */}
+          <motion.ellipse 
+            animate={{ 
+              y: [0, -5, 0, 0, 0],
+              scaleX: [1, 0.9, 1.1, 1, 1]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: danceDuration, 
+              ease: "easeInOut" 
+            }}
+            cx="68" cy="140" rx="7" ry="4.5" fill="#f59e0b" 
+          />
+          {/* Right Foot (Staggered for rhythmic tap) */}
+          <motion.ellipse 
+            animate={{ 
+              y: [0, 0, 0, -5, 0],
+              scaleX: [1, 1, 1, 0.9, 1]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: danceDuration, 
+              ease: "easeInOut" 
+            }}
+            cx="92" cy="140" rx="7" ry="4.5" fill="#f59e0b" 
+          />
         </svg>
 
-        {/* Floating Torch / Flame Badge */}
+        {/* Floating Blazing Streak Torch / Trophy Badge */}
         <motion.div
-          animate={{ scale: [1, 1.15, 1], rotate: [-4, 4, -4] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          className="absolute -right-1 bottom-1 w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 border-2 border-background shadow-lg flex items-center justify-center text-white"
+          animate={{ 
+            scale: isDancingFast ? [1.1, 1.35, 1.1] : [1, 1.18, 1], 
+            rotate: [-6, 6, -6],
+            y: [-3, 3, -3]
+          }}
+          transition={{ repeat: Infinity, duration: danceDuration * 0.9, ease: "easeInOut" }}
+          className="absolute -right-2 bottom-0 w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-orange-500 to-red-500 border-2 border-background shadow-xl flex items-center justify-center text-white"
         >
           {isSuper ? (
-            <Rocket className="w-5 h-5 fill-current" />
+            <Rocket className="w-5 h-5 fill-current animate-pulse" />
           ) : (
             <Flame className="w-5 h-5 fill-current" />
           )}
