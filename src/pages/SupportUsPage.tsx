@@ -1,6 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ExternalLink, ArrowLeft, Coins, Mail, Globe, ShieldCheck, Check, Copy, Sparkles, CheckCircle2, Server, Cloud, Code } from 'lucide-react';
+import { 
+  Heart, 
+  ExternalLink, 
+  ArrowLeft, 
+  Coins, 
+  Mail, 
+  Globe, 
+  ShieldCheck, 
+  Check, 
+  Copy, 
+  Sparkles, 
+  CheckCircle2, 
+  Server, 
+  Cloud, 
+  Code,
+  Zap,
+  Terminal,
+  Cpu
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { ADS_CONFIG } from '@/config/adsConfig';
 import { Button } from '@/components/ui/button';
@@ -38,6 +56,28 @@ const VOLUNTARY_CARDS: VoluntaryCard[] = [
     title: 'Support Free Student Learning',
     description: 'Help ensure aspiring software engineers worldwide can learn full-stack, AI, and systems programming without paywalls.',
     cta: 'Support Academy (15s)',
+  },
+];
+
+// Highlighted sponsor developer perks
+const SPONSOR_OFFERS = [
+  {
+    icon: Cloud,
+    tag: 'Cloud & VPS',
+    title: 'Free Cloud Hosting & VPS Credits',
+    desc: 'Deploy full-stack projects with trial credits and developer tiers.',
+  },
+  {
+    icon: Cpu,
+    tag: 'APIs & AI',
+    title: 'Developer APIs & AI Tooling',
+    desc: 'Access curated developer toolkits and fast inference engines.',
+  },
+  {
+    icon: Terminal,
+    tag: 'Dev Domains',
+    title: 'Free Domains & Student Perks',
+    desc: 'Claim partner student packs, free SSL certificates, and tool discounts.',
   },
 ];
 
@@ -95,17 +135,114 @@ export default function SupportUsPage() {
         <p className="flex items-center gap-2 text-xs font-mono text-primary">
           <Heart className="h-4 w-4 text-primary" /> COMMUNITY SUPPORTED
         </p>
-        <h1 className="text-2xl font-bold font-display">Support CodeSage</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold font-display">Support CodeSage</h1>
         <p className="text-sm text-muted-foreground leading-relaxed">
           Learning stays 100% free. Sponsor visits and direct contributions are completely voluntary.
         </p>
       </header>
 
-      {/* 3 VOLUNTARY SPONSOR ACTION CARDS WITH 15-SECOND COUNTDOWN */}
-      <div className="space-y-4">
+      {/* TOP FEATURED: BIG ADSTERRA SPONSOR SHOWCASE BANNER */}
+      <section className="rounded-2xl border border-primary/30 bg-gradient-to-b from-card/90 via-card/70 to-background/80 p-5 sm:p-6 space-y-5 shadow-lg relative overflow-hidden">
+        {/* Subtle accent glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-primary font-bold flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                <Sparkles className="w-3 h-3 text-primary" /> SPONSORED DEVELOPER PERKS
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground">Free for Students</span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold font-display text-foreground">
+              Featured Cloud Credits, VPS &amp; Free Developer Tools
+            </h2>
+          </div>
+          <a
+            href={ADS_CONFIG.defaultSponsorLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
+          >
+            <span>Explore All Partner Offers</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        {/* 3 Clickable Visual Offer Tiles (High CTR) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {SPONSOR_OFFERS.map((offer, idx) => {
+            const Icon = offer.icon;
+            return (
+              <a
+                key={idx}
+                href={ADS_CONFIG.defaultSponsorLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-4 rounded-xl border border-border/60 bg-secondary/30 hover:bg-secondary/60 hover:border-primary/40 transition-all duration-200 flex flex-col justify-between space-y-3"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-background/80 text-muted-foreground border border-border/40">
+                      {offer.tag}
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                    {offer.title}
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    {offer.desc}
+                  </p>
+                </div>
+                <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-primary">
+                  <span>View Perk</span>
+                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* SECTION: RUN ADS ON YOUR OWN WEBSITE */}
+      <section className="rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 via-card/90 to-amber-500/10 p-5 sm:p-6 space-y-4 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1.5 max-w-xl">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                ⭐ Developer Tool &amp; Partner
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-primary/20 text-primary border border-primary/30 font-semibold">
+                100% Free Setup
+              </span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold font-display text-foreground flex items-center gap-2">
+              🚀 Run Ads &amp; Monetize Your Own Website or Web App
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Have you built a student project, blog, or web application? Join our Verified Developer Sponsor network to monetize your visitors from day one with in-page banners, smart links, and high CPM instant payouts.
+            </p>
+          </div>
+          <a
+            href={ADS_CONFIG.defaultSponsorLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-5 py-3 rounded-xl text-xs font-bold font-display bg-gradient-to-r from-primary to-accent text-primary-foreground hover:neon-glow transition-all flex items-center justify-center gap-2 shadow-md"
+          >
+            <span>Monetize My Site (Free)</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+      </section>
+
+      {/* 3 VOLUNTARY SPONSOR ACTION CARDS (15-SECOND COUNTDOWN) */}
+      <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold font-display uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" /> Voluntary Sponsor Actions
+            <Zap className="w-4 h-4 text-amber-400" /> Voluntary Sponsor Actions
           </h2>
           <span className="text-[11px] font-mono text-muted-foreground">15s per visit · No payment needed</span>
         </div>
@@ -172,41 +309,10 @@ export default function SupportUsPage() {
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* SECTION: RUN ADS ON YOUR OWN WEBSITE (VERIFIED DEVELOPER SPONSOR NETWORK) */}
-      <div className="rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 via-card/90 to-amber-500/10 p-5 sm:p-7 space-y-4 shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1.5 max-w-xl">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                ⭐ Developer Tool &amp; Partner
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-primary/20 text-primary border border-primary/30 font-semibold">
-                100% Free Setup
-              </span>
-            </div>
-            <h2 className="text-base sm:text-lg font-bold font-display text-foreground flex items-center gap-2">
-              🚀 Run Ads &amp; Monetize Your Own Website or Web App
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Have you built a student project, blog, or web application? Join our Verified Developer Sponsor network to monetize your visitors from day one with in-page banners, smart links, and high CPM instant payouts.
-            </p>
-          </div>
-          <a
-            href={ADS_CONFIG.defaultSponsorLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 px-5 py-3 rounded-xl text-xs font-bold font-display bg-gradient-to-r from-primary to-accent text-primary-foreground hover:neon-glow transition-all flex items-center justify-center gap-2 shadow-md"
-          >
-            <span>Monetize My Site (Free)</span>
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        </div>
-      </div>
-
-      {/* SECTION 2: DIRECT DONATION */}
-      <div className="rounded-2xl border border-border/60 bg-card/80 p-5 sm:p-7 space-y-5">
+      {/* DIRECT DONATION (JAZZCASH & BINANCE) */}
+      <section className="rounded-2xl border border-border/60 bg-card/80 p-5 sm:p-7 space-y-5">
         <div className="space-y-1">
           <h2 className="text-lg font-bold font-display text-foreground flex items-center gap-2">
             <Coins className="w-5 h-5 text-amber-400" />
@@ -280,7 +386,7 @@ export default function SupportUsPage() {
             <span>{copiedEmail ? 'Copied' : 'Copy Email'}</span>
           </button>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
