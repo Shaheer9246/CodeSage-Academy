@@ -27,6 +27,7 @@ import CodeEditor from '@/components/CodeEditor';
 import ConsolePanel from '@/components/ConsolePanel';
 import ShareAchievementModal from '@/components/ShareAchievementModal';
 import { toast } from 'sonner';
+import { playTestPassed } from '@/lib/soundFx';
 
 interface DsaWorkspaceProps {
   problem: DsaProblem;
@@ -215,6 +216,7 @@ export const DsaWorkspace: React.FC<DsaWorkspaceProps> = ({
                 const willBeSolved = !isSolved;
                 onToggleSolved(problem.id);
                 if (willBeSolved) {
+                  playTestPassed();
                   setShowShareModal(true);
                 }
               }}
