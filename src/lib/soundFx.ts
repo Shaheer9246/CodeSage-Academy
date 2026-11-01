@@ -57,7 +57,7 @@ export function toggleSound(): boolean {
 }
 
 /** Haptic feedback on supported mobile devices */
-export function triggerHaptic(durationMs = 15): void {
+export function triggerHaptic(durationMs: number | number[] = 15): void {
   try {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(durationMs);
