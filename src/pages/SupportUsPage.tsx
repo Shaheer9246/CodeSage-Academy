@@ -11,14 +11,11 @@ import {
   ShieldCheck, 
   Check, 
   Copy, 
-  Sparkles, 
   CheckCircle2, 
   Server, 
   Cloud, 
   Code,
-  Zap,
-  Terminal,
-  Cpu
+  Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ADS_CONFIG } from '@/config/adsConfig';
@@ -59,10 +56,6 @@ const VOLUNTARY_CARDS: VoluntaryCard[] = [
     cta: 'Support Academy (15s)',
   },
 ];
-
-{/* LIVE RUNNING ADSTERRA NATIVE BANNER ADS */}
-<AdsterraBanner />
-
 
 export default function SupportUsPage() {
   const navigate = useNavigate();
@@ -124,73 +117,10 @@ export default function SupportUsPage() {
         </p>
       </header>
 
-      {/* TOP FEATURED: BIG ADSTERRA SPONSOR SHOWCASE BANNER */}
-      <section className="rounded-2xl border border-primary/30 bg-gradient-to-b from-card/90 via-card/70 to-background/80 p-5 sm:p-6 space-y-5 shadow-lg relative overflow-hidden">
-        {/* Subtle accent glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
+      {/* 1. LIVE RUNNING ADSTERRA NATIVE BANNER ADS */}
+      <AdsterraBanner />
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-primary font-bold flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-                <Sparkles className="w-3 h-3 text-primary" /> SPONSORED DEVELOPER PERKS
-              </span>
-              <span className="text-[10px] font-mono text-muted-foreground">Free for Students</span>
-            </div>
-            <h2 className="text-base sm:text-lg font-bold font-display text-foreground">
-              Featured Cloud Credits, VPS &amp; Free Developer Tools
-            </h2>
-          </div>
-          <a
-            href={ADS_CONFIG.defaultSponsorLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
-          >
-            <span>Explore All Partner Offers</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
-
-        {/* 3 Clickable Visual Offer Tiles (High CTR) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          {SPONSOR_OFFERS.map((offer, idx) => {
-            const Icon = offer.icon;
-            return (
-              <a
-                key={idx}
-                href={ADS_CONFIG.defaultSponsorLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group p-4 rounded-xl border border-border/60 bg-secondary/30 hover:bg-secondary/60 hover:border-primary/40 transition-all duration-200 flex flex-col justify-between space-y-3"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-background/80 text-muted-foreground border border-border/40">
-                      {offer.tag}
-                    </span>
-                  </div>
-                  <h3 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
-                    {offer.title}
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    {offer.desc}
-                  </p>
-                </div>
-                <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-primary">
-                  <span>View Perk</span>
-                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* SECTION: RUN ADS ON YOUR OWN WEBSITE */}
+      {/* 2. SECTION: RUN ADS ON YOUR OWN WEBSITE */}
       <section className="rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 via-card/90 to-amber-500/10 p-5 sm:p-6 space-y-4 shadow-md">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-xl">
@@ -221,7 +151,7 @@ export default function SupportUsPage() {
         </div>
       </section>
 
-      {/* 3 VOLUNTARY SPONSOR ACTION CARDS (15-SECOND COUNTDOWN) */}
+      {/* 3. 3 VOLUNTARY SPONSOR ACTION CARDS (15-SECOND COUNTDOWN) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold font-display uppercase tracking-wider text-muted-foreground flex items-center gap-2">
@@ -294,7 +224,7 @@ export default function SupportUsPage() {
         </div>
       </section>
 
-      {/* DIRECT DONATION (JAZZCASH & BINANCE) */}
+      {/* 4. DIRECT DONATION (JAZZCASH & BINANCE) */}
       <section className="rounded-2xl border border-border/60 bg-card/80 p-5 sm:p-7 space-y-5">
         <div className="space-y-1">
           <h2 className="text-lg font-bold font-display text-foreground flex items-center gap-2">
