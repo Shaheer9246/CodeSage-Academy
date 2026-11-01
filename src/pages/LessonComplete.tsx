@@ -30,6 +30,7 @@ import { getLessonQuizAttempt, saveLessonQuizAttempt, type QuizAttempt } from '@
 import { canClaimDaily2x, markDaily2xClaimed, recordFreeLessonFinished, PRO_TRACK_PREFIXES } from '@/lib/lessonAds';
 import { ADS_CONFIG } from '@/config/adsConfig';
 import ShareAchievementModal from '@/components/ShareAchievementModal';
+import { playTestPassed, playLevelUp } from '@/lib/soundFx';
 import { AdsterraBanner } from '@/components/AdsterraBanner';
 
 type TrackLessonItem = { 
@@ -254,6 +255,14 @@ const LessonComplete = () => {
   const prevLevel = completedCount > 0 ? badgeForLessons(completedCount - 1).level : 1;
   const isLeveledUp = currentLevel > prevLevel;
 
+  useEffect(() => {
+    if (isLeveledUp) {
+      playLevelUp();
+    } else {
+      playTestPassed();
+    }
+  }, [isLeveledUp]);
+
   return (
     <div className="min-h-screen bg-background grid-bg relative overflow-hidden flex items-center justify-center p-4 py-8">
       <div className="glow-orb glow-primary w-96 h-96 -top-20 -right-20 opacity-30" />
@@ -342,7 +351,7 @@ const LessonComplete = () => {
           )}
         </div>
 
-        {/* Real Live Running Adsterra Native Banner */}
+         {/* Real Live Running Adsterra Native Banner */}
           <div className="mb-5">
             <AdsterraBanner />
           </div>
