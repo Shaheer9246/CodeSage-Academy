@@ -133,7 +133,7 @@ const SECTIONS: SectionDef[] = [
         title: 'Applied Generative AI & Fine-Tuning', 
         emoji: '🤖',
         tour: 'intermediate-ai', 
-        lessons: 8,
+        lessons: 12,
         accent: 'primary',
         tags: ['PEFT', 'LoRA', 'RAG', 'Fine-Tuning'], 
         desc: 'PEFT → LoRA → Vector Databases → Production RAG', 
