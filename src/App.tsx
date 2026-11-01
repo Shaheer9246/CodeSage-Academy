@@ -61,8 +61,9 @@ import CppLearn from "./pages/CppLearn";
 import CppLessonPage from "./pages/CppLessonPage";
 import CppExpertLearn from "./pages/CppExpertLearn";
 import CppExpertLessonPage from "./pages/CppExpertLessonPage";
-import Three3dLearn from "./pages/Three3dLearn";
-import Three3dLessonPage from "./pages/Three3dLessonPage";
+// Lazy-load 3D WebGL engine & lessons on demand so non-3D courses do not download Three.js bundle upfront
+const Three3dLearn = React.lazy(() => import("./pages/Three3dLearn"));
+const Three3dLessonPage = React.lazy(() => import("./pages/Three3dLessonPage"));
 import Tour from "./pages/Tour";
 import Playground from "./pages/Playground";
 import Challenges from "./pages/Challenges";
@@ -195,7 +196,8 @@ const App = () => {
             <ErrorBoundary>
               <AppShell>
                 <LessonSponsorGate>
-                <Routes>
+                  <React.Suspense fallback={<LoadingScreen />}>
+                    <Routes>
                   <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
@@ -268,6 +270,7 @@ const App = () => {
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </React.Suspense>
                 </LessonSponsorGate>
               </AppShell>
             </ErrorBoundary>
