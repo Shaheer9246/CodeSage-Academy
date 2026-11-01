@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AdsterraBanner } from '@/components/AdsterraBanner';
 import { 
   Heart, 
   ExternalLink, 
@@ -59,27 +60,9 @@ const VOLUNTARY_CARDS: VoluntaryCard[] = [
   },
 ];
 
-// Highlighted sponsor developer perks
-const SPONSOR_OFFERS = [
-  {
-    icon: Cloud,
-    tag: 'Cloud & VPS',
-    title: 'Free Cloud Hosting & VPS Credits',
-    desc: 'Deploy full-stack projects with trial credits and developer tiers.',
-  },
-  {
-    icon: Cpu,
-    tag: 'APIs & AI',
-    title: 'Developer APIs & AI Tooling',
-    desc: 'Access curated developer toolkits and fast inference engines.',
-  },
-  {
-    icon: Terminal,
-    tag: 'Dev Domains',
-    title: 'Free Domains & Student Perks',
-    desc: 'Claim partner student packs, free SSL certificates, and tool discounts.',
-  },
-];
+{/* LIVE RUNNING ADSTERRA NATIVE BANNER ADS */}
+<AdsterraBanner />
+
 
 export default function SupportUsPage() {
   const navigate = useNavigate();
