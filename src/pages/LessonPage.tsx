@@ -8,6 +8,7 @@ import LivePreview from '@/components/LivePreview';
 import ConsolePanel from '@/components/ConsolePanel';
 import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Lightbulb, BookOpen, Code, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { playTestPassed } from '@/lib/soundFx';
 
 type FileTab = 'html' | 'css' | 'js';
 type MobileView = 'lesson' | 'code' | 'preview';
@@ -91,6 +92,7 @@ const LessonPage = () => {
     const passed = lesson.challenge.validationKeywords.every(kw => allCode.includes(normalizeCode(kw)));
     setChallengeResult(passed ? 'pass' : 'fail');
     if (passed) {
+      playTestPassed();
       if (user) completeLesson(lesson.id);
       setTimeout(() => navigate('/complete/' + lesson.id), 600);
     }
