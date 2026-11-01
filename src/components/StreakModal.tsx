@@ -203,17 +203,17 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                         <span className={`text-[10px] font-bold ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
                           {day}
                         </span>
-                        <div
+                                                <div
                           className={`w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${
                             isToday
-                              ? `bg-primary text-primary-foreground ${shadowColor} scale-110`
+                              ? `bg-gradient-to-br from-orange-500 to-amber-500 text-white ${shadowColor} scale-110 font-bold`
                               : isActive
-                              ? 'bg-secondary text-foreground border border-border/60'
+                              ? 'bg-orange-500/15 text-orange-400 border border-orange-500/30'
                               : 'bg-secondary/30 text-muted-foreground/30'
                           }`}
                         >
                           {isActive ? (
-                            <StatusIcon className={`w-3.5 h-3.5 ${isToday ? 'fill-current' : 'opacity-60'}`} />
+                            <StatusIcon className={`w-3.5 h-3.5 ${isToday ? 'fill-current' : 'opacity-70'}`} />
                           ) : (
                             <div className="w-1.5 h-1.5 rounded-full bg-current opacity-30" />
                           )}
@@ -224,40 +224,12 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                 </div>
               </div>
 
-                            {/* Streak Freeze Upsell */}
-              {!user ? null : (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleBuyFreeze}
-                  disabled={(user.sageCoins || 0) < 10}
-                  className="w-full mb-2 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-semibold rounded-xl py-2.5 transition-all text-xs flex items-center justify-center gap-2 hover:bg-yellow-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  Protect Streak (10 Coins)
-                </motion.button>
-              )}
-
-              {/* Donate with Ads Prompt */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  close();
-                  navigate('/support-us');
-                }}
-                className="w-full mb-2 bg-pink-500/10 border border-pink-500/30 text-pink-400 font-semibold rounded-xl py-2.5 transition-all text-xs flex items-center justify-center gap-2 hover:bg-pink-500/20 shadow-xs"
-              >
-                <Heart className="w-4 h-4 fill-pink-500/30" />
-                <span>Donate for CodeSage by watching ads (Takes 1 min)</span>
-              </motion.button>
-
               {/* Viral Share Streak Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowShareModal(true)}
-                className="w-full mb-2 bg-gradient-to-r from-orange-500/15 via-primary/15 to-amber-500/15 border border-orange-500/40 text-orange-400 font-semibold rounded-xl py-2.5 transition-all text-xs flex items-center justify-center gap-2 hover:bg-orange-500/25 shadow-xs"
+                className="w-full mb-2.5 bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-orange-400 hover:text-orange-300 font-semibold rounded-xl py-2.5 transition-all text-xs flex items-center justify-center gap-2 hover:bg-orange-500/20 shadow-xs"
               >
                 <Share2 className="w-4 h-4 text-orange-400" />
                 <span>Share {streakCount}-Day Streak 🔥</span>
@@ -268,13 +240,26 @@ export function StreakModal({ streakCount, forceOpen, onClose }: StreakModalProp
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={close}
-                className="w-full bg-foreground text-background font-bold rounded-xl py-3.5 transition-all text-sm shadow-lg flex items-center justify-center gap-2 hover:bg-foreground/90"
+                className="w-full mb-3 bg-foreground text-background font-bold rounded-xl py-3 transition-all text-sm shadow-md flex items-center justify-center gap-2 hover:bg-foreground/90"
               >
                 <Sparkles className="w-4 h-4" />
                 Keep Building
               </motion.button>
+
+              {/* Subtle Streak Freeze Protection Option */}
+              {!user ? null : (
+                <button
+                  onClick={handleBuyFreeze}
+                  disabled={(user.sageCoins || 0) < 10}
+                  className="w-full text-center text-[11px] text-muted-foreground hover:text-amber-400 transition-colors flex items-center justify-center gap-1.5 py-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Protect Streak with 10 Coins</span>
+                </button>
+              )}
             </div>
           </motion.div>
+
 
           {/* Share Achievement Modal */}
           <ShareAchievementModal
