@@ -7,7 +7,7 @@ Everything about how the app is built, where data lives, and exactly what to tou
 ## 1. Big picture
 
 - **Frontend only**: React 18 + Vite + TypeScript + Tailwind. All course content is *static TypeScript files in the bundle* — no lesson text is stored in the database.
-- **Backend (Lovable Cloud / Postgres)** stores only *user state*: profile, XP, streak, completed lessons/tests, enrollments, suggestions + votes, announcements, student IDs, promo codes.
+- **Backend (PostgreSQL Database & Edge Functions / Cloud Backend)** stores only *user state*: profile, XP, streak, completed lessons/tests, enrollments, suggestions + votes, announcements, student IDs, promo codes.
 - **Local storage** holds device-level preferences and caches (see §6).
 
 ---
