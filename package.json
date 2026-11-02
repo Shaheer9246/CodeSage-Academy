@@ -1,7 +1,10 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "codesage-academy",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Free interactive coding platform featuring in-browser WebAssembly code execution, gamified tracks, and comprehensive DSA sheets.",
+  "author": "Zain Rao",
+  "homepage": "https://codesageacademy.netlify.app",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -88,7 +91,6 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
-    "lovable-tagger": "^1.1.13",
     "postcss": "^8.5.6",
     "postgres": "^3.4.9",
     "tailwindcss": "^3.4.17",
