@@ -34,7 +34,7 @@ export interface ShareAchievementModalProps {
   streakCount?: number;
 }
 
-const PLATFORM_URL = 'https://learncodesage.lovable.app';
+const PLATFORM_URL = 'https://codesageacademy.netlify.app';
 
 export const ShareAchievementModal: React.FC<ShareAchievementModalProps> = ({
   isOpen,
@@ -207,7 +207,7 @@ export const ShareAchievementModal: React.FC<ShareAchievementModalProps> = ({
 
                 {/* Subtle verified badge */}
                 <div className="pt-2 border-t border-border/30 flex items-center justify-between text-[11px] text-muted-foreground font-mono">
-                  <span>learncodesage.lovable.app</span>
+                  <span>codesageacademy.netlify.app</span>
                   <span className="text-emerald-400 flex items-center gap-1 font-semibold">
                     <Trophy className="w-3 h-3" /> Verified Student
                   </span>
