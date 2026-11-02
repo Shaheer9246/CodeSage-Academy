@@ -548,46 +548,54 @@ const Dashboard = () => {
             ======================================================== */}
         <aside className="hidden lg:flex flex-col w-[260px] shrink-0 space-y-4">
           
-          {/* 1. YOUR TRACKS (Desktop) */}
-          {!isGuest && myTracks.length > 0 && (
+                    {/* 1. YOUR TRACKS (Desktop) */}
+          {!isGuest && (
             <div className="glass-card rounded-2xl border border-border/50 p-3.5 space-y-2.5">
               <div className="flex items-center justify-between">
                 <p className="text-[11px] font-display font-bold uppercase tracking-wider text-muted-foreground">Your Tracks</p>
                 <span className="text-[9px] font-mono text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded-full">
-                  {myTracks.length} active
+                  {myTracks.length}/2 active
                 </span>
               </div>
-              <div className="space-y-1.5 max-h-[190px] overflow-y-auto pr-1 scrollbar-thin">
-                {myTracks.map(({ track, done, total, pct }) => {
-                  const isDone = total > 0 && done >= total;
-                  return (
-                    <button
-                      key={track.id}
-                      onClick={go(track.path)}
-                      className="w-full text-left rounded-xl p-2 bg-secondary/20 border border-border/40 hover:border-primary/40 hover:bg-secondary/40 transition-all group"
-                    >
-                      <div className="flex items-center justify-between gap-1.5">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-base shrink-0">{track.emoji}</span>
-                          <p className="text-[11px] font-display font-semibold truncate text-foreground">{track.title}</p>
+              {myTracks.length > 0 ? (
+                <div className="space-y-1.5 max-h-[190px] overflow-y-auto pr-1 scrollbar-thin">
+                  {myTracks.map(({ track, done, total, pct }) => {
+                    const isDone = total > 0 && done >= total;
+                    return (
+                      <button
+                        key={track.id}
+                        onClick={go(track.path)}
+                        className="w-full text-left rounded-xl p-2 bg-secondary/20 border border-border/40 hover:border-primary/40 hover:bg-secondary/40 transition-all group"
+                      >
+                        <div className="flex items-center justify-between gap-1.5">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-base shrink-0">{track.emoji}</span>
+                            <p className="text-[11px] font-display font-semibold truncate text-foreground">{track.title}</p>
+                          </div>
+                          {isDone ? (
+                            <span className="text-[8px] font-mono font-bold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1 py-0.5 rounded-full shrink-0">
+                              Done
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-mono text-primary shrink-0">{done}/{total}</span>
+                          )}
                         </div>
-                        {isDone ? (
-                          <span className="text-[8px] font-mono font-bold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1 py-0.5 rounded-full shrink-0">
-                            Done
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-mono text-primary shrink-0">{done}/{total}</span>
-                        )}
-                      </div>
-                      <div className="mt-1.5 h-1 rounded-full bg-secondary overflow-hidden">
-                        <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                        <div className="mt-1.5 h-1 rounded-full bg-secondary overflow-hidden">
+                          <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-secondary/20 border border-dashed border-border/60 text-center">
+                  <p className="text-[11px] text-muted-foreground">No active tracks yet</p>
+                  <p className="text-[9px] text-muted-foreground/70 mt-0.5">Pick a course below to enroll</p>
+                </div>
+              )}
             </div>
           )}
+
 
           {/* 2. CATEGORIES FILTER LIST (Desktop) */}
           <div className="glass-card rounded-2xl border border-border/50 p-3.5 space-y-2">
@@ -863,59 +871,82 @@ const Dashboard = () => {
               color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
           </div>
 
-          {/* 4. CONTINUE LEARNING BANNER */}
-          {!isGuest && activeContinueTrack && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-                {(() => {
-                  const isTrackFinished = (continueLessonInfo?.total || 0) > 0 && (continueLessonInfo?.done || 0) >= (continueLessonInfo?.total || 0);
-                  return (
-                    <>
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
-                          <span className={`w-2 h-2 rounded-full ${isTrackFinished ? 'bg-amber-400' : 'bg-primary animate-pulse'}`} />
-                          <span>{isTrackFinished ? 'Track Completed 🎓' : 'Continue Learning'}</span>
-                          <span className="text-muted-foreground/60">·</span>
-                          <span className="text-muted-foreground">{activeContinueTrack.title}</span>
+                    {/* 4. CONTINUE LEARNING BANNER */}
+          {!isGuest && (
+            activeContinueTrack ? (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                  {(() => {
+                    const isTrackFinished = (continueLessonInfo?.total || 0) > 0 && (continueLessonInfo?.done || 0) >= (continueLessonInfo?.total || 0);
+                    return (
+                      <>
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
+                            <span className={`w-2 h-2 rounded-full ${isTrackFinished ? 'bg-amber-400' : 'bg-primary animate-pulse'}`} />
+                            <span>{isTrackFinished ? 'Track Completed 🎓' : 'Continue Learning'}</span>
+                            <span className="text-muted-foreground/60">·</span>
+                            <span className="text-muted-foreground">{activeContinueTrack.title}</span>
+                          </div>
+
+                          <h2 className="text-base sm:text-lg font-bold font-display text-foreground truncate">
+                            {isTrackFinished 
+                              ? `All ${continueLessonInfo?.total} lessons finished! Outstanding work.`
+                              : continueLessonInfo?.nextLesson 
+                                ? `${continueLessonInfo.nextLesson.title}`
+                                : activeContinueTrack.title}
+                          </h2>
                         </div>
 
-                        <h2 className="text-base sm:text-lg font-bold font-display text-foreground truncate">
-                          {isTrackFinished 
-                            ? `All ${continueLessonInfo?.total} lessons finished! Outstanding work.`
-                            : continueLessonInfo?.nextLesson 
-                              ? `${continueLessonInfo.nextLesson.title}`
-                              : activeContinueTrack.title}
-                        </h2>
-                      </div>
-
-                      <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
-                        <button
-                          onClick={() => {
-                            if (continueLessonInfo?.nextLesson?.url && !isTrackFinished) {
-                              navigate(continueLessonInfo.nextLesson.url + (continueLessonInfo.nextLesson.url.includes('?') ? '&from=dashboard' : '?from=dashboard'));
-                            } else {
-                              navigate(activeContinueTrack.path);
-                            }
-                          }}
-                          className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
-                        >
-                          {isTrackFinished ? 'Review Track →' : 'Resume Lesson →'}
-                        </button>
-                        <button
-                          onClick={go(activeContinueTrack.path)}
-                          className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          View Roadmap
-                        </button>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            </motion.div>
+                        <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+                          <button
+                            onClick={() => {
+                              if (continueLessonInfo?.nextLesson?.url && !isTrackFinished) {
+                                navigate(continueLessonInfo.nextLesson.url + (continueLessonInfo.nextLesson.url.includes('?') ? '&from=dashboard' : '?from=dashboard'));
+                              } else {
+                                navigate(activeContinueTrack.path);
+                              }
+                            }}
+                            className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
+                          >
+                            {isTrackFinished ? 'Review Track →' : 'Resume Lesson →'}
+                          </button>
+                          <button
+                            onClick={go(activeContinueTrack.path)}
+                            className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            View Roadmap
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/20 bg-gradient-to-r from-primary/5 via-background to-accent-blue/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                    <span>Start Learning</span>
+                  </div>
+                  <h2 className="text-sm sm:text-base font-bold font-display text-foreground mt-0.5">
+                    Ready to code? Pick your first course from the catalog below.
+                  </h2>
+                </div>
+                <button
+                  onClick={() => document.getElementById('course-catalog')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm self-start sm:self-auto"
+                >
+                  Explore Courses ↓
+                </button>
+              </motion.div>
+            )
           )}
+
 
           {/* 5. PROBLEM OF THE DAY */}
           <DailyProblemCard
