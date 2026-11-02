@@ -217,65 +217,74 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
     }
   };
 
-  return (
+    return (
     <>
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 font-display">
-          <AlertTriangle className="w-5 h-5 text-accent-orange" /> Course Limit Reached
+      <DialogHeader className="space-y-1.5 pb-1">
+        <DialogTitle className="flex items-center gap-2 text-base sm:text-lg font-display text-foreground">
+          <AlertTriangle className="w-5 h-5 text-accent-orange shrink-0" />
+          <span>Course Limit Reached (2/2)</span>
         </DialogTitle>
-        <DialogDescription className="text-xs leading-relaxed">
-          You are currently in <strong>{currentCount}</strong> active tracks, but the maximum limit is 2. To make room for this new course, you need to pause or end <strong>{numberToPause}</strong> of your current tracks below.
+        <DialogDescription className="text-xs text-foreground/80 leading-relaxed">
+          You are currently taking <strong>{currentCount} active courses</strong> (the maximum limit is 2). Pause or end one course below to start this new one:
         </DialogDescription>
       </DialogHeader>
-      <div className="space-y-2 mt-2">
+
+      <div className="space-y-2 my-2">
         {list.map(e => (
-          <div key={e.track} className="flex items-center justify-between gap-2 bg-secondary/30 rounded-xl px-3 py-2 border border-border/30">
-            <div className="min-w-0">
-              <p className="text-xs font-display font-semibold text-foreground truncate">
+          <div 
+            key={e.track} 
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-secondary/30 rounded-xl p-2.5 sm:p-3 border border-border/40"
+          >
+            <div className="min-w-0 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+              <p className="text-xs font-display font-bold text-foreground truncate">
                 {TRACK_META[e.track]?.label || e.track}
               </p>
             </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
+
+            <div className="flex items-center justify-end gap-2 shrink-0">
               <button
                 onClick={() => handlePause(e.track)}
                 disabled={actioningTrack !== null}
-                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 hover:bg-accent-yellow/25 disabled:opacity-50 transition-all"
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/25 disabled:opacity-50 transition-all font-semibold"
               >
                 {actioningTrack === e.track ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <PauseCircle className="w-3 h-3" />
+                  <PauseCircle className="w-3.5 h-3.5" />
                 )}
-                Pause
+                <span>Pause</span>
               </button>
+
               <button
                 onClick={() => handleEnd(e.track)}
                 disabled={actioningTrack !== null}
-                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25 disabled:opacity-50 transition-all"
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25 disabled:opacity-50 transition-all font-semibold"
               >
                 {actioningTrack === e.track ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <StopCircle className="w-3 h-3" />
+                  <StopCircle className="w-3.5 h-3.5" />
                 )}
-                End
+                <span>End</span>
               </button>
             </div>
           </div>
         ))}
       </div>
-      <div className="flex justify-end pt-2">
+
+      <div className="flex justify-end pt-1">
         <button
           onClick={onBack}
           disabled={actioningTrack !== null}
-          className="text-xs px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/60 text-foreground font-display disabled:opacity-50"
+          className="w-full sm:w-auto text-xs px-4 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground font-display font-semibold transition-colors disabled:opacity-50"
         >
-          Go back
+          Cancel & Go Back
         </button>
       </div>
     </>
   );
-}
+
 
 function PrereqStep({
   track, onBack, onGoTo, onEnrollAnyway, isSubmitting
