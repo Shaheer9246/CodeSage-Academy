@@ -43,13 +43,13 @@ const TOUR_STEPS: TourStep[] = [
 
 /* ---------- Track catalog ---------- */
 type TrackDef = {
-  id: string;                   // route id (without slash)
-  path: string;                 // dashboard route
+  id: string;
+  path: string;
   title: string;
   emoji: string;
   tour: string;
   lessons: number;
-  accent: string;               // tailwind color token
+  accent: string;
   tags: string[];
   desc: string;
   trackId?: TrackId;
@@ -60,7 +60,7 @@ type SectionDef = {
   title: string;
   subtitle: string;
   Icon: React.ComponentType<{ className?: string }>;
-  gradient: string;             // for section header accent bar
+  gradient: string;
   tracks: TrackDef[];
 };
 
@@ -89,25 +89,20 @@ const SECTIONS: SectionDef[] = [
         tour: 'frontend', lessons: 52, accent: 'primary',
         tags: ['HTML', 'CSS', 'JS'], desc: 'HTML → CSS → JS → React → Production UI',
         trackId: 'frontend' },
-      
       { id: 'fullstack', path: '/fullstack?from=dashboard', title: 'Full-Stack Application Architecture', emoji: '🚀',
         tour: 'fullstack', lessons: 28, accent: 'accent-orange',
         tags: ['React', 'Hooks', 'APIs', 'TS'], desc: 'React → APIs → Testing → Live Production Deploy',
         trackId: 'fullstack' },
-      
       { id: 'local', path: '/local?from=dashboard', title: 'Offline-First Software Engineering', emoji: '🏠',
         tour: 'local', lessons: 15, accent: 'emerald-400',
         tags: ['DOM', 'localStorage', 'PWA'], desc: 'Client Runtimes → IndexedDB → Resilient PWAs',
         trackId: 'local' },
-
       { id: 'three3d', path: '/three3d?from=dashboard', title: 'Interactive 3D Graphics & WebGL', emoji: '🧊',
         tour: 'three3d', lessons: 16, accent: 'accent-blue',
         tags: ['Three.js', 'WebGL', 'R3F'], desc: 'Three.js → Shaders → Spatial Web Experiences',
         trackId: 'three3d' as TrackId },
-      
     ],
   },
-
   {
     id: 'ai',
     title: 'Artificial Intelligence',
@@ -115,45 +110,20 @@ const SECTIONS: SectionDef[] = [
     Icon: Sparkles,
     gradient: 'from-purple-500/70 via-indigo-500/60 to-blue-500/70',
     tracks: [
-      { 
-        id: 'ai-fundamentals', 
-        path: '/ai-fundamentals?from=dashboard', 
-        title: 'Foundations of AI & Neural Models', 
-        emoji: '🧠',
-        tour: 'ai-fundamentals', 
-        lessons: 12,
-        accent: 'accent-blue',
-        tags: ['Foundations', 'LLMs', 'Agents'], 
-        desc: 'Machine Learning → Transformers → Autonomous Agents', 
-        trackId: 'ai-fundamentals'
-      },
-      { 
-        id: 'intermediate-ai', 
-        path: '/intermediate-ai?from=dashboard', 
-        title: 'Applied Generative AI & Fine-Tuning', 
-        emoji: '🤖',
-        tour: 'intermediate-ai', 
-        lessons: 12,
-        accent: 'primary',
-        tags: ['PEFT', 'LoRA', 'RAG', 'Fine-Tuning'], 
-        desc: 'PEFT → LoRA → Vector Databases → Production RAG', 
-        trackId: 'intermediate-ai' as TrackId
-      },
-      {
-        id: 'advanced-ai',
-        path: '/advanced-ai?from=dashboard',
-        title: 'Advanced AI & Autonomous Agents',
-        emoji: '⚡',
-        tour: 'advanced-ai',
-        lessons: 12,
-        accent: 'accent-orange',
-        tags: ['MCP', 'Agents', 'LLMOps', 'Production'],
-        desc: 'Reasoning → MCP → Agent Systems → Production AI',
-        trackId: 'advanced-ai' as TrackId
-      },
+      { id: 'ai-fundamentals', path: '/ai-fundamentals?from=dashboard', title: 'Foundations of AI & Neural Models', emoji: '🧠',
+        tour: 'ai-fundamentals', lessons: 12, accent: 'accent-blue',
+        tags: ['Foundations', 'LLMs', 'Agents'], desc: 'Machine Learning → Transformers → Autonomous Agents',
+        trackId: 'ai-fundamentals' },
+      { id: 'intermediate-ai', path: '/intermediate-ai?from=dashboard', title: 'Applied Generative AI & Fine-Tuning', emoji: '🤖',
+        tour: 'intermediate-ai', lessons: 12, accent: 'primary',
+        tags: ['PEFT', 'LoRA', 'RAG', 'Fine-Tuning'], desc: 'PEFT → LoRA → Vector Databases → Production RAG',
+        trackId: 'intermediate-ai' as TrackId },
+      { id: 'advanced-ai', path: '/advanced-ai?from=dashboard', title: 'Advanced AI & Autonomous Agents', emoji: '⚡',
+        tour: 'advanced-ai', lessons: 12, accent: 'accent-orange',
+        tags: ['MCP', 'Agents', 'LLMOps', 'Production'], desc: 'Reasoning → MCP → Agent Systems → Production AI',
+        trackId: 'advanced-ai' as TrackId },
     ],
   },
-
   {
     id: 'java',
     title: 'Java',
@@ -165,13 +135,12 @@ const SECTIONS: SectionDef[] = [
         tour: 'java', lessons: 30, accent: 'orange-500',
         tags: ['Core Java', 'OOP', 'Spring Boot'], desc: 'Core Java → OOP Design → Enterprise APIs',
         trackId: 'java' as TrackId },
-      { id: 'javaexpert', path: '/java-expert?from=dashboard', title: 'Advanced Java Systems & JVM Internals', emoji: '🧙‍️',
+      { id: 'javaexpert', path: '/java-expert?from=dashboard', title: 'Advanced Java Systems & JVM Internals', emoji: '🧙‍♂️',
         tour: 'javaexpert', lessons: 30, accent: 'orange-500',
         tags: ['JVM', 'Multithreading', 'Performance'], desc: 'JVM Internals → Concurrency → Memory Architecture',
-        trackId: 'javaexpert' as TrackId },  
+        trackId: 'javaexpert' as TrackId },
     ],
   },
-       
   {
     id: 'c',
     title: 'C Programming',
@@ -183,13 +152,12 @@ const SECTIONS: SectionDef[] = [
         tour: 'c', lessons: 30, accent: 'accent-blue',
         tags: ['Pointers', 'Memory', 'Structs', 'CLI'], desc: 'Memory Layout → Pointers → Low-Level Systems',
         trackId: 'c' as TrackId },
-    { id: 'cexpert', path: '/c-expert?from=dashboard', title: 'Advanced Low-Level Systems & Memory', emoji: '🧙‍♂️',
+      { id: 'cexpert', path: '/c-expert?from=dashboard', title: 'Advanced Low-Level Systems & Memory', emoji: '🧙‍♂️',
         tour: 'cexpert', lessons: 30, accent: 'accent-blue',
         tags: ['Advanced Memory', 'Data Structures', 'Performance'], desc: 'Custom Allocators → Cache Optimization → OS Primitives',
         trackId: 'cx' as TrackId },
     ],
   },
-  
   {
     id: 'cpp',
     title: 'C++',
@@ -248,7 +216,6 @@ const SECTIONS: SectionDef[] = [
         tour: 'freelance', lessons: 12, accent: 'yellow-500',
         tags: ['Niche', 'Pitch', 'Price', 'Deliver'], desc: 'Value Scoping → Contract Structure → Delivery Workflows',
         trackId: 'freelance' },
-
       { id: 'real-freelance', path: '/real-freelance?from=dashboard', title: 'Commercial Engineering Practice', emoji: '🎓',
         tour: 'real-freelance', lessons: 12, accent: 'primary',
         tags: ['Upwork', 'Proposals', 'Scaling'], desc: 'High-Ticket Retainers → Agency Infrastructure → Enterprise Delivery',
@@ -328,12 +295,7 @@ const Dashboard = () => {
   };
   
   const GUEST_ALLOWED = new Set<string>([
-    '/learn',
-    '/networking',
-    '/python',
-    '/freelance',
-    '/sql',
-    '/java',
+    '/learn', '/networking', '/python', '/freelance', '/sql', '/java',
   ]);
   
   const GUEST_FIRST_LESSON: Record<string, string> = {
@@ -436,15 +398,11 @@ const Dashboard = () => {
 
   const activeContinueTrack = useMemo(() => {
     if (myTracks.length === 0) return null;
-
-    // Check if user's last active track matches one of their active enrolled courses
     const lastStored = localStorage.getItem('codesage_last_active_track');
     if (lastStored) {
       const match = myTracks.find(m => m.track.trackId === lastStored);
       if (match) return match.track;
     }
-
-    // Default to the first enrolled course
     return myTracks[0].track;
   }, [myTracks]);
 
@@ -455,14 +413,7 @@ const Dashboard = () => {
     const total = lessonCountFor(trackKey) || activeContinueTrack.lessons || 0;
     const done = completedCountFor(trackKey, user?.completedLessons || []);
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-    return {
-      track: activeContinueTrack,
-      nextLesson,
-      done,
-      total,
-      pct,
-    };
+    return { track: activeContinueTrack, nextLesson, done, total, pct };
   }, [activeContinueTrack, isGuest, user?.completedLessons]);
 
   const energy = user ? energyToday(user.dailyXp, user.dailyXpDate) : 0;
@@ -481,7 +432,6 @@ const Dashboard = () => {
     customMessage?: string;
   }>({ isOpen: false });
 
-    // Auto-request notifications on login/visit, and alert at 6 PM if streak is at risk
   useEffect(() => {
     if (isGuest || !user) return;
     autoEnableStreakReminder();
@@ -573,7 +523,6 @@ const Dashboard = () => {
 
     setSelectedCategory(catId);
 
-    // Smooth scroll straight down to the course section
     setTimeout(() => {
       const el = document.getElementById('course-catalog');
       if (el) {
@@ -590,17 +539,157 @@ const Dashboard = () => {
       <div className="absolute bottom-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-accent-blue/5 blur-[180px] pointer-events-none" />
 
       {/* =========================================
-          MAIN LAYOUT WRAPPER
+          3-COLUMN MAIN LAYOUT WRAPPER
           ========================================= */}
-      <div className="relative z-10 flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-[1600px] mx-auto px-4 sm:px-6 py-6 lg:py-10">
-        
-        {/* LEFT COLUMN: MAIN FEED (65-70%) */}
-        <motion.div 
+      <div className="relative z-10 flex flex-col lg:flex-row gap-5 lg:gap-6 max-w-[1720px] mx-auto px-3 sm:px-6 py-4 sm:py-6 lg:py-8">
+
+        {/* ========================================================
+            COLUMN 1: DESKTOP SECONDARY LEFT SIDEBAR (w-[260px])
+            ======================================================== */}
+        <aside className="hidden lg:flex flex-col w-[260px] shrink-0 space-y-4">
+          
+          {/* 1. YOUR TRACKS (Desktop) */}
+          {!isGuest && myTracks.length > 0 && (
+            <div className="glass-card rounded-2xl border border-border/50 p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-display font-bold uppercase tracking-wider text-muted-foreground">Your Tracks</p>
+                <span className="text-[9px] font-mono text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded-full">
+                  {myTracks.length} active
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-[190px] overflow-y-auto pr-1 scrollbar-thin">
+                {myTracks.map(({ track, done, total, pct }) => {
+                  const isDone = total > 0 && done >= total;
+                  return (
+                    <button
+                      key={track.id}
+                      onClick={go(track.path)}
+                      className="w-full text-left rounded-xl p-2 bg-secondary/20 border border-border/40 hover:border-primary/40 hover:bg-secondary/40 transition-all group"
+                    >
+                      <div className="flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-base shrink-0">{track.emoji}</span>
+                          <p className="text-[11px] font-display font-semibold truncate text-foreground">{track.title}</p>
+                        </div>
+                        {isDone ? (
+                          <span className="text-[8px] font-mono font-bold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1 py-0.5 rounded-full shrink-0">
+                            Done
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-mono text-primary shrink-0">{done}/{total}</span>
+                        )}
+                      </div>
+                      <div className="mt-1.5 h-1 rounded-full bg-secondary overflow-hidden">
+                        <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 2. CATEGORIES FILTER LIST (Desktop) */}
+          <div className="glass-card rounded-2xl border border-border/50 p-3.5 space-y-2">
+            <div className="flex items-center justify-between pl-1">
+              <p className="text-[11px] font-display font-bold uppercase tracking-wider text-muted-foreground">Categories</p>
+              <span className="text-[9px] font-mono text-muted-foreground/70">Scroll ({filterOptions.length})</span>
+            </div>
+            
+            <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+              {filterOptions.map((option, index) => {
+                const Icon = option.icon;
+                const isSelected = selectedCategory === option.id;
+
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => handleCategorySelect(option.id as DashboardCategory, index)}
+                    className={`relative w-full text-left rounded-xl p-2 transition-all duration-300 group overflow-hidden ${
+                      isSelected ? 'bg-primary/10' : 'hover:bg-secondary/40'
+                    }`}
+                  >
+                    {/* Sweeping Glow */}
+                    <AnimatePresence mode="wait">
+                      {isSelected && (
+                        <motion.div
+                          key={`glow-${glowDirection}`}
+                          initial={{ x: glowDirection === 'ltr' ? '-100%' : '100%', opacity: 0 }}
+                          animate={{ x: '0%', opacity: 0.6 }}
+                          exit={{ opacity: 0, x: glowDirection === 'ltr' ? '100%' : '-100%' }}
+                          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                          className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/15 to-transparent pointer-events-none"
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    {/* Active Border */}
+                    {isSelected && (
+                      <div className="absolute inset-0 rounded-xl border border-primary/50 pointer-events-none shadow-[0_0_12px_rgba(var(--primary),0.3)]" />
+                    )}
+
+                    <div className="relative flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full transition-all shrink-0 ${
+                        isSelected ? 'bg-primary shadow-[0_0_10px_rgba(var(--primary),1)]' : 'bg-muted-foreground/30 group-hover:bg-muted-foreground/60'
+                      }`} />
+                      <Icon className={`w-3.5 h-3.5 transition-colors shrink-0 ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`} />
+                      <span className={`text-xs truncate transition-colors ${isSelected ? 'text-primary font-bold' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                        {option.label}
+                      </span>
+                      {isSelected && (
+                        <ChevronRight className="w-3.5 h-3.5 text-primary ml-auto shrink-0" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. SHORTCUTS (Desktop) */}
+          <div className="space-y-1.5">
+            <button
+              onClick={isGuest ? () => navigate('/auth') : go('/suggestions')}
+              className="w-full text-left rounded-xl p-2.5 bg-secondary/20 border border-border/40 hover:border-accent-yellow/40 hover:bg-secondary/40 transition-all flex items-center gap-2.5"
+            >
+              <div className="w-2 h-2 rounded-full bg-accent-yellow/70 shrink-0" />
+              <MessageSquare className="w-4 h-4 text-accent-yellow shrink-0" />
+              <span className="text-xs font-semibold text-foreground">Suggestions</span>
+            </button>
+
+            <button
+              onClick={go('/dsa-sheet')}
+              className="w-full text-left rounded-xl p-2.5 bg-primary/10 border border-primary/30 hover:border-primary/50 hover:bg-primary/20 transition-all flex items-center gap-2.5"
+            >
+              <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+              <Code2 className="w-4 h-4 text-primary shrink-0" />
+              <div className="flex items-center justify-between flex-1 min-w-0">
+                <span className="text-xs font-semibold text-foreground">DSA Sheet</span>
+                <span className="text-[9px] bg-primary/25 text-primary px-1.5 py-0.5 rounded font-mono font-bold">TOP 75</span>
+              </div>
+            </button>
+
+            <button
+              onClick={go('/games/crawler')}
+              className="w-full text-left rounded-xl p-2.5 bg-secondary/20 border border-border/40 hover:border-accent-orange/40 hover:bg-secondary/40 transition-all flex items-center gap-2.5"
+            >
+              <div className="w-2 h-2 rounded-full bg-accent-orange/70 shrink-0" />
+              <Gamepad2 className="w-4 h-4 text-accent-orange shrink-0" />
+              <span className="text-xs font-semibold text-foreground">Code Crawler</span>
+            </button>
+          </div>
+
+        </aside>
+
+        {/* ========================================================
+            COLUMN 2: CENTER FEED (Flexible width)
+            ======================================================== */}
+        <motion.main 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }}
-          className="flex-1 min-w-0 space-y-6 order-1 lg:order-none"
+          className="flex-1 min-w-0 space-y-4 sm:space-y-5"
         >
-          
+
           {/* 1. COMPACT SEARCH BAR */}
           <div ref={searchRef} className="relative z-50">
             <div className="relative group">
@@ -625,8 +714,8 @@ const Dashboard = () => {
                 </button>
               )}
             </div>
-            
-                        {/* Search Dropdown */}
+
+            {/* Search Dropdown */}
             <AnimatePresence>
               {isSearchOpen && (
                 <motion.div
@@ -654,7 +743,7 @@ const Dashboard = () => {
                             <div className="flex items-center gap-2">
                               <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{item.name}</p>
                               {item.badge && (
-                                <span className="px-1.5 py-0.2 text-[9px] font-bold rounded bg-primary/15 text-primary border border-primary/20">
+                                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-primary/15 text-primary border border-primary/20">
                                   {item.badge}
                                 </span>
                               )}
@@ -675,7 +764,7 @@ const Dashboard = () => {
             </AnimatePresence>
           </div>
 
-           {/* 2. COMPACT WELCOME BACK HUD CARD */}
+          {/* 2. COMPACT WELCOME BACK HUD CARD */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             className="relative z-20 glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-primary/20"
           >
@@ -750,7 +839,7 @@ const Dashboard = () => {
                   <Flame className="w-3.5 h-3.5 text-orange-400" />
                   <span className="text-xs font-bold text-orange-400">{streak}d</span>
                 </div>
-                 {!isGuest && (
+                {!isGuest && (
                   <>
                     <div className="flex items-center gap-1 bg-primary/20 border border-primary/40 px-2.5 py-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]">
                       <Trophy className="w-3.5 h-3.5 text-primary" />
@@ -764,7 +853,7 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* MOBILE ONLY QUICK TOOLS ROW */}
+          {/* 3. MOBILE ONLY QUICK TOOLS ROW */}
           <div className="lg:hidden grid grid-cols-3 gap-2 sm:gap-3">
             <QuickChip icon={<Zap className="w-4 h-4 text-accent-orange" />} label="Challenges" sub="Test skills"
               color="accent-orange" data-tour="challenges" onClick={go('/challenges')} disabled={isGuest} />
@@ -774,7 +863,7 @@ const Dashboard = () => {
               color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
           </div>
 
-          {/* 3. CONTINUE LEARNING BANNER */}
+          {/* 4. CONTINUE LEARNING BANNER */}
           {!isGuest && activeContinueTrack && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
@@ -828,7 +917,7 @@ const Dashboard = () => {
             </motion.div>
           )}
 
-          {/* 4. PROBLEM OF THE DAY */}
+          {/* 5. PROBLEM OF THE DAY */}
           <DailyProblemCard
             onOpenShare={(title, topic) => {
               setShareModalConfig({
@@ -840,16 +929,16 @@ const Dashboard = () => {
             }}
           />
 
-          {/* 5. CATEGORY FILTER CHIPS (Horizontal Scroll on Mobile/Tablet) */}
-          <div className="w-full overflow-x-auto scrollbar-none py-1 -mx-4 px-4 lg:mx-0 lg:px-0">
-            <div className="flex items-center gap-1.5 min-w-max pb-2">
+          {/* 6. MOBILE ONLY CATEGORY FILTER CHIPS */}
+          <div className="lg:hidden w-full overflow-x-auto scrollbar-none py-1 -mx-4 px-4">
+            <div className="flex items-center gap-1.5 min-w-max pb-1">
               {filterOptions.map((tab, index) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => handleCategorySelect(tab.id as DashboardCategory, index)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all ${
                       selectedCategory === tab.id
                         ? 'bg-primary text-primary-foreground shadow-sm neon-border'
                         : 'bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground border border-border/40'
@@ -863,37 +952,34 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* 6. YOUR ACTIVE TRACKS (Compact Pills/Accordion) */}
+          {/* 7. MOBILE ONLY ACTIVE TRACKS */}
           {!isGuest && myTracks.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="glass-card rounded-2xl border border-border/50 p-3 sm:p-4 space-y-2.5"
-            >
+            <div className="lg:hidden glass-card rounded-2xl border border-border/50 p-3 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-display font-bold uppercase tracking-wider text-muted-foreground">Your tracks</p>
+                <p className="text-xs font-display font-bold uppercase tracking-wider text-muted-foreground">Your Tracks</p>
                 <span className="text-[9px] font-mono text-muted-foreground">{myTracks.length} active</span>
               </div>
-              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1 scrollbar-thin">
                 {myTracks.map(({ track, done, total, pct }) => (
                   <button key={track.id} onClick={go(track.path)}
-                    className="w-full text-left rounded-xl p-2.5 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
+                    className="w-full text-left rounded-xl p-2 bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all group"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-lg shrink-0">{track.emoji}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-base shrink-0">{track.emoji}</span>
                       <p className="text-xs font-display font-semibold truncate flex-1">{track.title}</p>
                       <span className="text-[10px] font-mono text-primary shrink-0">{done}/{total}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                     </div>
-                    <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="mt-1.5 h-1 rounded-full bg-secondary overflow-hidden">
                       <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-blue transition-all" style={{ width: `${pct}%` }} />
                     </div>
                   </button>
                 ))}
               </div>
-            </motion.div>
+            </div>
           )}
 
-          {/* 7. COURSE / TRACK CATALOG CARDS */}
-           <div id="course-catalog" className="space-y-3">
+          {/* 8. COURSE / TRACK CATALOG CARDS */}
+          <div id="course-catalog" className="space-y-3">
             {visibleSections.map((section, i) => {
               const isCollapsed = !!collapsed[section.id];
               const enrolled = section.tracks.filter(t => t.trackId && isEnrolled(t.trackId)).length;
@@ -968,61 +1054,7 @@ const Dashboard = () => {
             })}
           </div>
 
-          {/* Footer Links (DSA Sheet, Crawler, Suggestions) - Moved to Bottom for Main Feed Flow */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-             <motion.button
-              initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-              onClick={go('/dsa-sheet')}
-              className={`glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-primary/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-blue/10" />
-              <div className="relative flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-primary/15 grid place-items-center border border-primary/30 neon-glow shrink-0">
-                  <Code2 className="w-5 h-5 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold font-display truncate">DSA Sheet</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Top 75 Interview Prep</p>
-                </div>
-              </div>
-            </motion.button>
-
-            <motion.button
-              initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-              onClick={go('/games/crawler')}
-              className={`glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-accent-orange/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/10 via-transparent to-primary/10" />
-              <div className="relative flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-accent-orange/15 grid place-items-center border border-accent-orange/30 neon-glow shrink-0">
-                  <Gamepad2 className="w-5 h-5 text-accent-orange" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold font-display truncate">Code Crawler</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Maze runner game</p>
-                </div>
-              </div>
-            </motion.button>
-
-            <motion.button
-              initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-              onClick={go('/suggestions')}
-              className={`glass-card p-4 rounded-2xl text-left transition-all relative overflow-hidden border border-accent-yellow/25 ${isGuest ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-yellow/10 via-transparent to-primary/10" />
-              <div className="relative flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 grid place-items-center border border-accent-yellow/30 neon-glow shrink-0">
-                  <MessageSquare className="w-5 h-5 text-accent-yellow" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold font-display truncate">Suggestions</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Feedback & Ideas</p>
-                </div>
-              </div>
-            </motion.button>
-          </div>
-
-          {/* Promo */}
+          {/* PROMO CODE (Kept in center feed) */}
           <div className="glass-card p-4 rounded-2xl">
             <h3 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider font-mono">promo_code</h3>
             <div className="flex gap-2">
@@ -1035,97 +1067,90 @@ const Dashboard = () => {
             {promoMsg && <p className="text-xs mt-2 font-mono">{promoMsg}</p>}
           </div>
 
-        </motion.div>
+        </motion.main>
 
-        {/* RIGHT SIDEBAR: TOOLS & MINI-HUD (30-35%, STICKY ON DESKTOP) */}
-        <aside className="hidden lg:block w-[30%] xl:w-[28%] shrink-0 order-2 lg:order-none">
-          <div className="sticky top-8 space-y-6">
+        {/* ========================================================
+            COLUMN 3: DESKTOP RIGHT SIDEBAR (w-[280px])
+            ======================================================== */}
+        <aside className="hidden lg:flex flex-col w-[280px] shrink-0 space-y-4">
+          <div className="sticky top-6 space-y-4">
             
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                <Zap className="w-4 h-4 text-yellow-500" /> Quick Tools
-              </h3>
+            <div className="flex items-center gap-2 px-1">
+              <Zap className="w-4 h-4 text-primary" />
+              <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground">Quick Tools</h3>
             </div>
 
-            {/* Challenge Card */}
+            {/* Daily Challenges */}
             <button
               onClick={go('/challenges')}
-              className="group relative w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1 text-left overflow-hidden"
+              className="group relative w-full p-3.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-0.5 text-left overflow-hidden"
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-purple-500" />
               <div className="relative z-10 flex items-start justify-between">
                 <div>
-                  <h4 className="font-bold text-sm text-foreground mb-1">Daily Challenges</h4>
-                  <p className="text-xs text-muted-foreground">Test your logic & DSA skills</p>
+                  <h4 className="font-bold text-xs sm:text-sm text-foreground mb-0.5">Daily Challenges</h4>
+                  <p className="text-[11px] text-muted-foreground">Test your logic & DSA skills</p>
                 </div>
-                <div className="p-2 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-purple-400">
-                  <Target className="w-5 h-5" />
+                <div className="p-1.5 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-purple-400">
+                  <Target className="w-4 h-4" />
                 </div>
               </div>
             </button>
 
-            {/* Playground Card */}
+            {/* Code Playground */}
             <button
               onClick={go('/playground')}
-              className="group relative w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1 text-left overflow-hidden"
+              className="group relative w-full p-3.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-0.5 text-left overflow-hidden"
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-cyan-500" />
               <div className="relative z-10 flex items-start justify-between">
                 <div>
-                  <h4 className="font-bold text-sm text-foreground mb-1">Code Playground</h4>
-                  <p className="text-xs text-muted-foreground">Sandbox environment for snippets</p>
+                  <h4 className="font-bold text-xs sm:text-sm text-foreground mb-0.5">Code Playground</h4>
+                  <p className="text-[11px] text-muted-foreground">Sandbox environment for snippets</p>
                 </div>
-                <div className="p-2 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-cyan-400">
-                  <Code className="w-5 h-5" />
+                <div className="p-1.5 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-cyan-400">
+                  <Code className="w-4 h-4" />
                 </div>
               </div>
             </button>
 
-            {/* Exams Card */}
+            {/* Exams & Quizzes */}
             <button
               onClick={go('/exams')}
-              className="group relative w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1 text-left overflow-hidden"
+              className="group relative w-full p-3.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-0.5 text-left overflow-hidden"
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-orange-500" />
               <div className="relative z-10 flex items-start justify-between">
                 <div>
-                  <h4 className="font-bold text-sm text-foreground mb-1">Exams & Quizzes</h4>
-                  <p className="text-xs text-muted-foreground">Validate your knowledge level</p>
+                  <h4 className="font-bold text-xs sm:text-sm text-foreground mb-0.5">Exams & Quizzes</h4>
+                  <p className="text-[11px] text-muted-foreground">Validate your knowledge level</p>
                 </div>
-                <div className="p-2 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-orange-400">
-                  <HelpCircle className="w-5 h-5" />
+                <div className="p-1.5 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-orange-400">
+                  <HelpCircle className="w-4 h-4" />
                 </div>
               </div>
             </button>
 
-            {/* Separator */}
-            <div className="h-px bg-border my-2" />
-
-            {/* Mini HUD: Coins & Streak */}
-            <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-background border border-border">
-              <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Status</h4>
+            {/* Status Card */}
+            <div className="p-3.5 rounded-xl bg-gradient-to-br from-secondary/50 to-background border border-border space-y-3">
+              <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Status</h4>
               
-              <div className="space-y-3">
-                {/* Coins */}
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Coins className="w-4 h-4 text-yellow-500" />
-                    <span className="text-sm font-medium text-foreground">Sage Coins</span>
+                    <Coins className="w-3.5 h-3.5 text-yellow-500" />
+                    <span className="text-xs font-medium text-foreground">Sage Coins</span>
                   </div>
-                  <span className="text-sm font-bold text-yellow-500">{sageCoins}</span>
+                  <span className="text-xs font-bold text-yellow-500">{sageCoins}</span>
                 </div>
                 
-                {/* Streak */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                    <span className="text-sm font-medium text-foreground">Current Streak</span>
+                    <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
+                    <span className="text-xs font-medium text-foreground">Current Streak</span>
                   </div>
-                  <span className="text-sm font-bold text-orange-500">{streak} Days</span>
+                  <span className="text-xs font-bold text-orange-500">{streak} Days</span>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-border/50">
+              <div className="pt-2 border-t border-border/50">
                 <button 
                   onClick={() => {
                     if (isGuest) {
@@ -1134,7 +1159,7 @@ const Dashboard = () => {
                       setShowCoinMenu(v => !v);
                     }
                   }}
-                  className="w-full py-2 px-3 rounded-lg bg-secondary/50 hover:bg-secondary text-xs font-semibold text-foreground transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-1.5 px-3 rounded-lg bg-secondary/50 hover:bg-secondary text-[11px] font-semibold text-foreground transition-colors flex items-center justify-center gap-1.5"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-primary" /> Visit Coin Shop
                 </button>
@@ -1142,18 +1167,18 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Links */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <button 
                 onClick={go('/dsa-sheet')}
-                className="w-full p-2.5 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
+                className="w-full p-2 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
               >
-                <BookOpen className="w-4 h-4 text-primary" /> DSA Sheet (Top 75)
+                <BookOpen className="w-3.5 h-3.5 text-primary" /> DSA Sheet (Top 75)
               </button>
               <button 
                 onClick={isGuest ? () => navigate('/auth') : go('/suggestions')}
-                className="w-full p-2.5 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
+                className="w-full p-2 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
               >
-                <Sparkles className="w-4 h-4 text-accent-yellow" /> Suggestions & Feedback
+                <Sparkles className="w-3.5 h-3.5 text-accent-yellow" /> Suggestions & Feedback
               </button>
             </div>
 
@@ -1234,45 +1259,27 @@ const Dashboard = () => {
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden space-y-2.5 pt-2.5"
                   >
-                    {/* Earning Section */}
                     <div className="bg-secondary/20 rounded-xl p-3 border border-border/30 space-y-1.5 text-left">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-primary font-display">
                         <Zap className="w-3.5 h-3.5" /> How You Earn XP & Coins
                       </div>
                       <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                        <li>
-                          <strong className="text-foreground">+1 Victory XP</strong> & <strong className="text-yellow-400">+2 Coins</strong> for every lesson completed.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">+3 XP</strong> & <strong className="text-yellow-400">+5 Coins</strong> for passing Track Exams & Challenges.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">10 Daily Allowance XP:</strong> Refilled at midnight for active lesson sessions (3.3 XP per lesson).
-                        </li>
-                        <li>
-                          <strong className="text-orange-400">Streak Milestones:</strong> Bonus coin chests unlocked on 3-day, 7-day, and 14-day streaks!
-                        </li>
+                        <li><strong className="text-foreground">+1 Victory XP</strong> & <strong className="text-yellow-400">+2 Coins</strong> for every lesson completed.</li>
+                        <li><strong className="text-foreground">+3 XP</strong> & <strong className="text-yellow-400">+5 Coins</strong> for passing Track Exams & Challenges.</li>
+                        <li><strong className="text-foreground">10 Daily Allowance XP:</strong> Refilled at midnight for active lesson sessions (3.3 XP per lesson).</li>
+                        <li><strong className="text-orange-400">Streak Milestones:</strong> Bonus coin chests unlocked on 3-day, 7-day, and 14-day streaks!</li>
                       </ul>
                     </div>
 
-                    {/* Using Section */}
                     <div className="bg-yellow-500/5 rounded-xl p-3 border border-yellow-500/20 space-y-1.5 text-left">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-yellow-400 font-display">
                         <Coins className="w-3.5 h-3.5" /> Where to Use XP & Coins
                       </div>
                       <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                        <li>
-                          <strong className="text-foreground">Streak Freeze (5 Coins):</strong> Protects your streak if you miss a study day — buy it from the coin button.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Buy XP (5 Coins):</strong> Tap the coin button to instantly refill +3.3 XP for one more lesson.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Arcade & Crawler Lives:</strong> Replenish hearts in Code Crawler and challenges.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Leaderboard & Rank (XP):</strong> Lifetime XP levels up your profile rank and trophy status.
-                        </li>
+                        <li><strong className="text-foreground">Streak Freeze (5 Coins):</strong> Protects your streak if you miss a study day.</li>
+                        <li><strong className="text-foreground">Buy XP (5 Coins):</strong> Tap the coin button to instantly refill +3.3 XP for one more lesson.</li>
+                        <li><strong className="text-foreground">Arcade & Crawler Lives:</strong> Replenish hearts in Code Crawler and challenges.</li>
+                        <li><strong className="text-foreground">Leaderboard & Rank (XP):</strong> Lifetime XP levels up your profile rank and trophy status.</li>
                       </ul>
                     </div>
                   </motion.div>
