@@ -284,7 +284,7 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
       </div>
     </>
   );
-
+}
 
 function PrereqStep({
   track, onBack, onGoTo, onEnrollAnyway, isSubmitting
