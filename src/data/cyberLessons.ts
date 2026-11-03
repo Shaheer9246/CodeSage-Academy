@@ -428,7 +428,7 @@ Hackers use regex to find AWS Keys, Private RSA blocks, or JWT tokens buried in 
     terminalNotice: 'Danger: Misconfiguring ACLs or Capabilities can grant unintended root access. Always revert changes after testing.',
     philosophy: `Unix permissions (rwx) are blunt instruments. Modern Linux uses granular controls: **ACLs** (Access Control Lists) for per-user/group exceptions, and **Capabilities** to split Root's powers into smaller chunks (e.g., allow binding to port 80 without full root).
 
-Attackers love complexity. Every additional layer of permission (ACL, SELinux, AppArmor, Caps) is a potential misconfiguration. An expert knows how to audit these layers to find the "golden ticket"—a file with \`chown root:root\` but \`chmod 777\`, or a binary with \`cap_net_bind_service\` that can be abused for port forwarding.`
+Attackers love complexity. Every additional layer of permission (ACL, SELinux, AppArmor, Caps) is a potential misconfiguration. An expert knows how to audit these layers to find the "golden ticket"—a file with \`chown root:root\` but \`chmod 777\`, or a binary with \`cap_net_bind_service\` that can be abused for port forwarding.`,
     concepts: [
       {
         title: 'Beyond rwx: POSIX ACLs',
