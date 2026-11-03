@@ -11,7 +11,9 @@ let memoryDaily2xDate = '';
 const memoryUnlockedPro = new Set<string>();
 
 export function isLessonPath(pathname: string): boolean {
-  return /^\/(?:lesson|n-lesson|f-lesson|fs-lesson|java-lesson|javax-lesson|c-lesson|cx-lesson|py-lesson|pyx-lesson|local-lesson|sql-lesson|rf-lesson|ai-lesson|iai-lesson|adv-ai-lesson|cpp-lesson|cppx-lesson|three-lesson)\/[^/]+\/?$/.test(pathname);
+ // Add |cyber-lesson into the regex
+return /^\/(?:lesson|n-lesson|cyber-lesson|f-lesson|fs-lesson|java-lesson|javax-lesson|c-lesson|cx-lesson|py-lesson|pyx-lesson|local-lesson|sql-lesson|rf-lesson|ai-lesson|iai-lesson|adv-ai-lesson|cpp-lesson|cppx-lesson|three-lesson)\/[^/]+\/?$/.test(pathname);
+
 }
 
 export function isProLessonPath(pathname: string): boolean {
