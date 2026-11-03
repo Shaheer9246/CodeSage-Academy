@@ -1601,7 +1601,28 @@ Escape artists break out of these namespaces to access the host root.`,
       "Responsible Disclosure protects users and vendors.",
       "Ethical hacking requires permission and adherence to scope."
     ]
-  },
-
-        
+  }     
 ];
+
+
+
+// Unified export of all 20 lessons
+export const CYBER_LESSONS: CyberLesson[] = [
+  ...CYBER_LESSONS_PART1, // Lessons 1-10
+  ...CYBER_LESSONS_PART2, // Lessons 11-20
+];
+
+// Helper to find a lesson by ID (e.g. 'cyber-1')
+export function getCyberLessonById(id: string): CyberLesson | undefined {
+  return CYBER_LESSONS.find(l => l.id === id);
+}
+
+// Sequential unlock helper (first lesson is always unlocked, others unlock once previous is completed)
+export function isCyberLessonUnlocked(lessonId: string, completedLessons: string[]): boolean {
+  const index = CYBER_LESSONS.findIndex(l => l.id === lessonId);
+  if (index <= 0) return true;
+  const previousLessonId = CYBER_LESSONS[index - 1].id;
+  return completedLessons.includes(previousLessonId);
+}
+
+    
