@@ -174,53 +174,53 @@ If you understand inodes, hard links, and symbolic links, you understand how Lin
 
 You can have multiple titles pointing to the same book (Hard Link). You can also have a sign saying "Go to Section B for Book X" (Symbolic Link). If you delete the original book, the sign still points to nothing (Broken Symlink), but other titles pointing directly to the physical spot remain valid until all references are gone.`,
         advanced: `**Inode Structure**: Contains metadata (permissions, UID/GID, timestamps, block pointers) but NOT the filename. Filenames reside in directory entries.
-- **Hard Links (`ln target link_name`)**: Multiple directory entries point to the same inode number. Reference count increases. File is only deleted when ref_count == 0. Cannot cross filesystem boundaries. Cannot link directories (to prevent cycles).
-- **Symbolic Links (`ln -s target link_name`)**: A special file type containing the path string to another file. Has its own inode. Can cross FS boundaries. Can link directories. Vulnerable to **Symlink Attacks** (e.g., `/tmp/race_condition` linking to `/etc/shadow`).
+- **Hard Links (\`ln target link_name\`)**: Multiple directory entries point to the same inode number. Reference count increases. File is only deleted when ref_count == 0. Cannot cross filesystem boundaries. Cannot link directories (to prevent cycles).
+- **Symbolic Links (\`ln -s target link_name\`)**: A special file type containing the path string to another file. Has its own inode. Can cross FS boundaries. Can link directories. Vulnerable to **Symlink Attacks** (e.g., \`/tmp/race_condition\` linking to \`/etc/shadow\`).
 - **Filesystem Types**: 
   - Ext4: Journaling, robust.
   - XFS: High performance for large files.
   - OverlayFS: Used in Docker/Containers. Layers read-only image + writable upper layer. Critical for container escape analysis.
 - **Commands**: 
-  - `ls -i`: Show inode numbers.
-  - `stat filename`: Detailed inode info (Size, Blocks, IO Block, Device, Inode, Links, Access/Modify/Change times).
-  - `df -h`: Disk free space. `du -sh`: Directory usage.`
+  - \`ls -i\`: Show inode numbers.
+  - \`stat filename\`: Detailed inode info (Size, Blocks, IO Block, Device, Inode, Links, Access/Modify/Change times).
+  - \`df -h\`: Disk free space. \`du -sh\`: Directory usage.`
       },
       {
         title: 'FHS Compliance & Hidden Artifacts',
         beginner: `The Filesystem Hierarchy Standard (FHS) organizes Linux like a corporate HQ.
-- `/bin` & `/sbin`: Essential binaries. If these break, the OS dies.
-- `/usr`: User-installed software. Large, shared, read-only mostly.
-- `/opt`: Add-on applications (like Chrome, VS Code). Self-contained.
-- `/proc` & `/sys`: **Virtual Filesystems**. These don't exist on disk! They are interfaces to the Kernel. `/proc/cpuinfo` reads RAM/CPU stats live. `/sys/class/net` shows network card status. Hackers read `/proc/self/maps` to see memory layout for buffer overflow exploits.`,
+- \`/bin\` & \`/sbin\`: Essential binaries. If these break, the OS dies.
+- \`/usr\`: User-installed software. Large, shared, read-only mostly.
+- \`/opt\`: Add-on applications (like Chrome, VS Code). Self-contained.
+- \`/proc\` & \`/sys\`: **Virtual Filesystems**. These don't exist on disk! They are interfaces to the Kernel. \`/proc/cpuinfo\` reads RAM/CPU stats live. \`/sys/class/net\` shows network card status. Hackers read \`/proc/self/maps\` to see memory layout for buffer overflow exploits.`,
         advanced: `**Forensic Relevance of Directories**:
-- `/var/log`: Primary evidence source. 
-  - `auth.log` / `secure`: SSH logins, sudo events.
-  - `kern.log`: Kernel panics, hardware errors.
-  - `syslog`: General system messages.
-  - *Anti-Forensics*: Attackers truncate logs (`> /var/log/auth.log`) or manipulate timestamps (`touch -t 202001010000 file`). Check inode Change time (`ctime`) vs Modify time (`mtime`). If `ctime` > `mtime`, the file was likely tampered with.
+- \`/var/log\`: Primary evidence source. 
+  - \`auth.log\` / \`secure\`: SSH logins, sudo events.
+  - \`kern.log\`: Kernel panics, hardware errors.
+  - \`syslog\`: General system messages.
+  - *Anti-Forensics*: Attackers truncate logs (\`> /var/log/auth.log\`) or manipulate timestamps (\`touch -t 202001010000 file\`). Check inode Change time (\`ctime\`) vs Modify time (\`mtime\`). If \`ctime\` > \`mtime\`, the file was likely tampered with.
   
-- `/tmp` & `/var/tmp`: World-writable sticky bit directories. Common drop zones for malware. Monitor for executable files here (`find /tmp -type f -executable`).
+- \`/tmp\` & \`/var/tmp\`: World-writable sticky bit directories. Common drop zones for malware. Monitor for executable files here (\`find /tmp -type f -executable\`).
   
-- `/proc` & `/sys` Exploitation:
-  - Reading `/proc/[pid]/environ`: Leaks environment variables (AWS keys, DB passwords) of running processes.
-  - Writing to `/proc/sys/kernel/core_pattern`: Can redirect crash dumps to execute arbitrary code upon application failure (Privilege Escalation vector).`
+- \`/proc\` & \`/sys\` Exploitation:
+  - Reading \`/proc/[pid]/environ\`: Leaks environment variables (AWS keys, DB passwords) of running processes.
+  - Writing to \`/proc/sys/kernel/core_pattern\`: Can redirect crash dumps to execute arbitrary code upon application failure (Privilege Escalation vector).`
       },
       {
         title: 'Navigation Efficiency: Globbing & Brace Expansion',
         beginner: `Typing full paths is slow. Linux offers shortcuts.
-- **Globbing**: Using wildcards `*` (anything) and `?` (one char). `rm *.log` deletes all log files.
-- **Brace Expansion**: `{start,end}` creates combinations. `mkdir dir{1..5}` creates dir1, dir2...dir5. `cp file.{txt,bak}` copies file.txt to file.bak.
+- **Globbing**: Using wildcards \`*\` (anything) and \`?\` (one char). \`rm *.log\` deletes all log files.
+- **Brace Expansion**: \`{start,end}\` creates combinations. \`mkdir dir{1..5}\` creates dir1, dir2...dir5. \`cp file.{txt,bak}\` copies file.txt to file.bak.
 Experts use these to manipulate hundreds of files in one command, reducing human error and increasing speed.`,
         advanced: `**Advanced Shell Features for Pentesters**:
-- **Nullglob (`shopt -s nullglob`)**: Prevents commands from failing if no files match wildcard. Crucial for scripting.
-- **Recursive Globbing (`**`)**: In Bash 4+, `echo **/*.py` finds all python files recursively. Requires `shopt -s globstar`.
-- **Command Substitution (`$(...)`)**: Embed output of one command into another. 
-  - Example: `kill $(pgrep -f "malware_process")` kills all processes matching name.
-  - Danger: Word splitting. If filenames have spaces, this breaks. Use arrays or `xargs`.
-- **History Expansion (`!!`, `!$`)**: 
-  - `sudo !!`: Re-run last command as root.
-  - `vim !$`: Edit the last argument of previous command.
-  - *OpSec Note*: Clear history (`history -c`) after sensitive ops, but remember `.bash_history` persists on disk unless configured otherwise (`HISTFILE=/dev/null`).`
+- **Nullglob (\`shopt -s nullglob\`)**: Prevents commands from failing if no files match wildcard. Crucial for scripting.
+- **Recursive Globbing (\`**\`)**: In Bash 4+, \`echo **/*.py\` finds all python files recursively. Requires \`shopt -s globstar\`.
+- **Command Substitution (\`$(...)\`)**: Embed output of one command into another. 
+  - Example: \`kill $(pgrep -f "malware_process")\` kills all processes matching name.
+  - Danger: Word splitting. If filenames have spaces, this breaks. Use arrays or \`xargs\`.
+- **History Expansion (\`!!\`, \`!$\`)**: 
+  - \`sudo !!\`: Re-run last command as root.
+  - \`vim !$\`: Edit the last argument of previous command.
+  - *OpSec Note*: Clear history (\`history -c\`) after sensitive ops, but remember \`.bash_history\` persists on disk unless configured otherwise (\`HISTFILE=/dev/null\`).`
       }
     ],
     practical: {
@@ -296,7 +296,7 @@ Experts use these to manipulate hundreds of files in one command, reducing human
     title: 'Stream Processing: Pipes, Filters & Regex Mastery',
     icon: '🌊',
     terminalNotice: 'Tip: Memorize basic regex patterns for IPs, Emails, and JWTs. They appear in almost every CTF challenge.',
-    philosophy: `Data streams like water. Pipes (`|`) are the plumbing that directs flow. Filtering (`grep`, `awk`, `sed`) is the sieve that catches gold nuggets (secrets, errors, IPs) while letting sand (noise) pass through.
+    philosophy: `Data streams like water. Pipes (\`|\`) are the plumbing that directs flow. Filtering (\`grep\`, \`awk\`, \`sed\`) is the sieve that catches gold nuggets (secrets, errors, IPs) while letting sand (noise) pass through.
 
 An expert doesn't read logs; they *query* them. By chaining small, single-purpose tools, you build powerful analytical pipelines capable of parsing gigabytes of JSON, XML, or raw binary in seconds. This skill separates script kiddies from engineers who can automate reconnaissance and incident response.`,
     concepts: [
@@ -309,54 +309,54 @@ An expert doesn't read logs; they *query* them. By chaining small, single-purpos
 
 Pipes connect STDOUT of one cmd to STDIN of next. Redirection sends STDOUT/STDERR to files. Separating them lets you save clean data to a file while keeping error messages visible on screen for debugging.`,
         advanced: `**File Descriptor Manipulation**:
-- `cmd > out.txt`: Redirects FD 1 to file.
-- `cmd 2> err.txt`: Redirects FD 2 to file.
-- `cmd > out.txt 2>&1`: Redirects FD 1 to file, then duplicates FD 2 to wherever FD 1 is going (same file). Merges streams.
-- `cmd | tee output.txt`: Sends stream to both screen AND file. Great for logging interactive sessions.
+- \`cmd > out.txt\`: Redirects FD 1 to file.
+- \`cmd 2> err.txt\`: Redirects FD 2 to file.
+- \`cmd > out.txt 2>&1\`: Redirects FD 1 to file, then duplicates FD 2 to wherever FD 1 is going (same file). Merges streams.
+- \`cmd | tee output.txt\`: Sends stream to both screen AND file. Great for logging interactive sessions.
 
 **Buffering Issues**: 
-- Pipes introduce buffering. `tail -f log | grep "error"` might delay output due to libc buffering. 
-- Fix: Use `stdbuf -oL tail -f log | grep --line-buffered "error"` to force line-buffering for real-time responsiveness.`
+- Pipes introduce buffering. \`tail -f log | grep "error"\` might delay output due to libc buffering. 
+- Fix: Use \`stdbuf -oL tail -f log | grep --line-buffered "error"\` to force line-buffering for real-time responsiveness.`
       },
       {
         title: 'Grep & Sed: Pattern Matching & Stream Editing',
-        beginner: `- **Grep**: Finds lines. Flags: `-v` (invert/exclude), `-E` (extended regex), `-o` (only matching part), `-r` (recursive).
-- **Sed**: Edits streams. "Stream Editor". Can replace text globally without opening the file. `sed 's/foo/bar/g'` replaces foo with bar everywhere.
+        beginner: `- **Grep**: Finds lines. Flags: \`-v\` (invert/exclude), \`-E\` (extended regex), \`-o\` (only matching part), \`-r\` (recursive).
+- **Sed**: Edits streams. "Stream Editor". Can replace text globally without opening the file. \`sed 's/foo/bar/g'\` replaces foo with bar everywhere.
 
 Together, they allow you to scrub sensitive data (PII) from logs before sharing them, or extract specific fields from messy outputs.`,
         advanced: `**Advanced Grep**:
-- PCRE Support: `grep -P '\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b' ip_list.txt` (Perl Compatible Regular Expressions for precise IP matching).
-- Context: `grep -B 2 -A 5 "CRITICAL" sys.log` (Show 2 lines Before, 5 After).
+- PCRE Support: \`grep -P '\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b' ip_list.txt\` (Perl Compatible Regular Expressions for precise IP matching).
+- Context: \`grep -B 2 -A 5 "CRITICAL" sys.log\` (Show 2 lines Before, 5 After).
 
 **Sed Magic**:
-- Delete lines: `sed '/DEBUG/d' app.log` (Remove all debug noise).
-- Print range: `sed -n '10,20p' file.txt` (Print lines 10-20 only).
-- Insertion: `sed '1i#!/bin/bash' script.sh` (Add shebang to line 1).
+- Delete lines: \`sed '/DEBUG/d' app.log\` (Remove all debug noise).
+- Print range: \`sed -n '10,20p' file.txt\` (Print lines 10-20 only).
+- Insertion: \`sed '1i#!/bin/bash' script.sh\` (Add shebang to line 1).
 
 **AWK (The Swiss Army Knife)**:
-- Field processing: `awk '{print $1, $NF}' access.log` (Print First and Last column).
-- Conditional logic: `awk '$9 == 404 {count++} END {print count}' access.log` (Count 404 errors).
+- Field processing: \`awk '{print $1, $NF}' access.log\` (Print First and Last column).
+- Conditional logic: \`awk '$9 == 404 {count++} END {print count}' access.log\` (Count 404 errors).
 - Parsing CSV/JSON-like structures without external libraries.`
       },
       {
         title: 'Regex for Secret Detection',
         beginner: `Regular Expressions are pattern languages. 
-- `\d`: Digit.
-- `[a-z]`: Letter.
-- `.*`: Anything, any amount.
-- `^`: Start of line.
-- `$`: End of line.
+- \`\d\`: Digit.
+- \`[a-z]\`: Letter.
+- \`.*\`: Anything, any amount.
+- \`^\`: Start of line.
+- \`$\`: End of line.
 
 Hackers use regex to find AWS Keys, Private RSA blocks, or JWT tokens buried in config files or git histories.`,
         advanced: `**Common Pentest Regex Patterns**:
-1. **AWS Access Key ID**: `(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}`
-2. **Private Key Header**: `-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----`
-3. **JWT Token**: `eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*`
-4. **Slack Webhook**: `https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}`
-5. **Generic Password Assignment**: `(?i)(password|passwd|pwd)\s*[=:]\s*\S+`
+1. **AWS Access Key ID**: \`(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}\`
+2. **Private Key Header**: \`-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----\`
+3. **JWT Token**: \`eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\`
+4. **Slack Webhook**: \`https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}\`
+5. **Generic Password Assignment**: \`(?i)(password|passwd|pwd)\s*[=:]\s*\S+\`
 
 **Tooling**: 
-- Use `trufflehog` or `gitleaks` for automated scanning, but know the underlying regex to customize rules for proprietary formats.`
+- Use \`trufflehog\` or \`gitleaks\` for automated scanning, but know the underlying regex to customize rules for proprietary formats.`
       }
     ],
     practical: {
@@ -428,56 +428,56 @@ Hackers use regex to find AWS Keys, Private RSA blocks, or JWT tokens buried in 
     terminalNotice: 'Danger: Misconfiguring ACLs or Capabilities can grant unintended root access. Always revert changes after testing.',
     philosophy: `Unix permissions (rwx) are blunt instruments. Modern Linux uses granular controls: **ACLs** (Access Control Lists) for per-user/group exceptions, and **Capabilities** to split Root's powers into smaller chunks (e.g., allow binding to port 80 without full root).
 
-Attackers love complexity. Every additional layer of permission (ACL, SELinux, AppArmor, Caps) is a potential misconfiguration. An expert knows how to audit these layers to find the "golden ticket"—a file with `chown root:root` but `chmod 777`, or a binary with `cap_net_bind_service` that can be abused for port forwarding.`
+Attackers love complexity. Every additional layer of permission (ACL, SELinux, AppArmor, Caps) is a potential misconfiguration. An expert knows how to audit these layers to find the "golden ticket"—a file with \`chown root:root\` but \`chmod 777\`, or a binary with \`cap_net_bind_service\` that can be abused for port forwarding.`,
     concepts: [
       {
         title: 'Beyond rwx: POSIX ACLs',
         beginner: `Sometimes you need: "Alice can read/write, Bob can only read, Charlie can do nothing." Standard Unix groups can't handle this easily. ACLs let you assign permissions to specific users/groups individually.
 
-View with `getfacl`. Set with `setfacl`. If ACLs are present, `ls -l` shows a `+` sign at the end of permissions (e.g., `-rw-rw-r--+`).`,
+View with \`getfacl\`. Set with \`setfacl\`. If ACLs are present, \`ls -l\` shows a \`+\` sign at the end of permissions (e.g., \`-rw-rw-r--+\`).`,
         advanced: `**Management Commands**:
-- `getfacl file.txt`: Displays detailed ACL entries.
-- `setfacl -m u:bob:r-x file.txt`: Grants bob read/execute.
-- `setfacl -x u:bob file.txt`: Removes bob's entry.
-- `setfacl -b file.txt`: Removes ALL ACLs (reset to standard).
+- \`getfacl file.txt\`: Displays detailed ACL entries.
+- \`setfacl -m u:bob:r-x file.txt\`: Grants bob read/execute.
+- \`setfacl -x u:bob file.txt\`: Removes bob's entry.
+- \`setfacl -b file.txt\`: Removes ALL ACLs (reset to standard).
 
 **Security Implications**:
-- Default ACLs on directories propagate to new files (`setfacl -d -m g:devs:rwx /project`).
-- Attack Vector: If a web server user (`www-data`) has write ACL on a config dir, they can overwrite configs.
-- Audit: `find / -type f -exec getfacl {} \; 2>/dev/null | grep "user:"` to scan for custom user perms.`
+- Default ACLs on directories propagate to new files (\`setfacl -d -m g:devs:rwx /project\`).
+- Attack Vector: If a web server user (\`www-data\`) has write ACL on a config dir, they can overwrite configs.
+- Audit: \`find / -type f -exec getfacl {} \; 2>/dev/null | grep "user:"\` to scan for custom user perms.`
       },
       {
         title: 'Linux Capabilities: Splitting Root',
         beginner: `Root is too powerful. Instead of giving a program full root, we give it specific "superpowers."
-- Want to ping? Need `CAP_NET_RAW`.
-- Want to bind to port 80? Need `CAP_NET_BIND_SERVICE`.
-- Want to load kernel modules? Need `CAP_SYS_MODULE`.
+- Want to ping? Need \`CAP_NET_RAW\`.
+- Want to bind to port 80? Need \`CAP_NET_BIND_SERVICE\`.
+- Want to load kernel modules? Need \`CAP_SYS_MODULE\`.
 
 If a binary has capabilities set, it runs with those elevated privileges even if owned by a normal user. This is safer than SUID, but still risky if the capability is broad.`,
         advanced: `**Inspection & Modification**:
-- `getcap /usr/bin/ping`: Shows assigned caps.
-- `setcap cap_net_raw+p /usr/bin/mytool`: Assigns capability permanently to file.
-- `capsh --print`: Lists current process capabilities.
+- \`getcap /usr/bin/ping\`: Shows assigned caps.
+- \`setcap cap_net_raw+p /usr/bin/mytool\`: Assigns capability permanently to file.
+- \`capsh --print\`: Lists current process capabilities.
 
 **Escalation Vectors**:
-1. **Writable Binary with Caps**: If `/usr/local/bin/tool` has `cap_setuid+ep` and is writable by user, they can modify it to spawn a root shell.
+1. **Writable Binary with Caps**: If \`/usr/local/bin/tool\` has \`cap_setuid+ep\` and is writable by user, they can modify it to spawn a root shell.
 2. **Ambient Capabilities**: Inherited by children. Rarely used correctly.
-3. **Audit Command**: `find / -perm -4000 -o -perm -2000 2>/dev/null` (SUID/SGID) PLUS `getcap -r / 2>/dev/null` (Capabilities). Look for interesting bins like `python`, `perl`, `gcc` with caps.`
+3. **Audit Command**: \`find / -perm -4000 -o -perm -2000 2>/dev/null\` (SUID/SGID) PLUS \`getcap -r / 2>/dev/null\` (Capabilities). Look for interesting bins like \`python\`, \`perl\`, \`gcc\` with caps.`
       },
       {
         title: 'SELinux/AppArmor: Mandatory Access Control (MAC)',
-        beginner: `DAC (Discretionary Access Control) is what we discussed (owner decides). MAC (Mandatory) is decided by the SYSTEM POLICY. Even if you are Root, SELinux might deny you from reading `/etc/shadow` if the policy says "Web servers cannot read shadow files."
+        beginner: `DAC (Discretionary Access Control) is what we discussed (owner decides). MAC (Mandatory) is decided by the SYSTEM POLICY. Even if you are Root, SELinux might deny you from reading \`/etc/shadow\` if the policy says "Web servers cannot read shadow files."
 
 It confines programs. If Apache is hacked, SELinux prevents it from spawning a shell or accessing unrelated files. It's the "seatbelt" of Linux.`,
         advanced: `**States**: Enforcing (blocks), Permissive (logs but allows), Disabled.
-- Check status: `getenforce` (SELinux) or `aa-status` (AppArmor).
-- Logs: AVC denials in `/var/log/audit/audit.log` (SELinux) or `dmesg`/`syslog` (AppArmor).
-- Troubleshooting: `ausearch -m avc -ts recent` finds denials. `audit2allow` generates policy fixes.
+- Check status: \`getenforce\` (SELinux) or \`aa-status\` (AppArmor).
+- Logs: AVC denials in \`/var/log/audit/audit.log\` (SELinux) or \`dmesg\`/\`syslog\` (AppArmor).
+- Troubleshooting: \`ausearch -m avc -ts recent\` finds denials. \`audit2allow\` generates policy fixes.
 
 **Bypass Attempts**:
-- Attackers often try to disable SELinux (`setenforce 0`) if they have root. 
-- Detection: Monitor for `setenforce` calls or modifications to `/selinux/enforce`.
-- Container Escape: If Docker runs with `--privileged`, it disables most MAC restrictions, allowing direct device access.`
+- Attackers often try to disable SELinux (\`setenforce 0\`) if they have root. 
+- Detection: Monitor for \`setenforce\` calls or modifications to \`/selinux/enforce\`.
+- Container Escape: If Docker runs with \`--privileged\`, it disables most MAC restrictions, allowing direct device access.`
       }
     ],
     practical: {
@@ -544,25 +544,25 @@ It confines programs. If Apache is hacked, SELinux prevents it from spawning a s
     title: 'Process Injection, Namespace Isolation & Evasion',
     icon: '👻',
     terminalNotice: 'Ethical Warning: Process injection techniques described here are dual-use. Use only for authorized red team engagements or malware research in isolated VMs.',
-    philosophy: `Malware doesn't just run; it hides. It injects code into legitimate processes (like `explorer.exe` or `svchost.exe`) to blend in. It manipulates namespaces to isolate itself from the host. It tampers with syscall tables to lie to monitoring tools.
+    philosophy: `Malware doesn't just run; it hides. It injects code into legitimate processes (like \`explorer.exe\` or \`svchost.exe\`) to blend in. It manipulates namespaces to isolate itself from the host. It tampers with syscall tables to lie to monitoring tools.
 
-To catch stealthy threats, defenders must look beyond process names. They analyze memory maps, network connections tied to PIDs, and behavioral anomalies. Understanding how attackers evade detection is the only way to build detectors that actually work.`
+To catch stealthy threats, defenders must look beyond process names. They analyze memory maps, network connections tied to PIDs, and behavioral anomalies. Understanding how attackers evade detection is the only way to build detectors that actually work.`,
     concepts: [
       {
         title: 'Process Injection & Hollowing',
-        beginner: `Instead of running `evil.exe`, malware loads its code into the memory of `notepad.exe`. Task Manager shows "Notepad Running," but it's actually hosting malicious threads.
+        beginner: `Instead of running \`evil.exe\`, malware loads its code into the memory of \`notepad.exe\`. Task Manager shows "Notepad Running," but it's actually hosting malicious threads.
 
 **Process Hollowing**: Malware starts a legit process suspended, wipes its memory, writes its own code, and resumes it. The original binary is gone; only the shell remains.`,
         advanced: `**Techniques**:
-1. **DLL Injection**: `LoadLibrary` remote thread. Injects DLL into target process address space.
+1. **DLL Injection**: \`LoadLibrary\` remote thread. Injects DLL into target process address space.
 2. **Reflective DLL Loading**: Loads DLL from memory without touching disk (no file on disk to scan).
 3. **APC Injection**: Asynchronous Procedure Calls queued to thread. Executes code when thread wakes up.
 4. **Process Doppelgänging**: Uses NTFS transactions to swap file content momentarily during creation.
 
 **Detection**:
-- Monitor for `CreateRemoteThread`, `WriteProcessMemory`, `VirtualAllocEx` syscalls.
+- Monitor for \`CreateRemoteThread\`, \`WriteProcessMemory\`, \`VirtualAllocEx\` syscalls.
 - EDR solutions hook these APIs.
-- Forensics: Dump memory (`LiME`, `WinPmem`) and analyze strings/PE headers in injected regions.`
+- Forensics: Dump memory (\`LiME\`, \`WinPmem\`) and analyze strings/PE headers in injected regions.`
       },
       {
         title: 'Linux Namespaces & Cgroups: Container Isolation',
@@ -573,34 +573,34 @@ To catch stealthy threats, defenders must look beyond process names. They analyz
 
 Escape artists break out of these namespaces to access the host root.`,
         advanced: `**Namespace Inspection**:
-- `ls -l /proc/<pid>/ns/`: Shows namespace IDs (mnt, net, pid, uts, ipc, user).
-- `unshare --mount --uts --ipc --net --pid /bin/bash`: Creates new namespaces manually.
+- \`ls -l /proc/<pid>/ns/\`: Shows namespace IDs (mnt, net, pid, uts, ipc, user).
+- \`unshare --mount --uts --ipc --net --pid /bin/bash\`: Creates new namespaces manually.
 
 **Container Escape Vectors**:
-1. **Privileged Mode**: `docker run --privileged`. Gives container access to all host devices (`/dev`). Mount host root: `mount /dev/sda1 /mnt/host`.
-2. **Cap_sys_admin**: Allows mounting filesystems. Mount procfs of host: `mount -t proc proc /host_proc`. Read `/host_proc/1/root/etc/shadow`.
-3. **Volumes**: Mounting `/var/run/docker.sock` inside container allows controlling Docker daemon -> spawn privileged sibling container.
+1. **Privileged Mode**: \`docker run --privileged\`. Gives container access to all host devices (\`/dev\`). Mount host root: \`mount /dev/sda1 /mnt/host\`.
+2. **Cap_sys_admin**: Allows mounting filesystems. Mount procfs of host: \`mount -t proc proc /host_proc\`. Read \`/host_proc/1/root/etc/shadow\`.
+3. **Volumes**: Mounting \`/var/run/docker.sock\` inside container allows controlling Docker daemon -> spawn privileged sibling container.
 
-**Hardening**: Use User Namespaces (`--userns=host` disabled), Drop all capabilities (`--cap-drop=ALL`), Read-only rootfs.`
+**Hardening**: Use User Namespaces (\`--userns=host\` disabled), Drop all capabilities (\`--cap-drop=ALL\`), Read-only rootfs.`
       },
       {
         title: 'Syscall Tampering & Rootkits',
-        beginner: `Programs talk to the kernel via System Calls (sys_read, sys_write). A **Rootkit** hooks these calls. When you run `ps`, the rootkit intercepts the syscall, removes its own malicious process from the list, and returns the fake result. You literally cannot see the malware with standard tools.`,
+        beginner: `Programs talk to the kernel via System Calls (sys_read, sys_write). A **Rootkit** hooks these calls. When you run \`ps\`, the rootkit intercepts the syscall, removes its own malicious process from the list, and returns the fake result. You literally cannot see the malware with standard tools.`,
         advanced: `**Types**:
 1. **Userland LD_PRELOAD**: Override libc functions. Easy to detect (check env vars).
-2. **Kernel Module (LKM)**: Modifies syscall table in kernel memory. Harder to detect. Requires loading `.ko` module.
-3. **Direct Kernel Object Manipulation (DKOM)**: Unlinks process from kernel task list without unloading it. Process runs but invisible to `ps`/`top`.
+2. **Kernel Module (LKM)**: Modifies syscall table in kernel memory. Harder to detect. Requires loading \`.ko\` module.
+3. **Direct Kernel Object Manipulation (DKOM)**: Unlinks process from kernel task list without unloading it. Process runs but invisible to \`ps\`/\`top\`.
 
 **Detection Strategies**:
-- **Cross-Reference**: Compare `/proc` listing vs `sys_call_table` iteration vs Network connections (`ss -antp`). Discrepancies reveal hidden processes.
+- **Cross-Reference**: Compare \`/proc\` listing vs \`sys_call_table\` iteration vs Network connections (\`ss -antp\`). Discrepancies reveal hidden processes.
 - **Integrity Checks**: Verify checksum of kernel memory/code segments.
-- **Tools**: `chkrootkit`, `rkhunter`, `Volatility` (memory forensics).
+- **Tools**: \`chkrootkit\`, \`rkhunter\`, \`Volatility\` (memory forensics).
 - **eBPF**: Modern tracing uses eBPF to monitor syscalls at kernel level, harder to hook than traditional kprobes.`
       }
     ],
     practical: {
       title: 'Detecting Hidden Processes via /proc vs ps Discrepancy',
-      intro: `Simulate a DKOM-style hidden process (conceptually) by comparing authoritative sources. In a real rootkit, `ps` lies. We will verify integrity by checking `/proc` directly.`,
+      intro: `Simulate a DKOM-style hidden process (conceptually) by comparing authoritative sources. In a real rootkit, \`ps\` lies. We will verify integrity by checking \`/proc\` directly.`,
       steps: [
         '# 1. Get list of PIDs from standard tool',
         'ps aux | awk \'{print $2}\' | sort -n > ps_pids.txt',
@@ -1119,7 +1119,7 @@ Escape artists break out of these namespaces to access the host root.`,
       {
         title: "JWT Anatomy & Risks",
         beginner: "JSON Web Tokens (JWT) are like digital passports. They contain three parts: Header (what type it is), Payload (who you are), and Signature (proof it’s real). The problem? The Payload is just Base64 encoded, not encrypted. Anyone can read it. And if the signature check is weak or skipped, hackers can forge their own passports to become admins.",
-        advanced: "JWT Structure: `Header.Payload.Signature`\n- **Header:** `{"alg": "HS256", "typ": "JWT"}`\n- **Payload:** `{"sub": "123", "role": "admin"}` (Base64Url encoded, NOT encrypted).\n- **Signature:** HMACSHA256(base64UrlEncode(header) + '.' + base64UrlEncode(payload), secret)\n\n**Attacks:**\n- **None Algorithm:** Change header alg to 'none' and remove signature. Some libraries accept unsigned tokens.\n- **Weak Secret:** Brute-force HS256 secret if short.\n- **RS256 to HS256 Confusion:** If server expects RSA public key but attacker switches to HMAC with public key as secret.\n- **Data Leakage:** Sensitive data in payload is visible to anyone."
+        advanced: "JWT Structure: `Header.Payload.Signature`\n- **Header:** `{\"alg\": \"HS256\", \"typ\": \"JWT\"}`\n- **Payload:** `{\"sub\": \"123\", \"role\": \"admin\"}` (Base64Url encoded, NOT encrypted).\n- **Signature:** HMACSHA256(base64UrlEncode(header) + '.' + base64UrlEncode(payload), secret)\n\n**Attacks:**\n- **None Algorithm:** Change header alg to 'none' and remove signature. Some libraries accept unsigned tokens.\n- **Weak Secret:** Brute-force HS256 secret if short.\n- **RS256 to HS256 Confusion:** If server expects RSA public key but attacker switches to HMAC with public key as secret.\n- **Data Leakage:** Sensitive data in payload is visible to anyone."
       },
       {
         title: "Cookie Flags & Session Hijacking",
@@ -1606,11 +1606,6 @@ Escape artists break out of these namespaces to access the host root.`,
 
 
 
-// Unified export of all 20 lessons
-export const CYBER_LESSONS: CyberLesson[] = [
-  ...CYBER_LESSONS_PART1, // Lessons 1-10
-  ...CYBER_LESSONS_PART2, // Lessons 11-20
-];
 
 // Helper to find a lesson by ID (e.g. 'cyber-1')
 export function getCyberLessonById(id: string): CyberLesson | undefined {
