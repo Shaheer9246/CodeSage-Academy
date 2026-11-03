@@ -1606,11 +1606,6 @@ Escape artists break out of these namespaces to access the host root.`,
 
 
 
-// Unified export of all 20 lessons
-export const CYBER_LESSONS: CyberLesson[] = [
-  ...CYBER_LESSONS_PART1, // Lessons 1-10
-  ...CYBER_LESSONS_PART2, // Lessons 11-20
-];
 
 // Helper to find a lesson by ID (e.g. 'cyber-1')
 export function getCyberLessonById(id: string): CyberLesson | undefined {
