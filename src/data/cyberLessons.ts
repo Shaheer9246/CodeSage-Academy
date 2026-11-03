@@ -197,11 +197,11 @@ You can have multiple titles pointing to the same book (Hard Link). You can also
   - \`auth.log\` / \`secure\`: SSH logins, sudo events.
   - \`kern.log\`: Kernel panics, hardware errors.
   - \`syslog\`: General system messages.
-  - *Anti-Forensics*: Attackers truncate logs (\`> /var/log/auth.log`) or manipulate timestamps (`touch -t 202001010000 file`). Check inode Change time (`ctime`) vs Modify time (`mtime`). If `ctime\` > \`mtime`, the file was likely tampered with.
+  - *Anti-Forensics*: Attackers truncate logs (\`> /var/log/auth.log\`) or manipulate timestamps (\`touch -t 202001010000 file\`). Check inode Change time (\`ctime\`) vs Modify time (\`mtime\`). If \`ctime\` > \`mtime\`, the file was likely tampered with.
   
-- `/tmp\` & \`/var/tmp\`: World-writable sticky bit directories. Common drop zones for malware. Monitor for executable files here (\`find /tmp -type f -executable`).
+- \`/tmp\` & \`/var/tmp\`: World-writable sticky bit directories. Common drop zones for malware. Monitor for executable files here (\`find /tmp -type f -executable\`).
   
-- `/proc\` & \`/sys\` Exploitation:
+- \`/proc\` & \`/sys\` Exploitation:
   - Reading \`/proc/[pid]/environ\`: Leaks environment variables (AWS keys, DB passwords) of running processes.
   - Writing to \`/proc/sys/kernel/core_pattern\`: Can redirect crash dumps to execute arbitrary code upon application failure (Privilege Escalation vector).`
       },
@@ -212,20 +212,20 @@ You can have multiple titles pointing to the same book (Hard Link). You can also
 - **Brace Expansion**: \`{start,end}\` creates combinations. \`mkdir dir{1..5}\` creates dir1, dir2...dir5. \`cp file.{txt,bak}\` copies file.txt to file.bak.
 Experts use these to manipulate hundreds of files in one command, reducing human error and increasing speed.`,
         advanced: `**Advanced Shell Features for Pentesters**:
-- **Nullglob (\`shopt -s nullglob`)**: Prevents commands from failing if no files match wildcard. Crucial for scripting.
-- **Recursive Globbing (`**`)**: In Bash 4+, `echo **/*.py\` finds all python files recursively. Requires \`shopt -s globstar\`.
-- **Command Substitution (\`$(...)`)**: Embed output of one command into another. 
-  - Example: `kill $(pgrep -f "malware_process")\` kills all processes matching name.
+- **Nullglob (\`shopt -s nullglob\`)**: Prevents commands from failing if no files match wildcard. Crucial for scripting.
+- **Recursive Globbing (\`**\`)**: In Bash 4+, \`echo **/*.py\` finds all python files recursively. Requires \`shopt -s globstar\`.
+- **Command Substitution (\`$(...)\`)**: Embed output of one command into another. 
+  - Example: \`kill $(pgrep -f "malware_process")\` kills all processes matching name.
   - Danger: Word splitting. If filenames have spaces, this breaks. Use arrays or \`xargs\`.
-- **History Expansion (\`!!`, `!$`)**: 
-  - `sudo !!\`: Re-run last command as root.
+- **History Expansion (\`!!\`, \`!$\`)**: 
+  - \`sudo !!\`: Re-run last command as root.
   - \`vim !$\`: Edit the last argument of previous command.
-  - *OpSec Note*: Clear history (\`history -c`) after sensitive ops, but remember `.bash_history\` persists on disk unless configured otherwise (\`HISTFILE=/dev/null`).`
+  - *OpSec Note*: Clear history (\`history -c\`) after sensitive ops, but remember \`.bash_history\` persists on disk unless configured otherwise (\`HISTFILE=/dev/null\`).`
       }
     ],
     practical: {
       title: 'Detecting Symlink Races & Inode Manipulation',
-      intro: \`Simulate a Time-of-Check to Time-of-Use (TOCTOU) vulnerability. We will create a script that checks a file's existence, then acts on it. We will race to swap the file with a symlink to a protected system file.`,
+      intro: `Simulate a Time-of-Check to Time-of-Use (TOCTOU) vulnerability. We will create a script that checks a file's existence, then acts on it. We will race to swap the file with a symlink to a protected system file.`,
       steps: [
         '# Create a working directory',
         'mkdir ~/race_lab && cd ~/race_lab',
@@ -349,14 +349,14 @@ Together, they allow you to scrub sensitive data (PII) from logs before sharing 
 
 Hackers use regex to find AWS Keys, Private RSA blocks, or JWT tokens buried in config files or git histories.`,
         advanced: `**Common Pentest Regex Patterns**:
-1. **AWS Access Key ID**: \`(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}`
-2. **Private Key Header**: `-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----`
-3. **JWT Token**: `eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*`
-4. **Slack Webhook**: `https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}`
-5. **Generic Password Assignment**: `(?i)(password|passwd|pwd)\s*[=:]\s*\S+`
+1. **AWS Access Key ID**: \`(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}\`
+2. **Private Key Header**: \`-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----\`
+3. **JWT Token**: \`eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\`
+4. **Slack Webhook**: \`https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}\`
+5. **Generic Password Assignment**: \`(?i)(password|passwd|pwd)\s*[=:]\s*\S+\`
 
 **Tooling**: 
-- Use `trufflehog\` or \`gitleaks\` for automated scanning, but know the underlying regex to customize rules for proprietary formats.`
+- Use \`trufflehog\` or \`gitleaks\` for automated scanning, but know the underlying regex to customize rules for proprietary formats.`
       }
     ],
     practical: {
@@ -434,8 +434,8 @@ Attackers love complexity. Every additional layer of permission (ACL, SELinux, A
         title: 'Beyond rwx: POSIX ACLs',
         beginner: `Sometimes you need: "Alice can read/write, Bob can only read, Charlie can do nothing." Standard Unix groups can't handle this easily. ACLs let you assign permissions to specific users/groups individually.
 
-View with \`getfacl\`. Set with \`setfacl\`. If ACLs are present, \`ls -l\` shows a \`+\` sign at the end of permissions (e.g., \`-rw-rw-r--+`).`,
-        advanced: \`**Management Commands**:
+View with \`getfacl\`. Set with \`setfacl\`. If ACLs are present, \`ls -l\` shows a \`+\` sign at the end of permissions (e.g., \`-rw-rw-r--+\`).`,
+        advanced: `**Management Commands**:
 - \`getfacl file.txt\`: Displays detailed ACL entries.
 - \`setfacl -m u:bob:r-x file.txt\`: Grants bob read/execute.
 - \`setfacl -x u:bob file.txt\`: Removes bob's entry.
@@ -475,14 +475,14 @@ It confines programs. If Apache is hacked, SELinux prevents it from spawning a s
 - Troubleshooting: \`ausearch -m avc -ts recent\` finds denials. \`audit2allow\` generates policy fixes.
 
 **Bypass Attempts**:
-- Attackers often try to disable SELinux (\`setenforce 0`) if they have root. 
-- Detection: Monitor for `setenforce\` calls or modifications to \`/selinux/enforce\`.
-- Container Escape: If Docker runs with \`--privileged`, it disables most MAC restrictions, allowing direct device access.`
+- Attackers often try to disable SELinux (\`setenforce 0\`) if they have root. 
+- Detection: Monitor for \`setenforce\` calls or modifications to \`/selinux/enforce\`.
+- Container Escape: If Docker runs with \`--privileged\`, it disables most MAC restrictions, allowing direct device access.`
       }
     ],
     practical: {
       title: 'Auditing SUID, SGID, and Capabilities for Privesc Paths',
-      intro: \`Perform a comprehensive privilege escalation audit on a local Linux machine. Identify binaries that could potentially be abused to gain root.`,
+      intro: `Perform a comprehensive privilege escalation audit on a local Linux machine. Identify binaries that could potentially be abused to gain root.`,
       steps: [
         '# 1. Find all SUID binaries (run as owner, usually root)',
         'find / -perm -4000 -type f 2>/dev/null',
@@ -560,13 +560,13 @@ To catch stealthy threats, defenders must look beyond process names. They analyz
 4. **Process Doppelgänging**: Uses NTFS transactions to swap file content momentarily during creation.
 
 **Detection**:
-- Monitor for \`CreateRemoteThread`, `WriteProcessMemory`, `VirtualAllocEx\` syscalls.
+- Monitor for \`CreateRemoteThread\`, \`WriteProcessMemory\`, \`VirtualAllocEx\` syscalls.
 - EDR solutions hook these APIs.
-- Forensics: Dump memory (\`LiME`, `WinPmem`) and analyze strings/PE headers in injected regions.`
+- Forensics: Dump memory (\`LiME\`, \`WinPmem\`) and analyze strings/PE headers in injected regions.`
       },
       {
         title: 'Linux Namespaces & Cgroups: Container Isolation',
-        beginner: \`Docker containers aren't VMs. They share the host kernel. Isolation comes from **Namespaces** (view isolation) and **Cgroups** (resource limits).
+        beginner: `Docker containers aren't VMs. They share the host kernel. Isolation comes from **Namespaces** (view isolation) and **Cgroups** (resource limits).
 - PID Namespace: Container sees its processes as PID 1, hiding host processes.
 - NET Namespace: Container has its own IP/Interfaces.
 - MNT Namespace: Container has its own filesystem view.
@@ -633,7 +633,7 @@ Escape artists break out of these namespaces to access the host root.`,
         explanation: 'eBPF programs are verified by the kernel before loading and run in a restricted sandbox. Unlike LKM rootkits which can corrupt kernel memory, eBPF provides safe, observable instrumentation points.'
       },
       {
-        question: 'If a Docker container is run with \`--privileged`, what security boundary is broken?',
+        question: 'If a Docker container is run with \`--privileged\`, what security boundary is broken?',
         options: ['Network isolation', 'Filesystem isolation', 'All major isolation boundaries (Devices, Capabilities, cgroups)', 'DNS resolution'],
         correctIndex: 2,
         explanation: '--privileged gives the container nearly all host capabilities and access to all devices, effectively removing the security benefits of containerization. It can mount host disks and load kernel modules.'
@@ -683,9 +683,9 @@ Escape artists break out of these namespaces to access the host root.`,
       title: "Network Interface & ARP Forensics",
       intro: "We will inspect the raw network state. You will learn to read the ARP table to detect anomalies and identify your gateway—the most critical target in a local network.",
       steps: [
-        "Run `ip addr show\`. Identify your interface (eth0/wlan0). Note the \`inet\` (IPv4) and \`link/ether\` (MAC). Check the scope: \`global\` means routable, \`link\` means local only.",
-        "Run \`ip neigh show\` (or \`arp -a`). This is your ARP cache. Look for the entry corresponding to your default gateway. Note the MAC address.",
-        "Run `ip route show default\`. This confirms the gateway IP. Compare this IP with the MAC in your ARP table. If you see two different MACs for the same Gateway IP, you are likely under an ARP spoofing attack.",
+        "Run \`ip addr show\`. Identify your interface (eth0/wlan0). Note the \`inet\` (IPv4) and \`link/ether\` (MAC). Check the scope: \`global\` means routable, \`link\` means local only.",
+        "Run \`ip neigh show\` (or \`arp -a\`). This is your ARP cache. Look for the entry corresponding to your default gateway. Note the MAC address.",
+        "Run \`ip route show default\`. This confirms the gateway IP. Compare this IP with the MAC in your ARP table. If you see two different MACs for the same Gateway IP, you are likely under an ARP spoofing attack.",
         "Analyze the TTL (Time To Live) of entries. Stale entries that don't refresh may indicate a disconnected host or a static ARP entry set by an admin."
       ],
       goal: "Identify your network topology, map IP-to-MAC relationships, and recognize the signs of ARP poisoning."
@@ -794,22 +794,22 @@ Escape artists break out of these namespaces to access the host root.`,
       {
         title: "DNS Resolution: The Hierarchical Lookup",
         beginner: "When you type google.com, your computer doesn't know where it is. It asks a Recursive Resolver (like 8.8.8.8). The resolver asks the Root Server ('.'), which points to the .com Server. The .com Server points to Google's Authoritative Server. Google's Server says 'It's 142.250.80.46.' Your computer caches this. Different records tell different stories: A records are IPs, MX records are for email, TXT records are for notes (like security policies).",
-        advanced: "**DNS Hierarchy:**\n1. **Recursive Resolver:** Client-side agent (ISP/Public). Performs iterative queries.\n2. **Root Servers (13 clusters):** Refer to TLDs. Query \`dig . NS\`.\n3. **TLD Servers (.com, .org):** Managed by registries. Refer to Authoritative NS.\n4. **Authoritative NS:** Holds actual zone data.\n\n**Record Types:**\n- **A (IPv4), AAAA (IPv6):** Address mapping.\n- **CNAME:** Alias. Cannot coexist with other records.\n- **MX:** Mail Exchanger. Priority-based.\n- **TXT:** Arbitrary text. SPF (\`v=spf1...`), DKIM, DMARC.\n- **NS:** Nameserver delegation.\n- **SOA:** Start of Authority. Serial number, refresh intervals.\n\n**DNSSEC:** Adds digital signatures (RRSIG) to prevent spoofing but does not encrypt queries (use DoH/DoT for privacy)."
+        advanced: "**DNS Hierarchy:**\n1. **Recursive Resolver:** Client-side agent (ISP/Public). Performs iterative queries.\n2. **Root Servers (13 clusters):** Refer to TLDs. Query \`dig . NS\`.\n3. **TLD Servers (.com, .org):** Managed by registries. Refer to Authoritative NS.\n4. **Authoritative NS:** Holds actual zone data.\n\n**Record Types:**\n- **A (IPv4), AAAA (IPv6):** Address mapping.\n- **CNAME:** Alias. Cannot coexist with other records.\n- **MX:** Mail Exchanger. Priority-based.\n- **TXT:** Arbitrary text. SPF (\`v=spf1...\`), DKIM, DMARC.\n- **NS:** Nameserver delegation.\n- **SOA:** Start of Authority. Serial number, refresh intervals.\n\n**DNSSEC:** Adds digital signatures (RRSIG) to prevent spoofing but does not encrypt queries (use DoH/DoT for privacy)."
       },
       {
         title: "Active DNS Reconnaissance",
-        beginner: "Hackers use DNS to map a company. They look for subdomains like dev.company.com or staging.company.com. They check TXT records for SPF policies, which often list internal IP ranges (e.g., 'ip4:10.0.0.0/8'). This leaks the internal network structure. Tools like `dig\` and \`nslookup\` are used to query these records. It’s like reading the footnotes in a document to find hidden clues.",
-        advanced: "**Recon Techniques:**\n- **Subdomain Enumeration:** Brute-force (\`gobuster dns`), Certificate Transparency logs (`crt.sh`), Search Engines (`site:*.example.com`).\n- **SPF Analysis:** `dig example.com TXT\`. Look for \`ip4:\` ranges. Reveals internal infrastructure and third-party services.\n- **Reverse DNS:** \`dig -x IP\`. Maps IPs to hostnames.\n- **Zone Walking:** If DNSSEC NSEC records are used, iterate through linked list to enumerate all names. NSEC3 mitigates with hashing but is vulnerable to offline dictionary attacks."
+        beginner: "Hackers use DNS to map a company. They look for subdomains like dev.company.com or staging.company.com. They check TXT records for SPF policies, which often list internal IP ranges (e.g., 'ip4:10.0.0.0/8'). This leaks the internal network structure. Tools like \`dig\` and \`nslookup\` are used to query these records. It’s like reading the footnotes in a document to find hidden clues.",
+        advanced: "**Recon Techniques:**\n- **Subdomain Enumeration:** Brute-force (\`gobuster dns\`), Certificate Transparency logs (\`crt.sh\`), Search Engines (\`site:*.example.com\`).\n- **SPF Analysis:** \`dig example.com TXT\`. Look for \`ip4:\` ranges. Reveals internal infrastructure and third-party services.\n- **Reverse DNS:** \`dig -x IP\`. Maps IPs to hostnames.\n- **Zone Walking:** If DNSSEC NSEC records are used, iterate through linked list to enumerate all names. NSEC3 mitigates with hashing but is vulnerable to offline dictionary attacks."
       },
       {
         title: "DNS Attack Vectors",
         beginner: "DNS attacks are clever. Cache Poisoning tricks your computer into remembering the wrong IP for a site. DNS Tunneling hides stolen data inside DNS queries, slipping past firewalls because DNS is usually allowed. Zone Transfer is the jackpot: if a server is misconfigured, you can download the entire DNS database—all subdomains and internal IPs—in one go.",
-        advanced: "**Attack Vectors:**\n- **Cache Poisoning (Kaminsky):** Floods resolver with forged responses matching transaction IDs. Mitigation: Source port randomization, DNSSEC.\n- **DNS Tunneling:** Encodes data in subdomain labels (e.g., \`data.evil.com`). Bypasses firewalls. Detection: Long subdomains, high query frequency.\n- **Zone Transfer (AXFR):** `dig axfr @ns1.example.com example.com\`. Downloads entire zone. Fix: Restrict AXFR to trusted secondary IPs in BIND config (\`allow-transfer { ip; };`).\n- **Fast Flux:** Rapidly rotating IPs behind a domain to evade takedowns. Used by botnets."
+        advanced: "**Attack Vectors:**\n- **Cache Poisoning (Kaminsky):** Floods resolver with forged responses matching transaction IDs. Mitigation: Source port randomization, DNSSEC.\n- **DNS Tunneling:** Encodes data in subdomain labels (e.g., \`data.evil.com\`). Bypasses firewalls. Detection: Long subdomains, high query frequency.\n- **Zone Transfer (AXFR):** \`dig axfr @ns1.example.com example.com\`. Downloads entire zone. Fix: Restrict AXFR to trusted secondary IPs in BIND config (\`allow-transfer { ip; };\`).\n- **Fast Flux:** Rapidly rotating IPs behind a domain to evade takedowns. Used by botnets."
       }
     ],
     practical: {
       title: "DNS Interrogation & Zone Transfer",
-      intro: "We will use `dig\` to extract intelligence from DNS records and attempt a zone transfer to demonstrate the risk of misconfiguration.",
+      intro: "We will use \`dig\` to extract intelligence from DNS records and attempt a zone transfer to demonstrate the risk of misconfiguration.",
       steps: [
         "Run \`dig target.thm ANY +noall +answer\`. View all record types.\n",
         "Query TXT records: \`dig target.thm TXT\`. Analyze SPF for internal IP ranges.\n",
@@ -823,7 +823,7 @@ Escape artists break out of these namespaces to access the host root.`,
         question: "What information does an SPF TXT record reveal?",
         options: ["Website content", "Authorized mail servers and internal IP ranges", "SSL certificate details", "Server OS version"],
         correctIndex: 1,
-        explanation: "SPF records list IPs authorized to send email. They often include internal IP ranges (e.g., \`ip4:10.0.0.0/8`), leaking network topology."
+        explanation: "SPF records list IPs authorized to send email. They often include internal IP ranges (e.g., \`ip4:10.0.0.0/8\`), leaking network topology."
       },
       {
         question: "Why is an unrestricted Zone Transfer (AXFR) dangerous?",
@@ -843,7 +843,7 @@ Escape artists break out of these namespaces to access the host root.`,
       "SPF records leak internal IP ranges.",
       "AXFR zone transfers expose entire network topology.",
       "DNS tunneling hides data exfiltration in DNS traffic.",
-      "Use `dig\` for comprehensive DNS reconnaissance."
+      "Use \`dig\` for comprehensive DNS reconnaissance."
     ]
   },
   {
@@ -922,11 +922,11 @@ Escape artists break out of these namespaces to access the host root.`,
       {
         title: "Packet Sniffing & Promiscuous Mode",
         beginner: "Normally, your network card ignores traffic not meant for it. Promiscuous mode makes it listen to everything. It’s like turning on a microphone in a crowded room to hear every conversation. This is essential for analysis. On switched networks, you only see your traffic unless you use port mirroring or ARP spoofing.",
-        advanced: "**Promiscuous Mode:**\nNIC passes all frames to OS. Enabled by Wireshark/tcpdump. \n**Capture Methods:**\n- **Direct Interface:** Local traffic only.\n- **Port Mirroring (SPAN):** Switch copies traffic to monitoring port.\n- **Network Tap:** Hardware inline copy.\n- **ARP Spoofing:** MITM redirection (illegal without auth).\n\n**Filters:**\n- **Capture Filter (BPF):** Applied during capture (e.g., \`tcp port 80`). Reduces file size.\n- **Display Filter:** Applied post-capture (e.g., `http.request.method == \"POST\"`). More flexible."
+        advanced: "**Promiscuous Mode:**\nNIC passes all frames to OS. Enabled by Wireshark/tcpdump. \n**Capture Methods:**\n- **Direct Interface:** Local traffic only.\n- **Port Mirroring (SPAN):** Switch copies traffic to monitoring port.\n- **Network Tap:** Hardware inline copy.\n- **ARP Spoofing:** MITM redirection (illegal without auth).\n\n**Filters:**\n- **Capture Filter (BPF):** Applied during capture (e.g., \`tcp port 80\`). Reduces file size.\n- **Display Filter:** Applied post-capture (e.g., \`http.request.method == \"POST\"\`). More flexible."
       },
       {
         title: "Wireshark Display Filters",
-        beginner: "Wireshark shows thousands of packets. Filters help you find the needle. `http\` shows web traffic. \`ip.addr == 1.2.3.4\` shows traffic for a specific IP. \`http.request.method == \"POST\"\` shows login attempts. Combine them with \`&&\` (AND) and \`||\` (OR).",
+        beginner: "Wireshark shows thousands of packets. Filters help you find the needle. \`http\` shows web traffic. \`ip.addr == 1.2.3.4\` shows traffic for a specific IP. \`http.request.method == \"POST\"\` shows login attempts. Combine them with \`&&\` (AND) and \`||\` (OR).",
         advanced: "**Key Filters:**\n- \`http.request.method == \"POST\"\`: Login forms.\n- \`ip.addr == 192.168.1.100\`: Specific host.\n- \`tcp.port == 21\`: FTP.\n- \`dns\`: DNS queries.\n- \`tcp.flags.syn == 1 && tcp.flags.ack == 0\`: SYN scans.\n- \`frame.len > 1000\`: Large packets (exfiltration).\n- \`http contains \"password\"\`: Cleartext creds.\n\n**Strategy:** Start broad, narrow by method, add content match, exclude noise."
       },
       {
@@ -987,12 +987,12 @@ Escape artists break out of these namespaces to access the host root.`,
       {
         title: "HTTP Methods: The Verbs of the Web",
         beginner: "Think of HTTP methods as verbs in a sentence. GET is 'read this page.' POST is 'submit this form.' PUT is 'update this record.' DELETE is 'remove this item.' Most websites only use GET and POST, but developers sometimes leave PUT and DELETE open by mistake. If a hacker finds an open DELETE method on a user profile URL, they might be able to delete accounts just by sending the right command.",
-        advanced: "HTTP/1.1 defines several request methods (RFC 7231):\n- **GET**: Retrieves resources. Idempotent (safe to retry). Parameters visible in URL query strings.\n- **POST**: Submits data to be processed. Non-idempotent. Data in request body (not logged in server access logs by default).\n- **PUT**: Replaces target resource with request payload. Idempotent.\n- **DELETE**: Removes target resource. Idempotent.\n- **PATCH**: Partial modification.\n- **OPTIONS**: Returns supported methods (CORS preflight).\n\n**Security Risk:** Improper implementation of PUT/DELETE can lead to Unauthorized Resource Modification. Attackers use \`curl -X DELETE https://target.com/api/user/1\` to test. Defense: Explicitly disable unused methods in web server config (e.g., Apache \`LimitExcept GET POST`)."
+        advanced: "HTTP/1.1 defines several request methods (RFC 7231):\n- **GET**: Retrieves resources. Idempotent (safe to retry). Parameters visible in URL query strings.\n- **POST**: Submits data to be processed. Non-idempotent. Data in request body (not logged in server access logs by default).\n- **PUT**: Replaces target resource with request payload. Idempotent.\n- **DELETE**: Removes target resource. Idempotent.\n- **PATCH**: Partial modification.\n- **OPTIONS**: Returns supported methods (CORS preflight).\n\n**Security Risk:** Improper implementation of PUT/DELETE can lead to Unauthorized Resource Modification. Attackers use \`curl -X DELETE https://target.com/api/user/1\` to test. Defense: Explicitly disable unused methods in web server config (e.g., Apache \`LimitExcept GET POST\`)."
       },
       {
         title: "Headers & Status Codes: The Metadata",
         beginner: "Every web request has a header, like the envelope of a letter. It tells the server who you are, what browser you use, and what language you speak. The server replies with a status code: 200 means 'OK,' 404 means 'Not Found,' 403 means 'Forbidden,' and 500 means 'Server Error.' Hackers look for 500 errors because they often reveal database details or code paths. They also look for 403 Forbidden pages to see if they can bypass them by changing headers.",
-        advanced: "**Key Request Headers:**\n- `Host\`: Target domain (virtual hosting).\n- \`User-Agent\`: Client identity (often spoofed for testing).\n- \`Cookie\`: Session tokens.\n- \`Authorization\`: Bearer tokens or Basic Auth credentials.\n- \`X-Forwarded-For\`: Original client IP (if behind proxy). Spoofable.\n\n**Key Response Headers:**\n- \`Set-Cookie\`: Issues session cookie.\n- \`Content-Type\`: MIME type of response.\n- \`X-Powered-By\`: Leaks server technology (e.g., Express, PHP/7.4). Security risk.\n- \`Strict-Transport-Security\`: Enforces HTTPS.\n\n**Status Codes:**\n- **2xx (Success):** 200 OK, 201 Created, 204 No Content.\n- **3xx (Redirection):** 301 Permanent, 302 Temporary (open redirect vulnerability).\n- **4xx (Client Error):** 400 Bad Request, 401 Unauthorized (auth needed), 403 Forbidden (auth failed/insufficient perms), 404 Not Found.\n- **5xx (Server Error):** 500 Internal Server Error (often leaks stack traces), 502 Bad Gateway, 503 Service Unavailable."
+        advanced: "**Key Request Headers:**\n- \`Host\`: Target domain (virtual hosting).\n- \`User-Agent\`: Client identity (often spoofed for testing).\n- \`Cookie\`: Session tokens.\n- \`Authorization\`: Bearer tokens or Basic Auth credentials.\n- \`X-Forwarded-For\`: Original client IP (if behind proxy). Spoofable.\n\n**Key Response Headers:**\n- \`Set-Cookie\`: Issues session cookie.\n- \`Content-Type\`: MIME type of response.\n- \`X-Powered-By\`: Leaks server technology (e.g., Express, PHP/7.4). Security risk.\n- \`Strict-Transport-Security\`: Enforces HTTPS.\n\n**Status Codes:**\n- **2xx (Success):** 200 OK, 201 Created, 204 No Content.\n- **3xx (Redirection):** 301 Permanent, 302 Temporary (open redirect vulnerability).\n- **4xx (Client Error):** 400 Bad Request, 401 Unauthorized (auth needed), 403 Forbidden (auth failed/insufficient perms), 404 Not Found.\n- **5xx (Server Error):** 500 Internal Server Error (often leaks stack traces), 502 Bad Gateway, 503 Service Unavailable."
       },
       {
         title: "DevTools Network Tab: The X-Ray Vision",
@@ -1007,7 +1007,7 @@ Escape artists break out of these namespaces to access the host root.`,
         "Open any web application in Chrome/Firefox. Press F12 to open DevTools. Go to the 'Network' tab.",
         "Perform an action (e.g., login, search). Observe the new requests appearing. Filter by 'XHR' to see API calls.",
         "Click on a POST request. Inspect the 'Payload' tab to see submitted data. Check the 'Headers' tab for \`X-Powered-By\` or \`Server\` headers that reveal technology stack.",
-        "Right-click the request → 'Copy as cURL'. Paste into a terminal. Modify a parameter (e.g., change \`id=1\` to \`id=2`) and resend to test for IDOR (Insecure Direct Object Reference)."
+        "Right-click the request → 'Copy as cURL'. Paste into a terminal. Modify a parameter (e.g., change \`id=1\` to \`id=2\`) and resend to test for IDOR (Insecure Direct Object Reference)."
       ],
       goal: "Master the ability to view, understand, and replay HTTP requests using native browser tools."
     },
@@ -1028,7 +1028,7 @@ Escape artists break out of these namespaces to access the host root.`,
         question: "Why is the 'X-Powered-By' header considered a security risk?",
         options: ["It slows down the server", "It reveals the underlying technology stack", "It encrypts the connection", "It blocks hackers"],
         correctIndex: 1,
-        explanation: "Headers like `X-Powered-By: Express\` or \`Server: Apache/2.4.49\` tell attackers exactly what software versions are running, allowing them to search for specific CVEs targeting those versions."
+        explanation: "Headers like \`X-Powered-By: Express\` or \`Server: Apache/2.4.49\` tell attackers exactly what software versions are running, allowing them to search for specific CVEs targeting those versions."
       }
     ],
     keyTakeaways: [
@@ -1069,7 +1069,7 @@ Escape artists break out of these namespaces to access the host root.`,
       steps: [
         "Start Burp Suite. Ensure Proxy → Intercept is 'On'. Configure browser proxy to 127.0.0.1:8080.",
         "Submit a form on a target site (e.g., login). Burp captures the request.",
-        "Modify the request body: Change a parameter value (e.g., \`price=100\` to \`price=1`).",
+        "Modify the request body: Change a parameter value (e.g., \`price=100\` to \`price=1\`).",
         "Forward the request. Observe the response. Did the server accept the modified value?",
         "Send the request to Repeater (Ctrl+R). Test different values manually to map server behavior."
       ],
@@ -1114,7 +1114,7 @@ Escape artists break out of these namespaces to access the host root.`,
       {
         title: "Stateless HTTP & Session Management",
         beginner: "HTTP doesn't remember you. Every time you click a link, it’s like meeting the server for the first time. To fix this, servers give you a 'Session ID' stored in a cookie. Your browser sends this cookie with every request. The server looks up the ID to remember who you are. If someone steals your cookie, they become you.",
-        advanced: "HTTP is stateless. Session management maintains state across requests.\n**Mechanism:**\n1. User authenticates.\n2. Server generates unique Session ID (high entropy random string).\n3. Server stores Session ID ↔ User Data mapping (in memory/DB).\n4. Server sends Session ID to client via `Set-Cookie\` header.\n5. Client includes Cookie in subsequent requests.\n\n**Vulnerability:** Session Fixation (attacker sets known session ID), Session Prediction (weak randomness), and Session Sniffing (unencrypted transmission)."
+        advanced: "HTTP is stateless. Session management maintains state across requests.\n**Mechanism:**\n1. User authenticates.\n2. Server generates unique Session ID (high entropy random string).\n3. Server stores Session ID ↔ User Data mapping (in memory/DB).\n4. Server sends Session ID to client via \`Set-Cookie\` header.\n5. Client includes Cookie in subsequent requests.\n\n**Vulnerability:** Session Fixation (attacker sets known session ID), Session Prediction (weak randomness), and Session Sniffing (unencrypted transmission)."
       },
       {
         title: "JWT Anatomy & Risks",
@@ -1132,7 +1132,7 @@ Escape artists break out of these namespaces to access the host root.`,
       intro: "Inspect session cookies and JWTs to identify missing security flags and decode payload data.",
       steps: [
         "Log in to a target app. Open DevTools → Application → Cookies.",
-        "Check for \`HttpOnly`, `Secure`, and `SameSite\` flags. Note missing flags.",
+        "Check for \`HttpOnly\`, \`Secure\`, and \`SameSite\` flags. Note missing flags.",
         "If JWT is used, copy the token. Decode the Payload section at jwt.io.",
         "Check for sensitive data in Payload (e.g., internal IDs, roles). Attempt to modify 'role' to 'admin' and resign if possible (for educational purposes only)."
       ],
@@ -1143,7 +1143,7 @@ Escape artists break out of these namespaces to access the host root.`,
         question: "What does the HttpOnly cookie flag prevent?",
         options: ["Cookie theft via network sniffing", "JavaScript access to the cookie (XSS)", "Cookie expiration", "Cross-Site Request Forgery"],
         correctIndex: 1,
-        explanation: "HttpOnly prevents client-side scripts (JavaScript) from accessing the cookie via \`document.cookie`, mitigating cookie theft via Cross-Site Scripting (XSS)."
+        explanation: "HttpOnly prevents client-side scripts (JavaScript) from accessing the cookie via \`document.cookie\`, mitigating cookie theft via Cross-Site Scripting (XSS)."
       },
       {
         question: "Is the payload of a JWT encrypted?",
@@ -1176,26 +1176,26 @@ Escape artists break out of these namespaces to access the host root.`,
     concepts: [
       {
         title: "What is SQL Injection?",
-        beginner: "SQL Injection happens when a website puts your input directly into a database command. Imagine a login form that builds a command like: `SELECT * FROM users WHERE name = '` + YOUR_INPUT + `'\`. If you type \`' OR '1'='1`, the command becomes `SELECT * FROM users WHERE name = '' OR '1'='1'\`. Since '1'='1' is always true, the database returns all users. You’ve just logged in as the first user (often admin) without a password.",
+        beginner: "SQL Injection happens when a website puts your input directly into a database command. Imagine a login form that builds a command like: \`SELECT * FROM users WHERE name = '\` + YOUR_INPUT + \`'\`. If you type \`' OR '1'='1\`, the command becomes \`SELECT * FROM users WHERE name = '' OR '1'='1'\`. Since '1'='1' is always true, the database returns all users. You’ve just logged in as the first user (often admin) without a password.",
         advanced: "SQLi occurs when untrusted input is concatenated into SQL queries. \n**Types:**\n- **In-Band:** Error-based (leaks DB info) or Union-based (extracts data via UNION SELECT).\n- **Blind:** Boolean-based (true/false responses) or Time-based (delays indicate truth).\n- **Out-of-Band:** Uses DNS/HTTP requests to exfiltrate data (rare).\n\n**Impact:** Authentication bypass, data extraction, modification, deletion, and remote code execution (via \`xp_cmdshell\` in MSSQL or \`LOAD_FILE\` in MySQL)."
       },
       {
         title: "Union-Based & Blind SQLi",
         beginner: "Union-based SQLi lets you combine results from two tables. If you know the number of columns, you can ask the database to show you data from other tables (like passwords) alongside the normal results. Blind SQLi is harder: the page doesn’t show data, but you can ask true/false questions. 'Does the password start with A?' If the page loads normally, yes. If it errors, no. You repeat this for every letter.",
-        advanced: "**Union-Based:**\nRequires knowing column count (\`ORDER BY 1,2,3...`).\nPayload: `' UNION SELECT username, password FROM users --`\nExtracts data directly into the response.\n\n**Blind Boolean:**\nPayload: `' AND (SELECT SUBSTRING(password,1,1) FROM users LIMIT 1) = 'a' --\`\nIf true, page loads normally. If false, content changes/errors.\n\n**Blind Time-Based:**\nPayload: \`' AND IF(1=1, SLEEP(5), 0) --`\nIf true, server delays 5 seconds. Used when no visual feedback exists."
+        advanced: "**Union-Based:**\nRequires knowing column count (\`ORDER BY 1,2,3...\`).\nPayload: \`' UNION SELECT username, password FROM users --\`\nExtracts data directly into the response.\n\n**Blind Boolean:**\nPayload: \`' AND (SELECT SUBSTRING(password,1,1) FROM users LIMIT 1) = 'a' --\`\nIf true, page loads normally. If false, content changes/errors.\n\n**Blind Time-Based:**\nPayload: \`' AND IF(1=1, SLEEP(5), 0) --\`\nIf true, server delays 5 seconds. Used when no visual feedback exists."
       },
       {
         title: "Defense: Parameterized Queries",
-        beginner: "The only way to stop SQLi is to separate code from data. Parameterized queries (Prepared Statements) treat user input as data, not code. The database compiles the command first, then plugs in the data. Even if you type `' OR '1'='1`, the database treats it as a literal string name, not a command. It’s like putting input in a sealed box that can’t escape.",
-        advanced: "**Parameterized Queries (Prepared Statements):**\nUse placeholders (`?` or `:name`) instead of concatenation.\nExample (Java JDBC):\n`PreparedStatement stmt = conn.prepareStatement('SELECT * FROM users WHERE name = ?');`\n`stmt.setString(1, userInput);`\n\nThe driver sends the query structure and data separately. The database engine treats data strictly as values, preventing injection.\n\n**Other Defenses:**\n- Input Validation (whitelist allowed chars).\n- Least Privilege (DB user has minimal permissions).\n- WAF (Web Application Firewall) rules for SQL patterns.\n- ORM (Object-Relational Mapping) frameworks often use prepared statements internally."
+        beginner: "The only way to stop SQLi is to separate code from data. Parameterized queries (Prepared Statements) treat user input as data, not code. The database compiles the command first, then plugs in the data. Even if you type \`' OR '1'='1\`, the database treats it as a literal string name, not a command. It’s like putting input in a sealed box that can’t escape.",
+        advanced: "**Parameterized Queries (Prepared Statements):**\nUse placeholders (\`?\` or \`:name\`) instead of concatenation.\nExample (Java JDBC):\n\`PreparedStatement stmt = conn.prepareStatement('SELECT * FROM users WHERE name = ?');\`\n\`stmt.setString(1, userInput);\`\n\nThe driver sends the query structure and data separately. The database engine treats data strictly as values, preventing injection.\n\n**Other Defenses:**\n- Input Validation (whitelist allowed chars).\n- Least Privilege (DB user has minimal permissions).\n- WAF (Web Application Firewall) rules for SQL patterns.\n- ORM (Object-Relational Mapping) frameworks often use prepared statements internally."
       }
     ],
     practical: {
       title: "Exploiting & Fixing SQL Injection",
       intro: "Identify a SQLi vulnerability, extract data using Union-based technique, and understand how parameterized queries prevent it.",
       steps: [
-        "Find a vulnerable parameter (e.g., `?id=1`). Test with `'\` to trigger error.\n",
-        "Determine column count: \`ORDER BY 1`, `ORDER BY 2\`... until error.\n",
+        "Find a vulnerable parameter (e.g., \`?id=1\`). Test with \`'\` to trigger error.\n",
+        "Determine column count: \`ORDER BY 1\`, \`ORDER BY 2\`... until error.\n",
         "Extract data: \`UNION SELECT 1, table_name FROM information_schema.tables --\`.\n",
         "Review code: Compare vulnerable string concatenation vs secure parameterized query examples."
       ],
