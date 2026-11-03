@@ -20,11 +20,13 @@ import { C_LESSONS } from './cLessons';
 import { C_EXPERT_LESSONS } from './cExpertLessons';
 import { CPP_LESSONS } from './cppLessons';
 import { CPP_EXPERT_LESSONS } from './cppExpertLessons';
+import { CYBER_LESSONS } from './cyberLessons';
 
 export type LessonTrackKey =
   | 'frontend'
   | 'networking'
   | 'fullstack'
+  | 'cyber'
   | 'freelance'
   | 'real-freelance'
   | 'python'
@@ -49,6 +51,7 @@ export const TRACK_LESSON_IDS: Record<LessonTrackKey, string[]> = {
   frontend: getAllLessons().map(l => l.id),
   networking: ids(NETWORKING_LESSONS),
   fullstack: ids(FULLSTACK_LESSONS),
+  cyber: ids(CYBER_LESSONS),
   freelance: ids(FREELANCE_LESSONS),
   'real-freelance': ids(REAL_FREELANCE_LESSONS),
   python: ids(PYTHON_LESSONS),
@@ -72,6 +75,7 @@ export const TRACK_LESSON_LABELS: Record<LessonTrackKey, string> = {
   frontend: 'Frontend',
   networking: 'Networking',
   fullstack: 'Full Stack',
+  cyber: 'Cyber Security',
   freelance: 'Freelance',
   'real-freelance': 'Real-World Freelancing',
   python: 'Python',
@@ -117,6 +121,7 @@ export const TRACK_BASE_URLS: Record<LessonTrackKey, string> = {
   frontend: '/lesson',
   networking: '/n-lesson',
   fullstack: '/fs-lesson',
+  cyber: '/cyber-lesson',
   freelance: '/f-lesson',
   'real-freelance': '/rf-lesson',
   python: '/py-lesson',
