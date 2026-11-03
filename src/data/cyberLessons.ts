@@ -546,7 +546,7 @@ It confines programs. If Apache is hacked, SELinux prevents it from spawning a s
     terminalNotice: 'Ethical Warning: Process injection techniques described here are dual-use. Use only for authorized red team engagements or malware research in isolated VMs.',
     philosophy: `Malware doesn't just run; it hides. It injects code into legitimate processes (like \`explorer.exe\` or \`svchost.exe\`) to blend in. It manipulates namespaces to isolate itself from the host. It tampers with syscall tables to lie to monitoring tools.
 
-To catch stealthy threats, defenders must look beyond process names. They analyze memory maps, network connections tied to PIDs, and behavioral anomalies. Understanding how attackers evade detection is the only way to build detectors that actually work.`
+To catch stealthy threats, defenders must look beyond process names. They analyze memory maps, network connections tied to PIDs, and behavioral anomalies. Understanding how attackers evade detection is the only way to build detectors that actually work.`,
     concepts: [
       {
         title: 'Process Injection & Hollowing',
