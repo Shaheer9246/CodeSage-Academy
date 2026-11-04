@@ -23,6 +23,7 @@ import { C_LESSONS } from '@/data/cLessons';
 import { C_EXPERT_LESSONS } from '@/data/cExpertLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
 import { CPP_EXPERT_LESSONS } from '@/data/cppExpertLessons';
+import { CYBER_LESSONS } from '@/data/cyberLessons';
 
 /* ------------------------------------------------------------------ */
 /*  TYPES + DATA (identical shape to your original — just re-authored) */
@@ -39,7 +40,7 @@ interface TrackNode {
   routePrefix:
     | 'lesson' | 'n-lesson' | 'fs-lesson' | 'f-lesson'
     | 'py-lesson' | 'local-lesson' | 'sql-lesson' | 'pyx-lesson'| 'ai-lesson' | 'iai-lesson' | 'adv-ai-lesson' | 'three-lesson' | 'rf-lesson'
-    | 'java-lesson' | 'javax-lesson'| 'cpp-lesson' | 'cppx-lesson' | 'c-lesson' | 'cx-lesson';
+    | 'java-lesson' | 'javax-lesson'| 'cpp-lesson' | 'cppx-lesson' | 'c-lesson' | 'cx-lesson' | 'cyber-lesson';
   locked?: boolean;
 }
 
@@ -137,10 +138,17 @@ const TRACKS_DATA: Record<string, TrackNode[]> = {
   javaexpert: buildTrack(JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '☕' })), 'javax-lesson', 'Module 1: Advanced Java', 'JAVA EXPERT MASTER'),
   c: buildTrack(C_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '⚡' })), 'c-lesson', 'Module 1: C Foundations', 'C MASTER'),
   cexpert: buildTrack(C_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '💻' })), 'cx-lesson', 'Module 1: Advanced C', 'C EXPERT MASTER'),
+  cyber: buildTrack(
+    CYBER_LESSONS.map(l => ({ id: l.id, title: l.title, icon: l.icon || '🛡️' })),
+    'cyber-lesson',
+    'Module 1: Hacker Mindset & Foundations',
+    'CYBER DEFENDER'
+  ),
  };
 
 const TRACKS = [
   { key: 'frontend',     label: 'Frontend Dev' },
+  { key: 'cyber',        label: 'Cyber Security' },
   { key: 'java',         label: 'Java' },
   { key: 'javaexpert',   label: 'Java Expert' },
   { key: 'c',            label: 'C' },
@@ -163,6 +171,7 @@ const TRACKS = [
 
 const TRACK_KEY_TO_ENROLL_TRACK: Record<string, TrackId> = {
   frontend: 'frontend',
+  cyber: 'cyber',
   networking: 'networking',
   fullstack: 'fullstack',
   freelance: 'freelance',
@@ -524,6 +533,20 @@ interface CareerPath {
 }
 
 const CAREER_PATHS: CareerPath[] = [
+  {
+    id: 'cyber-career',
+    title: 'Cyber Security & Ethical Hacker',
+    subtitle: 'From network fundamentals to vulnerability exploitation and SOC defense',
+    icon: '🛡️',
+    duration: '3–5 Months',
+    badge: 'New Track',
+    steps: [
+      { title: 'Computer Systems & Network Architecture', trackKey: 'networking' },
+      { title: 'Cyber Security & Ethical Hacking', trackKey: 'cyber' },
+      { title: 'Python for Beginners & Scripting', trackKey: 'python' },
+      { title: 'SQL & Database Security', trackKey: 'sql' },
+    ],
+  },
   {
     id: 'fullstack-career',
     title: 'Full-Stack Developer',
