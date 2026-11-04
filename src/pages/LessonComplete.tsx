@@ -20,6 +20,7 @@ import { C_EXPERT_LESSONS } from '@/data/cExpertLessons';
 import { CPP_LESSONS } from '@/data/cppLessons';
 import { CPP_EXPERT_LESSONS } from '@/data/cppExpertLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
+import { CYBER_LESSONS } from '@/data/cyberLessons';
 import { 
   Trophy, Zap, Coins, Flame, ArrowRight, BookOpen, RotateCcw, Sparkles,
   CheckCircle2, XCircle, AlertTriangle, Award, ChevronDown, ChevronUp, Check, X,
@@ -68,10 +69,12 @@ const TRACKS: Track[] = [
   { prefix: 'javax-',      path: '/javax-lesson', list: JAVA_EXPERT_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'free-',       path: '/f-lesson',     list: FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
   { prefix: 'real-free-',  path: '/rf-lesson',    list: REAL_FREELANCE_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
+  { prefix: 'cyber-',      path: '/cyber-lesson', list: CYBER_LESSONS.map(l => ({ id: l.id, title: l.title, keyTakeaways: (l as any).keyTakeaways, quiz: (l as any).quiz || (l as any).questions, topic: (l as any).topic, challenge: (l as any).challenge })) },
 ];
 
 const TRACK_HOME: Record<string, string> = {
   'net-': '/networking',
+  'cyber-': '/cyber',
   'ai-': '/ai-fundamentals',
   'aiin-': '/intermediate-ai',
   'aiadv-': '/advanced-ai',
