@@ -216,6 +216,9 @@ export function getLessonDetails(lessonId: string): {
       } else if (trackKey === 'cppexpert') {
         const found = CPP_EXPERT_LESSONS.find(l => l.id === lessonId);
         if (found) title = found.title;
+      } else if (trackKey === 'cyber') {
+        const found = CYBER_LESSONS.find(l => l.id === lessonId);
+        if (found) title = found.title;
       }
 
       return {
