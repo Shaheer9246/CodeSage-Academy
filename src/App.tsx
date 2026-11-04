@@ -29,6 +29,8 @@ import LessonPage from "./pages/LessonPage";
 import LessonComplete from "./pages/LessonComplete";
 import NetworkingLearn from "./pages/NetworkingLearn";
 import NetworkingLessonPage from "./pages/NetworkingLessonPage";
+import CyberLearn from "./pages/CyberLearn";
+import CyberLessonPage from "./pages/CyberLessonPage";
 import AiFundamentalsLearn from "./pages/AiFundamentalsLearn";
 import AiFundamentalsLessonPage from "./pages/AiFundamentalsLessonPage";
 import IntermediateAiLearn from "./pages/IntermediateAiLearn";
@@ -208,6 +210,8 @@ const App = () => {
                   <Route path="/lesson/:id/complete" element={<ProtectedRoute><LessonComplete /></ProtectedRoute>} />
                   <Route path="/n-lesson/:id" element={<ProtectedRoute><NetworkingLessonPage /></ProtectedRoute>} />
                   <Route path="/networking" element={<ProtectedRoute><NetworkingLearn /></ProtectedRoute>} />
+                  <Route path="/cyber" element={<ProtectedRoute><CyberLearn /></ProtectedRoute>} />
+                  <Route path="/cyber-lesson/:id" element={<ProtectedRoute><CyberLessonPage /></ProtectedRoute>} />
                   <Route path="/freelance" element={<ProtectedRoute><FreelanceLearn /></ProtectedRoute>} />
                   <Route path="/f-lesson/:id" element={<ProtectedRoute><FreelanceLessonPage /></ProtectedRoute>} />
                   <Route path="/fullstack" element={<ProtectedRoute><FullstackLearn /></ProtectedRoute>} />
