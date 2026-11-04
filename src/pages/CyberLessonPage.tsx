@@ -7,6 +7,7 @@ import {
   ArrowLeft, BookOpen, FlaskConical, ClipboardCheck,
   Check, X, ChevronRight, ChevronLeft, GraduationCap, Sparkles, Lightbulb, Terminal, Shield, type LucideIcon
 } from 'lucide-react';
+import { CyberTerminal } from '@/components/cyber/CyberTerminal';
 
 // --- Types (Local definitions to ensure type safety without circular deps) ---
 interface Concept {
@@ -111,6 +112,7 @@ export default function CyberLessonPage() {
   const [openConceptIndex, setOpenConceptIndex] = useState<number | null>(0);
   
   // Practical State
+  const [labMode, setLabMode] = useState<'terminal' | 'checklist'>('terminal');
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
   // Quiz State
@@ -191,6 +193,32 @@ export default function CyberLessonPage() {
 
   const renderPractical = () => (
     <div className="space-y-6">
+      {/* Mode Switcher */}
+      <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 w-fit">
+        <button
+          onClick={() => setLabMode('terminal')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            labMode === 'terminal'
+              ? 'bg-emerald-500 text-slate-950 shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Terminal size={14} />
+          <span>Interactive Terminal</span>
+        </button>
+        <button
+          onClick={() => setLabMode('checklist')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            labMode === 'checklist'
+              ? 'bg-emerald-500 text-slate-950 shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <ClipboardCheck size={14} />
+          <span>Simple Checklist</span>
+        </button>
+      </div>
+
       <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-6">
         <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
           <FlaskConical className="text-emerald-400" size={20} />
@@ -207,31 +235,41 @@ export default function CyberLessonPage() {
         </div>
       </div>
 
-      <div className="space-y-3">
-        {lesson.practical.steps.map((step, idx) => {
-          const isDone = completedSteps.has(idx);
-          return (
-            <div 
-              key={idx}
-              onClick={() => toggleStep(idx)}
-              className={`group flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
-                isDone 
-                  ? 'bg-slate-900/30 border-slate-800 opacity-60' 
-                  : 'bg-slate-800/40 border-slate-700 hover:border-indigo-500/50 hover:bg-slate-800/60'
-              }`}
-            >
-              <div className={`mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                isDone ? 'bg-indigo-500 border-indigo-500' : 'border-slate-600 group-hover:border-indigo-400'
-              }`}>
-                {isDone && <Check size={14} className="text-white" />}
+      {labMode === 'terminal' ? (
+        <CyberTerminal
+          lessonId={lesson.id}
+          steps={lesson.practical.steps}
+          goal={lesson.practical.goal}
+          completedSteps={completedSteps}
+          onToggleStep={toggleStep}
+        />
+      ) : (
+        <div className="space-y-3">
+          {lesson.practical.steps.map((step, idx) => {
+            const isDone = completedSteps.has(idx);
+            return (
+              <div 
+                key={idx}
+                onClick={() => toggleStep(idx)}
+                className={`group flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
+                  isDone 
+                    ? 'bg-slate-900/30 border-slate-800 opacity-60' 
+                    : 'bg-slate-800/40 border-slate-700 hover:border-indigo-500/50 hover:bg-slate-800/60'
+                }`}
+              >
+                <div className={`mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                  isDone ? 'bg-indigo-500 border-indigo-500' : 'border-slate-600 group-hover:border-indigo-400'
+                }`}>
+                  {isDone && <Check size={14} className="text-white" />}
+                </div>
+                <div className={`text-sm leading-relaxed ${isDone ? 'line-through text-slate-500' : 'text-slate-300'}`}>
+                  <FormattedText text={step} />
+                </div>
               </div>
-              <div className={`text-sm leading-relaxed ${isDone ? 'line-through text-slate-500' : 'text-slate-300'}`}>
-                <FormattedText text={step} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 
