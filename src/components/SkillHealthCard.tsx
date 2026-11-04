@@ -33,6 +33,7 @@ const TRACK_EMOJIS: Record<string, string> = {
   cppexpert: '⚙️',
   c: '🧩',
   cx: '🧩',
+  cyber: '🛡️',
 };
 
 interface SkillHealthCardProps {
