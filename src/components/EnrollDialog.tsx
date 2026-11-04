@@ -164,7 +164,7 @@ export default function EnrollDialog({ open, track, onClose, onEnrolled }: Props
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v && !isSubmitting) onClose(); }}>
-      <DialogContent className="glass-card border-primary/30 max-w-md w-[92vw] sm:w-full max-h-[85vh] overflow-y-auto">
+      <DialogContent className="glass-card border-primary/30 max-w-lg w-[94vw] sm:w-full max-h-[85vh] overflow-y-auto">
         {step === 'limit' && <LimitStep onBack={onClose} onChanged={refresh} />}
         {step === 'prereq' && (
           <PrereqStep
@@ -234,29 +234,29 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-2 my-2">
+         <div className="space-y-2 my-2.5">
         {list.map(e => (
           <div 
             key={e.track} 
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-secondary/30 rounded-xl p-2.5 sm:p-3 border border-border/40"
+            className="flex items-center justify-between gap-2.5 bg-secondary/30 rounded-xl px-3 py-2 border border-border/40"
           >
-            <div className="min-w-0 flex items-center gap-2">
+            <div className="min-w-0 flex items-center gap-2 flex-1">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-              <p className="text-xs font-display font-bold text-foreground truncate">
+              <p className="text-xs font-display font-bold text-foreground truncate" title={TRACK_META[e.track]?.label || e.track}>
                 {TRACK_META[e.track]?.label || e.track}
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => handlePause(e.track)}
                 disabled={actioningTrack !== null}
-                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/25 disabled:opacity-50 transition-all font-semibold"
+                className="flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/25 disabled:opacity-50 transition-all font-semibold"
               >
                 {actioningTrack === e.track ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3 h-3 animate-spin" />
                 ) : (
-                  <PauseCircle className="w-3.5 h-3.5" />
+                  <PauseCircle className="w-3 h-3" />
                 )}
                 <span>Pause</span>
               </button>
@@ -264,12 +264,12 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
               <button
                 onClick={() => handleEnd(e.track)}
                 disabled={actioningTrack !== null}
-                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25 disabled:opacity-50 transition-all font-semibold"
+                className="flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25 disabled:opacity-50 transition-all font-semibold"
               >
                 {actioningTrack === e.track ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3 h-3 animate-spin" />
                 ) : (
-                  <StopCircle className="w-3.5 h-3.5" />
+                  <StopCircle className="w-3 h-3" />
                 )}
                 <span>End</span>
               </button>
@@ -277,6 +277,7 @@ function LimitStep({ onBack, onChanged }: { onBack: () => void; onChanged: () =>
           </div>
         ))}
       </div>
+
 
       <div className="flex justify-end pt-1">
         <button
