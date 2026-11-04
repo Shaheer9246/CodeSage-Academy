@@ -27,6 +27,7 @@ import { THREE3D_LESSONS } from '@/data/three3dLessons';
 import { FREELANCE_LESSONS } from '@/data/freelanceLessons';
 import { REAL_FREELANCE_LESSONS } from '@/data/realfreelanceLesson';
 import { LOCAL_LESSONS } from '@/data/localLessons';
+import { CYBER_LESSONS } from '@/data/cyberLessons';
 
 export type AiTeacherMode = 'professor' | 'interviewer' | 'counselor';
 
@@ -194,6 +195,7 @@ const TRACK_CATALOG_DEFS: { id: string; name: string; badge: string; icon: strin
   { id: 'pythonexpert', name: 'Python Expert Systems', badge: '16 Lessons', icon: 'Cpu', list: PYTHON_EXPERT_LESSONS },
   { id: 'sql', name: 'SQL & Relational Databases', badge: '25 Lessons', icon: 'Database', list: SQL_LESSONS },
   { id: 'networking', name: 'Computer Systems & Networks', badge: '15 Lessons', icon: 'Network', list: NETWORKING_LESSONS },
+  { id: 'cyber', name: 'Cyber Security & Ethical Hacking', badge: '20 Missions', icon: 'Shield', list: CYBER_LESSONS },
   { id: 'fullstack', name: 'Full Stack Engineering', badge: '29 Lessons', icon: 'Layers', list: FULLSTACK_LESSONS },
   { id: 'c', name: 'Systems Programming in C', badge: '25 Lessons', icon: 'Binary', list: C_LESSONS },
   { id: 'cexpert', name: 'Advanced Low-Level C', badge: '16 Lessons', icon: 'Cpu', list: C_EXPERT_LESSONS },
