@@ -12,26 +12,27 @@ Everything about how the app is built, where data lives, and exactly what to tou
 
 ---
 
-## 2. Adding a NEW TRACK — the 10-step checklist
+## 2. Adding a NEW TRACK — the comprehensive checklist
 
-Use C++ as the reference implementation. Suppose your new track is `rust`.
+Use Cyber Security or C++ as reference implementations. Suppose your new track is `rust`.
 
 | # | File | What to add |
 |---|------|-------------|
 | 1 | `src/data/rustLessons.ts` | `RUST_LESSONS` array + `getRustLessonById()` + `isRustLessonUnlocked()`. Lesson ids must share a unique prefix, e.g. `rust-01`. |
-| 2 | `src/pages/RustLearn.tsx` | Track home page (lesson list + progress bar). Copy `CppLearn.tsx`. |
-| 3 | `src/pages/RustLessonPage.tsx` | Lesson viewer (concept / practical / quiz). Copy `CppLessonPage.tsx`. |
-| 4 | `src/App.tsx` | Two routes: `/rust` and `/rust-lesson/:id`, both wrapped in `<ProtectedRoute>`. |
-| 5 | `src/data/lessonIndex.ts` | Add `'rust'` to `LessonTrackKey`, `TRACK_LESSON_IDS`, `TRACK_LESSON_LABELS`. This one file drives Settings progress, Roadmap totals and the registry list. |
+| 2 | `src/pages/RustLearn.tsx` | Track home page (lesson list + progress bar). Copy `CyberLearn.tsx` or `CppLearn.tsx`. |
+| 3 | `src/pages/RustLessonPage.tsx` | Lesson viewer / interactive execution environment. Copy `CyberLessonPage.tsx` or `CppLessonPage.tsx`. |
+| 4 | `src/App.tsx` | Two routes: `/rust` and `/rust-lesson/:id`, wrapped in `<ProtectedRoute>` and lazy-loaded. |
+| 5 | `src/data/lessonIndex.ts` | Add `'rust'` to `LessonTrackKey`, `TRACK_LESSON_IDS`, `TRACK_LESSON_LABELS`, `TRACK_BASE_URLS`, and add the title lookup branch inside `getLessonDetails()`. Drives dashboard cards, settings progress, and roadmap totals. |
 | 6 | `src/lib/enrollment.ts` | Add `'rust'` to `TrackId`, `VALID_TRACK_IDS`, and a `TRACK_META.rust` entry (`label`, `short`, `route`, `idPrefix`, `seed`, optional `prereq`). |
-| 7 | **Database** | Add `'rust'` to the allowed list inside `enroll_track()` **and** insert every `rust-*` id into `lesson_registry`. Without the registry rows, `award_lesson` raises "Unknown lesson id" and progress silently fails. |
-| 8 | `src/pages/Dashboard.tsx` | Add a `SECTIONS` entry or a track object inside an existing section, plus `ROUTE_TO_TRACK['/rust']`, a `TOUR_STEPS` entry, and (optional) `GUEST_ALLOWED` + `GUEST_FIRST_LESSON` for guest previews. |
-| 9 | `src/pages/Roadmap.tsx` | Import the lessons, add the route prefix to the `routePrefix` union, add a `buildTrack(...)` entry, and add `{ key: 'rust', label: 'Rust' }` to `TRACKS`. |
-| 10 | `src/pages/LessonComplete.tsx` | Add a `TRACKS` row (`prefix: 'rust-'`, `path: '/rust-lesson'`) and `TRACK_HOME['rust-'] = '/rust'`, so the celebration card, "next lesson" and "lesson path" buttons work. |
+| 7 | **Database** | Add `'rust'` to the allowed list inside `enroll_track()` **and** insert every `rust-*` id into `lesson_registry`. Without registry rows, `award_lesson` raises "Unknown lesson id" and progress won't record. |
+| 8 | `src/pages/Dashboard.tsx` | Add `SECTIONS` entry (or add to an existing section), `ROUTE_TO_TRACK['/rust']`, `DashboardCategory`, `filterOptions`, `SEARCH_CATEGORIES`, `TOUR_STEPS`, and optional `GUEST_ALLOWED` + `GUEST_FIRST_LESSON`. |
+| 9 | `src/pages/Roadmap.tsx` | Import lessons, add route prefix to `TrackNode.routePrefix`, add `buildTrack(...)` in `TRACKS_DATA`, selector pill in `TRACKS`, and `TRACK_KEY_TO_ENROLL_TRACK`. Optionally add to `CAREER_PATHS`. |
+| 10 | `src/pages/LessonComplete.tsx` | Add a `TRACKS` row (`prefix: 'rust-'`, `path: '/rust-lesson'`) and `TRACK_HOME['rust-'] = '/rust'`, so the celebration card, "next lesson" and "course roadmap" buttons work. |
+| 11 | `src/components/EnrollDialog.tsx` | If the track has prerequisites, add a friendly `PREREQ_WARNING` recommendation copy and route CTA. |
+| 12 | `src/components/SkillHealthCard.tsx` | Add `rust: '🦀'` to `TRACK_EMOJIS` so the student skill breakdown card shows the correct badge icon. |
+| 13 | `src/services/aiTeacherService.ts` & `src/data/courseCurriculumGuide.ts` | Add to `TRACK_CATALOG_DEFS` (enables AI Teacher grounding on your lessons) and `COURSE_CURRICULUM` (powers top bar curriculum guide). |
 
-Optional: `src/components/EnrollDialog.tsx` — only needed if the track has prerequisites (add a `PREREQ_COPY` entry).
-
-**Rule of thumb:** if a lesson completes but progress disappears after refresh, you forgot step 7.
+**Rule of thumb:** if a lesson completes but progress disappears after refresh, you forgot step 7 (server `lesson_registry`).
 
 ---
 
@@ -103,6 +104,7 @@ Anonymous users cannot execute any of these; every table has RLS and explicit gr
 | SQL | `SqlWorkspace.tsx` — in-browser SQL engine | Queries run against a seeded demo dataset. |
 | Java | `JavaWorkspace.tsx` | Pattern/keyword validation of the exercise, not a real JVM. |
 | C++ | `CppWorkspace.tsx` | Same approach: guided validation; lesson 1 teaches installing a real g++/clang locally. |
+| Cyber Security | `CyberLessonPage.tsx` | In-browser simulated Linux terminal (`bash`, `nmap`, `grep`, `chmod`, `cat`, permissions, exploits, hashes) with objective tests and CTF flag verification. |
 | Playground | Monaco editor + LivePreview | Single-file or multi-folder mode, ZIP import/export, mobile cut/copy/paste, dockable console. |
 
 ---
