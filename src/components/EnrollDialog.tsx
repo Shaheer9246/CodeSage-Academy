@@ -49,6 +49,11 @@ const PREREQ_COPY: Partial<Record<TrackId, { title: string; body: string; ctas: 
     body: 'Before starting this offline runtime track, you should be familiar with the browser DOM and core frontend engineering. We recommend completing Modern Frontend Engineering first.',
     ctas: [{ label: 'Frontend course', route: '/learn' }],
   },
+  cyber: {
+    title: 'Start with Computer Systems & Network Architecture',
+    body: 'Hacking and cybersecurity rely fundamentally on how computers, operating systems, and network protocols function. We strongly recommend completing Computer Systems & Networks first.',
+    ctas: [{ label: 'Networking course', route: '/networking' }],
+  },
   python: {
     title: 'Start with Computer Systems & Network Architecture',
     body: 'Python runs on real machines. If you understand how computers, memory, and network sockets operate, Python systems programming clicks much faster. We recommend finishing Computer Systems & Networks first.',
