@@ -37,6 +37,7 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'c',          title: 'Systems Programming in C', body: 'Procedural programming, pointer arithmetic, and low-level memory layout.' },
   { target: 'cpp',        title: 'Modern C++ Engineering & RAII', body: 'Compilers, RAII memory management, STL algorithms, and high performance.' },
   { target: 'sql',        title: 'Relational Database Engineering & SQL', body: 'Relational design, indexing, complex joins, and query optimization.' },
+  { target: 'cyber',      title: 'Cyber Security & Practical Hacking', body: 'TryHackMe-style offensive & defensive security missions.' },
   { target: 'challenges', title: 'Algorithmic Challenges', body: 'Bite-sized puzzles to test engineering speed and logic.' },
   { target: 'playground', title: 'Interactive Code Editor', body: 'Multi-file web and script sandbox with instant execution.' },
 ];
@@ -76,6 +77,27 @@ const SECTIONS: SectionDef[] = [
         tour: 'networking', lessons: 13, accent: 'accent-blue',
         tags: ['Hardware', 'OS', 'DNS', 'HTTP'], desc: 'Hardware → OS → Networking → Security Architecture',
         trackId: 'networking' },
+    ],
+  },
+  {
+    id: 'cyber',
+    title: 'Cyber Security',
+    subtitle: 'Offensive & defensive security operations',
+    Icon: ShieldCheck,
+    gradient: 'from-cyan-400/70 via-teal-400/60 to-emerald-500/70',
+    tracks: [
+      {
+        id: 'cyber',
+        path: '/cyber?from=dashboard',
+        title: 'Cyber Security & Practical Hacking',
+        emoji: '🛡️',
+        tour: 'cyber',
+        lessons: 20,
+        accent: 'accent-cyan',
+        tags: ['Linux', 'Nmap', 'OWASP', 'Crypto'],
+        desc: 'TryHackMe-style offensive & defensive security missions',
+        trackId: 'cyber' as TrackId,
+      },
     ],
   },
   {
@@ -250,7 +272,7 @@ const Dashboard = () => {
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [enrollTick, setEnrollTick] = useState(0);
 
-  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'c' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'career';
+  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'c' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'cyber' | 'career';
   
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
@@ -295,12 +317,13 @@ const Dashboard = () => {
   };
   
   const GUEST_ALLOWED = new Set<string>([
-    '/learn', '/networking', '/python', '/freelance', '/sql', '/java',
+    '/learn', '/networking', '/cyber', '/python', '/freelance', '/sql', '/java',
   ]);
   
   const GUEST_FIRST_LESSON: Record<string, string> = {
     '/learn': '/lesson/html-1?guest=1',
     '/networking': '/n-lesson/net-1?guest=1',
+    '/cyber': '/cyber-lesson/cyber-1?guest=1',
     '/freelance': '/f-lesson/free-1?guest=1',
     '/python': '/py-lesson/py-01?guest=1',
     '/sql': '/sql-lesson/sql-01?guest=1',
@@ -308,7 +331,7 @@ const Dashboard = () => {
   };
   
   const ROUTE_TO_TRACK: Record<string, TrackId> = {
-    '/learn': 'frontend', '/networking': 'networking', '/fullstack': 'fullstack',
+    '/learn': 'frontend', '/networking': 'networking', '/cyber': 'cyber', '/fullstack': 'fullstack',
     '/freelance': 'freelance', '/real-freelance': 'real-freelance' as TrackId, '/python': 'python', '/local': 'local',
     '/sql': 'sql' as TrackId, '/pythonexpert': 'pythonexpert',
     '/ai-fundamentals': 'ai-fundamentals',
@@ -449,6 +472,7 @@ const Dashboard = () => {
     { id: 'sql', label: 'SQL & Backend', icon: Database },
     { id: 'ai', label: 'AI', icon: Sparkles },
     { id: 'fundamentals', label: 'Fundamentals', icon: Cpu },
+    { id: 'cyber', label: 'Cyber Security', icon: ShieldCheck },
     { id: 'career', label: 'Career', icon: Briefcase },
   ];
 
@@ -466,7 +490,7 @@ const Dashboard = () => {
   const searchRef = useRef<HTMLDivElement>(null);
 
   const SEARCH_CATEGORIES: {
-    id: DashboardCategory | 'cyber';
+    id: DashboardCategory;
     name: string;
     subtitle: string;
     emoji: string;
@@ -481,7 +505,7 @@ const Dashboard = () => {
     { id: 'frontend', name: 'Frontend Development', subtitle: 'HTML, CSS, JavaScript & React', emoji: '📱', keywords: ['frontend', 'html', 'css', 'javascript', 'js', 'react'] },
     { id: 'sql', name: 'SQL & Backend', subtitle: 'Relational DBs, queries & schemas', emoji: '🗄️', keywords: ['sql', 'database', 'backend', 'postgres'] },
     { id: 'fundamentals', name: 'Computer Fundamentals', subtitle: 'Hardware, OS & networking', emoji: '🌐', keywords: ['computer', 'hardware', 'os', 'networking', 'dns'] },
-    { id: 'cyber', name: 'Cyber Security', subtitle: 'Network defense & security', emoji: '🛡️', badge: 'Soon', keywords: ['cyber', 'security', 'hacking'] },
+    { id: 'cyber', name: 'Cyber Security', subtitle: 'Network defense & security', emoji: '🛡️', badge: 'Active', keywords: ['cyber', 'security', 'hacking', 'nmap', 'linux', 'crypto'] },
     { id: 'All', name: 'All Courses', subtitle: 'Show all tracks & modules', emoji: '📚', keywords: ['all', 'courses', 'tracks'] },
   ];
 
@@ -512,15 +536,9 @@ const Dashboard = () => {
     };
   }, []);
 
-  const handleSelectSearchCategory = (catId: DashboardCategory | 'cyber') => {
+  const handleSelectSearchCategory = (catId: DashboardCategory) => {
     setIsSearchOpen(false);
     setSearchQuery('');
-    
-    if (catId === 'cyber') {
-      toast.info('🛡️ Cyber Security track is in active development! Coming soon.');
-      return;
-    }
-
     setSelectedCategory(catId);
 
     setTimeout(() => {
