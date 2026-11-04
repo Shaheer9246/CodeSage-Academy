@@ -20,7 +20,8 @@ export type TrackId =
   | 'cpp'
   | 'cppexpert'
   | 'c'
-  | 'cx';
+  | 'cx'
+  | 'cyber';
 
 export type EnrollmentStatus = 'active' | 'paused' | 'ended' | 'completed';
 
@@ -54,7 +55,8 @@ const VALID_TRACK_IDS: Set<string> = new Set([
   'cpp',
   'cppexpert',
   'c',
-  'cx'
+  'cx',
+  'cyber'
 ]);
 
 
@@ -217,6 +219,14 @@ export const TRACK_META: Record<
     idPrefix: 'CS-CX',
     seed: 10,
     prereq: ['c'],
+  },
+  cyber: {
+    label: 'Cyber Security & Ethical Hacking',
+    short: 'Cyber Security',
+    route: '/cyber',
+    idPrefix: 'CS-SEC',
+    seed: 85,
+    prereq: ['networking'],
   },
 };
 
