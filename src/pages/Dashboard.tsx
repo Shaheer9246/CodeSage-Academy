@@ -562,9 +562,9 @@ const Dashboard = () => {
       <div className="relative z-10 flex flex-col lg:flex-row gap-5 lg:gap-6 max-w-[1720px] mx-auto px-3 sm:px-6 py-4 sm:py-6 lg:py-8">
 
         {/* ========================================================
-            COLUMN 1: DESKTOP SECONDARY LEFT SIDEBAR (w-[260px])
+            COLUMN 1: DESKTOP SECONDARY LEFT SIDEBAR (w-[240px])
             ======================================================== */}
-        <aside className="hidden lg:flex flex-col w-[260px] shrink-0 space-y-4">
+        <aside className="hidden lg:flex flex-col w-[240px] shrink-0 space-y-4">
           
                     {/* 1. YOUR TRACKS (Desktop) */}
           {!isGuest && (
@@ -729,7 +729,7 @@ const Dashboard = () => {
                   setSearchQuery(e.target.value);
                   setIsSearchOpen(true);
                 }}
-                className="w-full pl-10 pr-9 py-2 sm:py-2.5 rounded-xl bg-card/90 border border-border/70 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-xs sm:text-sm shadow-sm"
+                className="w-full pl-10 pr-9 py-2 sm:py-2.5 rounded-2xl glass-card border border-primary/20 bg-secondary/15 backdrop-blur-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-xs sm:text-sm shadow-sm placeholder:text-muted-foreground/60"
               />
               {searchQuery && (
                 <button 
@@ -814,11 +814,11 @@ const Dashboard = () => {
                 </p>
               </div>
               
-              <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-0.5 sm:mt-0">
+              <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 justify-start sm:justify-end shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
                 <button onClick={() => isGuest ? navigate('/auth') : setShowXpModal(true)}
-                  className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-full hover:neon-glow transition-all cursor-pointer">
-                  <Zap className="w-3 h-3 text-primary" />
-                  <span className="text-[11px] font-bold text-primary">{energy} / 10 XP</span>
+                  className="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full hover:neon-glow transition-all cursor-pointer">
+                  <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
+                  <span className="text-[10px] sm:text-xs font-bold text-primary">{energy} / 10 XP</span>
                 </button>
                 <div className="relative">
                   <button
@@ -829,11 +829,11 @@ const Dashboard = () => {
                         setShowCoinMenu(v => !v);
                       }
                     }}
-                    className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2 py-1 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
+                    className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full hover:border-yellow-500/60 transition-all cursor-pointer"
                     title="Sage Coins — Buy XP or Streak Freeze"
                   >
-                    <Coins className="w-3 h-3 text-yellow-400" />
-                    <span className="text-[11px] font-bold text-yellow-400">{sageCoins}</span>
+                    <Coins className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-400" />
+                    <span className="text-[10px] sm:text-xs font-bold text-yellow-400">{sageCoins}</span>
                   </button>
                   {showCoinMenu && !isGuest && (
                     <>
@@ -861,15 +861,15 @@ const Dashboard = () => {
                     </>
                   )}
                 </div>
-                <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-full">
-                  <Flame className="w-3.5 h-3.5 text-orange-400" />
-                  <span className="text-xs font-bold text-orange-400">{streak}d</span>
+                <div className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
+                  <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-400 fill-orange-400" />
+                  <span className="text-[10px] sm:text-xs font-bold text-orange-400">{streak}d</span>
                 </div>
                 {!isGuest && (
                   <>
-                    <div className="flex items-center gap-1 bg-primary/20 border border-primary/40 px-2.5 py-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]">
-                      <Trophy className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-xs font-bold text-primary">Lvl {user?.level || 1}</span>
+                    <div className="flex items-center gap-1 bg-primary/20 border border-primary/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]">
+                      <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
+                      <span className="text-[10px] sm:text-xs font-bold text-primary">Lvl {user?.level || 1}</span>
                     </div>
                     <InboxBadge asPillButton />
                     <SuggestionsBadge />
@@ -889,35 +889,35 @@ const Dashboard = () => {
               color="accent-blue" onClick={go('/exams')} disabled={isGuest} />
           </div>
 
-                    {/* 4. CONTINUE LEARNING BANNER */}
+          {/* 4. CONTINUE LEARNING BANNER */}
           {!isGuest && (
             activeContinueTrack ? (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
+                className="w-full glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-primary/25 bg-gradient-to-r from-primary/10 via-background to-accent-blue/5 relative overflow-hidden"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                <div className="flex items-center justify-between gap-3 relative z-10">
                   {(() => {
                     const isTrackFinished = (continueLessonInfo?.total || 0) > 0 && (continueLessonInfo?.done || 0) >= (continueLessonInfo?.total || 0);
                     return (
                       <>
-                        <div className="space-y-1 min-w-0 flex-1">
-                          <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
-                            <span className={`w-2 h-2 rounded-full ${isTrackFinished ? 'bg-amber-400' : 'bg-primary animate-pulse'}`} />
+                        <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] font-mono text-primary uppercase tracking-wider">
+                            <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isTrackFinished ? 'bg-amber-400' : 'bg-primary animate-pulse'}`} />
                             <span>{isTrackFinished ? 'Track Completed 🎓' : 'Continue Learning'}</span>
                             <span className="text-muted-foreground/60">·</span>
-                            <span className="text-muted-foreground">{activeContinueTrack.title}</span>
+                            <span className="text-muted-foreground truncate">{activeContinueTrack.title}</span>
                           </div>
 
-                          <h2 className="text-base sm:text-lg font-bold font-display text-foreground truncate">
+                          <h2 className="text-xs sm:text-base font-bold font-display text-foreground truncate">
                             {isTrackFinished 
-                              ? `All ${continueLessonInfo?.total} lessons finished! Outstanding work.`
+                              ? `All ${continueLessonInfo?.total} lessons finished!`
                               : continueLessonInfo?.nextLesson 
                                 ? `${continueLessonInfo.nextLesson.title}`
                                 : activeContinueTrack.title}
                           </h2>
                         </div>
 
-                        <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+                        <div className="flex flex-col items-end gap-1 sm:gap-1.5 shrink-0">
                           <button
                             onClick={() => {
                               if (continueLessonInfo?.nextLesson?.url && !isTrackFinished) {
@@ -926,13 +926,13 @@ const Dashboard = () => {
                                 navigate(activeContinueTrack.path);
                               }
                             }}
-                            className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
+                            className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
                           >
                             {isTrackFinished ? 'Review Track →' : 'Resume Lesson →'}
                           </button>
                           <button
                             onClick={go(activeContinueTrack.path)}
-                            className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+                            className="hidden sm:block text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
                           >
                             View Roadmap
                           </button>
@@ -944,22 +944,22 @@ const Dashboard = () => {
               </motion.div>
             ) : (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="w-full glass-card rounded-2xl p-4 sm:p-5 border border-primary/20 bg-gradient-to-r from-primary/5 via-background to-accent-blue/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="w-full glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-primary/20 bg-gradient-to-r from-primary/5 via-background to-accent-blue/5 flex items-center justify-between gap-3"
               >
                 <div>
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-wider">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
+                  <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-mono text-primary uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                     <span>Start Learning</span>
                   </div>
-                  <h2 className="text-sm sm:text-base font-bold font-display text-foreground mt-0.5">
-                    Ready to code? Pick your first course from the catalog below.
+                  <h2 className="text-xs sm:text-sm font-bold font-display text-foreground mt-0.5">
+                    Ready to code? Pick your first course below.
                   </h2>
                 </div>
                 <button
                   onClick={() => document.getElementById('course-catalog')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm self-start sm:self-auto"
+                  className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
                 >
-                  Explore Courses ↓
+                  Explore ↓
                 </button>
               </motion.div>
             )
@@ -1119,27 +1119,28 @@ const Dashboard = () => {
         </motion.main>
 
         {/* ========================================================
-            COLUMN 3: DESKTOP RIGHT SIDEBAR (w-[280px])
+            COLUMN 3: DESKTOP RIGHT SIDEBAR (w-[240px])
             ======================================================== */}
-        <aside className="hidden lg:flex flex-col w-[280px] shrink-0 space-y-4">
-          <div className="sticky top-6 space-y-4">
+        <aside className="hidden lg:flex flex-col w-[240px] shrink-0 space-y-4">
+          <div className="sticky top-6 space-y-3.5">
             
             <div className="flex items-center gap-2 px-1">
-              <Zap className="w-4 h-4 text-primary" />
-              <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground">Quick Tools</h3>
+              <Zap className="w-3.5 h-3.5 text-primary" />
+              <h3 className="font-display font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Quick Tools</h3>
             </div>
 
             {/* Daily Challenges */}
             <button
               onClick={go('/challenges')}
-              className="group relative w-full p-3.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-0.5 text-left overflow-hidden"
+              className="group relative w-full p-3 rounded-2xl glass-card border border-primary/20 bg-gradient-to-br from-secondary/30 via-background/60 to-purple-500/5 hover:border-purple-500/50 hover:bg-secondary/40 backdrop-blur-xl transition-all duration-300 hover:shadow-[0_8px_24px_rgba(168,85,247,0.18)] hover:-translate-y-0.5 text-left overflow-hidden"
             >
-              <div className="relative z-10 flex items-start justify-between">
-                <div>
-                  <h4 className="font-bold text-xs sm:text-sm text-foreground mb-0.5">Daily Challenges</h4>
-                  <p className="text-[11px] text-muted-foreground">Test your logic & DSA skills</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="relative z-10 flex items-center justify-between gap-2.5">
+                <div className="min-w-0">
+                  <h4 className="font-bold text-xs text-foreground group-hover:text-purple-300 transition-colors truncate">Daily Challenges</h4>
+                  <p className="text-[10px] text-muted-foreground truncate">Test logic & DSA skills</p>
                 </div>
-                <div className="p-1.5 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-purple-400">
+                <div className="p-2 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/25 transition-all shrink-0 shadow-[0_0_12px_rgba(168,85,247,0.25)]">
                   <Target className="w-4 h-4" />
                 </div>
               </div>
@@ -1148,14 +1149,15 @@ const Dashboard = () => {
             {/* Code Playground */}
             <button
               onClick={go('/playground')}
-              className="group relative w-full p-3.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-0.5 text-left overflow-hidden"
+              className="group relative w-full p-3 rounded-2xl glass-card border border-primary/20 bg-gradient-to-br from-secondary/30 via-background/60 to-primary/5 hover:border-primary/50 hover:bg-secondary/40 backdrop-blur-xl transition-all duration-300 hover:shadow-[0_8px_24px_rgba(var(--primary),0.18)] hover:-translate-y-0.5 text-left overflow-hidden"
             >
-              <div className="relative z-10 flex items-start justify-between">
-                <div>
-                  <h4 className="font-bold text-xs sm:text-sm text-foreground mb-0.5">Code Playground</h4>
-                  <p className="text-[11px] text-muted-foreground">Sandbox environment for snippets</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="relative z-10 flex items-center justify-between gap-2.5">
+                <div className="min-w-0">
+                  <h4 className="font-bold text-xs text-foreground group-hover:text-primary transition-colors truncate">Code Playground</h4>
+                  <p className="text-[10px] text-muted-foreground truncate">Sandbox environment</p>
                 </div>
-                <div className="p-1.5 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-cyan-400">
+                <div className="p-2 rounded-xl bg-primary/15 border border-primary/30 text-primary group-hover:scale-110 group-hover:bg-primary/25 transition-all shrink-0 shadow-[0_0_12px_rgba(var(--primary),0.25)]">
                   <Code className="w-4 h-4" />
                 </div>
               </div>
@@ -1164,42 +1166,53 @@ const Dashboard = () => {
             {/* Exams & Quizzes */}
             <button
               onClick={go('/exams')}
-              className="group relative w-full p-3.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-0.5 text-left overflow-hidden"
+              className="group relative w-full p-3 rounded-2xl glass-card border border-primary/20 bg-gradient-to-br from-secondary/30 via-background/60 to-cyan-500/5 hover:border-cyan-500/50 hover:bg-secondary/40 backdrop-blur-xl transition-all duration-300 hover:shadow-[0_8px_24px_rgba(6,182,212,0.18)] hover:-translate-y-0.5 text-left overflow-hidden"
             >
-              <div className="relative z-10 flex items-start justify-between">
-                <div>
-                  <h4 className="font-bold text-xs sm:text-sm text-foreground mb-0.5">Exams & Quizzes</h4>
-                  <p className="text-[11px] text-muted-foreground">Validate your knowledge level</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="relative z-10 flex items-center justify-between gap-2.5">
+                <div className="min-w-0">
+                  <h4 className="font-bold text-xs text-foreground group-hover:text-cyan-300 transition-colors truncate">Exams & Quizzes</h4>
+                  <p className="text-[10px] text-muted-foreground truncate">Validate knowledge level</p>
                 </div>
-                <div className="p-1.5 rounded-lg bg-secondary/50 group-hover:scale-110 transition-transform text-orange-400">
+                <div className="p-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 group-hover:scale-110 group-hover:bg-cyan-500/25 transition-all shrink-0 shadow-[0_0_12px_rgba(6,182,212,0.25)]">
                   <HelpCircle className="w-4 h-4" />
                 </div>
               </div>
             </button>
 
             {/* Status Card */}
-            <div className="p-3.5 rounded-xl bg-gradient-to-br from-secondary/50 to-background border border-border space-y-3">
-              <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Status</h4>
+            <div className="p-3.5 rounded-2xl glass-card border border-primary/20 bg-gradient-to-br from-secondary/25 via-background/70 to-yellow-500/5 backdrop-blur-xl space-y-3 shadow-lg">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  Live Status
+                </h4>
+                <span className="text-[9px] font-mono text-primary/90 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">Active</span>
+              </div>
               
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2 rounded-xl bg-secondary/30 border border-border/40">
                   <div className="flex items-center gap-2">
-                    <Coins className="w-3.5 h-3.5 text-yellow-500" />
-                    <span className="text-xs font-medium text-foreground">Sage Coins</span>
+                    <div className="w-6 h-6 rounded-lg bg-yellow-500/15 border border-yellow-500/30 flex items-center justify-center text-yellow-400">
+                      <Coins className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[11px] font-medium text-foreground">Sage Coins</span>
                   </div>
-                  <span className="text-xs font-bold text-yellow-500">{sageCoins}</span>
+                  <span className="text-xs font-bold text-yellow-400 font-mono">{sageCoins}</span>
                 </div>
                 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-2 rounded-xl bg-secondary/30 border border-border/40">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
-                    <span className="text-xs font-medium text-foreground">Current Streak</span>
+                    <div className="w-6 h-6 rounded-lg bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400">
+                      <Flame className="w-3.5 h-3.5 fill-orange-400" />
+                    </div>
+                    <span className="text-[11px] font-medium text-foreground">Streak</span>
                   </div>
-                  <span className="text-xs font-bold text-orange-500">{streak} Days</span>
+                  <span className="text-xs font-bold text-orange-400 font-mono">{streak}d</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-border/50">
+              <div className="pt-1">
                 <button 
                   onClick={() => {
                     if (isGuest) {
@@ -1208,26 +1221,32 @@ const Dashboard = () => {
                       setShowCoinMenu(v => !v);
                     }
                   }}
-                  className="w-full py-1.5 px-3 rounded-lg bg-secondary/50 hover:bg-secondary text-[11px] font-semibold text-foreground transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full py-2 px-3 rounded-xl bg-primary/15 hover:bg-primary text-primary hover:text-primary-foreground border border-primary/30 text-xs font-display font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-primary" /> Visit Coin Shop
+                  <ShieldCheck className="w-3.5 h-3.5" /> Visit Coin Shop
                 </button>
               </div>
             </div>
 
             {/* Quick Links */}
-            <div className="space-y-1">
+            <div className="space-y-1.5 p-1 rounded-2xl bg-secondary/10 border border-border/40 backdrop-blur-md">
               <button 
                 onClick={go('/dsa-sheet')}
-                className="w-full p-2 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
+                className="w-full p-2 rounded-xl hover:bg-secondary/50 hover:text-foreground transition-all text-xs font-semibold text-muted-foreground flex items-center gap-2 text-left group"
               >
-                <BookOpen className="w-3.5 h-3.5 text-primary" /> DSA Sheet (Top 75)
+                <div className="p-1 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                  <BookOpen className="w-3.5 h-3.5" />
+                </div>
+                <span>DSA Sheet (Top 75)</span>
               </button>
               <button 
                 onClick={isGuest ? () => navigate('/auth') : go('/suggestions')}
-                className="w-full p-2 rounded-lg hover:bg-secondary/40 transition-colors text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2 text-left"
+                className="w-full p-2 rounded-xl hover:bg-secondary/50 hover:text-foreground transition-all text-xs font-semibold text-muted-foreground flex items-center gap-2 text-left group"
               >
-                <Sparkles className="w-3.5 h-3.5 text-accent-yellow" /> Suggestions & Feedback
+                <div className="p-1 rounded-lg bg-yellow-500/10 text-yellow-400 group-hover:bg-yellow-500/20 transition-colors">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
+                <span>Suggestions & Feedback</span>
               </button>
             </div>
 
@@ -1377,13 +1396,13 @@ function QuickChip({
     <button
       {...rest}
       onClick={onClick}
-      className={`glass-card p-2 sm:p-2.5 rounded-xl text-left transition-all ${disabled ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
+      className={`glass-card p-1.5 sm:p-2.5 rounded-xl text-left transition-all ${disabled ? 'opacity-40 pointer-events-none grayscale' : 'hover:neon-border'}`}
     >
-      <div className="flex items-center gap-2">
-        <div className={`w-7 h-7 rounded-lg bg-${color}/15 grid place-items-center shrink-0`}>{icon}</div>
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-${color}/15 grid place-items-center shrink-0`}>{icon}</div>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-bold font-display leading-tight truncate">{label}</p>
-          <p className="text-[9px] text-muted-foreground truncate">{sub}</p>
+          <p className="text-[10px] sm:text-[11px] font-bold font-display leading-tight truncate">{label}</p>
+          <p className="hidden sm:block text-[9px] text-muted-foreground truncate">{sub}</p>
         </div>
       </div>
     </button>
