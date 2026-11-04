@@ -175,6 +175,56 @@ export const COURSE_CURRICULUM: CourseCurriculumInfo[] = [
     targetRoles: ['Systems Engineer', 'DevOps / SRE', 'Network Architect', 'Backend Developer']
   },
   {
+    id: 'cyber',
+    trackId: 'cyber',
+    title: 'Cyber Security & Ethical Hacking',
+    shortTitle: 'Cyber Security',
+    credentialCode: 'CS-SEC',
+    emoji: '🛡️',
+    category: 'Systems & Low-Level',
+    lessonsCount: 20,
+    level: 'Beginner → Advanced',
+    route: '/cyber',
+    briefOverview: 'TryHackMe-style offensive and defensive security missions from Linux fundamentals and reconnaissance to OWASP Top 10 web vulnerabilities and SOC defense.',
+    whatYouWillGet: 'Practical hands-on knowledge to audit infrastructure, exploit real vulnerabilities safely, and harden servers against malicious attacks.',
+    inDepthSummary: 'A 20-mission immersive hacking track combining interactive Linux terminal simulations, network scanning (Nmap), vulnerability exploitation (SQLi, XSS, CSRF, IDOR), password hash cracking, and security operations center (SOC) defensive monitoring.',
+    modules: [
+      {
+        title: 'Module 1: Foundations & Hacker Mindset',
+        description: 'Ethics, legal boundaries, Linux terminal navigation, permissions, file system forensics, and reconnaissance fundamentals.',
+        topics: ['Hacker Mindset & Ethics', 'Linux Terminal & Permissions', 'Networking for Hackers', 'Passive Reconnaissance & OSINT']
+      },
+      {
+        title: 'Module 2: Network Scanning & Vulnerability Analysis',
+        description: 'Host discovery, port scanning, service enumeration, banner grabbing, and password hash cracking.',
+        topics: ['Active Reconnaissance & Nmap', 'Port Scanning Strategies', 'Vulnerability Assessment', 'Authentication & Password Cracking']
+      },
+      {
+        title: 'Module 3: Web Application Security (OWASP)',
+        description: 'Hands-on exploitation of critical web vulnerabilities: SQL injection, cross-site scripting, CSRF, and authorization flaws.',
+        topics: ['OWASP Top 10 Overview', 'SQL Injection (SQLi) Exploitation', 'Cross-Site Scripting (XSS)', 'CSRF & IDOR Broken Access']
+      },
+      {
+        title: 'Module 4: Exploitation & SOC Defensive Security',
+        description: 'Command injection, reverse shells, cryptography, firewall configuration, SIEM log analysis, and incident response.',
+        topics: ['File Inclusion & Command Injection', 'Reverse Shells & Exploitation', 'Cryptography & Encryption', 'Defensive Security & Firewalls', 'SOC Log Analysis & Incident Response']
+      }
+    ],
+    whatYouWillBeAbleToDo: [
+      'Perform structured reconnaissance and port scanning using Nmap and OSINT tools.',
+      'Identify and remediate OWASP Top 10 vulnerabilities (SQLi, XSS, CSRF, IDOR) in web applications.',
+      'Analyze attack signatures in server logs and configure iptables/UFW firewalls to block intrusions.',
+      'Understand ethical hacking workflows, penetration testing methodologies, and defensive SOC operations.'
+    ],
+    capstoneProjects: [
+      'Automated Vulnerability Scanner & Target Port Mapper',
+      'End-to-End OWASP Web Pen-Test Report & Exploit Suite',
+      'SOC Defensive Log Monitoring & Intrusion Detection Script'
+    ],
+    prerequisites: 'Computer Systems & Network Architecture recommended.',
+    targetRoles: ['SOC Analyst', 'Junior Penetration Tester', 'Security Engineer', 'DevSecOps Specialist']
+  },
+  {
     id: 'python',
     trackId: 'python',
     title: 'Python Software Engineering',
