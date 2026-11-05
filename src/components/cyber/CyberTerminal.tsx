@@ -58,6 +58,24 @@ const INITIAL_FS: Record<string, VFSNode> = {
             size: 94,
             content: `nmap -sV 10.10.11.42\ncurl -I http://10.10.11.42\ncat /etc/passwd\nwhoami`,
           },
+          'incident_report.txt': {
+            type: 'file',
+            perms: '-rw-r--r--',
+            owner: 'codesage',
+            group: 'codesage',
+            size: 420,
+            content: `[INCIDENT TRIAGE REPORT - ALERT #SEC-9021]
+STATUS: UNDER ACTIVE INVESTIGATION
+AFFECTED SYSTEM: web-gateway-01 (10.10.11.42)
+
+OBSERVATIONS:
+- Unauthenticated access attempted on internal metrics endpoint.
+- Confidentiality: Public exposure of non-critical debug telemetry.
+- Integrity: Core binaries & hash signatures intact.
+- Availability: Verified reachable via HTTP/1.1 200 OK probe.
+
+TRIAGE CONCLUSION: Confidentiality compromised via information disclosure. Verify external availability with curl.`,
+          },
           'recon.sh': {
             type: 'file',
             perms: '-rwxr-xr-x',
