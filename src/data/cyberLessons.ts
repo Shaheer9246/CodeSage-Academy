@@ -210,42 +210,15 @@ Experts use these to manipulate hundreds of files in one command, reducing human
       }
     ],
     practical: {
-      title: 'Detecting Symlink Races & Inode Manipulation',
-      intro: `Simulate a Time-of-Check to Time-of-Use (TOCTOU) vulnerability. We will create a script that checks a file's existence, then acts on it. We will race to swap the file with a symlink to a protected system file.`,
+      title: 'Symbolic Links & Inode Inspection',
+      intro: 'Practice creating and inspecting symbolic links to understand how Linux resolves file paths and permissions.',
       steps: [
-        '# Create a working directory',
-        'mkdir ~/race_lab && cd ~/race_lab',
-        '',
-        '# Create a harmless target file',
-        'echo "Safe Data" > safe_file.txt',
-        '',
-        '# Create a malicious symlink pointing to /etc/passwd',
-        'ln -sf /etc/passwd evil_link.txt',
-        '',
-        '# Write a vulnerable bash script (simulating a privileged app)',
-        'cat > vuln_script.sh <<EOF',
-        '#!/bin/bash',
-        'TARGET=$1',
-        'if [ -f "$TARGET" ]; then',
-        '  echo "File exists. Processing..."',
-        '  sleep 1 # Simulate processing delay (the race window)',
-        '  cat "$TARGET" >> output.log',
-        'fi',
-        'EOF',
-        'chmod +x vuln_script.sh',
-        '',
-        '# Terminal 1: Run the script targeting the SAFE file',
-        './vuln_script.sh safe_file.txt',
-        '',
-        '# IMMEDIATELY in Terminal 2 (within 1 second): Swap the filename!',
-        '# We rename safe_file.txt to backup, and move evil_link.txt to safe_file.txt',
-        'mv safe_file.txt backup.txt && mv evil_link.txt safe_file.txt',
-        '',
-        '# Check output.log in Terminal 1',
-        'cat output.log',
-        '# RESULT: The script thought it was reading "safe_file.txt" but actually read "/etc/passwd" because the inode reference changed during the sleep!'
+        'ls -la',
+        'ln -s /etc/passwd user_link',
+        'ls -l user_link',
+        'cat user_link'
       ],
-      goal: 'Understand TOCTOU vulnerabilities caused by symlink manipulation and inode indirection.'
+      goal: 'Create a symbolic link pointing to a system file and verify its inode pointer using ls -l.'
     },
     quiz: [
       {
@@ -346,36 +319,15 @@ Hackers use regex to find AWS Keys, Private RSA blocks, or JWT tokens buried in 
       }
     ],
     practical: {
-      title: 'Building a Log Analysis Pipeline for Brute Force Detection',
-      intro: `Create a pipeline that parses Apache/Nginx logs, filters for failed logins (401/403), extracts IPs, counts occurrences, sorts by frequency, and flags top offenders.`,
+      title: 'Log Analysis with Pipes & Grep',
+      intro: 'Analyze authentication logs to detect brute-force SSH attacks by chaining Linux pipes.',
       steps: [
-        '# Generate synthetic log data',
-        'for i in {1..10}; do echo "192.168.1.$((RANDOM % 255)) - - [01/Nov/2026:10:00:$i] \"POST /login\" 401"; done > access.log',
-        'for i in {1..50}; do echo "10.0.0.$((RANDOM % 255)) - - [01/Nov/2026:10:00:$i] \"GET /index.html\" 200"; done >> access.log',
-        'for i in {1..100}; do echo "203.0.113.5 - - [01/Nov/2026:10:00:$i] \"POST /login\" 401"; done >> access.log',
-        '',
-        '# THE PIPELINE:',
-        '# 1. Filter only 401 Unauthorized responses',
-        '# 2. Extract the IP address (first field)',
-        '# 3. Sort IPs alphabetically',
-        '# 4. Count unique occurrences',
-        '# 5. Sort numerically descending (highest count first)',
-        '# 6. Take top 5',
-        '',
-        'grep " 401 " access.log \\',
-        '| awk \'{print $1}\' \\',
-        '| sort \\',
-        '| uniq -c \\',
-        '| sort -nr \\',
-        '| head -n 5',
-        '',
-        '# Expected Output: Shows 203.0.113.5 with count 100, proving it\'s the brute-forcer.',
-        '',
-        '# Bonus: Auto-block top offender (Simulation)',
-        'TOP_IP=$(grep " 401 " access.log | awk \'{print $1}\' | sort | uniq -c | sort -nr | head -n 1 | awk \'{print $2}\')',
-        'echo "iptables -A INPUT -s $TOP_IP -j DROP"'
+        'cat /var/log/auth.log',
+        'cat /var/log/auth.log | grep Failed',
+        'cat /var/log/auth.log | grep Failed | wc -l',
+        'cat /var/log/auth.log | sort | uniq'
       ],
-      goal: 'Chain grep, awk, sort, uniq to transform raw logs into actionable threat intelligence.'
+      goal: 'Filter failed authentication attempts from system logs using grep, wc, and sort.'
     },
     quiz: [
       {
@@ -467,33 +419,15 @@ It confines programs. If Apache is hacked, SELinux prevents it from spawning a s
       }
     ],
     practical: {
-      title: 'Auditing SUID, SGID, and Capabilities for Privesc Paths',
-      intro: `Perform a comprehensive privilege escalation audit on a local Linux machine. Identify binaries that could potentially be abused to gain root.`,
+      title: 'Auditing SUID Binaries & Permissions',
+      intro: 'Search for high-privilege binaries with SUID bits set to evaluate potential privilege escalation paths.',
       steps: [
-        '# 1. Find all SUID binaries (run as owner, usually root)',
-        'find / -perm -4000 -type f 2>/dev/null',
-        '',
-        '# 2. Find all SGID binaries (run as group)',
-        'find / -perm -2000 -type f 2>/dev/null',
-        '',
-        '# 3. Find binaries with Linux Capabilities',
-        'getcap -r / 2>/dev/null',
-        '',
-        '# 4. Cross-reference with GTFOBins (known exploit techniques)',
-        '# Example: If "find" has SUID bit:',
-        'ls -l $(which find)',
-        '# If it shows -rwsr-xr-x, it is vulnerable.',
-        '# Exploit simulation (DO NOT RUN ON PROD):',
-        '# find . -exec /bin/sh \\; -quit',
-        '',
-        '# 5. Check for world-writable directories in PATH',
-        'echo $PATH | tr ":" "\\n" | xargs ls -ld 2>/dev/null | grep "^d..w"',
-        '# If /usr/local/bin is world-writable, attacker can drop a malicious "ls" binary there.',
-        '',
-        '# 6. Review ACLs on sensitive dirs',
-        'getfacl /etc/sudoers.d/'
+        'id',
+        'find / -perm -4000 2>/dev/null',
+        'ls -la /usr/bin/passwd',
+        'cat /etc/shadow'
       ],
-      goal: 'Systematically enumerate privilege escalation surfaces using find, getcap, and PATH auditing.'
+      goal: 'Identify SUID binaries running with root permissions and test access to protected files.'
     },
     quiz: [
       {
@@ -585,31 +519,15 @@ Escape artists break out of these namespaces to access the host root.`,
       }
     ],
     practical: {
-      title: 'Detecting Hidden Processes via /proc vs ps Discrepancy',
-      intro: `Simulate a DKOM-style hidden process (conceptually) by comparing authoritative sources. In a real rootkit, \`ps\` lies. We will verify integrity by checking \`/proc\` directly.`,
+      title: 'Process Forensics & Kernel /proc Inspection',
+      intro: 'Inspect running system processes and query the virtual /proc filesystem to verify process state.',
       steps: [
-        '# 1. Get list of PIDs from standard tool',
-        'ps aux | awk \'{print $2}\' | sort -n > ps_pids.txt',
-        '',
-        '# 2. Get list of PIDs from /proc filesystem (kernel truth)',
-        'ls /proc | grep -E "^[0-9]+$" | sort -n > proc_pids.txt',
-        '',
-        '# 3. Compare the two lists',
-        'diff ps_pids.txt proc_pids.txt',
-        '',
-        '# IF DIFFERENCE EXISTS: Potential Rootkit hiding process from ps.',
-        '# Investigate the extra PID found in /proc but not in ps.',
-        '',
-        '# 4. Inspect suspicious PID details directly',
-        'SUS_PID=<insert_pid_from_diff>',
-        'cat /proc/$SUS_PID/cmdline | tr "\\0" " "',
-        'ls -l /proc/$SUS_PID/exe',
-        'cat /proc/$SUS_PID/status | grep Name',
-        '',
-        '# 5. Check network connections for this PID',
-        'ss -antp | grep $SUS_PID'
+        'ps aux',
+        'ls /proc',
+        'cat /proc/1/status',
+        'top'
       ],
-      goal: 'Use differential analysis between user-space tools and kernel interfaces to detect process hiding.'
+      goal: 'Audit active background processes and inspect init system metadata directly through /proc.'
     },
     quiz: [
       {
