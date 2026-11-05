@@ -540,7 +540,7 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
     order: 4,
     title: 'IP Addressing — The Internet\'s House Numbers',
     icon: '📍',
-    philosophy: 'Think of an IP address as your device's "Global Mailing Address." Without it, the internet wouldn't know how to deliver data packets to your doorstep. But addressing is deeper than just one number—it involves local networks, subnets, and the physical hardware underneath.',
+    philosophy: 'Think of an IP address as your device\'s "Global Mailing Address." Without it, the internet wouldn\'t know how to deliver data packets to your doorstep. But addressing is deeper than just one number—it involves local networks, subnets, and the physical hardware underneath.',
     concepts: [
       {
         title: '1. IPv4 vs IPv6',
