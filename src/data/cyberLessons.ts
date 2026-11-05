@@ -102,29 +102,15 @@ However, modern hackers don't always follow a straight line. They loop back. Tha
       }
     ],
     practical: {
-      title: 'Analyzing HTTP Headers for Security Posture Assessment',
-      intro: `We will go beyond "looking at the cert." We will analyze how a server identifies itself and what protections it claims. Missing headers are often low-hanging fruit for attackers.`,
+      title: 'Triage Your First Security Breach (Incident Response)',
+      intro: 'A company server triggered an alert. As the on-duty security analyst, your mission is to inspect the system, read the breach report, and diagnose which pillar of the CIA Triad was compromised.',
       steps: [
-        '# Install curl if not present: sudo apt install curl',
-        '',
-        '# Fetch headers from a target (using httpbin.org for safety):',
-        'curl -I https://httpbin.org/get',
-        '',
-        '# Analyze the output. Look for:',
-        '# 1. Server: Does it leak version info? (e.g., nginx/1.18.0)',
-        '# 2. Strict-Transport-Security (HSTS): Is max-age set high? (Prevents downgrade attacks)',
-        '# 3. Content-Security-Policy (CSP): Is it defined? (Prevents XSS)',
-        '# 4. X-Frame-Options: Is it DENY or SAMEORIGIN? (Prevents Clickjacking)',
-        '',
-        '# Compare with a poorly configured site (simulate locally if possible, or observe public sites):',
-        '# Notice absence of CSP allows inline scripts -> XSS risk.',
-        '# Notice absence of HSTS allows SSL Stripping (MitM) on first visit.',
-        '',
-        '# Use Wireshark/tcpdump to capture the handshake:',
-        'sudo tcpdump -i any host httpbin.org and port 443 -w tls_handshake.pcap',
-        '# Open pcap in Wireshark -> Follow TCP Stream -> Observe ClientHello/ServerHello exchange.'
+        'whoami',
+        'ls -la',
+        'cat incident_report.txt',
+        'curl -I https://codesage.org'
       ],
-      goal: 'Identify missing security controls via header analysis and understand TLS negotiation basics.'
+      goal: 'Inspect the system status, analyze the incident report, and confirm service availability using curl.'
     },
     quiz: [
       {
