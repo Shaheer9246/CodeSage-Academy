@@ -578,7 +578,7 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       intro: 'Time to see your machine\'s mailing address, trace the roads to the internet, and check your hardware fingerprint.',
       steps: [
         'Find your Private IP and MAC Address: Open terminal and type `ipconfig /all` (Windows) or `ifconfig` / `ip addr` (Mac/Linux). Look for "IPv4 Address" and "Physical Address" (MAC). This matters because this is your local identity on the LAN.',
-        'Find your Public IP: Search "What is my IP?" in your browser. Compare it to your private IP. Notice they are different? That's NAT in action shielding your local network.',
+        'Find your Public IP: Search "What is my IP?" in your browser. Compare it to your private IP. Notice they are different? That\'s NAT in action shielding your local network.',
         'Test Localhost: Open terminal and type `ping 127.0.0.1` and press Enter. You should see replies with `<1ms` time. This matters because it proves your OS network stack is functioning perfectly without needing a router or internet.',
         'Trace the Route: Type `tracert 8.8.8.8` (Windows) or `traceroute 8.8.8.8` (Mac/Linux). You will see a list of "hops" (routers) your packet visits to reach Google. This matters because it visualizes the physical and logical path your data takes across the internet.',
       ],
@@ -887,7 +887,7 @@ export const NETWORKING_LESSONS: NetworkingLesson[] = [
       steps: [
         'Open your terminal and run `netstat -an` (Windows/Mac/Linux) or `Get-NetTCPConnection` in PowerShell. Scan the "Local Address" and "Foreign Address" columns.',
         'Look for port numbers: `:443` (HTTPS), `:80` (HTTP), and `:22` (SSH). Notice the "ESTABLISHED" or "LISTENING" states. This is Layer 4 in action.',
-        'Open a browser, load a new site, and run the command again—you'll see a brand new "live connection" appear instantly on port 443.',
+        'Open a browser, load a new site, and run the command again—you\'ll see a brand new "live connection" appear instantly on port 443.',
         'Type `curl -I https://google.com` and press Enter. The `-I` flag asks for only the HTTP Headers (Layer 7). You will see the server\'s response code (HTTP/2 200) and security headers before the HTML body even downloads.',
       ],
       goal: 'Realize that your machine is constantly opening and closing sockets across dozens of different protocols, and learn how to inspect the raw HTTP handshake.',
