@@ -173,6 +173,90 @@ TRIAGE CONCLUSION: Confidentiality compromised via information disclosure. Verif
       },
     },
   },
+  usr: {
+    type: 'dir',
+    perms: 'drwxr-xr-x',
+    owner: 'root',
+    group: 'root',
+    size: 4096,
+    children: {
+      bin: {
+        type: 'dir',
+        perms: 'drwxr-xr-x',
+        owner: 'root',
+        group: 'root',
+        size: 4096,
+        children: {
+          passwd: {
+            type: 'file',
+            perms: '-rwsr-xr-x',
+            owner: 'root',
+            group: 'root',
+            size: 68208,
+            content: `[ELF 64-bit LSB pie executable, x86-64, SUID bit set]`,
+          },
+        },
+      },
+    },
+  },
+  proc: {
+    type: 'dir',
+    perms: 'dr-xr-xr-x',
+    owner: 'root',
+    group: 'root',
+    size: 0,
+    children: {
+      '1': {
+        type: 'dir',
+        perms: 'dr-xr-xr-x',
+        owner: 'root',
+        group: 'root',
+        size: 0,
+        children: {
+          status: {
+            type: 'file',
+            perms: '-r--r--r--',
+            owner: 'root',
+            group: 'root',
+            size: 1024,
+            content: `Name:\tsystemd\nUmask:\t0000\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t128\nGroups:\t0\nThreads:\t1`,
+          },
+          cmdline: {
+            type: 'file',
+            perms: '-r--r--r--',
+            owner: 'root',
+            group: 'root',
+            size: 32,
+            content: `/sbin/init\n`,
+          },
+        },
+      },
+      cpuinfo: {
+        type: 'file',
+        perms: '-r--r--r--',
+        owner: 'root',
+        group: 'root',
+        size: 1024,
+        content: `processor\t: 0\nmodel name\t: AMD EPYC 7B13 64-Core Processor\ncpu MHz\t\t: 2445.404\ncache size\t: 512 KB`,
+      },
+      meminfo: {
+        type: 'file',
+        perms: '-r--r--r--',
+        owner: 'root',
+        group: 'root',
+        size: 1024,
+        content: `MemTotal:        8142380 kB\nMemFree:         3512800 kB\nMemAvailable:    5829104 kB`,
+      },
+      version: {
+        type: 'file',
+        perms: '-r--r--r--',
+        owner: 'root',
+        group: 'root',
+        size: 128,
+        content: `Linux version 6.6.9-amd64 (devel@kali.org) (gcc version 13.2.0) #1 SMP PREEMPT_DYNAMIC`,
+      },
+    },
+  },
 };
 
 export const CyberTerminal: React.FC<CyberTerminalProps> = ({
@@ -271,28 +355,44 @@ export const CyberTerminal: React.FC<CyberTerminalProps> = ({
     let isSuccess = false;
     let nextPath = currentPath;
 
-    // 1. Mission Step Verification Check
-    const matchedStep = stepCommands.find(s => {
-      const baseCmd = s.cmd.toLowerCase().split(' ')[0];
-      const userBase = trimmed.toLowerCase().split(' ')[0];
-      return (
-        trimmed.toLowerCase() === s.cmd.toLowerCase() ||
-        (baseCmd === userBase && (trimmed.includes(s.cmd.slice(0, 10)) || s.cmd.includes(trimmed.slice(0, 10))))
-      );
-    });
+    // 1. Mission Step Verification Check (Exact matches first, then fuzzy prefix)
+    const normalizedTrimmed = trimmed.toLowerCase().replace(/\s+/g, ' ');
+    const matchedStep =
+      stepCommands.find(s => normalizedTrimmed === s.cmd.toLowerCase().replace(/\s+/g, ' ')) ||
+      stepCommands.find(s => {
+        const baseCmd = s.cmd.toLowerCase().split(' ')[0];
+        const userBase = trimmed.toLowerCase().split(' ')[0];
+        return (
+          baseCmd === userBase &&
+          (trimmed.toLowerCase().includes(s.cmd.toLowerCase().slice(0, 10)) ||
+            s.cmd.toLowerCase().includes(trimmed.toLowerCase().slice(0, 10)))
+        );
+      });
 
     if (matchedStep && !completedSteps.has(matchedStep.idx)) {
       onToggleStep(matchedStep.idx);
       isSuccess = true;
     }
 
-    // 2. Command Parsing & Virtual Engine
-    const [prog, ...args] = trimmed.split(/\s+/);
-    const lowerProg = prog.toLowerCase();
+    // 2. Pipe Stream Processor (|)
+    if (trimmed.includes('|')) {
+      if (trimmed.includes('wc -l')) {
+        output = '2';
+      } else if (trimmed.includes('sort') && trimmed.includes('uniq')) {
+        output = `Oct 24 14:22:01 kali sshd[1042]: Failed password for invalid user admin from 192.168.1.105 port 44122\nOct 24 14:22:03 kali sshd[1045]: Failed password for root from 192.168.1.105 port 44124\nOct 24 14:22:07 kali sshd[1050]: Accepted password for codesage from 192.168.1.50 port 50221 ssh2`;
+      } else if (trimmed.includes('grep Failed')) {
+        output = `Oct 24 14:22:01 kali sshd[1042]: Failed password for invalid user admin from 192.168.1.105 port 44122\nOct 24 14:22:03 kali sshd[1045]: Failed password for root from 192.168.1.105 port 44124`;
+      } else {
+        output = `Oct 24 14:22:01 kali sshd[1042]: Failed password for invalid user admin from 192.168.1.105 port 44122\nOct 24 14:22:03 kali sshd[1045]: Failed password for root from 192.168.1.105 port 44124`;
+      }
+    } else {
+      // 3. Command Parsing & Virtual Engine
+      const [prog, ...args] = trimmed.split(/\s+/);
+      const lowerProg = prog.toLowerCase();
 
-    switch (lowerProg) {
-      case 'help':
-        output = `CodeSage Linux Terminal Simulator (Kali Suite)
+      switch (lowerProg) {
+        case 'help':
+          output = `CodeSage Linux Terminal Simulator (Kali Suite)
 Navigation:
   pwd                   - Print current directory
   cd <dir>              - Change directory (e.g. "cd ..", "cd /etc", "cd ~")
@@ -306,127 +406,161 @@ Security Tools:
   curl -I [url]         - Inspect HTTP response headers
   grep <str> <file>     - Search patterns in logs (e.g. grep Failed /var/log/auth.log)
   find / -perm -4000    - Locate SUID privilege escalation binaries
-  ps aux                - Display running process table
+  ps aux / top          - Display running process table
+  ln -s <target> <link> - Create symbolic links
   chmod <mode> <file>   - Change file permissions (e.g. chmod 600 /etc/shadow)
   clear                 - Clear terminal screen`;
-        break;
+          break;
 
-      case 'pwd':
-        output = currentPath;
-        break;
+        case 'pwd':
+          output = currentPath;
+          break;
 
-      case 'whoami':
-        output = 'root';
-        break;
+        case 'whoami':
+          output = 'root';
+          break;
 
-      case 'id':
-        output = 'uid=0(root) gid=0(root) groups=0(root),27(sudo),1000(codesage)';
-        break;
+        case 'id':
+          output = 'uid=0(root) gid=0(root) groups=0(root),27(sudo),1000(codesage)';
+          break;
 
-      case 'uname':
-        output = 'Linux kali-box 6.6.9-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.6.9-1kali1 (2026-01-10) x86_64 GNU/Linux';
-        break;
+        case 'uname':
+          output = 'Linux kali-box 6.6.9-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.6.9-1kali1 (2026-01-10) x86_64 GNU/Linux';
+          break;
 
-      case 'cd': {
-        const dest = args[0] || '~';
-        const targetResolved = resolvePath(dest);
-        const node = getNodeAtPath(targetResolved);
-        if (!node) {
-          output = `bash: cd: ${dest}: No such file or directory`;
-        } else if (node.type !== 'dir') {
-          output = `bash: cd: ${dest}: Not a directory`;
-        } else {
-          nextPath = targetResolved;
-          setCurrentPath(nextPath);
-          output = '';
-        }
-        break;
-      }
-
-      case 'ls': {
-        const isLong = args.some(a => a.includes('l'));
-        const targetArg = args.find(a => !a.startsWith('-')) || '.';
-        const targetResolved = resolvePath(targetArg);
-        const node = getNodeAtPath(targetResolved);
-
-        if (!node) {
-          output = `ls: cannot access '${targetArg}': No such file or directory`;
-        } else if (node.type === 'file') {
-          output = isLong ? `${node.perms} 1 ${node.owner} ${node.group} ${node.size} ${targetArg}` : targetArg;
-        } else {
-          const children = node.children || {};
-          const keys = Object.keys(children);
-          if (keys.length === 0) {
-            output = '';
-          } else if (isLong) {
-            output = `total ${keys.length * 4}\n` +
-              keys
-                .map(k => {
-                  const c = children[k];
-                  return `${c.perms} 1 ${c.owner} ${c.group} ${String(c.size).padStart(5, ' ')} ${k}`;
-                })
-                .join('\n');
-          } else {
-            output = keys.join('    ');
-          }
-        }
-        break;
-      }
-
-      case 'cat': {
-        if (!args[0]) {
-          output = 'cat: missing file operand';
-        } else {
-          const targetResolved = resolvePath(args[0]);
+        case 'cd': {
+          const dest = args[0] || '~';
+          const targetResolved = resolvePath(dest);
           const node = getNodeAtPath(targetResolved);
           if (!node) {
-            output = `cat: ${args[0]}: No such file or directory`;
-          } else if (node.type === 'dir') {
-            output = `cat: ${args[0]}: Is a directory`;
+            output = `bash: cd: ${dest}: No such file or directory`;
+          } else if (node.type !== 'dir') {
+            output = `bash: cd: ${dest}: Not a directory`;
           } else {
-            output = node.content || '';
+            nextPath = targetResolved;
+            setCurrentPath(nextPath);
+            output = '';
           }
+          break;
         }
-        break;
-      }
 
-      case 'chmod': {
-        if (args.length < 2) {
-          output = 'chmod: missing operand';
-        } else {
-          output = `[+] File mode changed: ${args[1]} -> ${args[0]}`;
+        case 'ln': {
+          const linkTarget = args[args.length - 2] || '/etc/passwd';
+          const linkName = args[args.length - 1] || 'user_link';
+          output = `[+] Created symbolic link ${linkName} -> ${linkTarget}`;
+          break;
         }
-        break;
-      }
 
-      case 'curl': {
-        output = `HTTP/1.1 200 OK\nDate: ${new Date().toUTCString()}\nServer: nginx/1.18.0 (Ubuntu)\nContent-Type: application/json; charset=utf-8\nContent-Length: 128\nConnection: keep-alive\nX-Content-Type-Options: nosniff\n[!] Security Notice: Missing Content-Security-Policy & Strict-Transport-Security headers!`;
-        break;
-      }
+        case 'ls': {
+          const isLong = args.some(a => a.includes('l'));
+          const targetArg = args.find(a => !a.startsWith('-')) || '.';
+          
+          if (targetArg === 'user_link' || trimmed.includes('user_link')) {
+            output = isLong
+              ? `lrwxrwxrwx 1 codesage codesage 11 Nov  5 08:00 user_link -> /etc/passwd`
+              : 'user_link';
+            break;
+          }
 
-      case 'nmap': {
-        output = `Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for target.local (10.10.11.42)\nHost is up (0.012s latency).\nPORT     STATE SERVICE       VERSION\n22/tcp   open  ssh           OpenSSH 8.9p1 Ubuntu\n80/tcp   open  http          Apache httpd 2.4.52 ((Ubuntu))\n443/tcp  open  ssl/https     Apache httpd 2.4.52\nService detection performed. 1 host up scanned in 1.42 seconds.`;
-        break;
-      }
+          const targetResolved = resolvePath(targetArg);
+          const node = getNodeAtPath(targetResolved);
 
-      case 'grep': {
-        output = `Oct 24 14:22:01 kali sshd[1042]: Failed password for invalid user admin from 192.168.1.105 port 44122\nOct 24 14:22:03 kali sshd[1045]: Failed password for root from 192.168.1.105 port 44124`;
-        break;
-      }
+          if (!node) {
+            output = `ls: cannot access '${targetArg}': No such file or directory`;
+          } else if (node.type === 'file') {
+            output = isLong ? `${node.perms} 1 ${node.owner} ${node.group} ${node.size} ${targetArg}` : targetArg;
+          } else {
+            const children = node.children || {};
+            const keys = Object.keys(children);
+            if (keys.length === 0) {
+              output = '';
+            } else if (isLong) {
+              output = `total ${keys.length * 4}\n` +
+                keys
+                  .map(k => {
+                    const c = children[k];
+                    return `${c.perms} 1 ${c.owner} ${c.group} ${String(c.size).padStart(5, ' ')} ${k}`;
+                  })
+                  .join('\n');
+            } else {
+              output = keys.join('    ');
+            }
+          }
+          break;
+        }
 
-      case 'find': {
-        output = `/usr/bin/passwd\n/usr/bin/chfn\n/usr/bin/newgrp\n/usr/bin/sudo\n/opt/secret_backup (SUID Root privilege path identified!)`;
-        break;
-      }
+        case 'cat': {
+          if (!args[0]) {
+            output = 'cat: missing file operand';
+          } else if (args[0] === 'user_link' || trimmed.includes('user_link')) {
+            output = INITIAL_FS.etc?.children?.passwd?.content || '';
+          } else {
+            const targetResolved = resolvePath(args[0]);
+            const node = getNodeAtPath(targetResolved);
+            if (!node) {
+              output = `cat: ${args[0]}: No such file or directory`;
+            } else if (node.type === 'dir') {
+              output = `cat: ${args[0]}: Is a directory`;
+            } else {
+              output = node.content || '';
+            }
+          }
+          break;
+        }
 
-      case 'ps': {
-        output = `PID TTY          TIME CMD\n  1 ?        00:00:02 systemd\n412 ?        00:00:00 sshd\n820 pts/0    00:00:00 bash\n954 pts/0    00:00:00 python3`;
-        break;
-      }
+        case 'chmod': {
+          if (args.length < 2) {
+            output = 'chmod: missing operand';
+          } else {
+            output = `[+] File mode changed: ${args[1]} -> ${args[0]}`;
+          }
+          break;
+        }
 
-      default:
-        output = `[+] Executed: "${trimmed}"\nExit code: 0`;
-        break;
+        case 'curl': {
+          output = `HTTP/1.1 200 OK\nDate: ${new Date().toUTCString()}\nServer: nginx/1.18.0 (Ubuntu)\nContent-Type: application/json; charset=utf-8\nContent-Length: 128\nConnection: keep-alive\nX-Content-Type-Options: nosniff\n[!] Security Notice: Missing Content-Security-Policy & Strict-Transport-Security headers!`;
+          break;
+        }
+
+        case 'nmap': {
+          output = `Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for target.local (10.10.11.42)\nHost is up (0.012s latency).\nPORT     STATE SERVICE       VERSION\n22/tcp   open  ssh           OpenSSH 8.9p1 Ubuntu\n80/tcp   open  http          Apache httpd 2.4.52 ((Ubuntu))\n443/tcp  open  ssl/https     Apache httpd 2.4.52\nService detection performed. 1 host up scanned in 1.42 seconds.`;
+          break;
+        }
+
+        case 'grep': {
+          output = `Oct 24 14:22:01 kali sshd[1042]: Failed password for invalid user admin from 192.168.1.105 port 44122\nOct 24 14:22:03 kali sshd[1045]: Failed password for root from 192.168.1.105 port 44124`;
+          break;
+        }
+
+        case 'find': {
+          output = `/usr/bin/passwd\n/usr/bin/chfn\n/usr/bin/newgrp\n/usr/bin/sudo\n/opt/secret_backup (SUID Root privilege path identified!)`;
+          break;
+        }
+
+        case 'ps': {
+          output = `PID TTY          TIME CMD\n  1 ?        00:00:02 systemd\n412 ?        00:00:00 sshd\n820 pts/0    00:00:00 bash\n954 pts/0    00:00:00 python3`;
+          break;
+        }
+
+        case 'top': {
+          output = `top - 08:00:14 up 14 days,  2:14,  1 user,  load average: 0.08, 0.03, 0.01
+Tasks: 104 total,   1 running, 103 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  1.2 us,  0.8 sy,  0.0 ni, 97.8 id,  0.1 wa,  0.0 hi,  0.1 si
+MiB Mem :   7951.5 total,   3430.4 free,   2180.2 used,   2340.9 buff/cache
+MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   5692.1 avail Mem
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+      1 root      20   0  168540  12980   8920 S   0.0   0.2   0:02.14 systemd
+    412 root      20   0   15820   7412   6100 S   0.0   0.1   0:00.12 sshd
+    820 codesage  20   0   14320   5120   3420 S   0.0   0.1   0:00.08 bash
+    954 root      20   0   48120  18420  11200 S   0.0   0.2   0:00.45 python3`;
+          break;
+        }
+
+        default:
+          output = `[+] Executed: "${trimmed}"\nExit code: 0`;
+          break;
+      }
     }
 
     if (isSuccess) {
