@@ -5,6 +5,7 @@ export interface Concept {
   title: string;
   beginner: string;
   advanced: string;
+  cyber?: string;
 }
 
 export interface QuizQuestion {
