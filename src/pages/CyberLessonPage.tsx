@@ -9,56 +9,32 @@ import {
 } from 'lucide-react';
 import { CyberTerminal } from '@/components/cyber/CyberTerminal';
 
-// --- Types (Local definitions to ensure type safety without circular deps) ---
-interface Concept {
-  title: string;
-  beginner: string;
-  advanced: string;
-}
-
-interface QuizQuestion {
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-}
-
-interface CyberLesson {
-  id: string;
-  module: string;
-  order: number;
-  title: string;
-  icon: string;
-  terminalNotice?: string;
-  philosophy: string;
-  concepts: Concept[];
-  practical: {
-    title: string;
-    intro: string;
-    steps: string[];
-    goal: string;
-  };
-  quiz: QuizQuestion[];
-  keyTakeaways: string[];
-}
-
 type Stage = 'concept' | 'practical' | 'quiz';
 
-// --- Helper Components ---
-
-const CodeSnippet = ({ text }: { text: string }) => (
-  <code className="bg-slate-800/80 text-emerald-400 px-1.5 py-0.5 rounded text-[11px] font-mono border border-slate-700/50">
-    {text}
-  </code>
-);
+const STAGES: { key: Stage; icon: LucideIcon; label: string; hint: string }[] = [
+  { key: 'concept', icon: BookOpen, label: 'Brief', hint: 'Understand it' },
+  { key: 'practical', icon: FlaskConical, label: 'Lab', hint: 'Build it' },
+  { key: 'quiz', icon: ClipboardCheck, label: 'Proof', hint: 'Prove it' },
+];
 
 const FormattedText = ({ text }: { text: string }) => {
-  const parts = text.split(/(`[^`]+`)/g);
+  const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
   return (
     <span>
       {parts.map((part, i) => {
         if (part.startsWith('`') && part.endsWith('`')) {
-          return <CodeSnippet key={i} text={part.slice(1, -1)} />;
+          return (
+            <code key={i} className="bg-secondary/60 text-primary px-1.5 py-0.5 rounded text-[11px] font-mono border border-border/40">
+              {part.slice(1, -1)}
+            </code>
+          );
+        }
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <strong key={i} className="font-semibold text-foreground">
+              {part.slice(2, -2)}
+            </strong>
+          );
         }
         return <span key={i}>{part}</span>;
       })}
@@ -68,58 +44,48 @@ const FormattedText = ({ text }: { text: string }) => {
 
 export default function CyberLessonPage() {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const from = sp.get('from');
+  const backTo = from === 'roadmap' ? '/roadmap' : from === 'dashboard' ? '/cyber?from=dashboard' : '/cyber';
+
   const { user, completeLesson } = useUser();
-  
-  // Guest Gate Logic
-  const __pgGuest = useGuestLessonGate('cyber', id || '');
+  const { isGuest: __pgGuest } = useGuestLessonGate('cyber', id || '');
 
-  // Data Loading
-  const lesson = useMemo(() => {
-    if (!id) return null;
-    return getCyberLessonById(id) as CyberLesson | undefined;
-  }, [id]);
+  const lesson = id ? getCyberLessonById(id) : undefined;
 
-  // Navigation Logic
-  const from = searchParams.get('from');
-  const backTo = from === 'roadmap' 
-    ? '/roadmap' 
-    : from === 'dashboard' 
-      ? '/cyber?from=dashboard' 
-      : '/cyber';
-
-  // Protection Checks
-  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
-  if (!lesson) return <Navigate to="/roadmap" replace />;
-  
-  // Note: In a real app, we might allow guests to view but not complete. 
-  // Here we strictly follow the prompt's unlock logic for navigation.
-  // If guest, we assume access is granted by the gate, or we check local storage if implemented.
-  // For this implementation, we assume __pgGuest implies temporary unlock or we skip strict lock for guests in UI.
-  // However, prompt says: if (!isCyberLessonUnlocked...) return Navigate.
-  // We'll assume guests are "unlocked" for viewing or the gate handles it. 
-  // To be safe per prompt instructions:
-  if (user && !isCyberLessonUnlocked(lesson.id, (user?.completedLessons || []))) {
-     // If user exists and hasn't unlocked, redirect. 
-     // Guests (__pgGuest true) bypass this because user is null.
-     return <Navigate to="/roadmap" replace />;
-  }
-
-  // State
   const [stage, setStage] = useState<Stage>('concept');
   const [conceptView, setConceptView] = useState<'beginner' | 'advanced'>('beginner');
-  const [openConceptIndex, setOpenConceptIndex] = useState<number | null>(0);
-  
-  // Practical State
+  const [openConcept, setOpenConcept] = useState<number>(0);
+
+  // Practical state
   const [labMode, setLabMode] = useState<'terminal' | 'checklist'>('terminal');
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
-  // Quiz State
-  const [currentQIndex, setCurrentQIndex] = useState(0);
+  // Quiz state
+  const [qIndex, setQIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizPassed, setQuizPassed] = useState(false);
+
+  const quiz = lesson?.quiz ?? [];
+  const correctCount = useMemo(
+    () => quiz.filter((q, i) => selectedOptions[i] === q.correctIndex).length,
+    [quiz, selectedOptions]
+  );
+  const passingScore = Math.ceil(quiz.length * 0.75);
+  const passed = correctCount >= passingScore;
+  const stageIndex = STAGES.findIndex(s => s.key === stage);
+  const stepsDone = completedSteps.size;
+  const journey = Math.round(
+    ((stageIndex + (stage === 'quiz' && quizSubmitted && passed ? 1 : 0)) / STAGES.length) * 100
+  );
+
+  if (!user && !__pgGuest) return <Navigate to="/auth" replace />;
+  if (!lesson) return <Navigate to="/roadmap" replace />;
+  if (user && !isCyberLessonUnlocked(lesson.id, (user?.completedLessons || []))) {
+    return <Navigate to="/roadmap" replace />;
+  }
 
   const toggleStep = (index: number) => {
     const next = new Set(completedSteps);
@@ -128,458 +94,471 @@ export default function CyberLessonPage() {
     setCompletedSteps(next);
   };
 
-  const handleOptionSelect = (qIndex: number, optionIndex: number) => {
+  const handleOptionSelect = (qi: number, optIdx: number) => {
     if (quizSubmitted) return;
-    setSelectedOptions(prev => ({ ...prev, [qIndex]: optionIndex }));
+    setSelectedOptions(prev => ({ ...prev, [qi]: optIdx }));
   };
 
-  const submitQuiz = () => {
-    const correctCount = lesson.quiz.reduce((acc, q, idx) => {
-      return acc + (selectedOptions[idx] === q.correctIndex ? 1 : 0);
-    }, 0);
-    
-    const threshold = Math.ceil(lesson.quiz.length * 0.75);
-    const passed = correctCount >= threshold;
-    
+  const handleSubmitQuiz = () => {
     setQuizPassed(passed);
     setQuizSubmitted(true);
-
-    if (passed && user) {
-      completeLesson(lesson.id);
-      setTimeout(() => {
-        navigate('/complete/' + lesson.id);
-      }, 1500);
+    if (passed) {
+      if (user) completeLesson(lesson.id);
+      setTimeout(() => navigate('/complete/' + lesson.id), 1200);
     }
   };
 
   const retryQuiz = () => {
     setQuizSubmitted(false);
     setSelectedOptions({});
-    setCurrentQIndex(0);
+    setQIndex(0);
     setQuizPassed(false);
   };
 
-  // --- Render Helpers ---
-
-  const renderConcepts = () => (
-    <div className="space-y-4">
-      {lesson.concepts.map((concept, idx) => {
-        const isOpen = openConceptIndex === idx;
-        return (
-          <div key={idx} className="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-900/50">
-            <button
-              onClick={() => setOpenConceptIndex(isOpen ? null : idx)}
-              className="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-indigo-400' : 'bg-slate-600'}`} />
-                <span className="font-semibold text-slate-200">{concept.title}</span>
-              </div>
-              {isOpen ? <ChevronLeft size={16} className="text-slate-400 rotate-90" /> : <ChevronRight size={16} className="text-slate-400" />}
-            </button>
-            
-            {isOpen && (
-              <div className="p-4 pt-0 border-t border-slate-800/50 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="mt-4 text-slate-300 leading-relaxed text-sm md:text-base">
-                  <FormattedText text={conceptView === 'beginner' ? concept.beginner : concept.advanced} />
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-
-  const renderPractical = () => (
-    <div className="space-y-6">
-      {/* Mode Switcher */}
-      <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 w-fit">
-        <button
-          onClick={() => setLabMode('terminal')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-            labMode === 'terminal'
-              ? 'bg-emerald-500 text-slate-950 shadow-sm'
-              : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Terminal size={14} />
-          <span>Interactive Terminal</span>
-        </button>
-        <button
-          onClick={() => setLabMode('checklist')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-            labMode === 'checklist'
-              ? 'bg-emerald-500 text-slate-950 shadow-sm'
-              : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <ClipboardCheck size={14} />
-          <span>Simple Checklist</span>
-        </button>
-      </div>
-
-      <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-          <FlaskConical className="text-emerald-400" size={20} />
-          {lesson.practical.title}
-        </h3>
-        <p className="text-slate-400 mb-4">{lesson.practical.intro}</p>
-        
-        <div className="bg-emerald-900/20 border border-emerald-500/20 rounded-lg p-4 flex gap-3 items-start">
-          <Lightbulb className="text-emerald-400 shrink-0 mt-1" size={18} />
-          <div>
-            <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">Goal</span>
-            <p className="text-emerald-100/80 text-sm mt-1">{lesson.practical.goal}</p>
-          </div>
-        </div>
-      </div>
-
-      {labMode === 'terminal' ? (
-        <CyberTerminal
-          lessonId={lesson.id}
-          steps={lesson.practical.steps}
-          goal={lesson.practical.goal}
-          completedSteps={completedSteps}
-          onToggleStep={toggleStep}
-        />
-      ) : (
-        <div className="space-y-3">
-          {lesson.practical.steps.map((step, idx) => {
-            const isDone = completedSteps.has(idx);
-            return (
-              <div 
-                key={idx}
-                onClick={() => toggleStep(idx)}
-                className={`group flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
-                  isDone 
-                    ? 'bg-slate-900/30 border-slate-800 opacity-60' 
-                    : 'bg-slate-800/40 border-slate-700 hover:border-indigo-500/50 hover:bg-slate-800/60'
-                }`}
-              >
-                <div className={`mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                  isDone ? 'bg-indigo-500 border-indigo-500' : 'border-slate-600 group-hover:border-indigo-400'
-                }`}>
-                  {isDone && <Check size={14} className="text-white" />}
-                </div>
-                <div className={`text-sm leading-relaxed ${isDone ? 'line-through text-slate-500' : 'text-slate-300'}`}>
-                  <FormattedText text={step} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-
-  const renderQuiz = () => {
-    const currentQ = lesson.quiz[currentQIndex];
-    const isSelected = selectedOptions[currentQIndex] !== undefined;
-    
-    if (quizSubmitted) {
-      const score = lesson.quiz.reduce((acc, q, idx) => {
-        return acc + (selectedOptions[idx] === q.correctIndex ? 1 : 0);
-      }, 0);
-      const percentage = Math.round((score / lesson.quiz.length) * 100);
-
-      return (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          <div className={`text-center p-8 rounded-2xl border ${quizPassed ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-red-900/20 border-red-500/30'}`}>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-900 mb-4">
-              {quizPassed ? <GraduationCap size={32} className="text-emerald-400" /> : <X size={32} className="text-red-400" />}
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">
-              {quizPassed ? 'Module Mastered!' : 'Keep Training'}
-            </h3>
-            <p className="text-slate-400 mb-6">
-              You scored <span className={`font-bold ${quizPassed ? 'text-emerald-400' : 'text-red-400'}`}>{percentage}%</span>
-            </p>
-            
-            {!quizPassed && (
-              <button 
-                onClick={retryQuiz}
-                className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium transition-colors"
-              >
-                Retry Quiz
-              </button>
-            )}
-            {quizPassed && (
-              <div className="text-emerald-400 text-sm font-medium animate-pulse">
-                Redirecting to completion...
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-              <ClipboardCheck size={18} className="text-indigo-400" />
-              Review Answers
-            </h4>
-            {lesson.quiz.map((q, idx) => {
-              const userAns = selectedOptions[idx];
-              const isCorrect = userAns === q.correctIndex;
-              
-              return (
-                <div key={idx} className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-5">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className={`mt-1 p-1 rounded-full ${isCorrect ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
-                      {isCorrect ? <Check size={14} /> : <X size={14} />}
-                    </div>
-                    <p className="text-slate-200 font-medium text-sm">{q.question}</p>
-                  </div>
-                  
-                  <div className="ml-7 space-y-2 mb-4">
-                    {q.options.map((opt, optIdx) => {
-                      let optClass = "text-slate-500";
-                      if (optIdx === q.correctIndex) optClass = "text-emerald-400 font-medium";
-                      else if (optIdx === userAns && !isCorrect) optClass = "text-red-400 line-through";
-                      
-                      return (
-                        <div key={optIdx} className={`text-sm flex items-center gap-2 ${optClass}`}>
-                          <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[10px]">
-                            {String.fromCharCode(65 + optIdx)}
-                          </span>
-                          {opt}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="ml-7 bg-indigo-900/20 border border-indigo-500/20 rounded-lg p-3 flex gap-3 items-start">
-                    <Sparkles size={16} className="text-indigo-400 shrink-0 mt-0.5" />
-                    <p className="text-indigo-200/80 text-xs leading-relaxed">{q.explanation}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6 flex items-center justify-between text-sm text-slate-400">
-          <span>Question {currentQIndex + 1} of {lesson.quiz.length}</span>
-          <span className="px-2 py-1 bg-slate-800 rounded text-xs font-mono">
-            {Math.round(((currentQIndex) / lesson.quiz.length) * 100)}% Complete
-          </span>
-        </div>
-
-        <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-6 md:p-8 mb-6">
-          <h3 className="text-xl font-semibold text-white mb-6 leading-snug">
-            {currentQ.question}
-          </h3>
-
-          <div className="space-y-3">
-            {currentQ.options.map((opt, idx) => {
-              const isSelected = selectedOptions[currentQIndex] === idx;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleOptionSelect(currentQIndex, idx)}
-                  className={`w-full text-left p-4 rounded-xl border transition-all flex items-center gap-4 ${
-                    isSelected 
-                      ? 'bg-indigo-600/20 border-indigo-500 text-white' 
-                      : 'bg-slate-800/30 border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600'
-                  }`}
-                >
-                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 ${
-                    isSelected ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-500 text-slate-500'
-                  }`}>
-                    {String.fromCharCode(65 + idx)}
-                  </div>
-                  <span className="text-sm md:text-base">{opt}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Mobile Inline Actions for Quiz Navigation */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-800 md:hidden">
-           <button
-            onClick={() => setCurrentQIndex(prev => Math.max(0, prev - 1))}
-            disabled={currentQIndex === 0}
-            className="flex items-center gap-2 text-slate-400 disabled:opacity-30 px-4 py-2"
-          >
-            <ChevronLeft size={20} /> Prev
-          </button>
-          
-          {currentQIndex === lesson.quiz.length - 1 ? (
-             <button
-              onClick={submitQuiz}
-              disabled={!isSelected}
-              className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-            >
-              Submit <Check size={18} />
-            </button>
-          ) : (
-            <button
-              onClick={() => setCurrentQIndex(prev => Math.min(lesson.quiz.length - 1, prev + 1))}
-              className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 px-4 py-2"
-            >
-              Next <ChevronRight size={20} />
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // --- Main Render ---
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 pb-24 md:pb-12">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate(backTo)}
-              className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{lesson.icon}</span>
-              <div>
-                <h1 className="font-bold text-white leading-tight text-sm md:text-base">{lesson.title}</h1>
-                <p className="text-xs text-slate-500 hidden sm:block">{lesson.module}</p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-background grid-bg text-foreground">
+      {/* ── Command bar ─────────────────────────────── */}
+      <header className="sticky top-0 z-30 backdrop-blur-xl bg-background/85 border-b border-border/30">
+        <div className="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-3">
+          <button
+            onClick={() => navigate(backTo)}
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-secondary/50 transition-colors"
+            aria-label="Back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-[0.18em] truncate">
+              {lesson.module}
+            </p>
+            <h1 className="font-display font-bold text-sm text-foreground truncate flex items-center gap-1.5">
+              <span>{lesson.icon}</span> {lesson.title}
+            </h1>
           </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-1 bg-slate-900 rounded-lg p-1 border border-slate-800">
-              {(['concept', 'practical', 'quiz'] as Stage[]).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStage(s)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    stage === s 
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20' 
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
-                </button>
-              ))}
-            </div>
+          <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary shrink-0">
+            <Sparkles className="w-3 h-3" /> +1 XP · +2 ◈
           </div>
+        </div>
+        <div className="h-0.5 bg-secondary/40">
+          <div
+            className="h-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-500"
+            style={{ width: `${Math.max(journey, 6)}%` }}
+          />
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8">
-        {/* Stage Indicator (Mobile) */}
-        <div className="md:hidden flex justify-center mb-8">
-          <div className="flex items-center gap-2 bg-slate-900/50 p-1 rounded-full border border-slate-800">
-             {(['concept', 'practical', 'quiz'] as Stage[]).map((s, i) => (
-               <button
-                 key={s}
-                 onClick={() => setStage(s)}
-                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                   stage === s ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500'
-                 }`}
-               >
-                 {i + 1}
-               </button>
-             ))}
+      <div className="max-w-6xl mx-auto px-3 md:px-5 py-4 md:py-6 pb-28 md:flex md:gap-6">
+        {/* ── Stage rail ────────────────────────────── */}
+        <nav className="md:w-52 md:shrink-0 mb-4 md:mb-0">
+          <div className="md:sticky md:top-24 flex md:flex-col gap-2">
+            {STAGES.map((s, i) => {
+              const active = stage === s.key;
+              const done = i < stageIndex || (s.key === 'quiz' && quizSubmitted && passed);
+              return (
+                <button
+                  key={s.key}
+                  onClick={() => setStage(s.key)}
+                  className={`flex-1 md:flex-none flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all ${
+                    active
+                      ? 'border-primary/50 bg-primary/10 text-primary shadow-[0_0_20px_-8px_hsl(var(--primary))]'
+                      : 'border-border/30 bg-card/40 text-muted-foreground hover:border-primary/25 hover:text-foreground'
+                  }`}
+                >
+                  <span
+                    className={`w-6 h-6 rounded-lg grid place-items-center shrink-0 border text-[10px] font-mono ${
+                      done ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400' : 'border-current/30 bg-background/40'
+                    }`}
+                  >
+                    {done ? <Check className="w-3 h-3" /> : <s.icon className="w-3 h-3" />}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-display font-semibold leading-tight">{s.label}</span>
+                    <span className="hidden md:block text-[10px] opacity-70 leading-tight">{s.hint}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        </div>
+        </nav>
 
-        {/* Content Area */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          
-          {/* STAGE 1: CONCEPTS */}
+        {/* ── Stage content ─────────────────────────── */}
+        <main className="flex-1 min-w-0">
+          {/* STAGE 1: BRIEF */}
           {stage === 'concept' && (
-            <div className="space-y-8">
-              {/* Philosophy Brief */}
-              <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/20 rounded-2xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <BookOpen size={120} className="text-indigo-400" />
-                </div>
-                <h2 className="text-indigo-400 font-bold text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <Shield size={14} /> Mission Brief
-                </h2>
-                <p className="text-lg md:text-xl text-white font-medium leading-relaxed italic">
+            <div className="space-y-5 animate-fade-in">
+              <section className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/12 via-card/60 to-transparent p-5">
+                <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5" /> Mission brief
+                </p>
+                <p className="text-sm md:text-base text-foreground leading-relaxed italic">
                   "{lesson.philosophy}"
                 </p>
-              </div>
+                <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+              </section>
 
-              {/* Terminal Notice */}
               {lesson.terminalNotice && (
-                <div className="bg-black/40 border-l-4 border-emerald-500 p-4 rounded-r-lg flex gap-3 items-start font-mono text-xs md:text-sm text-emerald-400/90">
-                  <Terminal size={16} className="shrink-0 mt-0.5" />
+                <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4 flex gap-3 items-start font-mono text-xs text-emerald-400">
+                  <Terminal className="w-4 h-4 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold block mb-1 text-emerald-500">SYSTEM NOTICE</span>
-                    {lesson.terminalNotice}
+                    <span className="font-bold block mb-1 text-emerald-300 tracking-wider">SYSTEM NOTICE</span>
+                    <FormattedText text={lesson.terminalNotice} />
                   </div>
                 </div>
               )}
 
-              {/* View Toggle */}
-              <div className="flex justify-center">
-                <div className="bg-slate-900 p-1 rounded-xl inline-flex border border-slate-800">
-                  <button
-                    onClick={() => setConceptView('beginner')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      conceptView === 'beginner' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
-                    }`}
-                  >
-                    Beginner
-                  </button>
-                  <button
-                    onClick={() => setConceptView('advanced')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      conceptView === 'advanced' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
-                    }`}
-                  >
-                    Advanced
-                  </button>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.18em]">
+                  Breakdown · {lesson.concepts.length} ideas
+                </p>
+                <div className="flex p-0.5 rounded-full border border-border/40 bg-card/60">
+                  {(['beginner', 'advanced'] as const).map(v => (
+                    <button
+                      key={v}
+                      onClick={() => setConceptView(v)}
+                      className={`px-3 py-1 rounded-full text-[10px] font-display font-semibold capitalize transition-all ${
+                        conceptView === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {v}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Concepts Accordion */}
-              {renderConcepts()}
+              {/* Accordion spine */}
+              <div className="relative pl-5">
+                <span className="absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/50 via-border/40 to-transparent" />
+                <div className="space-y-2.5">
+                  {lesson.concepts.map((c, i) => {
+                    const open = openConcept === i;
+                    return (
+                      <div key={i} className="relative">
+                        <span
+                          className={`absolute -left-5 top-4 w-[11px] h-[11px] rounded-full border-2 transition-colors ${
+                            open ? 'bg-primary border-primary' : 'bg-background border-border'
+                          }`}
+                        />
+                        <button
+                          onClick={() => setOpenConcept(open ? -1 : i)}
+                          className={`w-full text-left glass-card rounded-2xl px-4 py-3 border transition-all ${
+                            open ? 'border-primary/35' : 'border-border/25 hover:border-primary/20'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className="text-[10px] font-mono text-primary">{String(i + 1).padStart(2, '0')}</span>
+                            <span className="flex-1 font-display font-bold text-sm text-foreground">{c.title}</span>
+                            <ChevronRight
+                              className={`w-4 h-4 text-muted-foreground transition-transform ${open ? 'rotate-90' : ''}`}
+                            />
+                          </span>
+                          {open && (
+                            <div className="text-xs text-muted-foreground leading-relaxed mt-2.5 animate-fade-in">
+                              <FormattedText text={conceptView === 'beginner' ? c.beginner : c.advanced} />
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
               {/* Key Takeaways */}
-              <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Check className="text-emerald-500" size={18} />
-                  Key Takeaways
-                </h3>
-                <ul className="space-y-3">
-                  {lesson.keyTakeaways.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-slate-400">
-                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                      <FormattedText text={item} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {lesson.keyTakeaways && lesson.keyTakeaways.length > 0 && (
+                <div className="glass-card rounded-2xl p-5 border border-border/30">
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-primary font-bold mb-3 flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" /> Key Takeaways
+                  </h3>
+                  <ul className="space-y-2">
+                    {lesson.keyTakeaways.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-xs text-muted-foreground leading-relaxed">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                        <FormattedText text={item} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
-          {/* STAGE 2: PRACTICAL */}
-          {stage === 'practical' && renderPractical()}
+          {/* STAGE 2: LAB */}
+          {stage === 'practical' && (
+            <div className="space-y-6 animate-fade-in">
+              <section className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent p-5">
+                <p className="text-[10px] font-mono text-amber-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
+                  <FlaskConical className="w-3 h-3" /> Practical lab
+                </p>
+                <h2 className="font-display font-bold text-base md:text-lg text-foreground mb-1">
+                  {lesson.practical.title}
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {lesson.practical.intro}
+                </p>
+              </section>
 
-          {/* STAGE 3: QUIZ */}
-          {stage === 'quiz' && renderQuiz()}
-        </div>
-      </main>
+              {/* Lab Mode Switcher */}
+              <div className="flex items-center gap-1 bg-card/60 p-1 rounded-xl border border-border/40 w-fit">
+                <button
+                  onClick={() => setLabMode('terminal')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    labMode === 'terminal'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Terminal className="w-3.5 h-3.5" />
+                  <span>Interactive Terminal</span>
+                </button>
+                <button
+                  onClick={() => setLabMode('checklist')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    labMode === 'checklist'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <ClipboardCheck className="w-3.5 h-3.5" />
+                  <span>Simple Checklist</span>
+                </button>
+              </div>
 
-      {/* Desktop Floating Action Dock */}
-      <div className="hidden md:flex fixed bottom-8 inset-x-0 z-30 justify-center pointer-events-none">
-        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 shadow-2xl shadow-black/50 rounded-2xl p-2 flex items-center gap-2 pointer-events-auto">
-          
+              {labMode === 'terminal' ? (
+                <CyberTerminal
+                  lessonId={lesson.id}
+                  steps={lesson.practical.steps}
+                  goal={lesson.practical.goal}
+                  completedSteps={completedSteps}
+                  onToggleStep={toggleStep}
+                />
+              ) : (
+                <div className="glass-card rounded-2xl p-4 border border-border/30">
+                  <div className="mb-4">
+                    <p className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-1">
+                      <Lightbulb className="w-3 h-3" /> Goal
+                    </p>
+                    <p className="text-sm text-foreground leading-relaxed">{lesson.practical.goal}</p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/10">
+                      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Steps</p>
+                      <span className="text-[10px] font-mono text-primary">
+                        {stepsDone}/{lesson.practical.steps.length}
+                      </span>
+                    </div>
+                    <ol className="space-y-2">
+                      {lesson.practical.steps.map((step, idx) => {
+                        const done = completedSteps.has(idx);
+                        return (
+                          <li key={idx}>
+                            <button
+                              onClick={() => toggleStep(idx)}
+                              className={`w-full flex gap-3 text-left rounded-xl px-3 py-2.5 border transition-all ${
+                                done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/20 hover:border-primary/20'
+                              }`}
+                            >
+                              <span
+                                className={`w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-mono border ${
+                                  done
+                                    ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400'
+                                    : 'border-border/50 text-muted-foreground'
+                                }`}
+                              >
+                                {done ? <Check className="w-3 h-3" /> : idx + 1}
+                              </span>
+                              <span className={`text-xs leading-relaxed flex-1 ${done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                                <FormattedText text={step} />
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STAGE 3: PROOF / QUIZ */}
+          {stage === 'quiz' && (
+            <div className="space-y-4 animate-fade-in">
+              {!quizSubmitted ? (
+                <>
+                  <section className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 to-transparent p-5 flex items-center gap-3">
+                    <GraduationCap className="w-5 h-5 text-primary shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-display font-bold text-foreground">Mastery check</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Score {passingScore}/{quiz.length} to finish this mission.
+                      </p>
+                    </div>
+                    <div className="flex gap-1.5">
+                      {quiz.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setQIndex(i)}
+                          className={`w-2.5 h-2.5 rounded-full transition-all ${
+                            i === qIndex
+                              ? 'bg-primary scale-125'
+                              : selectedOptions[i] !== undefined
+                              ? 'bg-primary/50'
+                              : 'bg-secondary'
+                          }`}
+                          aria-label={`Question ${i + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </section>
+
+                  {quiz[qIndex] && (
+                    <div className="glass-card rounded-2xl p-5" key={qIndex}>
+                      <p className="text-[10px] font-mono text-muted-foreground mb-2 uppercase tracking-[0.18em]">
+                        Question {qIndex + 1} of {quiz.length}
+                      </p>
+                      <p className="text-sm md:text-base font-display font-semibold text-foreground mb-4">
+                        {quiz[qIndex].question}
+                      </p>
+                      <div className="space-y-2">
+                        {quiz[qIndex].options.map((opt, oi) => {
+                          const isSelected = selectedOptions[qIndex] === oi;
+                          return (
+                            <button
+                              key={oi}
+                              onClick={() => handleOptionSelect(qIndex, oi)}
+                              className={`w-full text-left px-3.5 py-3 rounded-xl border text-xs leading-relaxed transition-all flex items-center gap-3 ${
+                                isSelected
+                                  ? 'border-primary bg-primary/15 text-primary font-semibold shadow-[0_0_15px_-5px_hsl(var(--primary))]'
+                                  : 'border-border/30 bg-card/30 text-foreground hover:border-primary/25 hover:bg-card/50'
+                              }`}
+                            >
+                              <span
+                                className={`w-5 h-5 rounded-full border grid place-items-center text-[10px] font-mono shrink-0 ${
+                                  isSelected
+                                    ? 'border-primary bg-primary text-primary-foreground font-bold'
+                                    : 'border-border/60 text-muted-foreground'
+                                }`}
+                              >
+                                {String.fromCharCode(65 + oi)}
+                              </span>
+                              <span className="flex-1">{opt}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Navigation buttons inside quiz card */}
+                      <div className="flex items-center justify-between mt-5 pt-3 border-t border-border/20">
+                        <button
+                          onClick={() => setQIndex(p => Math.max(0, p - 1))}
+                          disabled={qIndex === 0}
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors px-2 py-1"
+                        >
+                          <ChevronLeft className="w-4 h-4" /> Prev
+                        </button>
+                        {qIndex < quiz.length - 1 ? (
+                          <button
+                            onClick={() => setQIndex(p => Math.min(quiz.length - 1, p + 1))}
+                            className="flex items-center gap-1.5 text-xs text-primary font-semibold hover:underline px-2 py-1"
+                          >
+                            Next <ChevronRight className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleSubmitQuiz}
+                            disabled={selectedOptions[qIndex] === undefined}
+                            className="flex items-center gap-1.5 text-xs bg-primary text-primary-foreground font-semibold px-3 py-1.5 rounded-lg disabled:opacity-40 transition-all"
+                          >
+                            Submit <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Results card */
+                <div className="space-y-4">
+                  <div
+                    className={`rounded-2xl p-6 border text-center ${
+                      quizPassed
+                        ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                        : 'border-destructive/30 bg-destructive/10 text-destructive'
+                    }`}
+                  >
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-background/50 border border-current/20 mb-3">
+                      {quizPassed ? <GraduationCap className="w-6 h-6" /> : <X className="w-6 h-6" />}
+                    </div>
+                    <p className="font-display font-bold text-base mb-1">
+                      {quizPassed ? 'Mission Completed!' : 'Mastery Check Failed'}
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      You scored {correctCount} of {quiz.length} ({Math.round((correctCount / quiz.length) * 100)}%). Needed {passingScore} to pass.
+                    </p>
+                    {!quizPassed ? (
+                      <button
+                        onClick={retryQuiz}
+                        className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
+                      >
+                        Try Again
+                      </button>
+                    ) : (
+                      <p className="text-xs font-mono text-emerald-400 animate-pulse">
+                        Redirecting to mission debrief...
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Answers review */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Answer Review</p>
+                    {quiz.map((q, idx) => {
+                      const userAns = selectedOptions[idx];
+                      const isCorrect = userAns === q.correctIndex;
+                      return (
+                        <div key={idx} className="glass-card rounded-2xl p-4 border border-border/30 space-y-2 text-xs">
+                          <div className="flex items-start gap-2">
+                            <span className={`w-4 h-4 rounded-full grid place-items-center shrink-0 mt-0.5 ${
+                              isCorrect ? 'bg-emerald-500/20 text-emerald-400' : 'bg-destructive/20 text-destructive'
+                            }`}>
+                              {isCorrect ? <Check className="w-2.5 h-2.5" /> : <X className="w-2.5 h-2.5" />}
+                            </span>
+                            <p className="font-semibold text-foreground flex-1">{q.question}</p>
+                          </div>
+                          <div className="pl-6 space-y-1 text-muted-foreground">
+                            <p>
+                              Your answer: <span className={isCorrect ? 'text-emerald-400 font-semibold' : 'text-destructive font-semibold'}>{q.options[userAns] ?? 'Unanswered'}</span>
+                            </p>
+                            {!isCorrect && (
+                              <p>
+                                Correct answer: <span className="text-emerald-400 font-semibold">{q.options[q.correctIndex]}</span>
+                              </p>
+                            )}
+                            <p className="text-[11px] text-muted-foreground/80 italic pt-1 border-t border-border/10">
+                              {q.explanation}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* ── Desktop Floating Action Dock ───────────── */}
+      <div className="hidden md:flex fixed bottom-6 inset-x-0 z-30 justify-center pointer-events-none">
+        <div className="glass-card backdrop-blur-xl border border-border/40 shadow-2xl rounded-2xl p-2 flex items-center gap-2 pointer-events-auto">
           {stage === 'concept' && (
             <button
               onClick={() => setStage('practical')}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 shadow-lg shadow-indigo-900/20"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
             >
-              Start Lab <FlaskConical size={18} />
+              Start Lab <FlaskConical className="w-4 h-4" />
             </button>
           )}
 
@@ -587,55 +566,47 @@ export default function CyberLessonPage() {
             <>
               <button
                 onClick={() => setStage('concept')}
-                className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary/40 rounded-xl transition-colors"
+                aria-label="Back to Brief"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setStage('quiz')}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
               >
-                Take Quiz <ClipboardCheck size={18} />
+                Take Proof Quiz <ClipboardCheck className="w-4 h-4" />
               </button>
             </>
           )}
 
           {stage === 'quiz' && !quizSubmitted && (
-             <>
+            <>
               <button
-                onClick={() => setCurrentQIndex(prev => Math.max(0, prev - 1))}
-                disabled={currentQIndex === 0}
-                className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors disabled:opacity-30"
+                onClick={() => setQIndex(p => Math.max(0, p - 1))}
+                disabled={qIndex === 0}
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary/40 rounded-xl transition-colors disabled:opacity-30"
+                aria-label="Previous question"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft className="w-4 h-4" />
               </button>
-              
-              {currentQIndex === lesson.quiz.length - 1 ? (
+              {qIndex < quiz.length - 1 ? (
                 <button
-                  onClick={submitQuiz}
-                  disabled={selectedOptions[currentQIndex] === undefined}
-                  className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white px-8 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+                  onClick={() => setQIndex(p => Math.min(quiz.length - 1, p + 1))}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2"
                 >
-                  Submit Answers <Check size={18} />
+                  Next Question <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
                 <button
-                  onClick={() => setCurrentQIndex(prev => Math.min(lesson.quiz.length - 1, prev + 1))}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2"
+                  onClick={handleSubmitQuiz}
+                  disabled={selectedOptions[qIndex] === undefined}
+                  className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white px-6 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-900/20"
                 >
-                  Next Question <ChevronRight size={18} />
+                  Submit Answers <Check className="w-4 h-4" />
                 </button>
               )}
             </>
-          )}
-          
-          {stage === 'quiz' && quizSubmitted && !quizPassed && (
-             <button
-                onClick={retryQuiz}
-                className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2"
-              >
-                Retry Quiz <ChevronRight size={18} />
-              </button>
           )}
         </div>
       </div>
