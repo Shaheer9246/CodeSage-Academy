@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    console.log(`[Lemon Squeezy] Received event: ${eventName} for user: ${userId || customerEmail}`);
+    console.log(`[Lemon Squeezy] Received event: ${eventName || 'unknown'}`);
 
     let targetUserId = userId;
 
@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
     }
 
     if (!targetUserId) {
-      console.warn('[Lemon Squeezy] No user found for this transaction:', { userId, customerEmail });
+      console.warn(`[Lemon Squeezy] No account matched transaction event: ${eventName || 'unknown'}`);
       return new Response(JSON.stringify({ received: true, message: 'User not found in CodeSage' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: updateErr.message }), { status: 500, headers: corsHeaders });
       }
 
-      console.log(`[Lemon Squeezy] Successfully upgraded user ${targetUserId} to PRO!`);
+      console.log('[Lemon Squeezy] Successfully upgraded account to PRO.');
     } else if (eventName === 'subscription_expired' || eventName === 'subscription_cancelled') {
       // Revert student to Free Tier
       await supabaseAdmin
@@ -143,7 +143,7 @@ Deno.serve(async (req) => {
         })
         .eq('id', targetUserId);
 
-      console.log(`[Lemon Squeezy] Reverted user ${targetUserId} to Free Tier.`);
+      console.log('[Lemon Squeezy] Reverted account to Free Tier.');
     }
 
     return new Response(JSON.stringify({ success: true, event: eventName }), {
