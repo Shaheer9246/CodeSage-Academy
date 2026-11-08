@@ -10,78 +10,77 @@ import { LessonSponsorGate } from "@/components/LessonSponsorGate";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2, Terminal } from "lucide-react";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import RouteSEO from "@/components/RouteSEO";
 
-// Direct imports for all pages so route transitions are 100% instant
-// with zero per-page "loading module..." delay and zero chunk-mismatch errors
-import Auth from "./pages/Auth";
-import Welcome from "./pages/Welcome";
-import Dashboard from "./pages/Dashboard";
-import Onboarding from "./pages/Onboarding";
-import Trip from "./pages/Trip";
-import Privacy from "./pages/Privacy";
-import Contact from "./pages/Contact";
-import Terms from "./pages/Terms";
-import CookiePolicy from "./pages/CookiePolicy";
-import Admin from "./pages/Admin";
-import ResetPassword from "./pages/ResetPassword";
-import Learn from "./pages/Learn";
-import LessonPage from "./pages/LessonPage";
-import LessonComplete from "./pages/LessonComplete";
-import NetworkingLearn from "./pages/NetworkingLearn";
-import NetworkingLessonPage from "./pages/NetworkingLessonPage";
-import CyberLearn from "./pages/CyberLearn";
-import CyberLessonPage from "./pages/CyberLessonPage";
-import AiFundamentalsLearn from "./pages/AiFundamentalsLearn";
-import AiFundamentalsLessonPage from "./pages/AiFundamentalsLessonPage";
-import IntermediateAiLearn from "./pages/IntermediateAiLearn";
-import IntermediateAiLessonPage from "./pages/IntermediateAiLessonPage";
-import AdvancedAiLearn from "./pages/AdvancedAiLearn";
-import AdvancedAiLessonPage from "./pages/AdvancedAiLessonPage";
-import FreelanceLearn from "./pages/FreelanceLearn";
-import FreelanceLessonPage from "./pages/FreelanceLessonPage";
-import FullstackLearn from "./pages/FullstackLearn";
-import FullstackLessonPage from "./pages/FullstackLessonPage";
-import JavaLearn from "./pages/JavaLearn";
-import JavaLessonPage from "./pages/JavaLessonPage";
-import JavaExpertLearn from "@/pages/JavaExpertLearn";
-import JavaExpertLessonPage from "@/pages/JavaExpertLessonPage";
-import CLearn from "./pages/CLearn";
-import CLessonPage from "./pages/CLessonPage";
-import CExpertLearn from "./pages/CExpertLearn";
-import CExpertLessonPage from "./pages/CExpertLessonPage";
-import PythonLearn from "./pages/PythonLearn";
-import PythonLessonPage from "./pages/PythonLessonPage";
-import PythonExpertLearn from "./pages/PythonExpertLearn";
-import PythonExpertLessonPage from "./pages/PythonExpertLessonPage";
-import LocalLearn from "./pages/LocalLearn";
-import LocalLessonPage from "./pages/LocalLessonPage";
-import SqlLearn from "./pages/SqlLearn";
-import SqlLessonPage from "./pages/SqlLessonPage";
-import RealFreelanceLearn from "./pages/RealFreelanceLearn";
-import RealFreelanceLessonPage from "./pages/RealFreelanceLessonPage";
-import CppLearn from "./pages/CppLearn";
-import CppLessonPage from "./pages/CppLessonPage";
-import CppExpertLearn from "./pages/CppExpertLearn";
-import CppExpertLessonPage from "./pages/CppExpertLessonPage";
-// Lazy-load 3D WebGL engine & lessons on demand so non-3D courses do not download Three.js bundle upfront
+// Route-Level Code Splitting via React.lazy() for minimal initial bundle & fast TTI
+const Auth = React.lazy(() => import("./pages/Auth"));
+const Welcome = React.lazy(() => import("./pages/Welcome"));
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const Onboarding = React.lazy(() => import("./pages/Onboarding"));
+const Trip = React.lazy(() => import("./pages/Trip"));
+const Privacy = React.lazy(() => import("./pages/Privacy"));
+const Contact = React.lazy(() => import("./pages/Contact"));
+const Terms = React.lazy(() => import("./pages/Terms"));
+const CookiePolicy = React.lazy(() => import("./pages/CookiePolicy"));
+const Admin = React.lazy(() => import("./pages/Admin"));
+const ResetPassword = React.lazy(() => import("./pages/ResetPassword"));
+const Learn = React.lazy(() => import("./pages/Learn"));
+const LessonPage = React.lazy(() => import("./pages/LessonPage"));
+const LessonComplete = React.lazy(() => import("./pages/LessonComplete"));
+const NetworkingLearn = React.lazy(() => import("./pages/NetworkingLearn"));
+const NetworkingLessonPage = React.lazy(() => import("./pages/NetworkingLessonPage"));
+const CyberLearn = React.lazy(() => import("./pages/CyberLearn"));
+const CyberLessonPage = React.lazy(() => import("./pages/CyberLessonPage"));
+const AiFundamentalsLearn = React.lazy(() => import("./pages/AiFundamentalsLearn"));
+const AiFundamentalsLessonPage = React.lazy(() => import("./pages/AiFundamentalsLessonPage"));
+const IntermediateAiLearn = React.lazy(() => import("./pages/IntermediateAiLearn"));
+const IntermediateAiLessonPage = React.lazy(() => import("./pages/IntermediateAiLessonPage"));
+const AdvancedAiLearn = React.lazy(() => import("./pages/AdvancedAiLearn"));
+const AdvancedAiLessonPage = React.lazy(() => import("./pages/AdvancedAiLessonPage"));
+const FreelanceLearn = React.lazy(() => import("./pages/FreelanceLearn"));
+const FreelanceLessonPage = React.lazy(() => import("./pages/FreelanceLessonPage"));
+const FullstackLearn = React.lazy(() => import("./pages/FullstackLearn"));
+const FullstackLessonPage = React.lazy(() => import("./pages/FullstackLessonPage"));
+const JavaLearn = React.lazy(() => import("./pages/JavaLearn"));
+const JavaLessonPage = React.lazy(() => import("./pages/JavaLessonPage"));
+const JavaExpertLearn = React.lazy(() => import("@/pages/JavaExpertLearn"));
+const JavaExpertLessonPage = React.lazy(() => import("@/pages/JavaExpertLessonPage"));
+const CLearn = React.lazy(() => import("./pages/CLearn"));
+const CLessonPage = React.lazy(() => import("./pages/CLessonPage"));
+const CExpertLearn = React.lazy(() => import("./pages/CExpertLearn"));
+const CExpertLessonPage = React.lazy(() => import("./pages/CExpertLessonPage"));
+const PythonLearn = React.lazy(() => import("./pages/PythonLearn"));
+const PythonLessonPage = React.lazy(() => import("./pages/PythonLessonPage"));
+const PythonExpertLearn = React.lazy(() => import("./pages/PythonExpertLearn"));
+const PythonExpertLessonPage = React.lazy(() => import("./pages/PythonExpertLessonPage"));
+const LocalLearn = React.lazy(() => import("./pages/LocalLearn"));
+const LocalLessonPage = React.lazy(() => import("./pages/LocalLessonPage"));
+const SqlLearn = React.lazy(() => import("./pages/SqlLearn"));
+const SqlLessonPage = React.lazy(() => import("./pages/SqlLessonPage"));
+const RealFreelanceLearn = React.lazy(() => import("./pages/RealFreelanceLearn"));
+const RealFreelanceLessonPage = React.lazy(() => import("./pages/RealFreelanceLessonPage"));
+const CppLearn = React.lazy(() => import("./pages/CppLearn"));
+const CppLessonPage = React.lazy(() => import("./pages/CppLessonPage"));
+const CppExpertLearn = React.lazy(() => import("./pages/CppExpertLearn"));
+const CppExpertLessonPage = React.lazy(() => import("./pages/CppExpertLessonPage"));
 const Three3dLearn = React.lazy(() => import("./pages/Three3dLearn"));
 const Three3dLessonPage = React.lazy(() => import("./pages/Three3dLessonPage"));
-import Tour from "./pages/Tour";
-import Playground from "./pages/Playground";
-import Challenges from "./pages/Challenges";
-import DsaSheet from "./pages/DsaSheet";
-import Roadmap from "./pages/Roadmap";
-import LevelTest from "./pages/LevelTest";
-import SettingsPage from "./pages/SettingsPage";
-import QuestionsPage from "./pages/QuestionsPage";
-import CommunityPage from "./pages/CommunityPage";
-import Suggestions from "./pages/Suggestions";
-import CodeCrawler from "./pages/CodeCrawler";
-import NotFound from "./pages/NotFound";
-import InboxPage from "./pages/Inbox";
-import AiTeacher from "./pages/AiTeacher";
-import Marketplace from "./pages/Marketplace";
-import SupportUsPage from "./pages/SupportUsPage";
+const Tour = React.lazy(() => import("./pages/Tour"));
+const Playground = React.lazy(() => import("./pages/Playground"));
+const Challenges = React.lazy(() => import("./pages/Challenges"));
+const DsaSheet = React.lazy(() => import("./pages/DsaSheet"));
+const Roadmap = React.lazy(() => import("./pages/Roadmap"));
+const LevelTest = React.lazy(() => import("./pages/LevelTest"));
+const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
+const QuestionsPage = React.lazy(() => import("./pages/QuestionsPage"));
+const CommunityPage = React.lazy(() => import("./pages/CommunityPage"));
+const Suggestions = React.lazy(() => import("./pages/Suggestions"));
+const CodeCrawler = React.lazy(() => import("./pages/CodeCrawler"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const InboxPage = React.lazy(() => import("./pages/Inbox"));
+const AiTeacher = React.lazy(() => import("./pages/AiTeacher"));
+const Marketplace = React.lazy(() => import("./pages/Marketplace"));
+const SupportUsPage = React.lazy(() => import("./pages/SupportUsPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +90,20 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function RouteLoadingSpinner() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <div className="text-center animate-fade-in bg-[#1a1a2e]/90 border border-primary/20 backdrop-blur-xl px-6 py-5 rounded-2xl shadow-xl shadow-black/40">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 border border-primary/25">
+          <Terminal className="w-6 h-6 text-primary" />
+        </div>
+        <Loader2 className="w-4 h-4 text-primary animate-spin mx-auto mb-2" />
+        <p className="text-muted-foreground text-xs font-mono">Loading module...</p>
+      </div>
+    </div>
+  );
+}
 
 function LoadingScreen() {
   return (
@@ -105,6 +118,7 @@ function LoadingScreen() {
     </div>
   );
 }
+
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, isOnboarded, loading } = useUser();
@@ -194,11 +208,12 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <RouteSEO />
             <GoogleAnalyticsTracker />
             <ErrorBoundary>
               <AppShell>
                 <LessonSponsorGate>
-                  <React.Suspense fallback={<LoadingScreen />}>
+                  <React.Suspense fallback={<RouteLoadingSpinner />}>
                     <Routes>
                   <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
