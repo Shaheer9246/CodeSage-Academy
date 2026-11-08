@@ -102,23 +102,7 @@ const formatGoal = (goalId?: string) => {
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-
-  // Auto-open Edit Profile modal if navigated with ?edit=goal or ?edit=profile
-  useEffect(() => {
-    const editParam = searchParams.get('edit');
-    if ((editParam === 'goal' || editParam === 'profile' || editParam === 'true') && user) {
-      setActiveTab('profile');
-      setEditData({
-        name: user.name || '',
-        studying: user.studying || '',
-        goal: user.goal || 'all',
-        experienceLevel: user.experienceLevel || '',
-      });
-      setShowEditModal(true);
-    }
-  }, [searchParams, user]);
-
+  const [searchParams] = useSearchParams();
   const { user, logout, deleteAccount, resetTour, updateUser, spendCoins } = useUser();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'progress' | 'settings' | 'ai-teacher' | 'account'>('profile');
@@ -140,6 +124,21 @@ const SettingsPage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [editData, setEditData] = useState({ name: '', studying: '', goal: '', experienceLevel: '' });
+
+  // Auto-open Edit Profile modal when linked with ?edit=goal or ?edit=profile.
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if ((editParam === 'goal' || editParam === 'profile' || editParam === 'true') && user) {
+      setActiveTab('profile');
+      setEditData({
+        name: user.name || '',
+        studying: user.studying || '',
+        goal: user.goal || 'all',
+        experienceLevel: user.experienceLevel || '',
+      });
+      setShowEditModal(true);
+    }
+  }, [searchParams, user]);
 
   useEffect(() => { setTheme(getTheme()); }, []);
   useEffect(() => { if (user?.id) setAvatarUrl(getStoredAvatar(user.id)); }, [user?.id]);
