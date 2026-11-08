@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser, cleanStudentId, type UserProfile } from '@/contexts/UserContext';
 import { StreakModal } from "@/components/StreakModal";
 import {
@@ -102,6 +102,23 @@ const formatGoal = (goalId?: string) => {
 
 const SettingsPage = () => {
   const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+  // Auto-open Edit Profile modal if navigated with ?edit=goal or ?edit=profile
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if ((editParam === 'goal' || editParam === 'profile' || editParam === 'true') && user) {
+      setActiveTab('profile');
+      setEditData({
+        name: user.name || '',
+        studying: user.studying || '',
+        goal: user.goal || 'all',
+        experienceLevel: user.experienceLevel || '',
+      });
+      setShowEditModal(true);
+    }
+  }, [searchParams, user]);
+
   const { user, logout, deleteAccount, resetTour, updateUser, spendCoins } = useUser();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'progress' | 'settings' | 'ai-teacher' | 'account'>('profile');
