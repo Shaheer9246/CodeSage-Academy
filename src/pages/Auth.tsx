@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff, Loader2, Terminal, ShieldAlert, Sparkles, Check, Circle } from 'lucide-react';
@@ -7,6 +7,36 @@ import {
 } from '@/lib/loginGuard';
 
 type Mode = 'login' | 'signup' | 'forgot';
+
+/* ---------- Bot & Spam signup protection ---------- */
+const SIGNUP_ATTEMPTS_KEY = 'codesage_signup_attempts';
+const MAX_SIGNUP_ATTEMPTS = 3;
+const SIGNUP_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+function checkSignupRateLimit(): boolean {
+  try {
+    const raw = localStorage.getItem(SIGNUP_ATTEMPTS_KEY);
+    const now = Date.now();
+    const attempts: number[] = raw ? JSON.parse(raw) : [];
+    const validAttempts = attempts.filter(t => now - t < SIGNUP_WINDOW_MS);
+    return validAttempts.length >= MAX_SIGNUP_ATTEMPTS;
+  } catch {
+    return false;
+  }
+}
+
+function recordSignupAttempt(): void {
+  try {
+    const raw = localStorage.getItem(SIGNUP_ATTEMPTS_KEY);
+    const now = Date.now();
+    const attempts: number[] = raw ? JSON.parse(raw) : [];
+    const validAttempts = attempts.filter(t => now - t < SIGNUP_WINDOW_MS);
+    validAttempts.push(now);
+    localStorage.setItem(SIGNUP_ATTEMPTS_KEY, JSON.stringify(validAttempts));
+  } catch {
+    // ignore
+  }
+}
 
 /* ---------- Password requirements ---------- */
 const CHECKS = [
@@ -47,6 +77,8 @@ const Auth = () => {
   const [lockLeft, setLockLeft] = useState(0);
   const [bootCount, setBootCount] = useState(0);
   const [uptime, setUptime] = useState(0);
+  const [honeypot, setHoneypot] = useState('');
+  const formMountedAt = useRef<number>(Date.now());
   const { login, signup } = useUser();
 
   const isLogin = mode === 'login';
@@ -144,10 +176,36 @@ const Auth = () => {
           clearFailures(email);
         }
       } else {
+        // 1. Honeypot check: automated bots fill hidden inputs
+        if (honeypot.trim().length > 0) {
+          // Simulate brief delay and fake success without sending network requests to Supabase
+          await new Promise(r => setTimeout(r, 800));
+          setSubmitting(false);
+          setInfo('Account created successfully. Redirecting...');
+          return;
+        }
+
+        // 2. Submission timing guard (bots submit forms instantaneously)
+        const elapsed = Date.now() - formMountedAt.current;
+        if (elapsed < 1800) {
+          setError('Please take a moment before submitting.');
+          setSubmitting(false);
+          return;
+        }
+
+        // 3. Client cooldown / rate limiting
+        if (checkSignupRateLimit()) {
+          setError('Too many attempts. Please wait a few minutes before trying again.');
+          setSubmitting(false);
+          return;
+        }
+
         if (!username.trim()) { setError('Username is required'); setSubmitting(false); return; }
         if (!email.trim()) { setError('Email is required'); setSubmitting(false); return; }
         if (passed < CHECKS.length) { setError('Password too weak — complete all requirements below'); setSubmitting(false); return; }
         if (!acceptedTerms) { setError('You must accept the Terms of Service and Privacy Policy'); setSubmitting(false); return; }
+
+        recordSignupAttempt();
         const err = await signup(username, email, password);
         if (err) {
           setError(/weak|pwned|known to be weak/i.test(err)
@@ -162,7 +220,17 @@ const Auth = () => {
     }
   };
 
-  const switchMode = (m: Mode) => { setMode(m); setError(''); setInfo(''); setSubmitting(false); setPassword(''); setShowPassword(false); setAcceptedTerms(false); };
+  const switchMode = (m: Mode) => {
+    setMode(m);
+    setError('');
+    setInfo('');
+    setSubmitting(false);
+    setPassword('');
+    setShowPassword(false);
+    setAcceptedTerms(false);
+    setHoneypot('');
+    formMountedAt.current = Date.now();
+  };
 
   const locked = isLogin && lockLeft > 0;
 
@@ -282,6 +350,20 @@ const Auth = () => {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-3">
+                {/* Honeypot trap for scripted bots */}
+                {mode === 'signup' && (
+                  <div className="opacity-0 absolute top-0 left-0 h-0 w-0 -z-50 pointer-events-none" aria-hidden="true">
+                    <input
+                      type="text"
+                      name="website_verify_hp"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={e => setHoneypot(e.target.value)}
+                    />
+                  </div>
+                )}
+
                 {mode === 'signup' && (
                   <div>
                     <label className="block text-[10px] text-muted-foreground mb-1">&gt; enter_username</label>
