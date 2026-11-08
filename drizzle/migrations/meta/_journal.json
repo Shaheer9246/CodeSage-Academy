@@ -43,6 +43,13 @@
       "when": 1793037075695,
       "tag": "0005_restrict_suggestions_read",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794127944149,
+      "tag": "0006_enforce_active_track_quota",
+      "breakpoints": true
     }
   ]
 }
