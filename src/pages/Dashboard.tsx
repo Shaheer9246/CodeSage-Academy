@@ -374,6 +374,21 @@ const Dashboard = () => {
   };
 
   const displayName = user?.name || 'Explorer';
+    // Check if student hasn't set their primary career goal or is currently 'Explorer'
+  const [goalPromptDismissed, setGoalPromptDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem('codesage_dismiss_goal_prompt') === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  const needsGoalSelection = useMemo(() => {
+    if (isGuest || !user || goalPromptDismissed) return false;
+    const g = (user.goal || '').trim().toLowerCase();
+    return !g || g === 'all' || g.includes('explorer');
+  }, [isGuest, user, goalPromptDismissed]);
+
   const xp = user?.xp || 0;
   const sageCoins = user?.sageCoins ?? 0;
   const streak = user?.streakCount ?? 0;
@@ -878,6 +893,56 @@ const Dashboard = () => {
               </div>
             </div>
           </motion.div>
+          
+          {/* GOAL SELECTION REMINDER BANNER */}
+          <AnimatePresence>
+            {needsGoalSelection && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, height: 0 }}
+                className="w-full glass-card rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 border border-primary/30 bg-gradient-to-r from-primary/15 via-background/90 to-accent-blue/10 relative overflow-hidden flex items-center justify-between gap-2.5 sm:gap-3 shadow-md"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                    <Target className="w-4 h-4 text-primary animate-pulse" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30">Action</span>
+                      <p className="text-xs sm:text-sm font-bold text-foreground truncate">Choose your engineering goal</p>
+                    </div>
+                    <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate mt-0.5">
+                      You are set as Explorer. Pick your focus to personalize your roadmap.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => navigate('/settings?edit=goal')}
+                    className="flex items-center gap-1 bg-primary text-primary-foreground font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition-opacity"
+                  >
+                    <span>Set Goal</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setGoalPromptDismissed(true);
+                      try {
+                        sessionStorage.setItem('codesage_dismiss_goal_prompt', '1');
+                      } catch {}
+                    }}
+                    className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
+                    title="Dismiss for now"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
 
           {/* 3. MOBILE ONLY QUICK TOOLS ROW */}
           <div className="lg:hidden grid grid-cols-3 gap-2 sm:gap-3">
