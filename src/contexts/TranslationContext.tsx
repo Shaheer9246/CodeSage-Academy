@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useUser } from '@/contexts/UserContext';
 
 export type LanguageCode = 'en' | 'es' | 'ru' | 'ar' | 'ur' | 'hi';
 
@@ -210,6 +211,9 @@ const triggerGoogleTranslate = (langCode: string) => {
 };
 
 export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useUser();
+  const isPro = Boolean(user?.isPro);
+
   const [currentLanguage, setCurrentLanguageState] = useState<LanguageCode>(() => {
     try {
       const saved = localStorage.getItem('codesage_lang') as LanguageCode;
@@ -222,13 +226,16 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return 'en';
   });
 
-  const [isPro, setIsProState] = useState<boolean>(() => {
+  // Purge any legacy client-side localStorage PRO bypass flag
+  useEffect(() => {
     try {
-      return localStorage.getItem('codesage_is_pro') === 'true';
+      if (localStorage.getItem('codesage_is_pro')) {
+        localStorage.removeItem('codesage_is_pro');
+      }
     } catch {
-      return false;
+      // ignore
     }
-  });
+  }, []);
 
   const [autoTranslate, setAutoTranslateState] = useState<boolean>(() => {
     try {
@@ -241,23 +248,15 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
   const [proModalOpen, setProModalOpen] = useState<boolean>(false);
 
+  // Deprecated client-side setter: PRO status is server-authoritative
   const setIsPro = useCallback((val: boolean) => {
-    setIsProState(val);
-    try {
-      localStorage.setItem('codesage_is_pro', val ? 'true' : 'false');
-    } catch (e) {
-      console.warn(e);
-    }
+    console.info('PRO status is server-authoritative in UserContext. Value:', val);
   }, []);
 
-  const activatePro = useCallback((code?: string): boolean => {
-    const trimmed = (code || '').trim().toUpperCase();
-    if (!trimmed || trimmed === 'PRO' || trimmed === 'CODESAGE' || trimmed === 'VIP' || trimmed === 'FREEPRO') {
-      setIsPro(true);
-      return true;
-    }
-    return false;
-  }, [setIsPro]);
+  const activatePro = useCallback((_code?: string): boolean => {
+    // Client-side bypass removed. PRO is server-governed via LemonSqueezy / Admin.
+    return Boolean(user?.isPro);
+  }, [user?.isPro]);
 
   const setAutoTranslate = useCallback((val: boolean) => {
     setAutoTranslateState(val);
@@ -269,14 +268,6 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   const setLanguage = useCallback((lang: LanguageCode): boolean => {
-    if (!isPro && lang !== 'en') {
-      setIsProState(true);
-      try {
-        localStorage.setItem('codesage_is_pro', 'true');
-      } catch (e) {
-        console.warn(e);
-      }
-    }
     setCurrentLanguageState(lang);
     try {
       localStorage.setItem('codesage_lang', lang);
@@ -284,7 +275,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.warn(e);
     }
     return true;
-  }, [isPro]);
+  }, []);
 
   // Simplified translateText (Roman Urdu dictionary logic removed)
   const translateText = useCallback((text: string): string => {
