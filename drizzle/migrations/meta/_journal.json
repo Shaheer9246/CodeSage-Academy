@@ -50,6 +50,13 @@
       "when": 1794127944149,
       "tag": "0006_enforce_active_track_quota",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794128073484,
+      "tag": "0007_restrict_enrollment_writes_to_rpc",
+      "breakpoints": true
     }
   ]
 }
