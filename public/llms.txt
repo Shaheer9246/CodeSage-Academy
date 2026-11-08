@@ -8,13 +8,5 @@ Tracks include Python, C, C++, Java, Frontend Web Development, Backend, Artifici
 
 ## Pages
 
-- [Home](https://codesageacademy.netlify.app/): Overview of CodeSage Academy and sign up.
-- [Roadmap](https://codesageacademy.netlify.app/roadmap): Career paths and all learning tracks.
-- [Cyber Security](https://codesageacademy.netlify.app/cyber): Cyber security fundamentals with hands-on terminal labs.
-- [DSA Sheet](https://codesageacademy.netlify.app/dsa-sheet): Data structures and algorithms practice problems with solutions.
-- [Challenges](https://codesageacademy.netlify.app/challenges): Coding challenges to practice skills.
-- [Playground](https://codesageacademy.netlify.app/playground): In-browser code editor for multiple languages.
-
-## Optional
-
-- [Learn](https://codesageacademy.netlify.app/learn): Lesson tracks overview.
+- [Home](https://codesageacademy.netlify.app/): Overview of CodeSage Academy and free sign up.
+- [Playground](https://codesageacademy.netlify.app/playground): Free in-browser code editor for multiple languages.
