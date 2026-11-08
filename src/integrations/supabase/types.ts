@@ -912,6 +912,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_pro_status: {
+        Args: { _pro: boolean; _user_id: string }
+        Returns: undefined
+      }
       spend_coins: {
         Args: { _amount: number; _reason?: string }
         Returns: {
