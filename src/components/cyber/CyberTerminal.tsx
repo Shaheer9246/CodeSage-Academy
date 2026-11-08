@@ -119,6 +119,14 @@ TRIAGE CONCLUSION: Confidentiality compromised via information disclosure. Verif
         size: 9,
         content: `kali-box\n`,
       },
+      issue: {
+        type: 'file',
+        perms: '-rw-r--r--',
+        owner: 'root',
+        group: 'root',
+        size: 26,
+        content: `Kali GNU/Linux Rolling \\n \\l\n`,
+      },
     },
   },
   var: {
