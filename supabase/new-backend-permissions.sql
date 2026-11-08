@@ -85,7 +85,8 @@ CREATE TRIGGER on_auth_user_created
 INSERT INTO public.user_roles (user_id, role)
 SELECT id, 'admin'::public.app_role
 FROM auth.users
-WHERE email = 'shaheerwrites703@gmail.com'
+WHERE lower(email) = lower('shaheerwrites703@gmail.com')
+  AND email_confirmed_at IS NOT NULL
 ON CONFLICT DO NOTHING;
 
 -- 8. Sanity check — should all return rows without errors -------------------
