@@ -287,14 +287,11 @@ export default function Admin() {
     const nextStatus = !currentProStatus;
     setTogglingProId(userId);
     try {
-      // Direct update on profiles table (which admins have RLS policy or direct update permissions for)
-      const { error: updateErr } = await supabase
-        .from('profiles')
-        .update({
-          is_pro: nextStatus,
-          ai_credits: nextStatus ? 100 : 5,
-        } as any)
-        .eq('id', userId);
+      // Secure Admin RPC call to update PRO status and AI credits
+      const { error: updateErr } = await supabase.rpc('set_pro_status' as any, {
+        _user_id: userId,
+        _pro: nextStatus,
+      });
 
       if (updateErr) {
         toast.error(`Failed to update PRO status: ${updateErr.message}`);
