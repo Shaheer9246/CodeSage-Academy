@@ -1,0 +1,12 @@
+# CodeSage Academy
+
+> A free, interactive coding and cyber security learning platform for students, built by Zain Rao. Learn in the browser with hands-on labs, gamified tracks, and DSA preparation.
+
+CodeSage Academy teaches programming through Duolingo-style progression: lessons unlock one by one, each with inline challenges, and level tests gate the next level. Code runs directly in the browser (WebAssembly for C, C++, Python, Java and SQL), so no installs are needed. Students earn XP, streaks and Sage Coins, and can ask an AI Teacher for help.
+
+Tracks include Python, C, C++, Java, Frontend Web Development, Backend, Artificial Intelligence, SQL, Computer Systems & Networking, Cyber Security Fundamentals (with a simulated Linux terminal lab), and a DSA sheet with solutions in four languages.
+
+## Pages
+
+- [Home](https://codesageacademy.netlify.app/): Overview of CodeSage Academy and free sign up.
+- [Playground](https://codesageacademy.netlify.app/playground): Free in-browser code editor for multiple languages.
