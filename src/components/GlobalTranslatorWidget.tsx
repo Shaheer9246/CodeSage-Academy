@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Globe,
   Sparkles,
@@ -11,13 +11,15 @@ import {
   Crown,
   Zap,
   Languages,
-  CheckCircle2
+  CheckCircle2,
+  ArrowRight
 } from 'lucide-react';
 import {
   useTranslation,
   SUPPORTED_LANGUAGES,
   LanguageCode
 } from '@/contexts/TranslationContext';
+import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
 
 export interface GlobalTranslatorWidgetProps {
@@ -30,16 +32,18 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
     currentLanguage,
     setLanguage,
     isPro,
-    setIsPro,
-    activatePro,
     proModalOpen,
     setProModalOpen,
     isTranslating
   } = useTranslation();
 
+  const { applyPromoCode } = useUser();
+  const navigate = useNavigate();
+
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +73,9 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
 
   const handleSelectLanguage = (code: LanguageCode) => {
     if (!isPro && code !== 'en') {
-      setIsPro(true);
+      setDropdownOpen(false);
+      setProModalOpen(true);
+      return;
     }
     const success = setLanguage(code);
     if (success) {
@@ -83,16 +89,153 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
     }
   };
 
-  const handleUnlockPro = (e?: React.FormEvent) => {
+  const handleRedeemPromo = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const success = activatePro(promoCodeInput || 'PRO');
-    if (success) {
-      toast.success('🌟 CodeSage PRO Activated! All languages unlocked.');
-      setProModalOpen(false);
-      setPromoCodeInput('');
-    } else {
-      toast.error('Invalid promo code. Try "PRO" or "CODESAGE"');
+    const code = promoCodeInput.trim();
+    if (!code) {
+      toast.error('Please enter a valid promo code');
+      return;
     }
+    setIsSubmittingPromo(true);
+    try {
+      const success = await applyPromoCode(code);
+      if (success) {
+        toast.success('🎉 Promo code redeemed! CodeSage PRO activated.');
+        setProModalOpen(false);
+        setPromoCodeInput('');
+      } else {
+        toast.error('Invalid or expired promo code.');
+      }
+    } catch {
+      toast.error('Failed to redeem promo code.');
+    } finally {
+      setIsSubmittingPromo(false);
+    }
+  };
+
+  const renderProModal = () => {
+    if (!proModalOpen) return null;
+    return createPortal(
+      <div
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
+        data-no-translate="true"
+        onClick={() => setProModalOpen(false)}
+      >
+        <div
+          className="glass-card w-full max-w-md rounded-2xl p-6 border border-primary/30 shadow-2xl relative space-y-4 bg-card/95"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setProModalOpen(false)}
+            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-secondary/40 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          {/* Header with Crown */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-primary flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+              <Crown className="w-6 h-6 text-black" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold font-display text-foreground flex items-center gap-1.5">
+                CodeSage PRO Translator
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono border border-amber-400/30">
+                  {isPro ? 'Active' : 'VIP'}
+                </span>
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Learn programming in your native tongue
+              </p>
+            </div>
+          </div>
+
+          {/* Feature list */}
+          <div className="bg-secondary/20 rounded-xl p-3.5 border border-border/30 space-y-2">
+            <div className="flex items-start gap-2.5">
+              <span className="text-lg">🇵🇰</span>
+              <div>
+                <p className="text-xs font-semibold text-foreground">
+                  Roman Hindi / Urdu Programming
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Understand complex code logic, lessons & UI in Hinglish & Roman Urdu.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <span className="text-lg">🇪🇸 🇷🇺 🇸🇦</span>
+              <div>
+                <p className="text-xs font-semibold text-foreground">
+                  Spanish, Russian & Arabic Support
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Automatic page translation across dashboards, challenges, and roadmaps.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <Zap className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-semibold text-foreground">
+                  Instant Global Translation
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Seamless toggle on every single screen without reloading.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action options */}
+          {isPro ? (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center">
+              <p className="text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4" /> You are an active CodeSage PRO student!
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                All languages and AI features are unlocked for your account.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setProModalOpen(false);
+                  navigate('/support-us');
+                }}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-primary via-emerald-400 to-teal-400 text-black font-bold text-sm shadow-[0_0_25px_rgba(var(--primary),0.35)] hover:opacity-95 transition-opacity flex items-center justify-center gap-2"
+              >
+                <span>Get CodeSage PRO (Admin / LemonSqueezy)</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <form onSubmit={handleRedeemPromo} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Or enter Promo Code"
+                  value={promoCodeInput}
+                  onChange={e => setPromoCodeInput(e.target.value)}
+                  className="flex-1 bg-secondary/30 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 font-mono uppercase"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmittingPromo || !promoCodeInput.trim()}
+                  className="px-4 py-2 bg-secondary/40 hover:bg-secondary/60 disabled:opacity-50 border border-border/40 rounded-xl text-xs font-semibold text-foreground transition-colors"
+                >
+                  {isSubmittingPromo ? 'Applying...' : 'Apply'}
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      </div>,
+      document.body
+    );
   };
 
   if (mode === 'docked') {
@@ -264,124 +407,17 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
                   <span className="text-primary font-mono font-medium">
                     {isTranslating ? 'Translating...' : '✓ Active'}
                   </span>
-                  <button
-                    onClick={() => {
-                      setIsPro(false);
-                      toast.info('Switched to standard tier');
-                    }}
-                    className="hover:underline text-[9px]"
-                  >
-                    Relock PRO
-                  </button>
+                  <span className="text-emerald-400 font-mono text-[9px] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> PRO Active
+                  </span>
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* PRO Unlock Modal */}
-        {proModalOpen &&
-          createPortal(
-            <div
-              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
-              data-no-translate="true"
-              onClick={() => setProModalOpen(false)}
-            >
-            <div
-              className="glass-card w-full max-w-md rounded-2xl p-6 border border-primary/30 shadow-2xl relative space-y-4 bg-card/95"
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setProModalOpen(false)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-secondary/40 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-primary flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-                  <Crown className="w-6 h-6 text-black" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold font-display text-foreground flex items-center gap-1.5">
-                    CodeSage PRO Translator
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono border border-amber-400/30">
-                      VIP
-                    </span>
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Learn programming in your native tongue
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-secondary/20 rounded-xl p-3.5 border border-border/30 space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <span className="text-lg">🇵🇰</span>
-                  <div>
-                    <p className="text-xs font-semibold text-foreground">
-                      Roman Hindi / Urdu Programming
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Understand complex code logic, lessons & UI in Hinglish & Roman Urdu.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <span className="text-lg">🇪🇸 🇷🇺 🇸🇦</span>
-                  <div>
-                    <p className="text-xs font-semibold text-foreground">
-                      Spanish, Russian & Arabic Support
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Automatic page translation across dashboards, challenges, and roadmaps.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <Zap className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-semibold text-foreground">
-                      Instant Global Translation
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Seamless toggle on every single screen without reloading.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2.5 pt-1">
-                <button
-                  onClick={() => handleUnlockPro()}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-primary via-emerald-400 to-teal-400 text-black font-bold text-sm shadow-[0_0_25px_rgba(var(--primary),0.35)] hover:opacity-95 transition-opacity flex items-center justify-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Activate Free PRO Access Now
-                </button>
-
-                <form onSubmit={handleUnlockPro} className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Or enter Promo Code (e.g. PRO)"
-                    value={promoCodeInput}
-                    onChange={e => setPromoCodeInput(e.target.value)}
-                    className="flex-1 bg-secondary/30 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 font-mono uppercase"
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-secondary/40 hover:bg-secondary/60 border border-border/40 rounded-xl text-xs font-semibold text-foreground transition-colors"
-                  >
-                    Apply
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
+        {/* PRO Modal */}
+        {renderProModal()}
       </>
     );
   }
@@ -542,128 +578,17 @@ export default function GlobalTranslatorWidget({ mode = 'floating', compact = fa
                 <span className="text-primary font-mono font-medium">
                   {isTranslating ? 'Translating...' : '✓ Active'}
                 </span>
-                <button
-                  onClick={() => {
-                    setIsPro(false);
-                    toast.info('Switched to standard tier');
-                  }}
-                  className="hover:underline text-[9px]"
-                >
-                  Relock PRO
-                </button>
+                <span className="text-emerald-400 font-mono text-[9px] flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> PRO Active
+                </span>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* PRO Unlock Modal */}
-      {proModalOpen &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 notranslate"
-            data-no-translate="true"
-            onClick={() => setProModalOpen(false)}
-          >
-          <div
-            className="glass-card w-full max-w-md rounded-2xl p-6 border border-primary/30 shadow-2xl relative space-y-4 bg-card/95"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setProModalOpen(false)}
-              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-secondary/40 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Header with Crown */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-primary flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-                <Crown className="w-6 h-6 text-black" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold font-display text-foreground flex items-center gap-1.5">
-                  CodeSage PRO Translator
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono border border-amber-400/30">
-                    VIP
-                  </span>
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  Learn programming in your native tongue
-                </p>
-              </div>
-            </div>
-
-            {/* Feature list */}
-            <div className="bg-secondary/20 rounded-xl p-3.5 border border-border/30 space-y-2">
-              <div className="flex items-start gap-2.5">
-                <span className="text-lg">🇵🇰</span>
-                <div>
-                  <p className="text-xs font-semibold text-foreground">
-                    Roman Hindi / Urdu Programming
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Understand complex code logic, lessons & UI in Hinglish & Roman Urdu.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <span className="text-lg">🇪🇸 🇷🇺 🇸🇦</span>
-                <div>
-                  <p className="text-xs font-semibold text-foreground">
-                    Spanish, Russian & Arabic Support
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Automatic page translation across dashboards, challenges, and roadmaps.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Zap className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-semibold text-foreground">
-                    Instant Global Translation
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Seamless toggle on every single screen without reloading.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Unlock Action */}
-            <div className="space-y-2.5 pt-1">
-              <button
-                onClick={() => handleUnlockPro()}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-primary via-emerald-400 to-teal-400 text-black font-bold text-sm shadow-[0_0_25px_rgba(var(--primary),0.35)] hover:opacity-95 transition-opacity flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                Activate Free PRO Access Now
-              </button>
-
-              <form onSubmit={handleUnlockPro} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Or enter Promo Code (e.g. PRO)"
-                  value={promoCodeInput}
-                  onChange={e => setPromoCodeInput(e.target.value)}
-                  className="flex-1 bg-secondary/30 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 font-mono uppercase"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-secondary/40 hover:bg-secondary/60 border border-border/40 rounded-xl text-xs font-semibold text-foreground transition-colors"
-                >
-                  Apply
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* PRO Modal */}
+      {renderProModal()}
     </>
   );
 }
