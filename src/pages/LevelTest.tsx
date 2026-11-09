@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
-import { ArrowLeft, XCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, XCircle, Trophy, Share2 } from 'lucide-react';
+import { ShareAchievementModal } from '@/components/ShareAchievementModal';
 
 interface TestQuestion {
   question: string;
@@ -49,6 +50,7 @@ const LevelTest = () => {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   if (!user || !level) { navigate('/learn'); return null; }
   const test = TESTS[level];
@@ -79,6 +81,13 @@ const LevelTest = () => {
               <h2 className="text-2xl font-bold text-foreground mb-2">Congratulations! 🎉</h2>
               <p className="text-muted-foreground text-sm mb-4">You passed with {correct}/{test.questions.length} correct answers!</p>
               <p className="text-xs text-success mb-6">The next level is now unlocked!</p>
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 mb-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-semibold text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Share Milestone to WhatsApp & LinkedIn 🎉</span>
+              </button>
             </>
           ) : (
             <>
@@ -89,10 +98,20 @@ const LevelTest = () => {
             </>
           )}
           <button onClick={() => navigate('/learn')}
-            className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 shadow-lg shadow-primary/20">
+            className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 shadow-lg shadow-primary/20 transition-opacity">
             Back to Learning
           </button>
         </div>
+
+        {passed && (
+          <ShareAchievementModal
+            isOpen={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            title={`Level ${level.toUpperCase()} Assessment (${correct}/${test.questions.length} Correct)`}
+            topic={`${level.toUpperCase()} Web Engineering Assessment`}
+            achievementType="lesson"
+          />
+        )}
       </div>
     );
   }
