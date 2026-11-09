@@ -23,6 +23,13 @@ import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDeta
 import DailyProblemCard from '@/components/DailyProblemCard';
 import ShareAchievementModal, { ShareAchievementType } from '@/components/ShareAchievementModal';
 import { checkAndTriggerStreakReminder, autoEnableStreakReminder } from '@/lib/streakNotifications';
+import {
+  type DashboardCategory,
+  GOAL_MAP,
+  normalizeGoalValue,
+  getCategoryForGoal,
+  syncGoalWithDashboard,
+} from '@/lib/goalHelper';
 
 /* ---------- Tour ---------- */
 const TOUR_STEPS: TourStep[] = [
@@ -272,11 +279,23 @@ const Dashboard = () => {
   const [enrollTarget, setEnrollTarget] = useState<TrackId | null>(null);
   const [enrollTick, setEnrollTick] = useState(0);
 
-  type DashboardCategory = 'All' | 'frontend' | 'python' | 'java' | 'c' | 'cpp' | 'ai' | 'sql' | 'fundamentals' | 'cyber' | 'career';
-  
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>(() => {
     return (localStorage.getItem('codesage_dashboard_category') as DashboardCategory) || 'All';
   });
+
+  const lastSyncedGoalRef = useRef<string | null>(null);
+
+  // Automatically sync category filter and active track when user's goal is loaded or updated
+  useEffect(() => {
+    if (!user?.goal || isGuest) return;
+    const normalized = normalizeGoalValue(user.goal);
+    if (lastSyncedGoalRef.current !== normalized) {
+      lastSyncedGoalRef.current = normalized;
+      const targetCat = getCategoryForGoal(normalized);
+      setSelectedCategory(targetCat);
+      syncGoalWithDashboard(normalized, user.id);
+    }
+  }, [user?.goal, user?.id, isGuest]);
 
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number>(0);
   const [glowDirection, setGlowDirection] = useState<'ltr' | 'rtl'>('ltr');
@@ -435,14 +454,36 @@ const Dashboard = () => {
   );
 
   const activeContinueTrack = useMemo(() => {
-    if (myTracks.length === 0) return null;
-    const lastStored = localStorage.getItem('codesage_last_active_track');
-    if (lastStored) {
-      const match = myTracks.find(m => m.track.trackId === lastStored);
-      if (match) return match.track;
+    const goalNormalized = normalizeGoalValue(user?.goal);
+    const goalCfg = goalNormalized !== 'all' ? GOAL_MAP[goalNormalized] : null;
+
+    // 1. If enrolled in multiple tracks, prioritize the track matching the user's current goal
+    if (goalCfg && myTracks.length > 0) {
+      const goalEnrolledTrack = myTracks.find(m => m.track.trackId === goalCfg.primaryTrackId);
+      if (goalEnrolledTrack) {
+        return goalEnrolledTrack.track;
+      }
     }
-    return myTracks[0].track;
-  }, [myTracks]);
+
+    // 2. If user is enrolled in tracks, check if their last stored active track is among them
+    if (myTracks.length > 0) {
+      const lastStored = localStorage.getItem('codesage_last_active_track');
+      if (lastStored) {
+        const match = myTracks.find(m => m.track.trackId === lastStored);
+        if (match) return match.track;
+      }
+      return myTracks[0].track;
+    }
+
+    // 3. If user has no active enrolled tracks yet, but has chosen a specific goal,
+    // point the Continue Learning banner directly to their goal's primary track so they can immediately begin!
+    if (goalCfg) {
+      const target = allTracks.find(t => t.trackId === goalCfg.primaryTrackId);
+      if (target) return target;
+    }
+
+    return null;
+  }, [myTracks, allTracks, user?.goal]);
 
   const continueLessonInfo = useMemo(() => {
     if (!activeContinueTrack || !activeContinueTrack.trackId || isGuest) return null;
@@ -991,12 +1032,13 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between gap-3 relative z-10">
                   {(() => {
                     const isTrackFinished = (continueLessonInfo?.total || 0) > 0 && (continueLessonInfo?.done || 0) >= (continueLessonInfo?.total || 0);
+                    const isNotStarted = (continueLessonInfo?.done || 0) === 0;
                     return (
                       <>
                         <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] font-mono text-primary uppercase tracking-wider">
                             <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isTrackFinished ? 'bg-amber-400' : 'bg-primary animate-pulse'}`} />
-                            <span>{isTrackFinished ? 'Track Completed 🎓' : 'Continue Learning'}</span>
+                            <span>{isTrackFinished ? 'Track Completed 🎓' : isNotStarted ? 'Your Focus Track 🎯' : 'Continue Learning'}</span>
                             <span className="text-muted-foreground/60">·</span>
                             <span className="text-muted-foreground truncate">{activeContinueTrack.title}</span>
                           </div>
@@ -1021,7 +1063,7 @@ const Dashboard = () => {
                             }}
                             className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-bold font-display hover:neon-glow transition-all shrink-0 shadow-sm"
                           >
-                            {isTrackFinished ? 'Review Track →' : 'Resume Lesson →'}
+                            {isTrackFinished ? 'Review Track →' : isNotStarted ? 'Start Lesson →' : 'Resume Lesson →'}
                           </button>
                           <button
                             onClick={go(activeContinueTrack.path)}
