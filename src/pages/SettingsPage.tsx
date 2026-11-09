@@ -111,14 +111,21 @@ const formatGoal = (goalId?: string) => {
   }
 };
 
-const GOAL_OPTIONS = [
+interface GoalOption {
+  id: string;
+  label: string;
+  desc: string;
+  badge?: string;
+}
+
+const GOAL_OPTIONS: GoalOption[] = [
   { id: 'cyber', label: 'Cyber Security Specialist', badge: 'New', desc: 'Linux, Networking, Burp Suite & Defensive Ops' },
   { id: 'frontend', label: 'Modern Full-Stack & Web', desc: 'HTML, CSS, JavaScript, React & Production APIs' },
   { id: 'ai', label: 'AI & Machine Learning Engineer', badge: 'Trending', desc: 'Neural Nets, LLMs & Autonomous Agents' },
   { id: 'python', label: 'Python Software Engineer', desc: 'Python Core, OOP & Backend APIs' },
   { id: 'systems', label: 'Systems & Core Programming', desc: 'C, C++, Memory, Relational SQL & Networks' },
   { id: 'all', label: 'All-Round Explorer', desc: 'All 20 tracks across every language & tool' },
-] as const;
+];
 
 const EXPERIENCE_OPTIONS = [
   { id: 'Beginner', label: 'Beginner', desc: 'Starting from scratch / basics' },
