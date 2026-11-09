@@ -14,11 +14,11 @@ CodeSage Academy is an interactive coding education platform designed to take st
 - **In-Browser WebAssembly Execution**: Interactive SQL playground powered by `sql.js` (WebAssembly SQLite) running client-side with zero server latency.
 - **Monaco Code Editor**: Full-featured code editor with syntax highlighting, auto-completion, and live error diagnostic overlays.
 - **Duolingo-Style Gamified Progression**: Sequential lesson unlocking, daily streak tracking with streak freeze mechanics, Sage Coins economy, and level exit tests.
-- **19+ Learning Tracks**: Comprehensive curricula spanning C, C++, Java, Python, Web Development, SQL, AI/ML Engineering, and Computer Networking.
+- **19+ Learning Tracks**: Comprehensive curricula spanning C, C++, Java, Python, Web Development, SQL, AI/ML Engineering, Cyber Security, and Computer Networking.
 - **Audio & Haptic Feedback Engine**: In-browser Web Audio API synthesis delivering low-latency celebratory audio without heavy asset downloads.
 - **Progressive Web App (PWA)**: Offline-first caching with installability on Android, iOS, and Desktop.
 - **59-Point Security hardening**: Audited across 59 black-box attack vectors. Enforced airtight Row-Level Security (RLS) tenant isolation, patched atomic race conditions in credit detection, and configured strict security headers.
-- **3000+ Active Students**: Scaled to support an active community of 3000+ learnerswith sub-100ms client interactions. 
+- **3000+ Active Students**: Scaled to support an active community of 3000+ learners with sub-100ms client interactions. 
 
 ---
 
