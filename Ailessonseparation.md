@@ -131,3 +131,28 @@ export const GOAL_MAP: Record<string, GoalConfig> = {
     label: 'Machine Learning Engineer',
   },
 };
+```
+
+### 2. `src/lib/enrollment.ts`
+Add `'ml-engineer'` to `TrackId` union and register metadata in `TRACK_META`:
+```typescript
+'ml-engineer': {
+  trackId: 'ml-engineer',
+  title: 'Machine Learning & Neural Architectures',
+  badge: 'Math & Models',
+  icon: 'Cpu',
+  color: 'emerald',
+  estimatedHours: 24,
+  lessonsCount: 17,
+}
+```
+
+### 3. `src/data/lessonIndex.ts`
+Register all lesson IDs (`ML-01` through `ML-17`) and the route `/ml-lesson`.
+
+---
+
+## 5. Summary of Roles for Learners
+- Choose **AI Engineer** if your goal is: Building autonomous apps, chatbots, RAG search engines, and multi-agent SaaS products today.
+- Choose **Machine Learning Engineer** if your goal is: Understanding the core mathematics, training neural networks from scratch, and pursuing data science / research / MLOps roles.
+```
