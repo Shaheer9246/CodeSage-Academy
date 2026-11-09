@@ -760,43 +760,71 @@ const Dashboard = () => {
             <AnimatePresence>
               {isSearchOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-popover/95 backdrop-blur-md border border-border/80 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[360px] overflow-y-auto"
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className="absolute top-full left-0 right-0 mt-2 glass-card rounded-2xl border border-primary/30 bg-card/95 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.7)] ring-1 ring-primary/20 z-50 overflow-hidden max-h-[380px] overflow-y-auto"
                 >
-                  <div className="p-1.5 sm:p-2 space-y-1">
-                    <div className="px-2.5 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      {searchQuery ? 'Matching Languages' : 'Select Language or Course'}
-                    </div>
+                  <div className="flex items-center justify-between px-3.5 py-2.5 bg-secondary/30 text-[10px] font-mono uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                    <span className="flex items-center gap-1.5 font-semibold text-foreground/90">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      {searchQuery ? `Matching Tracks (${filteredCategories.length})` : 'Explore Languages & Tracks'}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground/60 hidden sm:inline">Click to filter</span>
+                  </div>
 
+                  <div className="p-2 space-y-1">
                     {filteredCategories.length > 0 ? (
-                      filteredCategories.map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleSelectSearchCategory(item.id)}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-secondary/70 transition-colors text-left group"
-                        >
-                          <div className="w-7 h-7 rounded-lg bg-secondary/80 flex items-center justify-center text-sm shrink-0 border border-border/40">
-                            {item.emoji}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{item.name}</p>
-                              {item.badge && (
-                                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-primary/15 text-primary border border-primary/20">
-                                  {item.badge}
-                                </span>
-                              )}
+                      filteredCategories.map((item) => {
+                        const isCurrentActive = selectedCategory === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleSelectSearchCategory(item.id)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group ${
+                              isCurrentActive
+                                ? 'bg-primary/15 border border-primary/40 text-primary shadow-sm'
+                                : 'hover:bg-secondary/60 text-foreground border border-transparent'
+                            }`}
+                          >
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm shrink-0 border transition-all ${
+                              isCurrentActive
+                                ? 'bg-primary/20 border-primary/40 text-primary scale-105'
+                                : 'bg-secondary/60 border-border/40 group-hover:bg-secondary group-hover:border-primary/30'
+                            }`}>
+                              {item.emoji}
                             </div>
-                            <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">{item.subtitle}</p>
-                          </div>
-                          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                        </button>
-                      ))
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className={`text-xs sm:text-sm font-semibold truncate ${
+                                  isCurrentActive ? 'text-primary' : 'text-foreground group-hover:text-primary transition-colors'
+                                }`}>
+                                  {item.name}
+                                </p>
+                                {item.badge && (
+                                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-primary/20 text-primary border border-primary/30">
+                                    {item.badge}
+                                  </span>
+                                )}
+                                {isCurrentActive && (
+                                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 ml-auto">
+                                    Active
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate mt-0.5">{item.subtitle}</p>
+                            </div>
+                            <ChevronRight className={`w-4 h-4 transition-all shrink-0 ${
+                              isCurrentActive ? 'text-primary translate-x-0.5' : 'text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5'
+                            }`} />
+                          </button>
+                        );
+                      })
                     ) : (
-                      <div className="p-4 text-center text-xs text-muted-foreground">
-                        No courses found matching "{searchQuery}"
+                      <div className="p-6 text-center text-xs text-muted-foreground space-y-1">
+                        <p className="font-semibold text-foreground/80">No courses found matching "{searchQuery}"</p>
+                        <p className="text-[11px] text-muted-foreground/70">Try searching for Python, C++, React, Cyber, AI, or SQL</p>
                       </div>
                     )}
                   </div>
