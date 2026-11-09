@@ -84,8 +84,30 @@ const TABS = [
 const formatBadgeName = (id: string) =>
   id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
+export const normalizeGoalValue = (raw?: string): string => {
+  if (!raw) return 'all';
+  const val = raw.toLowerCase().trim();
+  if (val.includes('cyber') || val.includes('hack') || val.includes('security')) return 'cyber';
+  if (val.includes('front') || val.includes('web') || val.includes('full')) return 'frontend';
+  if (val.includes('ai') || val.includes('machine') || val.includes('ml')) return 'ai';
+  if (val.includes('python')) return 'python';
+  if (val.includes('system') || val.includes('c++') || val.includes('core')) return 'systems';
+  return 'all';
+};
+
+export const normalizeExperienceValue = (raw?: string): string => {
+  if (!raw) return 'Beginner';
+  const val = raw.toLowerCase().trim();
+  if (val.includes('experience') || val.includes('advanced') || val.includes('expert')) return 'Advanced';
+  if (val.includes('cs') || val.includes('student') || val.includes('intermediate') || val.includes('self')) return 'Intermediate';
+  return 'Beginner';
+};
+
 const formatGoal = (goalId?: string) => {
-  switch (goalId) {
+  const normalized = normalizeGoalValue(goalId);
+  switch (normalized) {
+    case 'cyber':
+      return 'Cyber Security Specialist';
     case 'frontend':
       return 'Modern Full-Stack & Web';
     case 'ai':
@@ -133,8 +155,8 @@ const SettingsPage = () => {
       setEditData({
         name: user.name || '',
         studying: user.studying || '',
-        goal: user.goal || 'all',
-        experienceLevel: user.experienceLevel || '',
+        goal: normalizeGoalValue(user.goal),
+        experienceLevel: normalizeExperienceValue(user.experienceLevel),
       });
       setShowEditModal(true);
     }
@@ -354,7 +376,12 @@ const SettingsPage = () => {
                     <InfoRow label="Member Since" value={joinDate} />
                   </div>
                   <button onClick={() => {
-                    setEditData({ name: user.name || '', studying: user.studying || '', goal: user.goal || 'all', experienceLevel: user.experienceLevel || '' });
+                    setEditData({
+                      name: user.name || '',
+                      studying: user.studying || '',
+                      goal: normalizeGoalValue(user.goal),
+                      experienceLevel: normalizeExperienceValue(user.experienceLevel),
+                    });
                     setShowEditModal(true);
                   }} className="w-full mt-4 flex items-center justify-center gap-2 bg-secondary/15 rounded-xl px-3 py-2.5 border border-border/30 hover:bg-secondary/30 transition-colors text-xs font-semibold text-foreground">
                     <Pencil className="w-3.5 h-3.5 text-primary" /> Edit Profile Data
@@ -814,23 +841,46 @@ const SettingsPage = () => {
                 <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Studying</label><input type="text" value={editData.studying} onChange={e => setEditData({ ...editData, studying: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
                 <div>
                   <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label>
-                  <select
-                    value={editData.goal}
-                    onChange={e => setEditData({ ...editData, goal: e.target.value })}
-                    className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"
-                  >
-                    <option value="frontend">Modern Full-Stack & Web</option>
-                    <option value="ai">AI & Machine Learning Engineer</option>
-                    <option value="python">Python Software Engineer</option>
-                    <option value="systems">Systems & Core Programming</option>
-                    <option value="all">All-Round Explorer (All Tracks)</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={editData.goal}
+                      onChange={e => setEditData({ ...editData, goal: e.target.value })}
+                      className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 pr-9 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none cursor-pointer"
+                    >
+                      <option value="cyber">Cyber Security Specialist (New)</option>
+                      <option value="frontend">Modern Full-Stack & Web</option>
+                      <option value="ai">AI & Machine Learning Engineer</option>
+                      <option value="python">Python Software Engineer</option>
+                      <option value="systems">Systems & Core Programming</option>
+                      <option value="all">All-Round Explorer (All Tracks)</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
-                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label><select value={editData.experienceLevel} onChange={e => setEditData({ ...editData, experienceLevel: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none"><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option></select></div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label>
+                  <div className="relative">
+                    <select
+                      value={editData.experienceLevel}
+                      onChange={e => setEditData({ ...editData, experienceLevel: e.target.value })}
+                      className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 pr-9 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none cursor-pointer"
+                    >
+                      <option value="Beginner">Beginner (Starting from scratch / basics)</option>
+                      <option value="Intermediate">Intermediate (CS student / self-taught coder)</option>
+                      <option value="Advanced">Advanced / Experienced (Mastering new stacks)</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
               </div>
               <button onClick={() => {
                 if (user) {
-                  updateUser(editData);
+                  updateUser({
+                    name: editData.name,
+                    studying: editData.studying,
+                    goal: editData.goal,
+                    experienceLevel: editData.experienceLevel,
+                  });
                   try {
                     localStorage.setItem('codesage_selected_goal_' + user.id, editData.goal);
                   } catch {}
