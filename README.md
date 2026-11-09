@@ -80,7 +80,8 @@ npm run build
 ## 👨‍💻 Author
 
 **Zain Rao**  
-- **Role**: Creator & Full-Stack Engineer  
+- **Role**: Creator, Full-Stack Engineer & Web Security Auditor
+- **Portfolio**: [zainrao.netlify.app](https://zainrao.netlify.app/)
 - **Project**: CodeSage Academy  
 - **Website**: [codesageacademy.netlify.app](https://codesageacademy.netlify.app)
 
