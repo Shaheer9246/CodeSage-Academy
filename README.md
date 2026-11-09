@@ -1,52 +1,91 @@
-# CodeSage Academy — Full-Stack Interactive Learning Platform
+# CodeSage Academy 🦉
 
-> A production-grade e-learning and interactive coding platform serving over 3,000 active students. Architected with modern React, TypeScript, and Supabase, with an enterprise 59-point black-box security audit.
-
-![React](https://img.shields.io/badge/React-18-blue?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
-![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E?logo=supabase)
-![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwindcss)
-![Security Audit](https://img.shields.io/badge/Security-59%20Test%20Vectors%20Audited-success)
+> **An interactive, gamified computer science and software engineering learning platform built for students.**  
+> Live Platform: [codesageacademy.netlify.app](https://codesageacademy.netlify.app)  
+> Author: **Zain Rao**
 
 ---
 
-## 🚀 Overview
+## 🌟 Overview
 
-CodeSage Academy is a high-performance web platform designed to deliver interactive programming courses, real-time code sandboxes, and student progress tracking. Built from scratch with an emphasis on speed, sub-100ms database queries, and airtight authorization.
+CodeSage Academy is an interactive coding education platform designed to take students from absolute zero to production-level proficiency. Built with a focus on zero-cost student accessibility and client-side performance, CodeSage delivers gamified learning, in-browser compilation and execution, and industry-standard Data Structures & Algorithms (DSA) preparation.
 
-- **Active Students:** 3,000+ registered users
-- **Database Architecture:** Supabase (PostgreSQL) with 30+ custom RPC functions
-- **Security Posture:** 59-point black-box penetration assessment completed and verified
-
----
-
-## 🛠️ Tech Stack & Architecture
-
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons
-- **Backend & Database:** Supabase (PostgreSQL), Custom PL/pgSQL RPC Stored Procedures
-- **Authentication & Authorization:** Row-Level Security (RLS) policies, JWT session management
-- **AI Integrations:** Server-side proxy API routes for automated student feedback
+### 🚀 Key Engineering Highlights
+- **In-Browser WebAssembly Execution**: Interactive SQL playground powered by `sql.js` (WebAssembly SQLite) running client-side with zero server latency.
+- **Monaco Code Editor**: Full-featured code editor with syntax highlighting, auto-completion, and live error diagnostic overlays.
+- **Duolingo-Style Gamified Progression**: Sequential lesson unlocking, daily streak tracking with streak freeze mechanics, Sage Coins economy, and level exit tests.
+- **19+ Learning Tracks**: Comprehensive curricula spanning C, C++, Java, Python, Web Development, SQL, AI/ML Engineering, and Computer Networking.
+- **Audio & Haptic Feedback Engine**: In-browser Web Audio API synthesis delivering low-latency celebratory audio without heavy asset downloads.
+- **Progressive Web App (PWA)**: Offline-first caching with installability on Android, iOS, and Desktop.
+- **59-Point Security hardening**: Audited across 59 black-box attack vectors. Enforced airtight Row-Level Security (RLS) tenant isolation, patched atomic race conditions in credit detection, and configured strict security headers.
+- **3000+ Active Students**: Scaled to support an active community of 3000+ learnerswith sub-100ms client interactions. 
 
 ---
 
-## 🛡️ Security Audit & Hardening (59-Point Assessment)
+## 🛠️ Tech Stack
 
-This codebase underwent a rigorous 59-point security audit covering:
-1. **Row-Level Security (RLS) Enforcement:** Verified tenant isolation so students cannot query or modify peer records.
-2. **Atomic Credit Transactions:** Patched race conditions and negative integer edge cases in credit consumption via `deduct_user_ai_credits` RPC.
-3. **HTTP Security Headers:** Strict Content Security Policy (CSP), anti-clickjacking (`X-Frame-Options: DENY`), and strict HTTPS transport.
-4. **Input Sanitization & Injection Defense:** Parameterized SQL queries and sanitized user inputs across all interactive playground routes.
+- **Frontend Core**: React 18, TypeScript, Vite
+- **Styling & UI**: Tailwind CSS, Radix UI Primitives, Lucide Icons, Canvas Confetti
+- **Code Editor**: `@monaco-editor/react` (VS Code engine)
+- **In-Browser Runtimes**: SQLite via WebAssembly (`sql.js`)
+- **Backend & Auth**: PostgreSQL, Row Level Security (RLS), Edge Functions, Webhook Integrations
+- **Audio Engine**: Native HTML5 Web Audio API Synthesizer
 
 ---
 
-## 💻 Local Development
+## 📂 Project Structure
 
+```text
+├── public/                 # Static assets, WebAssembly binaries, icons
+├── src/
+│   ├── components/         # Reusable UI widgets, modals, navigation, editors
+│   ├── config/             # App & monetization configuration
+│   ├── data/               # Static course lesson registries and DSA sheet data
+│   │   └── dsa/            # 4-language solution implementations (Py, JS, C++, Java)
+│   ├── hooks/              # Custom React hooks (auth, streak, sounds)
+│   ├── lib/                # Audio synthesizer, storage utilities, theme definitions
+│   └── pages/              # Core application views (Dashboard, Learn, Labs, Tests)
+├── netlify.toml            # SPA routing rules & static cache headers
+└── DOCS.md                 # Curriculum maintenance & track creation handbook
+```
+
+---
+
+## ⚡ Getting Started
+
+### Prerequisites
+- Node.js (>= 20)
+- npm or bun
+
+### Local Setup
 ```bash
 # Clone the repository
-git clone https://github.com/Zainrao9246/CodeSage-Academy.git
+git clone https://github.com/Zainrao9246/build-learn-bloom.git
+cd build-learn-bloom
 
 # Install dependencies
 npm install
 
-# Start development server
+# Start local development server
 npm run dev
+```
+
+### Build for Production
+```bash
+npm run build
+```
+
+---
+
+## 👨‍💻 Author
+
+**Zain Rao**  
+- **Role**: Creator & Full-Stack Engineer  
+- **Project**: CodeSage Academy  
+- **Website**: [codesageacademy.netlify.app](https://codesageacademy.netlify.app)
+
+---
+
+## 📄 License
+
+This project is proprietary and developed by Zain Rao for CodeSage Academy. All rights reserved.
