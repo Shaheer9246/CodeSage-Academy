@@ -84,24 +84,13 @@ const TABS = [
 const formatBadgeName = (id: string) =>
   id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-export const normalizeGoalValue = (raw?: string): string => {
-  if (!raw) return 'all';
-  const val = raw.toLowerCase().trim();
-  if (val.includes('cyber') || val.includes('hack') || val.includes('security')) return 'cyber';
-  if (val.includes('front') || val.includes('web') || val.includes('full')) return 'frontend';
-  if (val.includes('ai') || val.includes('machine') || val.includes('ml')) return 'ai';
-  if (val.includes('python')) return 'python';
-  if (val.includes('system') || val.includes('c++') || val.includes('core')) return 'systems';
-  return 'all';
-};
+import {
+  normalizeGoalValue,
+  normalizeExperienceValue,
+  syncGoalWithDashboard,
+} from '@/lib/goalHelper';
 
-export const normalizeExperienceValue = (raw?: string): string => {
-  if (!raw) return 'Beginner';
-  const val = raw.toLowerCase().trim();
-  if (val.includes('experience') || val.includes('advanced') || val.includes('expert')) return 'Advanced';
-  if (val.includes('cs') || val.includes('student') || val.includes('intermediate') || val.includes('self')) return 'Intermediate';
-  return 'Beginner';
-};
+export { normalizeGoalValue, normalizeExperienceValue };
 
 const formatGoal = (goalId?: string) => {
   const normalized = normalizeGoalValue(goalId);
@@ -1028,9 +1017,7 @@ const SettingsPage = () => {
                       goal: editData.goal,
                       experienceLevel: editData.experienceLevel,
                     });
-                    try {
-                      localStorage.setItem('codesage_selected_goal_' + user.id, editData.goal);
-                    } catch {}
+                    syncGoalWithDashboard(editData.goal, user.id);
                   }
                   toast.success('Profile updated successfully!');
                   setShowEditModal(false);
