@@ -122,6 +122,21 @@ const formatGoal = (goalId?: string) => {
   }
 };
 
+const GOAL_OPTIONS = [
+  { id: 'cyber', label: 'Cyber Security Specialist', badge: 'New', desc: 'Linux, Networking, Burp Suite & Defensive Ops' },
+  { id: 'frontend', label: 'Modern Full-Stack & Web', desc: 'HTML, CSS, JavaScript, React & Production APIs' },
+  { id: 'ai', label: 'AI & Machine Learning Engineer', badge: 'Trending', desc: 'Neural Nets, LLMs & Autonomous Agents' },
+  { id: 'python', label: 'Python Software Engineer', desc: 'Python Core, OOP & Backend APIs' },
+  { id: 'systems', label: 'Systems & Core Programming', desc: 'C, C++, Memory, Relational SQL & Networks' },
+  { id: 'all', label: 'All-Round Explorer', desc: 'All 20 tracks across every language & tool' },
+] as const;
+
+const EXPERIENCE_OPTIONS = [
+  { id: 'Beginner', label: 'Beginner', desc: 'Starting from scratch / basics' },
+  { id: 'Intermediate', label: 'Intermediate', desc: 'CS student / self-taught coder' },
+  { id: 'Advanced', label: 'Advanced', desc: 'Mastering new stacks & architectures' },
+] as const;
+
 const SettingsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -144,6 +159,8 @@ const SettingsPage = () => {
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   const [, setEnrollTick] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [goalDropdownOpen, setGoalDropdownOpen] = useState(false);
+  const [expDropdownOpen, setExpDropdownOpen] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [editData, setEditData] = useState({ name: '', studying: '', goal: '', experienceLevel: '' });
 
@@ -830,64 +847,200 @@ const SettingsPage = () => {
         )}
 
         {showEditModal && user && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setShowEditModal(false)}>
-            <div className="glass-card w-full max-w-md rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2"><Pencil className="w-4 h-4 text-primary" /> Edit Profile</h3>
-                <button onClick={() => setShowEditModal(false)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4"
+            onClick={() => {
+              setShowEditModal(false);
+              setGoalDropdownOpen(false);
+              setExpDropdownOpen(false);
+            }}
+          >
+            <div
+              className="glass-card w-full max-w-md rounded-2xl p-5 sm:p-6 space-y-4 border border-primary/30 shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between pb-2 border-b border-border/40">
+                <h3 className="text-sm sm:text-base font-display font-bold text-foreground flex items-center gap-2">
+                  <Pencil className="w-4 h-4 text-primary" /> Edit Profile
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setGoalDropdownOpen(false);
+                    setExpDropdownOpen(false);
+                  }}
+                  className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-secondary/40 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <div className="space-y-3">
-                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Name</label><input type="text" value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
-                <div><label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Studying</label><input type="text" value={editData.studying} onChange={e => setEditData({ ...editData, studying: e.target.value })} className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50" /></div>
+
+              <div className="space-y-3.5">
                 <div>
-                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Goal</label>
-                  <div className="relative">
-                    <select
-                      value={editData.goal}
-                      onChange={e => setEditData({ ...editData, goal: e.target.value })}
-                      className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 pr-9 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none cursor-pointer"
-                    >
-                      <option value="cyber">Cyber Security Specialist (New)</option>
-                      <option value="frontend">Modern Full-Stack & Web</option>
-                      <option value="ai">AI & Machine Learning Engineer</option>
-                      <option value="python">Python Software Engineer</option>
-                      <option value="systems">Systems & Core Programming</option>
-                      <option value="all">All-Round Explorer (All Tracks)</option>
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block font-mono">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.name}
+                    onChange={e => setEditData({ ...editData, name: e.target.value })}
+                    className="w-full bg-secondary/30 border border-border/50 rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all font-sans"
+                    placeholder="Enter your name"
+                  />
                 </div>
+
                 <div>
-                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Experience</label>
-                  <div className="relative">
-                    <select
-                      value={editData.experienceLevel}
-                      onChange={e => setEditData({ ...editData, experienceLevel: e.target.value })}
-                      className="w-full bg-secondary/20 border border-border/30 rounded-lg px-3 py-2 pr-9 text-sm text-foreground focus:outline-none focus:border-primary/50 appearance-none cursor-pointer"
-                    >
-                      <option value="Beginner">Beginner (Starting from scratch / basics)</option>
-                      <option value="Intermediate">Intermediate (CS student / self-taught coder)</option>
-                      <option value="Advanced">Advanced / Experienced (Mastering new stacks)</option>
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block font-mono">
+                    Current Stage / Studying
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.studying}
+                    onChange={e => setEditData({ ...editData, studying: e.target.value })}
+                    className="w-full bg-secondary/30 border border-border/50 rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all font-sans"
+                    placeholder="e.g. CS Student, Self-Taught Developer"
+                  />
+                </div>
+
+                {/* Custom Goal Dropdown */}
+                <div className="relative">
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block font-mono">
+                    Engineering Goal
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGoalDropdownOpen(!goalDropdownOpen);
+                      setExpDropdownOpen(false);
+                    }}
+                    className={`w-full bg-secondary/30 hover:bg-secondary/50 border rounded-xl px-3.5 py-2.5 text-sm text-foreground flex items-center justify-between transition-all focus:outline-none focus:ring-1 focus:ring-primary/40 ${
+                      goalDropdownOpen ? 'border-primary shadow-[0_0_15px_hsl(145,90%,55%,0.15)] ring-1 ring-primary/40' : 'border-border/50 hover:border-primary/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-semibold text-foreground truncate">
+                        {GOAL_OPTIONS.find(g => g.id === editData.goal)?.label || 'All-Round Explorer'}
+                      </span>
+                      {GOAL_OPTIONS.find(g => g.id === editData.goal)?.badge && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-primary/20 text-primary border border-primary/30 shrink-0">
+                          {GOAL_OPTIONS.find(g => g.id === editData.goal)?.badge}
+                        </span>
+                      )}
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0 ${goalDropdownOpen ? 'rotate-180 text-primary' : ''}`} />
+                  </button>
+
+                  {goalDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1.5 z-40 p-1.5 rounded-xl bg-card border border-primary/40 shadow-[0_12px_40px_rgba(0,0,0,0.7)] backdrop-blur-2xl max-h-56 overflow-y-auto space-y-1">
+                      {GOAL_OPTIONS.map(opt => {
+                        const isSelected = editData.goal === opt.id;
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              setEditData(prev => ({ ...prev, goal: opt.id }));
+                              setGoalDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition-all ${
+                              isSelected
+                                ? 'bg-primary/15 text-primary border border-primary/30 shadow-sm'
+                                : 'hover:bg-secondary/70 text-foreground border border-transparent'
+                            }`}
+                          >
+                            <div className="min-w-0 pr-2">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-semibold">{opt.label}</span>
+                                {opt.badge && (
+                                  <span className="px-1 py-0.2 text-[8px] font-mono font-bold rounded bg-primary/20 text-primary">
+                                    {opt.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-muted-foreground truncate mt-0.5">{opt.desc}</p>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Custom Experience Dropdown */}
+                <div className="relative">
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block font-mono">
+                    Experience Level
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExpDropdownOpen(!expDropdownOpen);
+                      setGoalDropdownOpen(false);
+                    }}
+                    className={`w-full bg-secondary/30 hover:bg-secondary/50 border rounded-xl px-3.5 py-2.5 text-sm text-foreground flex items-center justify-between transition-all focus:outline-none focus:ring-1 focus:ring-primary/40 ${
+                      expDropdownOpen ? 'border-primary shadow-[0_0_15px_hsl(145,90%,55%,0.15)] ring-1 ring-primary/40' : 'border-border/50 hover:border-primary/40'
+                    }`}
+                  >
+                    <span className="font-semibold text-foreground truncate">
+                      {EXPERIENCE_OPTIONS.find(e => e.id === editData.experienceLevel)?.label || 'Beginner'}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0 ${expDropdownOpen ? 'rotate-180 text-primary' : ''}`} />
+                  </button>
+
+                  {expDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1.5 z-40 p-1.5 rounded-xl bg-card border border-primary/40 shadow-[0_12px_40px_rgba(0,0,0,0.7)] backdrop-blur-2xl space-y-1">
+                      {EXPERIENCE_OPTIONS.map(opt => {
+                        const isSelected = editData.experienceLevel === opt.id;
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              setEditData(prev => ({ ...prev, experienceLevel: opt.id }));
+                              setExpDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition-all ${
+                              isSelected
+                                ? 'bg-primary/15 text-primary border border-primary/30 shadow-sm'
+                                : 'hover:bg-secondary/70 text-foreground border border-transparent'
+                            }`}
+                          >
+                            <div className="min-w-0 pr-2">
+                              <span className="text-xs font-semibold">{opt.label}</span>
+                              <p className="text-[10px] text-muted-foreground truncate mt-0.5">{opt.desc}</p>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
-              <button onClick={() => {
-                if (user) {
-                  updateUser({
-                    name: editData.name,
-                    studying: editData.studying,
-                    goal: editData.goal,
-                    experienceLevel: editData.experienceLevel,
-                  });
-                  try {
-                    localStorage.setItem('codesage_selected_goal_' + user.id, editData.goal);
-                  } catch {}
-                }
-                toast.success('Profile updated successfully!');
-                setShowEditModal(false);
-              }} className="w-full bg-primary text-primary-foreground font-semibold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm">Save Changes</button>
+
+              <button
+                onClick={() => {
+                  if (user) {
+                    updateUser({
+                      name: editData.name,
+                      studying: editData.studying,
+                      goal: editData.goal,
+                      experienceLevel: editData.experienceLevel,
+                    });
+                    try {
+                      localStorage.setItem('codesage_selected_goal_' + user.id, editData.goal);
+                    } catch {}
+                  }
+                  toast.success('Profile updated successfully!');
+                  setShowEditModal(false);
+                  setGoalDropdownOpen(false);
+                  setExpDropdownOpen(false);
+                }}
+                className="w-full bg-primary text-primary-foreground font-bold rounded-xl py-2.5 mt-2 hover:opacity-90 transition-opacity text-sm shadow-[0_0_20px_hsl(145,90%,55%,0.2)]"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         )}
