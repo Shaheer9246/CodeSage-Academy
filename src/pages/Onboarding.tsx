@@ -6,6 +6,7 @@ import {
   Terminal, Globe, Sparkles, Code2, Cpu, Compass,
   GraduationCap, Laptop, Briefcase, Rocket, Clock, Zap, Flame, ShieldAlert
 } from 'lucide-react';
+import { syncGoalWithDashboard } from '@/lib/goalHelper';
 
 interface StepDef {
   key: string;
@@ -170,7 +171,7 @@ const Onboarding = () => {
       // Save tour preference and chosen goal locally
       try {
         localStorage.setItem(`codesage_tour_seen_${user.id}`, wantTour ? 'false' : 'true');
-        localStorage.setItem(`codesage_selected_goal_${user.id}`, chosenGoal);
+        syncGoalWithDashboard(chosenGoal, user.id);
       } catch {}
 
       await completeOnboarding({
