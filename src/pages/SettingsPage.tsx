@@ -188,7 +188,9 @@ const SettingsPage = () => {
   const handleReplayTour = async () => {
     try {
       localStorage.setItem(`codesage_tour_seen_${user?.id}`, 'false');
-    } catch {}
+    } catch (_e) {
+      // ignore localStorage errors in private browsing
+    }
     await resetTour();
     toast.success('Tour reset! Launching dashboard...');
     navigate('/dashboard');
