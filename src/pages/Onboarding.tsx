@@ -4,7 +4,7 @@ import { useUser } from '@/contexts/UserContext';
 import { 
   ChevronLeft, ChevronRight, CheckCircle2, ArrowRight,
   Terminal, Globe, Sparkles, Code2, Cpu, Compass,
-  GraduationCap, Laptop, Briefcase, Rocket, Clock, Zap, Flame
+  GraduationCap, Laptop, Briefcase, Rocket, Clock, Zap, Flame, ShieldAlert
 } from 'lucide-react';
 
 interface StepDef {
@@ -62,6 +62,14 @@ const steps: StepDef[] = [
 ];
 
 const CAREER_GOALS = [
+  {
+    id: 'cyber',
+    title: 'Cyber Security Specialist',
+    desc: 'Linux, Networking, OWASP, Cryptography, Burp Suite, and Defensive Ops',
+    icon: <ShieldAlert className="w-6 h-6 text-red-400" />,
+    badge: 'New Track',
+    accent: 'border-red-500/30 hover:border-red-500/60 bg-red-500/5',
+  },
   {
     id: 'frontend',
     title: 'Modern Full-Stack & Web',
