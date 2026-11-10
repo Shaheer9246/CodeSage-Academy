@@ -11,6 +11,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2, Terminal } from "lucide-react";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import RouteSEO from "@/components/RouteSEO";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { TrackPageSkeleton } from "@/components/skeletons/TrackPageSkeleton";
 
 // Route-Level Code Splitting via React.lazy() for minimal initial bundle & fast TTI
 const Auth = React.lazy(() => import("./pages/Auth"));
@@ -91,23 +93,24 @@ const queryClient = new QueryClient({
   },
 });
 
-function RouteLoadingSpinner() {
-  return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center p-4 relative">
-      {/* Top micro loading shimmer */}
-      <div className="fixed top-0 left-0 right-0 h-1 bg-primary/10 overflow-hidden z-50">
-        <div className="h-full w-1/3 bg-primary animate-[shimmer_1.5s_infinite] rounded-full" />
-      </div>
+function RouteLoadingFallback() {
+  const path = typeof window !== "undefined" ? window.location.pathname : "";
+  const isCourseTrack =
+    path.startsWith("/c") ||
+    path.startsWith("/cpp") ||
+    path.startsWith("/cyber") ||
+    path.startsWith("/python") ||
+    path.startsWith("/java") ||
+    path.startsWith("/learn") ||
+    path.startsWith("/sql") ||
+    path.startsWith("/networking") ||
+    path.startsWith("/dsa-sheet");
 
-      <div className="text-center animate-fade-in bg-[#1a1a2e]/90 border border-primary/20 backdrop-blur-xl px-8 py-6 rounded-2xl shadow-xl shadow-black/40">
-        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 border border-primary/25">
-          <Terminal className="w-6 h-6 text-primary animate-pulse" />
-        </div>
-        <p className="text-sm font-semibold text-foreground">Loading CodeSage...</p>
-        <p className="text-xs text-muted-foreground mt-1">Preparing your workspace</p>
-      </div>
-    </div>
-  );
+  if (isCourseTrack) {
+    return <TrackPageSkeleton />;
+  }
+
+  return <DashboardSkeleton />;
 }
 
 function LoadingScreen() {
@@ -218,7 +221,7 @@ const App = () => {
             <ErrorBoundary>
               <AppShell>
                 <LessonSponsorGate>
-                  <React.Suspense fallback={<RouteLoadingSpinner />}>
+                  <React.Suspense fallback={<RouteLoadingFallback />}>
                     <Routes>
                   <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
