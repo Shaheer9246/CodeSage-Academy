@@ -93,13 +93,18 @@ const queryClient = new QueryClient({
 
 function RouteLoadingSpinner() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="text-center animate-fade-in bg-[#1a1a2e]/90 border border-primary/20 backdrop-blur-xl px-6 py-5 rounded-2xl shadow-xl shadow-black/40">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center p-4 relative">
+      {/* Top micro loading shimmer */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-primary/10 overflow-hidden z-50">
+        <div className="h-full w-1/3 bg-primary animate-[shimmer_1.5s_infinite] rounded-full" />
+      </div>
+
+      <div className="text-center animate-fade-in bg-[#1a1a2e]/90 border border-primary/20 backdrop-blur-xl px-8 py-6 rounded-2xl shadow-xl shadow-black/40">
         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 border border-primary/25">
-          <Terminal className="w-6 h-6 text-primary" />
+          <Terminal className="w-6 h-6 text-primary animate-pulse" />
         </div>
-        <Loader2 className="w-4 h-4 text-primary animate-spin mx-auto mb-2" />
-        <p className="text-muted-foreground text-xs font-mono">Loading module...</p>
+        <p className="text-sm font-semibold text-foreground">Loading CodeSage...</p>
+        <p className="text-xs text-muted-foreground mt-1">Preparing your workspace</p>
       </div>
     </div>
   );
