@@ -23,6 +23,7 @@ import { completedCountFor, lessonCountFor, getNextLessonForTrack, getLessonDeta
 import DailyProblemCard from '@/components/DailyProblemCard';
 import ShareAchievementModal, { ShareAchievementType } from '@/components/ShareAchievementModal';
 import { checkAndTriggerStreakReminder, autoEnableStreakReminder } from '@/lib/streakNotifications';
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import {
   type DashboardCategory,
   GOAL_MAP,
@@ -324,7 +325,7 @@ const Dashboard = () => {
     return () => clearTimeout(t);
   }, [showTour]);
 
-  if (loading) return null;
+  if (loading) return <DashboardSkeleton />;
   if (!user && !isGuest) return <Navigate to="/auth" replace />;
   if (user && !user.isOnboarded && !isGuest) return <Navigate to="/onboarding" replace />;
 
